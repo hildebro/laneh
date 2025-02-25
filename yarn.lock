@@ -3154,6 +3154,11 @@ lodash.once@^4.0.0:
   resolved "https://registry.yarnpkg.com/@wolfy1339/lru-cache/-/lru-cache-11.0.2-patch.1.tgz#bb648b660478099c9022ee71a00b80603daf7294"
   integrity sha512-BgYZfL2ADCXKOw2wJtkM3slhHotawWkgIRRxq4wEybnZQPjvAp71SPX35xepMykTw8gXlzWcWPTY31hlbnRsDA==
 
+lucide-svelte@^0.476.0:
+  version "0.476.0"
+  resolved "https://registry.yarnpkg.com/lucide-svelte/-/lucide-svelte-0.476.0.tgz#2d39ce396906675410c3d2da483ab5e7c15dd2e8"
+  integrity sha512-Ph6zoMWjQVJibDrR+DJoT7LR2uEKLPzzGo886OLRk+nCJZESJUvoCWXk0uE6Y9aaamaSFAdI1Cpwslgzk3YYdQ==
+
 magic-string@^0.30.11, magic-string@^0.30.15, magic-string@^0.30.3, magic-string@^0.30.5:
   version "0.30.17"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.17.tgz#450a449673d2460e5bbcfba9a61916a1714c7453"
