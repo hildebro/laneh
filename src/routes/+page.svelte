@@ -3,10 +3,10 @@
 </script>
 
 <div class="flex flex-col gap-4">
-	<button class="btn preset-filled-primary-800-200">
+	<a class="btn preset-filled-primary-800-200" href="/shopping">
 		<ShoppingCart />
 		Shopping
-	</button>
+	</a>
 	<button class="btn preset-filled-primary-800-200">
 		<CalendarDays />
 		Schedule
