@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
-	import type { PageServerData } from './$types';
-	import type { Snippet } from 'svelte';
 
-	let { children, data }: { children: Snippet, data: PageServerData } = $props();
+	let { children, data } = $props();
 </script>
 
 <div class="h-screen grid grid-rows-[auto_1fr_auto]">

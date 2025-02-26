@@ -1,4 +1,4 @@
-import type { Actions } from '../../../.svelte-kit/types/src/routes/login/$types';
+import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth.js';
 
