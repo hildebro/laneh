@@ -1,12 +1,8 @@
 <script lang="ts">
 	let { data } = $props();
-	let categoryName = $state('');
 
-	$effect(() => {
-		if (data.category) {
-			categoryName = data.category.name;
-		}
-	});
+  // Initialize form state directly from props
+  let categoryName = $state(data.category?.name || '');
 </script>
 
 <h1>{data.category ? 'Edit Category' : 'Add New Category'}</h1>
@@ -19,5 +15,6 @@
 		bind:value={categoryName}
 		required
 	/>
+	<input type="hidden" name="categoryId" value={data.category?.id}>
 	<button type="submit">{data.category ? 'Update' : 'Create'}</button>
 </form>
