@@ -4,11 +4,11 @@ export const user = pgTable('user', {
     id: text('id').primaryKey(),
     username: text('username').notNull().unique(),
 });
+export type User = typeof user.$inferSelect;
 
 export const shoppingCategory = pgTable('shopping_category', {
     id: text('id').primaryKey(),
     name: text('name').notNull(),
     priority: integer('priority').unique(),
 });
-
-export type User = typeof user.$inferSelect;
+export type ShoppingCategory = typeof shoppingCategory.$inferSelect;
