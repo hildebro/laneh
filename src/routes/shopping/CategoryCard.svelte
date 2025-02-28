@@ -1,5 +1,4 @@
 <script lang="ts">
-
 	let { category } = $props();
 </script>
 
@@ -9,4 +8,8 @@
 		{category.name}
 		<a href="/shopping/{category.id}" class="btn border">Edit</a>
 	</div>
+	<!-- Item list -->
+	{#each category.shoppingItems as item}
+		{item.name}
+	{/each}
 </div>
