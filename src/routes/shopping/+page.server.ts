@@ -4,6 +4,6 @@ import { db } from '$lib/server/db';
 
 export const load: PageServerLoad = async (event) => {
 	return {
-		categories: db.select().from(table.shoppingCategory)
+		categories: db.select().from(table.shoppingCategory).orderBy(table.shoppingCategory.priority)
 	};
 };
