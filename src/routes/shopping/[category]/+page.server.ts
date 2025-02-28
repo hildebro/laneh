@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const [category] = await db
 		.select()
 		.from(shoppingCategory)
-		.where(eq(shoppingCategory.name, params.category))
+		.where(eq(shoppingCategory.id, params.category))
 		.limit(1);
 
 	if (!category) throw error(404, 'Category not found');
@@ -41,7 +41,7 @@ export const actions: Actions = {
 					.from(table.shoppingCategory))
 					.at(0);
 
-				const nextPriority = maxPriority?.value ? maxPriority.value + 1 : 0;
+				const nextPriority = typeof maxPriority?.value === "number" ? maxPriority.value + 1 : 0;
 				await db.insert(table.shoppingCategory).values({ id: generateCategoryId(), name: name, priority: nextPriority });
 			}
 		} catch (e) {
