@@ -1,28 +1,23 @@
 import type { PageServerLoad } from './$types';
 import { type Actions, fail, redirect } from '@sveltejs/kit';
-import * as table from '$lib/server/db/schema';
-import { db } from '$lib/server/db';
-import { eq } from 'drizzle-orm';
 import { USER_COOKIE } from '$lib';
+import { findAllUsers, findUser } from '$lib/server/db/functions';
 
-export const load: PageServerLoad = async (event) => {
+export const load: PageServerLoad = async () => {
 	return {
-		users: db
-			.select()
-			.from(table.user)
+		users: findAllUsers()
 	};
 };
 
 export const actions: Actions = {
 	select: async (event) => {
 		const formData = await event.request.formData();
-		const id = formData.get('userId')?.toString();
-		if (!id) {
+		const userid = formData.get('userId')?.toString();
+		if (!userid) {
 			return;
 		}
 
-		const results = await db.select().from(table.user).where(eq(table.user.id, id));
-		const user = results.at(0);
+		const user = await findUser(userid);
 		if (!user) {
 			return fail(400, { message: 'User does not exist.' });
 		}

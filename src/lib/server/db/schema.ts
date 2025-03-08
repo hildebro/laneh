@@ -1,4 +1,4 @@
-import { integer, pgTable, text } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, unique } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const user = pgTable('user', {
@@ -22,8 +22,10 @@ export const shoppingItem = pgTable('shopping_item', {
     id: text().primaryKey(),
     categoryId: text().references(() => shoppingCategory.id),
     name: text().notNull().unique(),
-    priority: integer().notNull().unique(),
-});
+    priority: integer().notNull(),
+}, (shoppingItem) => [
+	unique().on(shoppingItem.categoryId, shoppingItem.priority),
+]);
 export type ShoppingItem = typeof shoppingItem.$inferSelect;
 
 export const shoppingItemRelations = relations(shoppingItem, ({ one }) => ({

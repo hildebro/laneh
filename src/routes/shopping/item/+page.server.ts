@@ -1,9 +1,7 @@
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { max } from 'drizzle-orm';
-import * as table from '$lib/server/db/schema';
 import { fail, redirect } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { addShoppingItem } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async (event) => {
 	return {};
@@ -11,12 +9,6 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
 	create: async ({ request }) => {
-		const maxPriority = (await db
-			.select({ value: max(table.shoppingItem.priority) })
-			.from(table.shoppingItem))
-			.at(0);
-		const nextPriority = typeof maxPriority?.value === 'number' ? maxPriority.value + 1 : 0;
-
 		const data = await request.formData();
 		let categoryId = data.get('categoryId')?.toString();
 		let name = data.get('name')?.toString();
@@ -24,12 +16,7 @@ export const actions = {
 			return fail(400, { message: 'Missing data' });
 		}
 
-		await db.insert(table.shoppingItem).values({
-			id: generateItemId(),
-			categoryId: categoryId,
-			name: name,
-			priority: nextPriority
-		});
+		await addShoppingItem(categoryId, name);
 
 		return redirect(302, '/shopping');
 	}
