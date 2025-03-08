@@ -1,7 +1,7 @@
 <script>
-	import { enhance } from '$app/forms';
+  import { enhance } from '$app/forms';
 
-	export let form;
+  export let form;
 </script>
 
 <div class="flex justify-center items-center h-full bg-surface-100">

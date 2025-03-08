@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Avatar } from '@skeletonlabs/skeleton-svelte';
+  import { Avatar } from '@skeletonlabs/skeleton-svelte';
 
-	let { user } = $props();
+  let { user } = $props();
 </script>
 <header class="preset-filled-primary-800-200 p-4 flex items-center justify-between">
 	<div class="flex items-center gap-1">

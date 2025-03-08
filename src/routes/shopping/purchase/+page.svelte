@@ -1,8 +1,8 @@
 <script lang="ts">
-	import PurchaseCategoryCard from './PurchaseCategoryCard.svelte';
-	import { enhance } from '$app/forms';
+  import PurchaseCategoryCard from './PurchaseCategoryCard.svelte';
+  import { enhance } from '$app/forms';
 
-	let { data } = $props();
+  let { data } = $props();
 </script>
 
 {#await data.categories}

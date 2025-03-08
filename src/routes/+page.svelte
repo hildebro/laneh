@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CalendarDays, ShoppingCart, Star } from 'lucide-svelte';
+  import { CalendarDays, ShoppingCart, Star } from 'lucide-svelte';
 </script>
 
 <div class="flex flex-col gap-4">

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+  import { enhance } from '$app/forms';
 
-	let { data } = $props();
+  let { data } = $props();
 
   // Initialize form state directly from props
   let categoryName = $state(data.category?.name || '');
