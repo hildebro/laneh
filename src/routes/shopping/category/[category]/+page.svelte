@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+
 	let { data } = $props();
 
   // Initialize form state directly from props
@@ -7,7 +9,7 @@
 
 <h1>{data.category ? 'Edit Category' : 'Add New Category'}</h1>
 
-<form method="POST">
+<form method="POST" use:enhance>
 	<input
 		type="text"
 		name="name"

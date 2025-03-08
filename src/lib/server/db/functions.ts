@@ -1,7 +1,7 @@
 import * as table from '$lib/server/db/schema';
 import { shoppingCategory, type ShoppingCategory, shoppingItem, type User } from '$lib/server/db/schema';
 import { db } from '$lib/server/db/index';
-import { asc, eq, max } from 'drizzle-orm';
+import { asc, eq, inArray, max } from 'drizzle-orm';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 
 // ------- USER RELATED -------
@@ -74,6 +74,10 @@ export const addShoppingItem = async (categoryId: string, name: string): Promise
 		name: name,
 		priority: nextPriority
 	});
+};
+
+export const removeShoppingItems = async (itemIds: string[]): Promise<void> => {
+	await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds)).execute()
 };
 
 // ------- GENERIC -------

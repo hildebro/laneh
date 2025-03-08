@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+
 	let { category } = $props();
 </script>
 
@@ -13,7 +15,7 @@
 		{#each category.shoppingItems as item}
 			- {item.name}<br/>
 		{/each}
-		<form method="POST" action="/shopping/item?/create">
+		<form method="POST" action="/shopping/item?/create" use:enhance>
 			<input type="hidden" name="categoryId" value={category.id}>
 			<input class="preset-filled-secondary-50-950" type="text" name="name" />
 		</form>
