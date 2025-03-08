@@ -1,8 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
 import type { Actions } from './$types';
-import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { addUser } from '$lib/server/db/functions';
 
 export const actions: Actions = {
 	default: async (event) => {
@@ -13,15 +11,13 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid username' });
 		}
 
-		const userId = generateUserId();
-
 		try {
-			await db.insert(table.user).values({ id: userId, username  });
+			await addUser(username);
 		} catch (e) {
 			return fail(500, { message: 'An error has occurred' });
 		}
 		return redirect(302, '/users');
-	},
+	}
 };
 
 function validateUsername(username: unknown): username is string {
@@ -31,10 +27,4 @@ function validateUsername(username: unknown): username is string {
 		username.length <= 31 &&
 		/^[a-z0-9_-]+$/.test(username)
 	);
-}
-
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	return encodeBase32LowerCase(bytes);
 }

@@ -1,12 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
+import { findAllShoppingCategories } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async (event) => {
 	return {
-		categories: db.query.shoppingCategory.findMany({
-			with: {
-				shoppingItems: true
-			}
-		})
+		categories: findAllShoppingCategories()
 	};
 };

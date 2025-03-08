@@ -2,9 +2,7 @@ import { sequence } from '@sveltejs/kit/hooks';
 import { i18n } from '$lib/i18n';
 import type { Handle } from '@sveltejs/kit';
 import { USER_COOKIE } from '$lib';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { findUser } from '$lib/server/db/functions';
 
 const handleUser: Handle = async ({ event, resolve }) => {
 	const userCookie = event.cookies.get(USER_COOKIE);
@@ -14,15 +12,7 @@ const handleUser: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	const result = await db.select().from(table.user).where(eq(table.user.id, userCookie))
-	const user = result.at(0);
-	if (!user) {
-		event.locals.user = undefined;
-
-		return resolve(event);
-	}
-
-	event.locals.user = user;
+	event.locals.user = await findUser(userCookie);
 
 	return resolve(event);
 };
