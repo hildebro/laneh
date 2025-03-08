@@ -1,7 +1,7 @@
 import * as table from '$lib/server/db/schema';
-import { type ShoppingCategory, type User } from '$lib/server/db/schema';
+import { shoppingCategory, type ShoppingCategory, shoppingItem, type User } from '$lib/server/db/schema';
 import { db } from '$lib/server/db/index';
-import { eq, max } from 'drizzle-orm';
+import { asc, eq, max } from 'drizzle-orm';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 
 // ------- USER RELATED -------
@@ -32,8 +32,11 @@ export const findShoppingCategory = async (categoryId: string): Promise<Shopping
 export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> => {
 	return db.query.shoppingCategory.findMany({
 		with: {
-			shoppingItems: true
-		}
+			shoppingItems: {
+				orderBy: [asc(shoppingItem.priority)]
+			}
+		},
+		orderBy: [asc(shoppingCategory.priority)]
 	}).execute();
 };
 
