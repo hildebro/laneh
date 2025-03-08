@@ -6,7 +6,7 @@
 	<!-- Header -->
 	<div class="flex justify-between p-2">
 		{category.name}
-		<a href="/shopping/{category.id}" class="btn border">Edit</a>
+		<a href="/shopping/category/{category.id}" class="btn border">Edit</a>
 	</div>
 	<!-- Item list -->
 	<div class="p-2">
