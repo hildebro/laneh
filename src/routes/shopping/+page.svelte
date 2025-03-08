@@ -1,7 +1,7 @@
 <script lang="ts">
-	import CategoryCard from './CategoryCard.svelte';
+  import CategoryCard from './CategoryCard.svelte';
 
-	let { data } = $props();
+  let { data } = $props();
 </script>
 
 {#await data.categories}

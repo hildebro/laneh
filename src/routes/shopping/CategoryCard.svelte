@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+  import { enhance } from '$app/forms';
 
-	let { category } = $props();
+  let { category } = $props();
 </script>
 
 <div class="card preset-filled-secondary-100-900 w-full">
@@ -13,7 +13,7 @@
 	<!-- Item list -->
 	<div class="p-2">
 		{#each category.shoppingItems as item}
-			- {item.name}<br/>
+			- {item.name}<br />
 		{/each}
 		<form method="POST" action="/shopping/item?/create" use:enhance>
 			<input type="hidden" name="categoryId" value={category.id}>

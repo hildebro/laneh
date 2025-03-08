@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { category } = $props();
+  let { category } = $props();
 </script>
 
 {#if category.shoppingItems.length > 0 }

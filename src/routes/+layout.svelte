@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { i18n } from '$lib/i18n';
-	import { ParaglideJS } from '@inlang/paraglide-sveltekit';
-	import '../app.css';
-	import AppHeader from './AppHeader.svelte';
+  import { i18n } from '$lib/i18n';
+  import { ParaglideJS } from '@inlang/paraglide-sveltekit';
+  import '../app.css';
+  import AppHeader from './AppHeader.svelte';
 
-	let { children, data } = $props();
+  let { children, data } = $props();
 </script>
 
 <ParaglideJS {i18n}>
