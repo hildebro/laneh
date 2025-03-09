@@ -3,21 +3,15 @@
 </script>
 
 {#if category.shoppingItems.length > 0 }
-	<div class="card preset-filled-secondary-100-900 w-full mt-2">
+	<div class="card preset-filled-secondary-100-900 w-full">
 		<!-- Header -->
-		<div class="flex justify-between p-2">
-			{category.name}
-		</div>
+		{category.name}
 		<!-- Item list -->
-		<div class="p-2">
+		<div>
 			{#each category.shoppingItems as item}
 				<div>
 					<label>
-						<input
-							type="checkbox"
-							name="items"
-							value={item.id}
-						/>
+						<input type="checkbox" name="items" value={item.id} />
 						{item.name}
 					</label>
 				</div>

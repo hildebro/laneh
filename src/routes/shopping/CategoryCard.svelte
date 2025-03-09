@@ -6,18 +6,16 @@
 
 <div class="card preset-filled-secondary-100-900 w-full">
 	<!-- Header -->
-	<div class="flex justify-between p-2">
+	<div class="flex justify-between">
 		{category.name}
-		<a href="/shopping/category/{category.id}" class="btn border">Edit</a>
+		<a href="/shopping/category/{category.id}" class="btn">Edit</a>
 	</div>
 	<!-- Item list -->
-	<div class="p-2">
-		{#each category.shoppingItems as item}
-			- {item.name}<br />
-		{/each}
-		<form method="POST" action="/shopping/item?/create" use:enhance>
-			<input type="hidden" name="categoryId" value={category.id}>
-			<input class="preset-filled-secondary-50-950" type="text" name="name" />
-		</form>
-	</div>
+	{#each category.shoppingItems as item}
+		- {item.name}<br />
+	{/each}
+	<form method="POST" action="/shopping/item?/create" use:enhance>
+		<input type="hidden" name="categoryId" value={category.id}>
+		<input class="form-input mt-2" type="text" name="name" />
+	</form>
 </div>

@@ -9,7 +9,8 @@
 		<div class="mb-4">
 			<label>
 				Username
-				<input class="input" name="username" id="username" />
+				<br/>
+				<input type="text" name="username" id="username" />
 			</label>
 		</div>
 		<div class="flex flex-col sm:flex-row gap-2">

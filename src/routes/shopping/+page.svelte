@@ -7,13 +7,11 @@
 {#await data.categories}
 	loading...
 {:then categories}
-	<a href="/shopping/purchase" class="btn border preset-filled-primary-600-400 ml-auto">Start purchase</a>
-	<div class="flex flex-col gap-4 items-center w-full h-full">
+	<a href="/shopping/purchase" class="btn ml-auto">Start purchase</a>
 		{#each categories as category}
 			<CategoryCard {category}></CategoryCard>
 		{/each}
-		<a class="card btn preset-filled-primary-100-900 w-36 h-24" href="/shopping/category/add">
+		<a class="card" href="/shopping/category/add">
 			Add new category
 		</a>
-	</div>
 {/await}

@@ -12,7 +12,7 @@
 		<!-- Header -->
 		<AppHeader user={data.user}></AppHeader>
 		<!-- Main -->
-		<main class="p-4 space-y-4 flex flex-col justify-center items-center">
+		<main class="p-4 space-y-4 flex flex-col gap-3 justify-center items-center">
 			{@render children()}
 		</main>
 		<!-- Footer -->
