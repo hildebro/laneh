@@ -33,8 +33,7 @@ export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> =
   return db.query.shoppingCategory.findMany({
     with: {
       shoppingItems: {
-        orderBy: [asc(shoppingItem.priority)],
-        where: eq(shoppingItem.active, true)
+        orderBy: [asc(shoppingItem.priority)]
       }
     },
     orderBy: [asc(shoppingCategory.priority)]
