@@ -4,7 +4,7 @@
   let { category } = $props();
 </script>
 
-<div class="card preset-filled-secondary-100-900 w-full">
+<div class="card w-full">
 	<!-- Header -->
 	<div class="flex justify-between">
 		{category.name}

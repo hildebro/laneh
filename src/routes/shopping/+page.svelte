@@ -8,10 +8,8 @@
 	loading...
 {:then categories}
 	<a href="/shopping/purchase" class="btn ml-auto">Start purchase</a>
-		{#each categories as category}
-			<CategoryCard {category}></CategoryCard>
-		{/each}
-		<a class="card" href="/shopping/category/add">
-			Add new category
-		</a>
+	{#each categories as category}
+		<CategoryCard {category}></CategoryCard>
+	{/each}
+	<a class="btn ml-auto" href="/shopping/category/add">New category</a>
 {/await}
