@@ -12,7 +12,7 @@
 		{#each categories as category}
 			<CategoryCard {category}></CategoryCard>
 		{/each}
-		<a class="card btn preset-filled-primary-100-900 w-36 h-24" href="/shopping/add">
+		<a class="card btn preset-filled-primary-100-900 w-36 h-24" href="/shopping/category/add">
 			Add new category
 		</a>
 	</div>
