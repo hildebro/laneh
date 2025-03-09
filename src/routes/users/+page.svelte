@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import { Avatar } from '@skeletonlabs/skeleton-svelte';
 
   let { data } = $props();
 </script>
@@ -7,14 +8,20 @@
 {#await data.users}
 	loading...
 {:then users}
-	<div class="flex gap-4 justify-center items-center w-full h-full">
+	<div class="flex gap-4">
 		{#each users as user}
 			<form method="POST" action="?/select" use:enhance>
 				<input type="hidden" name="userId" value={user.id}>
-				<button type="submit" class="card btn preset-filled-secondary-100-900 w-32 h-24">{user.username}</button>
+				<button type="submit" class="card w-40 h-40 flex flex-col items-center justify-center gap-1">
+					<Avatar name={user?.username ?? ''}
+									background="preset-filled-secondary-800-200"
+									classes="w-20 h-20"
+					/>
+					{user?.username}
+				</button>
 			</form>
 		{/each}
-		<a class="card btn preset-filled-primary-100-900 w-32 h-24" href="/users/add">
+		<a class="card w-40 h-40 flex items-center justify-center" href="/users/add">
 			Add new user
 		</a>
 	</div>

@@ -3,3 +3,22 @@
 @import '@skeletonlabs/skeleton';
 @import '@skeletonlabs/skeleton/optional/presets';
 @import '@skeletonlabs/skeleton/themes/cerberus';
+
+@layer base {
+    main {
+        @apply preset-filled-surface-100-900;
+    }
+
+    footer, header {
+        @apply preset-filled-primary-100-900;
+    }
+
+    .btn {
+        @apply preset-filled-primary-800-200 px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors
+        disabled:hover:bg-primary-800;
+    }
+
+    .card {
+        @apply preset-filled-primary-100-900 p-6 rounded-xl shadow-md;
+    }
+}
