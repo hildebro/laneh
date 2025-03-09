@@ -8,7 +8,7 @@
 </script>
 
 <div class="flex justify-center items-center h-full bg-surface-100">
-	<div class="card p-8  preset-filled-primary-100-900">
+	<div class="card p-8">
 		<div class="h4 mb-2">{data.category ? 'Edit Category' : 'Add New Category'}</div>
 		<form method="POST" use:enhance>
 			<input type="hidden" name="categoryId" value={data.category?.id}>

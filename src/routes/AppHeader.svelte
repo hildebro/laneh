@@ -3,12 +3,12 @@
 
   let { user } = $props();
 </script>
-<header class="preset-filled-primary-100-900 p-4 flex items-center justify-between">
+<header class="p-4 flex items-center justify-between">
 	<a href="/" class="btn">Home</a>
 	<div class="flex items-center gap-1">
 		<a href="/users">
 			<Avatar name={user?.username ?? ''}
-							background="preset-filled-secondary-500"
+							background="preset-filled-secondary-800-200"
 							classes="w-10 h-10 rounded-full text-lg flex"
 			/>
 		</a>

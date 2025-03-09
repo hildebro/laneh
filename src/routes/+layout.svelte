@@ -12,10 +12,10 @@
 		<!-- Header -->
 		<AppHeader user={data.user}></AppHeader>
 		<!-- Main -->
-		<main class="preset-filled-surface-100-900 p-4 space-y-4">
+		<main class="p-4 space-y-4 flex flex-col justify-center items-center">
 			{@render children()}
 		</main>
 		<!-- Footer -->
-		<footer class="preset-filled-primary-200-800 p-4">(footer)</footer>
+		<footer class="p-4">(footer)</footer>
 	</div>
 </ParaglideJS>
