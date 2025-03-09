@@ -3,7 +3,7 @@
 </script>
 
 {#if category.shoppingItems.length > 0 }
-	<div class="card preset-filled-secondary-100-900 w-full">
+	<div class="card w-full">
 		<!-- Header -->
 		{category.name}
 		<!-- Item list -->
