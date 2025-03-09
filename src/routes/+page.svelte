@@ -7,11 +7,11 @@
 		<ShoppingCart />
 		Shopping
 	</a>
-	<button class="btn preset-filled-primary-800-200">
+	<button class="btn preset-filled-primary-800-200 cursor-not-allowed" disabled>
 		<CalendarDays />
 		Schedule
 	</button>
-	<button class="btn preset-filled-primary-800-200">
+	<button class="btn preset-filled-primary-800-200 cursor-not-allowed" disabled>
 		<Star />
 		Daily Upkeep
 	</button>
