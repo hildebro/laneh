@@ -10,8 +10,12 @@
         @apply preset-filled-surface-100-900;
     }
 
-    footer, header {
-        @apply preset-filled-primary-100-900;
+    header {
+        @apply preset-filled-primary-200-800 border-b border-b-surface-100;
+    }
+
+    footer {
+        @apply preset-filled-primary-200-800 border-t border-t-surface-100;
     }
 
     .btn {
