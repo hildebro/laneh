@@ -9,13 +9,10 @@
 
 <ParaglideJS {i18n}>
 	<div class="h-screen grid grid-rows-[auto_1fr_auto]">
-		<!-- Header -->
 		<AppHeader user={data.user}></AppHeader>
-		<!-- Main -->
-		<main class="p-4 space-y-4 flex flex-col gap-3 justify-center items-center">
+		<main class="p-4 space-y-4 flex flex-col gap-3 items-center overflow-y-auto">
 			{@render children()}
 		</main>
-		<!-- Footer -->
 		<footer class="p-4">(footer)</footer>
 	</div>
 </ParaglideJS>
