@@ -93,7 +93,25 @@ export const addShoppingItem = async (categoryId: string, name: string): Promise
   });
 };
 
-export const removeShoppingItems = async (itemIds: string[]): Promise<void> => {
+export const createPurchase = async (user: User, itemIds: string[]): Promise<void> => {
+  // 1. Create a new purchase
+  let purchaseId = generateUUID();
+  await db.insert(table.shoppingPurchase)
+    .values({
+      id: purchaseId,
+      date: new Date(),
+      userId: user.id
+    })
+    .execute();
+
+  // 2. Create entries in the junction table (shoppingPurchaseItem)
+  const purchaseItemInserts = itemIds.map((itemId) => ({
+    purchaseId,
+    itemId
+  }));
+  await db.insert(table.shoppingPurchaseItem).values(purchaseItemInserts);
+
+  // 3. Deactivate the shopping items
   await db.update(table.shoppingItem).set({ active: false }).where(inArray(table.shoppingItem.id, itemIds)).execute();
 };
 
