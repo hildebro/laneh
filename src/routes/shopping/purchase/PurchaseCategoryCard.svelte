@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ShoppingItem } from '$lib/server/db/schema';
+
   let { category } = $props();
 </script>
 
@@ -8,7 +10,7 @@
 		{category.name}
 		<!-- Item list -->
 		<div>
-			{#each category.shoppingItems as item}
+			{#each category.shoppingItems.filter((item: ShoppingItem) => item.active) as item}
 				<div>
 					<label>
 						<input type="checkbox" name="items" value={item.id} />
