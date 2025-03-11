@@ -20,13 +20,15 @@ export const addUser = async (username: string): Promise<void> => {
 };
 
 // ------- SHOPPING RELATED -------
-export const findShoppingCategory = async (categoryId: string): Promise<ShoppingCategory | undefined> => {
-  const result = await db
-    .select()
-    .from(table.shoppingCategory)
-    .where(eq(table.shoppingCategory.id, categoryId));
-
-  return result.at(0);
+export const findShoppingCategory = async (categoryId: string) => {
+  return db.query.shoppingCategory.findFirst({
+    with: {
+      shoppingItems: {
+        orderBy: [asc(shoppingItem.priority)]
+      }
+    },
+    where: eq(table.shoppingCategory.id, categoryId)
+  }).execute();
 };
 
 export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> => {
@@ -40,8 +42,12 @@ export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> =
   }).execute();
 };
 
-export const updateShoppingCategory = async (categoryId: string, name: string): Promise<void> => {
+export const updateShoppingCategory = async (categoryId: string, name: string, itemIds: string[]): Promise<void> => {
   await db.update(table.shoppingCategory).set({ name: name }).where(eq(table.shoppingCategory.id, categoryId)).execute();
+
+  if (itemIds.length > 0) {
+    await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds))
+  }
 };
 
 export const addShoppingCategory = async (name: string): Promise<void> => {

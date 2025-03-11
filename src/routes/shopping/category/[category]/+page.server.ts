@@ -19,6 +19,7 @@ export const actions: Actions = {
   default: async (event) => {
     const formData = await event.request.formData();
     const name = formData.get('name')?.toString();
+    let items = formData.getAll('items').map((formValue) => formValue.toString());
     if (!name) {
       return fail(400, { message: 'No name given' });
     }
@@ -27,7 +28,7 @@ export const actions: Actions = {
 
     try {
       if (id) {
-        await updateShoppingCategory(id, name);
+        await updateShoppingCategory(id, name, items);
       } else {
         await addShoppingCategory(name);
       }
