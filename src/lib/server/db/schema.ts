@@ -27,7 +27,8 @@ export const shoppingItem = pgTable('shopping_item', {
   categoryId: text().references(() => shoppingCategory.id),
   name: text().notNull().unique(),
   priority: integer().notNull(),
-  active: boolean().notNull()
+  active: boolean().notNull(),
+  amount: text().notNull().default(''),
 }, (shoppingItem) => [
   unique().on(shoppingItem.categoryId, shoppingItem.priority)
 ]);
