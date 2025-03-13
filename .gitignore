@@ -1,4 +1,8 @@
 node_modules
+.yarn/.cache
+.pnp.*
+/.yarn/build-state.yml
+.yarn/install-state.gz
 
 # Output
 .output
