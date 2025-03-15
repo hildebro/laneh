@@ -12,11 +12,12 @@ export const actions = {
     const data = await request.formData();
     let categoryId = data.get('categoryId')?.toString();
     let name = data.get('name')?.toString();
+    let amount = data.get('amount')?.toString();
     if (categoryId === undefined || categoryId.length === 0 || name === undefined || name.length === 0) {
       return fail(400, { message: 'Missing data' });
     }
 
-    await addShoppingItem(categoryId, name);
+    await addShoppingItem(categoryId, name, amount);
 
     return redirect(302, '/shopping');
   }

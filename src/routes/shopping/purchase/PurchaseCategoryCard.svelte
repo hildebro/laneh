@@ -14,7 +14,7 @@
 				<div>
 					<label>
 						<input type="checkbox" name="items" value={item.id} />
-						{item.name}
+						{item.amount} {item.name}
 					</label>
 				</div>
 			{/each}
