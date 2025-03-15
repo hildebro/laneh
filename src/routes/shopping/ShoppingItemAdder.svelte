@@ -58,13 +58,13 @@
 		<input
 			type="text"
 			bind:value={inputValue}
-			placeholder="Type to add..."
+			placeholder="Type and hit enter..."
 			class="form-input"
 			name="name"
 			autocomplete="off"
 			onkeydown={handleKeyDown}
 		/>
-		Suggestions:
+		Or select a suggestion:
 		{#each filteredOptions as option}
 			<button
 				onclick={() => inputValue = option.name}
