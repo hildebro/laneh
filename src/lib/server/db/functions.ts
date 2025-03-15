@@ -46,7 +46,7 @@ export const updateShoppingCategory = async (categoryId: string, name: string, i
   await db.update(table.shoppingCategory).set({ name: name }).where(eq(table.shoppingCategory.id, categoryId)).execute();
 
   if (itemIds.length > 0) {
-    await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds))
+    await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds));
   }
 };
 
@@ -65,7 +65,7 @@ export const addShoppingCategory = async (name: string): Promise<void> => {
   });
 };
 
-export const addShoppingItem = async (categoryId: string, name: string): Promise<void> => {
+export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
   // If we have a matching inactive item, we just make it active again.
   const existingItemId = (await db.select({ id: table.shoppingItem.id })
       .from(table.shoppingItem)
@@ -76,7 +76,7 @@ export const addShoppingItem = async (categoryId: string, name: string): Promise
       ))
   ).at(0)?.id;
   if (existingItemId) {
-    await db.update(table.shoppingItem).set({ active: true }).where(eq(table.shoppingItem.id, existingItemId)).execute();
+    await db.update(table.shoppingItem).set({ active: true, amount: amount }).where(eq(table.shoppingItem.id, existingItemId)).execute();
 
     return;
   }
@@ -94,6 +94,7 @@ export const addShoppingItem = async (categoryId: string, name: string): Promise
     id: generateUUID(),
     categoryId: categoryId,
     name: name,
+    amount: amount,
     priority: nextPriority,
     active: true
   });

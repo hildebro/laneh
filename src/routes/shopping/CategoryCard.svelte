@@ -14,7 +14,7 @@
 	<!-- Item list -->
 	<div class="mb-2">
 		{#each category.shoppingItems.filter((item: ShoppingItem) => item.active) as item}
-			- {item.name}<br />
+			- {item.amount} {item.name}<br />
 		{/each}
 	</div>
 	<ShoppingItemAdder
