@@ -8,3 +8,25 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: local
+    networks:
+      - app-network
+
+  app:
+    build: .
+    ports:
+      - 5173:5173
+    environment:
+      DATABASE_URL: postgres://root:mysecretpassword@db:5432/local
+      NODE_ENV: development
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    networks:
+      - app-network
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+networks:
+  app-network:
+    driver: bridge
