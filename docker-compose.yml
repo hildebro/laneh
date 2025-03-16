@@ -4,17 +4,21 @@ services:
     restart: always
     ports:
       - 5432:5432
-    environment: 
+    environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: local
+    volumes:  # Persistent database data.  VERY IMPORTANT!
+        - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 
   app:
-    build: .
+    build:
+      context: .
+      target: builder
     ports:
-      - 5173:5173
+      - 5173:5173  # Keep this for direct access & hot reload
     environment:
       DATABASE_URL: postgres://root:mysecretpassword@db:5432/local
       NODE_ENV: development
@@ -25,7 +29,30 @@ services:
       - db
     networks:
       - app-network
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    command: npm run dev -- --host 0.0.0.0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.my-app-dev.rule=Host(`localhost`)"  # Use localhost
+      - "traefik.http.routers.my-app-dev.entrypoints=web"
+      - "traefik.http.services.my-app-dev.loadbalancer.server.port=5173" # Use dev port
+
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true" # Enable the Traefik dashboard (for development ONLY)
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false" # Only expose services with labels
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"  # Traefik dashboard (optional)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" # Access to Docker API
+    networks:
+      - app-network
+
+volumes:
+    postgres_data:
 
 networks:
   app-network:
