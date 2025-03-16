@@ -19,7 +19,7 @@ export const actions = {
 
     await addShoppingItem(categoryId, name, amount);
 
-    return redirect(302, '/shopping');
+    return redirect(302, '../shopping');
   }
 };
 

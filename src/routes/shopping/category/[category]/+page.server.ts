@@ -35,6 +35,6 @@ export const actions: Actions = {
     } catch (e) {
       return fail(500, { message: 'An error has occurred' });
     }
-    return redirect(302, '/shopping');
+    return redirect(302, '../../shopping');
   }
 };

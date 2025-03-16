@@ -9,7 +9,7 @@
 	<!-- Header -->
 	<div class="flex justify-between">
 		{category.name}
-		<a href="/shopping/category/{category.id}" class="btn">Edit</a>
+		<a href="shopping/category/{category.id}" class="btn">Edit</a>
 	</div>
 	<!-- Item list -->
 	<div class="mb-2">
