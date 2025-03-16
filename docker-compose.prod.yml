@@ -15,7 +15,8 @@ services:
   app:
     build: .  # Build the full, multi-stage image
     restart: always
-    # NO ports section here. Traefik handles routing.
+    ports:
+      - "127.0.0.1:3000:3000"  # Expose on localhost only
     environment:
       DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: production
@@ -24,37 +25,9 @@ services:
       - db
     networks:
       - app-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.my-app.rule=Host(`${APP_HOST}`)"  # Your domain name
-      - "traefik.http.routers.my-app.entrypoints=web"
-      - "traefik.http.services.my-app.loadbalancer.server.port=3000"  # App's internal port
-      - "traefik.http.routers.my-app.tls.certresolver=myresolver"
-
-  traefik:
-    image: traefik:v2.10
-    restart: always
-    command:
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - traefik_data:/letsencrypt # Persistent storage for certificates
-    networks:
-      - app-network
 
 volumes:
   postgres_data:
-  traefik_data: # Volume for LetsEncrypt certificates
 
 networks:
   app-network:
