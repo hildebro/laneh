@@ -1,12 +1,13 @@
 ## Usage
 
 ### Preconditions
-Install `yarn` and `docker`.
+Install `docker` `docker compose` and `docker-buildx`.
 
-### Start a development server
+### Setup app
 ```bash
-yarn run dev
-yarn run db:start
+docker compose up
+# For database initialization
+docker compose exec app npm run db:push
 ```
 
 ### Setup environment
