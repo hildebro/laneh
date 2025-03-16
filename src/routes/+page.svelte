@@ -3,7 +3,7 @@
 </script>
 
 <div class="flex flex-col gap-4 card">
-	<a class="btn" href="/shopping">
+	<a class="btn" href="shopping">
 		<ShoppingCart />
 		Shopping
 	</a>

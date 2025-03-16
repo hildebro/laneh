@@ -31,7 +31,7 @@
       formData.append('categoryId', categoryId);
       formData.append('name', trimmedName);
       formData.append('amount', amountValue)
-      const response = await fetch('/shopping/item?/create', {
+      const response = await fetch('shopping/item?/create', {
         method: 'POST',
         body: formData
       });

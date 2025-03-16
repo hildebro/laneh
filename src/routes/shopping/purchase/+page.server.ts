@@ -14,6 +14,6 @@ export const actions = {
       await createPurchase(user, items);
     }
 
-    return redirect(302, '/shopping');
+    return redirect(302, '../shopping');
   }
 };

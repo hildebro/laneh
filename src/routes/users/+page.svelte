@@ -21,7 +21,7 @@
 				</button>
 			</form>
 		{/each}
-		<a class="card w-40 h-40 flex items-center justify-center" href="/users/add">
+		<a class="card w-40 h-40 flex items-center justify-center" href="users/add">
 			Add new user
 		</a>
 	</div>
