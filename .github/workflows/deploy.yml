@@ -1,0 +1,31 @@
+#name: Deploy to Production
+#
+#on:
+#  push:
+#    branches: [main] # Trigger on push to main
+#
+#jobs:
+#  deploy:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Set up SSH
+#        uses: webfactory/ssh-agent@v0.7.0
+#        with:
+#          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+#
+#      - name: Deploy via SSH
+#        env:
+#          SSH_USER: ${{ secrets.SSH_USERNAME }}
+#          SSH_PORT: ${{ secrets.SSH_PORT }}
+#          SERVER_IP: ${{ secrets.SERVER_IP }}
+#        run: |
+#          ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_IP} -p ${SSH_PORT} << 'ENDSSH'
+#            cd /path/to/your/project # Change to your project directory
+#            git pull origin main      # Pull latest code (if repo exists on server)
+#            docker compose -f prod.yml pull  # Pull updated images (if using a registry)
+#            docker compose -f prod.yml up -d --build
+#            docker system prune -af  # Optional: Cleanup
+#          ENDSSH
