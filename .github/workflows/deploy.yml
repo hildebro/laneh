@@ -1,31 +1,28 @@
-#name: Deploy to Production
-#
-#on:
-#  push:
-#    branches: [main] # Trigger on push to main
-#
-#jobs:
-#  deploy:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Set up SSH
-#        uses: webfactory/ssh-agent@v0.7.0
-#        with:
-#          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-#
-#      - name: Deploy via SSH
-#        env:
-#          SSH_USER: ${{ secrets.SSH_USERNAME }}
-#          SSH_PORT: ${{ secrets.SSH_PORT }}
-#          SERVER_IP: ${{ secrets.SERVER_IP }}
-#        run: |
-#          ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_IP} -p ${SSH_PORT} << 'ENDSSH'
-#            cd /path/to/your/project # Change to your project directory
-#            git pull origin main      # Pull latest code (if repo exists on server)
-#            docker compose -f prod.yml pull  # Pull updated images (if using a registry)
-#            docker compose -f prod.yml up -d --build
-#            docker system prune -af  # Optional: Cleanup
-#          ENDSSH
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server
+        run: |
+          ssh -i ~/.ssh/id_rsa -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} \
+            "cd /srv/chorehub && \
+            git pull origin main && \
+            sudo systemctl restart chorehub"
