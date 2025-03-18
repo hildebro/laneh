@@ -27,6 +27,6 @@ export const actions: Actions = {
       path: '/'
     });
 
-    return redirect(302, `${base}/users`);
+    return redirect(302, `${base}`);
   }
 };
