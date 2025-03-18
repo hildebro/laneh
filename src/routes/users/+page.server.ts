@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { type Actions, fail, redirect } from '@sveltejs/kit';
 import { USER_COOKIE } from '$lib';
 import { findAllUsers, findUser } from '$lib/server/db/functions';
+import { base } from '$app/paths';
 
 export const load: PageServerLoad = async () => {
   return {
@@ -26,6 +27,6 @@ export const actions: Actions = {
       path: '/'
     });
 
-    return redirect(302, '/');
+    return redirect(302, `${base}/users`);
   }
 };
