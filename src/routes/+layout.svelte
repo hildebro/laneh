@@ -13,6 +13,6 @@
 		<main class="p-4 space-y-4 flex flex-col gap-3 items-center overflow-y-auto">
 			{@render children()}
 		</main>
-		<footer class="p-4">(footer)</footer>
+<!--		<footer class="p-4">(footer)</footer>-->
 	</div>
 </ParaglideJS>
