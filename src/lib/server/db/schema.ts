@@ -14,7 +14,7 @@ export const userRelations = relations(user, ({ many }) => ({
 export const shoppingCategory = pgTable('shopping_category', {
   id: text().primaryKey(),
   name: text().notNull().unique(),
-  priority: integer().notNull().unique()
+  priority: integer().notNull()
 });
 export type ShoppingCategory = typeof shoppingCategory.$inferSelect;
 

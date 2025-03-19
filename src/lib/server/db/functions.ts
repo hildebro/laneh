@@ -3,6 +3,7 @@ import { shoppingCategory, type ShoppingCategory, shoppingItem, type User } from
 import { db } from '$lib/server/db/index';
 import { and, asc, eq, inArray, max } from 'drizzle-orm';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { error } from '@sveltejs/kit';
 
 // ------- USER RELATED -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
@@ -65,6 +66,31 @@ export const addShoppingCategory = async (name: string): Promise<void> => {
   });
 };
 
+export const updateOrdering = async (newOrder: string[]): Promise<void> => {
+  if (!Array.isArray(newOrder)) {
+    throw error(400, 'Invalid input: Expected an array of IDs.');
+  }
+
+  if (newOrder.length === 0) {
+    throw error(400, 'Invalid input: The array cannot be empty.');
+  }
+
+  // Check for duplicate IDs *within the request* (important!)
+  const uniqueIds = new Set(newOrder);
+  if (uniqueIds.size !== newOrder.length) {
+    throw error(400, 'Invalid input: Duplicate IDs are not allowed.');
+  }
+
+  await db.transaction(async (tx) => {
+    for (const [index, id] of newOrder.entries()) {
+      await tx
+        .update(table.shoppingCategory)
+        .set({ priority: index })
+        .where(eq(table.shoppingCategory.id, id));
+    }
+  });
+};
+
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
   // If we have a matching inactive item, we just make it active again.
   const existingItemId = (await db.select({ id: table.shoppingItem.id })
@@ -76,7 +102,10 @@ export const addShoppingItem = async (categoryId: string, name: string, amount: 
       ))
   ).at(0)?.id;
   if (existingItemId) {
-    await db.update(table.shoppingItem).set({ active: true, amount: amount }).where(eq(table.shoppingItem.id, existingItemId)).execute();
+    await db.update(table.shoppingItem).set({
+      active: true,
+      amount: amount
+    }).where(eq(table.shoppingItem.id, existingItemId)).execute();
 
     return;
   }
