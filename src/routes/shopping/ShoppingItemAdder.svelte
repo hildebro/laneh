@@ -30,7 +30,7 @@
       const formData = new FormData();
       formData.append('categoryId', categoryId);
       formData.append('name', trimmedName);
-      formData.append('amount', amountValue)
+      formData.append('amount', amountValue);
       const response = await fetch('shopping/item?/create', {
         method: 'POST',
         body: formData
@@ -39,6 +39,7 @@
       if (response.ok) {
         console.log('Data sent successfully!');
         nameValue = ''; // Clear the input after successful submission
+        amountValue = ''; // Also clear amount
         await invalidateAll();
       } else {
         console.error('Failed to send data:', response.status);
@@ -55,40 +56,38 @@
 	<button onclick={() => expanded = true} class="btn">
 		Add items
 	</button>
-{:else }
+{:else}
 	<div class="flex flex-col w-full">
-		<div class="flex gap-1 w-full">
-			<label class="w-1/2">
+		<div class="flex flex-col sm:flex-row gap-1 w-full">
+			<label class="w-full sm:w-1/2">
 				Name
 				<input
 					type="text"
 					bind:value={nameValue}
 					placeholder="Type and hit enter..."
-					class="form-input input"
-					name="name"
+					class="form-input input w-full" name="name"
 					autocomplete="off"
 					onkeydown={handleKeyDown}
 				/>
 			</label>
-			<label class="w-1/4">
+			<label class="w-full sm:w-1/4">
 				Amount
 				<input
 					type="text"
 					bind:value={amountValue}
 					placeholder="1x"
-					class="form-input input"
-					name="name"
+					class="form-input input w-full" name="name"
 					autocomplete="off"
 					onkeydown={handleKeyDown}
 				/>
 			</label>
 		</div>
-		<div class="flex flex-col w-1/2">
+		<div class="flex flex-col w-full sm:w-1/2 mt-2">
 			Or select a suggestion:
 			{#each filteredOptions as option}
 				<button
-					onclick={() => nameValue = option.name}
-					class="form-input"
+					onclick={() => {nameValue = option.name; amountValue = '';}}
+					class="form-input text-left"
 				>
 					{option.name}
 				</button>
