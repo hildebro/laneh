@@ -8,7 +8,7 @@
 {#await data.users}
 	loading...
 {:then users}
-	<div class="flex gap-4">
+	<div class="flex flex-wrap justify-center gap-4">
 		{#each users as user}
 			<form method="POST" action="?/select" use:enhance>
 				<input type="hidden" name="userId" value={user.id}>
