@@ -7,12 +7,12 @@ export const actions: Actions = {
     const formData = await request.formData();
     const otp = formData.get('otp')?.toString() ?? '';
 
-    if (verifyOTP(otp)) {
+    if (await verifyOTP(otp)) {
       await createSession(cookies);
 
       return redirect(302, `${base}`);
     } else {
-      return fail(400, { message: 'wrong otp' });
+      return fail(400, { message: 'wrong code' });
     }
   }
 };

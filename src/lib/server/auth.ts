@@ -9,15 +9,31 @@ const SESSION_SECRET = env.SESSION_SECRET;
 const REFRESH_SECRET = env.REFRESH_SECRET;
 const SESSION_EXPIRY = env.SESSION_EXPIRY || '1h';  // Default to 1 hour
 const REFRESH_TOKEN_EXPIRY = env.REFRESH_TOKEN_EXPIRY || '7d'; // Default to 7 days
+const MIN_DELAY_MS = 1000; // Minimum delay of 2 seconds
+const MAX_DELAY_MS = 5000; // Maximum delay of 5 seconds (adjust as needed)
 
 if (!OTP_SECRET || !SESSION_SECRET || !REFRESH_SECRET) {
   console.error("Missing required environment variables for authentication!");
   throw new Error("Missing authentication secrets.  See console.");
 }
 
-export function verifyOTP(token: string): boolean {
+function getRandomDelay(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function verifyOTP(token: string): Promise<boolean> {
   try {
-    return authenticator.verify({ token, secret: OTP_SECRET });
+    const isValid = authenticator.verify({ token, secret: OTP_SECRET });
+    if (!isValid) {
+      const delayMs = getRandomDelay(MIN_DELAY_MS, MAX_DELAY_MS);
+      await delay(delayMs);
+    }
+
+    return isValid;
   } catch (err) {
     console.error("OTP verification error:", err);
     return false;
