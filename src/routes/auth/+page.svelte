@@ -5,12 +5,12 @@
 </script>
 
 <div class="card">
-	<h1>Login</h1>
-
 	<form method="POST" use:enhance>
-		<label for="otp">OTP:</label>
-		<input type="text" name="otp" required />
-		<button type="submit">Login</button>
+		<label>
+			Access code:
+			<input class="form-input input" type="text" name="otp" required />
+		</label>
+		<button class="btn mt-1" type="submit">Login</button>
 	</form>
 
 	{#if form?.message}
