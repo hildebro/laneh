@@ -1,9 +1,19 @@
 import * as table from '$lib/server/db/schema';
-import { shoppingCategory, type ShoppingCategory, shoppingItem, type User } from '$lib/server/db/schema';
+import {
+  shoppingCategory,
+  type ShoppingCategory,
+  type ShoppingItem,
+  shoppingItem,
+  type User
+} from '$lib/server/db/schema';
 import { db } from '$lib/server/db/index';
-import { and, asc, eq, inArray, max } from 'drizzle-orm';
+import { and, asc, eq, inArray, max, sql } from 'drizzle-orm';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { error } from '@sveltejs/kit';
+// *** Import fast-levenshtein using the default import for CJS compatibility ***
+import levenshteinPkg from 'fast-levenshtein';
+// The actual function is usually on the '.get' property for this library
+const levenshtein = levenshteinPkg.get;
 
 // ------- USER RELATED -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
@@ -90,6 +100,55 @@ export const updateOrdering = async (newOrder: string[]): Promise<void> => {
     }
   });
 };
+
+export const findShoppingItem = async (name: string): Promise<ShoppingItem | undefined> => {
+  return (await db.select()
+      .from(table.shoppingItem)
+      .where(sql`lower(${table.shoppingItem.name}) = ${name.toLowerCase()}`)
+  ).at(0);
+};
+
+/**
+ * Finds shopping items with names similar to the input name using Levenshtein distance.
+ * Calculates distance in the application code using the 'fast-levenshtein' library.
+ *
+ * @param name The name to search for similar items.
+ * @param maxDistance The maximum Levenshtein distance to consider an item "similar". Defaults to 2.
+ */
+export const findSimilarShoppingItems = async (
+  name: string,
+  maxDistance: number = 2
+): Promise<ShoppingItem[]> => {
+  try {
+    // Fetch all items from the database.
+    // Consider optimizations for very large lists if needed.
+    const allItems = await db.select()
+      .from(table.shoppingItem)
+      .execute();
+
+    const lowerCaseName = name.toLowerCase();
+
+    return allItems.filter(item => {
+      const itemNameLower = item.name.toLowerCase();
+
+      // Avoid comparing the item with itself (exact match)
+      if (itemNameLower === lowerCaseName) {
+        return false;
+      }
+
+      // *** Use fast-levenshtein directly ***
+      // The function signature is the same: levenshtein(string1, string2)
+      const distance = levenshtein(lowerCaseName, itemNameLower); // .get method is standard
+
+      return distance > 0 && distance <= maxDistance; // Check distance is within threshold and not zero
+    });
+
+  } catch (error) {
+    console.error("Error finding similar shopping items:", error);
+    return [];
+  }
+};
+
 
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
   // If we have a matching inactive item, we just make it active again.
