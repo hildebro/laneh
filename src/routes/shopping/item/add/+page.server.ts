@@ -1,12 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import type { ShoppingItem } from '$lib/server/db/schema';
-import {
-  addShoppingItem,
-  findAllShoppingCategories,
-  findShoppingItem,
-  findSimilarShoppingItems
-} from '$lib/server/db/functions';
+import { findShoppingItem, findSimilarShoppingItems } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async () => {
   return {};
@@ -42,16 +37,6 @@ export const actions = {
     // Or use cookies/session if appropriate for your setup and data size
     // Example using cookies (limited size!) - Session is generally better
     cookies.set('validationData', JSON.stringify(results), { path: '/', maxAge: 300 }); // Short expiry
-
-    // TODO Temp add items directly into the db for testing, remove later
-    let categories = await findAllShoppingCategories();
-    for (const result of results) {
-      if (result.status === 'new') {
-        await addShoppingItem(categories[0].id, result.originalName, result.originalAmount);
-      }
-    }
-
-    return redirect(303, '../');
 
     if (needsValidation) {
       // Redirect to validation page, passing the ID or relying on session/cookie
@@ -110,7 +95,7 @@ function parseLine(line: string): { name: string; amount: string } {
 }
 
 // --- Helper: Matching (Simplified) ---
-type MatchResult =
+export type MatchResult =
   | { status: 'perfect'; item: ShoppingItem; originalAmount: string }
   | { status: 'very_close'; originalName: string; originalAmount: string; suggestions: ShoppingItem[] }
   | { status: 'new'; originalName: string; originalAmount: string };
