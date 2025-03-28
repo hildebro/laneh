@@ -17,8 +17,4 @@
 			- {item.amount} {item.name}<br />
 		{/each}
 	</div>
-	<ShoppingItemAdder
-		categoryId={category.id}
-		options={category.shoppingItems.filter((item: ShoppingItem) => !item.active)}
-	/>
 </div>
