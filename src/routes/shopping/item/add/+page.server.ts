@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import type { ShoppingItem } from '$lib/server/db/schema';
-import { findShoppingItem, findSimilarShoppingItems } from '$lib/server/db/functions';
+import { findShoppingItem, findSimilarShoppingItem } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async () => {
   return {};
@@ -97,7 +97,7 @@ function parseLine(line: string): { name: string; amount: string } {
 // --- Helper: Matching (Simplified) ---
 export type MatchResult =
   | { status: 'perfect'; item: ShoppingItem; originalAmount: string }
-  | { status: 'very_close'; originalName: string; originalAmount: string; suggestions: ShoppingItem[] }
+  | { status: 'very_close'; originalName: string; originalAmount: string; suggestion: ShoppingItem }
   | { status: 'new'; originalName: string; originalAmount: string };
 
 async function findItemMatch(name: string, amount: string): Promise<MatchResult> {
@@ -108,9 +108,9 @@ async function findItemMatch(name: string, amount: string): Promise<MatchResult>
   }
 
   // 2. Very Close Match
-  const similarItems = await findSimilarShoppingItems(name);
-  if (similarItems && similarItems.length > 0) {
-    return { status: 'very_close', originalName: name, originalAmount: amount, suggestions: similarItems };
+  const similarItem = await findSimilarShoppingItem(name);
+  if (similarItem) {
+    return { status: 'very_close', originalName: name, originalAmount: amount, suggestion: similarItem };
   }
 
   // 3. New Item

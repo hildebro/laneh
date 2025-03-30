@@ -104,7 +104,11 @@ export const updateOrdering = async (newOrder: string[]): Promise<void> => {
 export const findShoppingItem = async (name: string): Promise<ShoppingItem | undefined> => {
   return (await db.select()
       .from(table.shoppingItem)
-      .where(sql`lower(${table.shoppingItem.name}) = ${name.toLowerCase()}`)
+      .where(sql`lower(
+      ${table.shoppingItem.name}
+      )
+      =
+      ${name.toLowerCase()}`)
   ).at(0);
 };
 
@@ -115,40 +119,50 @@ export const findShoppingItem = async (name: string): Promise<ShoppingItem | und
  * @param name The name to search for similar items.
  * @param maxDistance The maximum Levenshtein distance to consider an item "similar". Defaults to 2.
  */
-export const findSimilarShoppingItems = async (
+export const findSimilarShoppingItem = async (
   name: string,
   maxDistance: number = 2
-): Promise<ShoppingItem[]> => {
-  try {
-    // Fetch all items from the database.
-    // Consider optimizations for very large lists if needed.
-    const allItems = await db.select()
-      .from(table.shoppingItem)
-      .execute();
+): Promise<ShoppingItem> => {
+  // Fetch all items from the database.
+  // Consider optimizations for very large lists if needed.
+  const allItems = await db.select()
+    .from(table.shoppingItem)
+    .execute();
 
-    const lowerCaseName = name.toLowerCase();
+  const lowerCaseName = name.toLowerCase();
 
-    return allItems.filter(item => {
-      const itemNameLower = item.name.toLowerCase();
+  let closestItem = null;
+  let minDistanceFound = Infinity; // Start with a distance larger than any possible outcome
 
-      // Avoid comparing the item with itself (exact match)
-      if (itemNameLower === lowerCaseName) {
-        return false;
-      }
+  for (const item of allItems) {
+    const itemNameLower = item.name.toLowerCase();
 
-      // *** Use fast-levenshtein directly ***
-      // The function signature is the same: levenshtein(string1, string2)
-      const distance = levenshtein(lowerCaseName, itemNameLower); // .get method is standard
+    // Avoid comparing the item with itself (exact match)
+    if (itemNameLower === lowerCaseName) {
+      continue; // Skip to the next item
+    }
 
-      return distance > 0 && distance <= maxDistance; // Check distance is within threshold and not zero
-    });
+    // Calculate Levenshtein distance
+    const distance = levenshtein(lowerCaseName, itemNameLower);
 
-  } catch (error) {
-    console.error("Error finding similar shopping items:", error);
-    return [];
+    // Check if this item is within the threshold AND closer than the current best match found
+    if (distance > 0 && distance <= maxDistance && distance < minDistanceFound) {
+      // We found a new closest item
+      minDistanceFound = distance;
+      closestItem = item;
+    }
   }
+
+  // Return the single closest item found (or null if none met the criteria)
+  return closestItem;
 };
 
+export const reactivateShoppingItem = async (item: ShoppingItem, amount: string | undefined): Promise<void> => {
+  await db.update(table.shoppingItem).set({
+    active: true,
+    amount: amount
+  }).where(eq(table.shoppingItem.id, item.id)).execute();
+};
 
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
   // If we have a matching inactive item, we just make it active again.
