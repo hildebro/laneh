@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import type { ShoppingCategory } from '$lib/server/db/schema';
-import { addShoppingItem, findAllShoppingCategories } from '$lib/server/db/functions';
+import { addShoppingItem, findAllShoppingCategories, reactivateShoppingItem } from '$lib/server/db/functions';
 import type { MatchResult } from '../add/+page.server'; // Adjust path
 
 // Define the structure of the item data expected from the session
@@ -29,7 +29,11 @@ export const load: PageServerLoad = async ({ cookies }) => {
     // No items need categorization, maybe they were already processed or user navigated directly.
     // Redirect to the main list. Optionally add a flash message.
     // locals.session?.flash('info', 'No items to categorize.');
-    return redirect(303, '../');
+    // todo temp empty item return for testing. should be replaced by service call and instant adding
+    return {
+      newItems: [],
+      categories: []
+    };
   }
 
   // --- 4. Fetch categories from DB ---
@@ -60,33 +64,38 @@ export const load: PageServerLoad = async ({ cookies }) => {
 
 export const actions: Actions = {
   // Default action for saving category assignments
-  default: async ({ request, locals, cookies }) => {
+  default: async ({ request, cookies }) => {
+    // TODO Wrap in transaction so no half baked stuff gets in.
     // --- 3. Get form data (assignments) ---
     const formData = await request.formData();
     const assignmentsJson = formData.get('assignments') as string | null;
-
-    if (!assignmentsJson) {
-      return fail(400, { message: 'Missing item assignments.' });
-    }
-
-    let assignments: [];
-    try {
-      assignments = JSON.parse(assignmentsJson);
-    } catch (error) {
-      return fail(400, { message: 'Invalid assignment data format.' });
-    }
-
+    const assignments = JSON.parse(assignmentsJson ?? '[]');
     if (assignments.some(item => item.categoryId === null)) {
       return fail(400, { message: 'Assign all items' });
     }
-
     // --- 5. Process and Save Items ---
     for (const assignment of assignments) {
       // Add the new item to the database
-      await addShoppingItem(assignment.categoryId,
+      await addShoppingItem(
+        assignment.categoryId,
         assignment.originalName,
         assignment.originalAmount
       );
+    }
+
+    let allItems: MatchResult[] = JSON.parse(cookies.get('validationData') ?? '');
+    for (const index in allItems) {
+      const item = allItems[index]
+      switch (item.status) {
+        case 'new':
+          // Nothing to do, already added via assignments.
+          continue;
+        case 'perfect':
+          await reactivateShoppingItem(item.item, item.originalAmount);
+          continue;
+        case 'very_close':
+          return fail(400, { message: 'very_close data arrived in final step. please start from scratch' });
+      }
     }
 
     // --- 7. Cleanup Session ---

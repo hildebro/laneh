@@ -4,15 +4,11 @@
   let { data, form } = $props();
 
   // State for item assignments: maps originalName to categoryId (or null if unassigned)
-  let assignedItems = $state(data.newItems.map(item => ({ ...item, categoryId: null })));
+  let perfectItems = $state(data.items.filter(item => item.status === 'perfect'));
+  let veryCloseItems = $state(data.items.filter(item => item.status === 'very_close'));
+  let newItems = $state(data.items.filter(item => item.status === 'new'));
 
   let isSubmitting = $state(false);
-
-  function handleCategoryChange(itemName: string, categoryId: number | null) {
-    assignedItems = assignedItems.map(item =>
-      item.originalName === itemName ? { ...item, categoryId } : item
-    );
-  }
 </script>
 
 <svelte:head>
@@ -20,7 +16,7 @@
 </svelte:head>
 
 <div class="container mx-auto p-4">
-  <h1 class="text-2xl font-semibold mb-4">Categorize New Shopping Items</h1>
+  <h1 class="text-2xl font-semibold mb-4">Validate Shopping Items</h1>
 
   {#if form?.message}
     <div class="alert alert-error shadow-lg mb-4">
@@ -35,6 +31,12 @@
     </div>
   {/if}
 
+  Existing item count: {perfectItems.length}
+  <br />
+  <br />
+  New item count: {newItems.length}
+  <br />
+  <br />
   <form
     method="POST"
     use:enhance={() => {
@@ -46,18 +48,14 @@
       }}
     class="space-y-6"
   >
-    <input type="hidden" name="assignments" value={JSON.stringify(assignedItems)} />
-
-    {#each assignedItems as item (item.originalName)}
-      <div class="flex items-center space-x-4">
+    {#each veryCloseItems as item (item.originalName)}
+      <div class="flex items-center gap-2">
         <span>{item.originalName}</span>
-        <select class="select select-bordered" bind:value={item.categoryId}
-                on:change={() => handleCategoryChange(item.originalName, item.categoryId)}>
-          <option value={null}>Unassigned</option>
-          {#each data.categories as category (category.id)}
-            <option value={category.id}>{category.name}</option>
-          {/each}
-        </select>
+        <span>Auto-fix item: {item.suggestion.name}</span>
+        <label>
+          <input type="checkbox" name="{item.originalName}" />
+          Save as new instead
+        </label>
       </div>
     {/each}
 
