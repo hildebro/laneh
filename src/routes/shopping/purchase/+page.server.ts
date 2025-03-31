@@ -7,7 +7,7 @@ export const actions = {
     let items = data.getAll('items').map((formValue) => formValue.toString());
     let user = locals.user;
     if (!user) {
-      return fail(400, { message: 'Missing data' });
+      return fail(400, { message: 'Could not resolve user.' });
     }
 
     if (items.length > 0) {
