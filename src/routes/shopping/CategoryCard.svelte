@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { ShoppingItem } from '$lib/server/db/schema';
-  import ShoppingItemAdder from './ShoppingItemAdder.svelte';
 
   let { category } = $props();
 </script>
