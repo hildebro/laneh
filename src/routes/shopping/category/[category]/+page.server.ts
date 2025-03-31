@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions: Actions = {
   default: async (event) => {
     const formData = await event.request.formData();
-    const name = formData.get('name')?.toString();
+    const name = formData.get('name')?.toString()?.trim();
     let items = formData.getAll('items').map((formValue) => formValue.toString());
     if (!name) {
       return fail(400, { message: 'No name given' });
