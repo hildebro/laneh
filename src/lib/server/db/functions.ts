@@ -6,32 +6,40 @@ import {
   shoppingItem,
   type User
 } from '$lib/server/db/schema';
-import { db } from '$lib/server/db/index';
 import { and, asc, eq, inArray, max, sql } from 'drizzle-orm';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { error } from '@sveltejs/kit';
 // *** Import fast-levenshtein using the default import for CJS compatibility ***
 import levenshteinPkg from 'fast-levenshtein';
+import { getTx } from '$lib/context';
 // The actual function is usually on the '.get' property for this library
 const levenshtein = levenshteinPkg.get;
 
 // ------- USER RELATED -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
+  const db = getTx();
+
   const result = await db.select().from(table.user).where(eq(table.user.id, userId));
 
   return result.at(0);
 };
 
 export const findAllUsers = async (): Promise<User[]> => {
+  const db = getTx();
+
   return db.select().from(table.user).execute();
 };
 
 export const addUser = async (username: string): Promise<void> => {
+  const db = getTx();
+
   await db.insert(table.user).values({ id: generateUUID(), username }).execute();
 };
 
 // ------- SHOPPING RELATED -------
 export const findShoppingCategory = async (categoryId: string) => {
+  const db = getTx();
+
   return db.query.shoppingCategory.findFirst({
     with: {
       shoppingItems: {
@@ -43,6 +51,8 @@ export const findShoppingCategory = async (categoryId: string) => {
 };
 
 export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> => {
+  const db = getTx();
+
   return db.query.shoppingCategory.findMany({
     with: {
       shoppingItems: {
@@ -54,6 +64,8 @@ export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> =
 };
 
 export const updateShoppingCategory = async (categoryId: string, name: string, itemIds: string[]): Promise<void> => {
+  const db = getTx();
+
   await db.update(table.shoppingCategory).set({ name: name }).where(eq(table.shoppingCategory.id, categoryId)).execute();
 
   if (itemIds.length > 0) {
@@ -62,6 +74,8 @@ export const updateShoppingCategory = async (categoryId: string, name: string, i
 };
 
 export const addShoppingCategory = async (name: string): Promise<void> => {
+  const db = getTx();
+
   const currentMaxPriority = (
     await db
       .select({ value: max(table.shoppingCategory.priority) })
@@ -77,6 +91,8 @@ export const addShoppingCategory = async (name: string): Promise<void> => {
 };
 
 export const updateOrdering = async (newOrder: string[]): Promise<void> => {
+  const db = getTx();
+
   if (!Array.isArray(newOrder)) {
     throw error(400, 'Invalid input: Expected an array of IDs.');
   }
@@ -102,6 +118,8 @@ export const updateOrdering = async (newOrder: string[]): Promise<void> => {
 };
 
 export const findShoppingItem = async (name: string): Promise<ShoppingItem | undefined> => {
+  const db = getTx();
+
   return (await db.select()
       .from(table.shoppingItem)
       .where(sql`lower(
@@ -123,6 +141,8 @@ export const findSimilarShoppingItem = async (
   name: string,
   maxDistance: number = 2
 ): Promise<ShoppingItem|null> => {
+  const db = getTx();
+
   // Fetch all items from the database.
   // Consider optimizations for very large lists if needed.
   const allItems = await db.select()
@@ -158,6 +178,8 @@ export const findSimilarShoppingItem = async (
 };
 
 export const reactivateShoppingItem = async (item: ShoppingItem, amount: string | undefined): Promise<void> => {
+  const db = getTx();
+
   await db.update(table.shoppingItem).set({
     active: true,
     amount: amount
@@ -165,6 +187,8 @@ export const reactivateShoppingItem = async (item: ShoppingItem, amount: string 
 };
 
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
+  const db = getTx();
+
   // If we have a matching inactive item, we just make it active again.
   const existingItemId = (await db.select({ id: table.shoppingItem.id })
       .from(table.shoppingItem)
@@ -203,6 +227,8 @@ export const addShoppingItem = async (categoryId: string, name: string, amount: 
 };
 
 export const createPurchase = async (user: User, itemIds: string[]): Promise<void> => {
+  const db = getTx();
+
   // 1. Create a new purchase
   let purchaseId = generateUUID();
   await db.insert(table.shoppingPurchase)
