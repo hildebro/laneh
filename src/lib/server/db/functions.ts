@@ -122,7 +122,7 @@ export const findShoppingItem = async (name: string): Promise<ShoppingItem | und
 export const findSimilarShoppingItem = async (
   name: string,
   maxDistance: number = 2
-): Promise<ShoppingItem> => {
+): Promise<ShoppingItem|null> => {
   // Fetch all items from the database.
   // Consider optimizations for very large lists if needed.
   const allItems = await db.select()
