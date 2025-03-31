@@ -8,7 +8,7 @@
 <div class="card w-full">
 	<!-- Header -->
 	<div class="flex justify-between">
-		{category.name}
+		<b>{category.name}</b>
 		<a href="shopping/category/{category.id}" class="btn">Edit</a>
 	</div>
 	<!-- Item list -->

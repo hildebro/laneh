@@ -7,7 +7,7 @@
 {#if category.shoppingItems.length > 0 }
 	<div class="card w-full">
 		<!-- Header -->
-		{category.name}
+		<b>{category.name}</b>
 		<!-- Item list -->
 		<div>
 			{#each category.shoppingItems.filter((item: ShoppingItem) => item.active) as item}
