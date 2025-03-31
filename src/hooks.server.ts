@@ -4,6 +4,8 @@ import { type Handle } from '@sveltejs/kit';
 import { USER_COOKIE } from '$lib';
 import { findUser } from '$lib/server/db/functions';
 import { getSession, refreshSession } from '$lib/server/auth';
+import { db } from '$lib/server/db';
+import { transactionContext } from '$lib/context';
 
 const handleAuth: Handle = async ({ event, resolve }) => {
   const session = await getSession(event.cookies);
@@ -26,6 +28,24 @@ const handleAuth: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
+const handleDatabase: Handle = async ({ event, resolve }) => {
+  try {
+    // Start the Drizzle transaction using the main db client
+    return await db.transaction(async (tx) => {
+      // Run the request resolution within the ALS context, storing the transactional client 'tx'.
+      return await transactionContext.run(tx, async () => {
+        return resolve(event);
+      });
+    });
+  } catch (error) {
+    // Catch errors from db.transaction OR transactionContext.run OR resolve
+    console.error('Hook Error:', error);
+    // Re-throw to let SvelteKit handle it
+    throw error;
+  }
+
+};
+
 const handleUser: Handle = async ({ event, resolve }) => {
   const userCookie = event.cookies.get(USER_COOKIE);
   if (!userCookie) {
@@ -40,4 +60,4 @@ const handleUser: Handle = async ({ event, resolve }) => {
 };
 
 const handleParaglide: Handle = i18n.handle();
-export const handle: Handle = sequence(handleAuth, handleUser, handleParaglide);
+export const handle: Handle = sequence(handleAuth, handleDatabase, handleUser, handleParaglide);
