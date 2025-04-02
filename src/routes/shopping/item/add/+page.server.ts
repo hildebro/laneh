@@ -110,7 +110,7 @@ async function persistStagedItem(name: string, amount: string, listId: string): 
   // 2. Very Close Match
   const similarItem = await findSimilarShoppingItem(name);
   if (similarItem) {
-    await addCloseStagedItem(listId, similarItem, amount);
+    await addCloseStagedItem(listId, similarItem, name, amount);
 
     return 'close_match';
   }
