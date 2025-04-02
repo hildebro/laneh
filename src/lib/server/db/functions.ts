@@ -140,7 +140,7 @@ export const findShoppingItem = async (name: string): Promise<ShoppingItem | und
 export const findSimilarShoppingItem = async (
   name: string,
   maxDistance: number = 2
-): Promise<ShoppingItem|null> => {
+): Promise<ShoppingItem | null> => {
   const db = getTx();
 
   // Fetch all items from the database.
@@ -177,13 +177,13 @@ export const findSimilarShoppingItem = async (
   return closestItem;
 };
 
-export const reactivateShoppingItem = async (item: ShoppingItem, amount: string | undefined): Promise<void> => {
+export const reactivateShoppingItem = async (itemId: string, amount: string | undefined): Promise<void> => {
   const db = getTx();
 
   await db.update(table.shoppingItem).set({
     active: true,
     amount: amount
-  }).where(eq(table.shoppingItem.id, item.id)).execute();
+  }).where(eq(table.shoppingItem.id, itemId)).execute();
 };
 
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
@@ -248,6 +248,90 @@ export const createPurchase = async (user: User, itemIds: string[]): Promise<voi
 
   // 3. Deactivate the shopping items
   await db.update(table.shoppingItem).set({ active: false }).where(inArray(table.shoppingItem.id, itemIds)).execute();
+};
+
+export const addStagedShoppingList = async (userId: string): Promise<string> => {
+  const db = getTx();
+
+  const id = generateUUID();
+  await db.insert(table.stagedShoppingList).values({
+    id: id,
+    userId: userId,
+    status: 'validating'
+  });
+
+  return id;
+};
+
+export const addPerfectStagedItem = async (listId: string, matchedItem: ShoppingItem, amount: string | undefined): Promise<void> => {
+  const db = getTx();
+
+  await db.insert(table.stagedShoppingItem).values({
+    id: generateUUID(),
+    listId: listId,
+    status: 'perfect_match',
+    name: matchedItem.name,
+    amount: amount ?? '',
+    matchedItemId: matchedItem.id
+  });
+};
+
+export const addCloseStagedItem = async (listId: string, suggestedItem: ShoppingItem, amount: string | undefined): Promise<void> => {
+  const db = getTx();
+
+  await db.insert(table.stagedShoppingItem).values({
+    id: generateUUID(),
+    listId: listId,
+    status: 'perfect_match',
+    name: suggestedItem.name,
+    amount: amount ?? '',
+    suggestedItemId: suggestedItem.id
+  });
+};
+
+export const addNewStagedItem = async (listId: string, name: string, amount: string | undefined): Promise<void> => {
+  const db = getTx();
+
+  await db.insert(table.stagedShoppingItem).values({
+    id: generateUUID(),
+    listId: listId,
+    status: 'perfect_match',
+    name: name,
+    amount: amount ?? ''
+  });
+};
+
+export const commitStagedItems = async (userId: string) => {
+  const db = getTx();
+
+  // Get the staged list.
+  const list = await db.query.stagedShoppingList.findFirst({
+    with: {
+      stagedItems: {}
+    },
+    where: eq(table.stagedShoppingList.userId, userId)
+  }).execute();
+
+  if (!list) {
+    throw new Error('Trying to commit nonexistent list.');
+  }
+
+  // Commit every item.
+  for (const item of list.stagedItems) {
+    switch (item.status) {
+      case 'close_match':
+        throw new Error('Trying to commit an unfinished list.');
+      case 'perfect_match':
+        await reactivateShoppingItem(item.matchedItemId as string, item.amount);
+        continue;
+      case 'unmatched':
+        // todo implement
+        throw new Error('not implemented yet');
+    }
+  }
+
+  // Delete the staged list
+  db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId))
 };
 
 // ------- GENERIC -------

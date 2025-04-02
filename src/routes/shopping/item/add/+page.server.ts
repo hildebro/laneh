@@ -1,66 +1,68 @@
 import type { PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
-import type { ShoppingItem } from '$lib/server/db/schema';
-import { findShoppingItem, findSimilarShoppingItem } from '$lib/server/db/functions';
+import {
+  addCloseStagedItem,
+  addNewStagedItem,
+  addPerfectStagedItem,
+  addStagedShoppingList, commitStagedItems,
+  findShoppingItem,
+  findSimilarShoppingItem
+} from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async () => {
   return {};
 };
 
 export const actions = {
-  create: async ({ request, cookies }) => {
+  create: async ({ request, locals }) => {
+    // --- Process Input Lines ---
     const formData = await request.formData();
     const itemsText = formData.get('items') as string || '';
     const lines = itemsText.split('\n').map(line => line.trim()).filter(l => l !== '');
 
     if (lines.length === 0) {
-      return fail(400, { message: 'No items entered' });
+      return fail(400, { message: 'Empty data given' });
     }
 
-    const results: MatchResult[] = [];
+    // --- Get User (Essential) ---
+    const userId = locals.user?.id as string;
+    const listId = await addStagedShoppingList(userId);
+
+    // --- Process lines and prepare staged data ---
+    let needsValidation = false;
+    let needsCategorization = false;
     for (const line of lines) {
       const { name, amount } = parseLine(line);
-      if (name) { // Only process if a name was found
-        results.push(await findItemMatch(name, amount));
+      if (!name) {
+        return fail(400, { message: 'Some line could not be parsed. Please check for mistakes.' });
+      }
+
+      // case `perfect_match` doesn't matter to us here.
+      const result = await persistStagedItem(name, amount, listId);
+      switch (result) {
+        case 'close_match':
+          needsValidation = true;
+          continue;
+        case 'unmatched':
+          needsCategorization = true;
       }
     }
 
-    const needsValidation = results.some(r => r.status === 'very_close');
-    const hasNewItems = results.some(r => r.status === 'new');
-    const hasPerfectMatches = results.some(r => r.status === 'perfect');
-
     // --- Decision Logic ---
-
-    // Option A: Store results in session/temp storage for next steps
-    // const resultId = crypto.randomUUID(); // Generate unique ID
-    // await storeResultsTemporarily(resultId, results); // Implement DB/Cache storage
-    // Or use cookies/session if appropriate for your setup and data size
-    // Example using cookies (limited size!) - Session is generally better
-    cookies.set('validationData', JSON.stringify(results), { path: '/', maxAge: 300 }); // Short expiry
-
     if (needsValidation) {
-      // Redirect to validation page, passing the ID or relying on session/cookie
-      // throw redirect(303, `/shopping/validate?id=${resultId}`);
-      return redirect(303, `validate`); // Rely on cookie/session
-    } else if (hasNewItems) {
-      // No validation needed, but new items require categorization
-      // throw redirect(303, `/shopping/categorize?id=${resultId}`);
-      return redirect(303, `categorize`); // Rely on cookie/session
-    } else if (hasPerfectMatches) {
-      // Only perfect matches - process them directly
-      // await activateItems(results.filter(r => r.status === 'perfect').map(r => ({ id: r.item.id, amount: r.originalAmount }))); // Implement DB logic
-      console.log('Processing perfect matches only...'); // Replace with actual DB update
-      // Invalidate data and redirect back to the main list
-      // Use invalidateAll() on the client via enhance's update, or specific layout data invalidation if needed
-      return redirect(303, '../'); // Redirect back to origin page
+      return redirect(303, `validate`);
+    } else if (needsCategorization) {
+      return redirect(303, `categorize`);
     } else {
-      // No items processed (e.g., only empty lines submitted)
+      // If all items are perfect matches, we can just commit them
+      await commitStagedItems(userId);
+
       return redirect(303, '../');
     }
   }
 };
 
-// --- Helper: Parsing ---
+// --- Helper: Parsing (Keep your existing function) ---
 function parseLine(line: string): { name: string; amount: string } {
   line = line.trim();
   let name = line;
@@ -94,25 +96,26 @@ function parseLine(line: string): { name: string; amount: string } {
   return { name: name.trim(), amount };
 }
 
-// --- Helper: Matching (Simplified) ---
-export type MatchResult =
-  | { status: 'perfect'; item: ShoppingItem; originalAmount: string }
-  | { status: 'very_close'; originalName: string; originalAmount: string; suggestion: ShoppingItem }
-  | { status: 'new'; originalName: string; originalAmount: string };
+type MatchResult = 'perfect_match' | 'close_match' | 'unmatched';
 
-async function findItemMatch(name: string, amount: string): Promise<MatchResult> {
+async function persistStagedItem(name: string, amount: string, listId: string): Promise<MatchResult> {
   // 1. Perfect Match (case-insensitive, check active & inactive)
   const perfectMatch = await findShoppingItem(name);
   if (perfectMatch) {
-    return { status: 'perfect', item: perfectMatch, originalAmount: amount };
+    await addPerfectStagedItem(listId, perfectMatch, amount);
+
+    return 'perfect_match';
   }
 
   // 2. Very Close Match
   const similarItem = await findSimilarShoppingItem(name);
   if (similarItem) {
-    return { status: 'very_close', originalName: name, originalAmount: amount, suggestion: similarItem };
+    await addCloseStagedItem(listId, similarItem, amount);
+
+    return 'close_match';
   }
 
-  // 3. New Item
-  return { status: 'new', originalName: name, originalAmount: amount };
+  await addNewStagedItem(listId, name, amount);
+
+  return 'unmatched';
 }
