@@ -331,7 +331,7 @@ export const commitStagedItems = async (userId: string) => {
   }
 
   // Delete the staged list
-  db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId))
+  await db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId)).execute()
 };
 
 // ------- GENERIC -------
