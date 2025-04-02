@@ -4,6 +4,7 @@ import {
   type ShoppingCategory,
   type ShoppingItem,
   shoppingItem,
+  type StagedShoppingItem,
   type User
 } from '$lib/server/db/schema';
 import { and, asc, eq, inArray, max, sql } from 'drizzle-orm';
@@ -250,6 +251,22 @@ export const createPurchase = async (user: User, itemIds: string[]): Promise<voi
   await db.update(table.shoppingItem).set({ active: false }).where(inArray(table.shoppingItem.id, itemIds)).execute();
 };
 
+export const findStagedShoppingList = async (userId: string) => {
+  const db = getTx();
+
+  return db.query.stagedShoppingList.findFirst({
+    with: {
+      stagedItems: {
+        with: {
+          suggestedItem: {},
+          matchedItem: {}
+        }
+      }
+    },
+    where: eq(table.stagedShoppingList.userId, userId)
+  }).execute();
+};
+
 export const addStagedShoppingList = async (userId: string): Promise<string> => {
   const db = getTx();
 
@@ -287,6 +304,22 @@ export const addCloseStagedItem = async (listId: string, suggestedItem: Shopping
     amount: amount ?? '',
     suggestedItemId: suggestedItem.id
   });
+};
+
+export const matchStagedItem = async (item: StagedShoppingItem): Promise<void> => {
+  const db = getTx();
+
+  await db.update(table.stagedShoppingItem)
+    .set({ matchedItemId: item.suggestedItemId, suggestedItemId: null, status: 'perfect_match' })
+    .where(eq(table.stagedShoppingItem.id, item.id));
+};
+
+export const unmatchStagedItem = async (item: StagedShoppingItem): Promise<void> => {
+  const db = getTx();
+
+  await db.update(table.stagedShoppingItem)
+    .set({ suggestedItemId: null, status: 'unmatched' })
+    .where(eq(table.stagedShoppingItem.id, item.id));
 };
 
 export const addNewStagedItem = async (listId: string, name: string, amount: string | undefined): Promise<void> => {
@@ -331,7 +364,7 @@ export const commitStagedItems = async (userId: string) => {
   }
 
   // Delete the staged list
-  await db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId)).execute()
+  await db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId)).execute();
 };
 
 // ------- GENERIC -------
