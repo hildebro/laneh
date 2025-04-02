@@ -1,0 +1,1 @@
+ALTER TABLE "staged_shopping_list" ADD CONSTRAINT "staged_shopping_list_userId_unique" UNIQUE("user_id");
