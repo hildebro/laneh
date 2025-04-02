@@ -276,14 +276,14 @@ export const addPerfectStagedItem = async (listId: string, matchedItem: Shopping
   });
 };
 
-export const addCloseStagedItem = async (listId: string, suggestedItem: ShoppingItem, amount: string | undefined): Promise<void> => {
+export const addCloseStagedItem = async (listId: string, suggestedItem: ShoppingItem, name: string, amount: string | undefined): Promise<void> => {
   const db = getTx();
 
   await db.insert(table.stagedShoppingItem).values({
     id: generateUUID(),
     listId: listId,
     status: 'close_match',
-    name: suggestedItem.name,
+    name: name,
     amount: amount ?? '',
     suggestedItemId: suggestedItem.id
   });
