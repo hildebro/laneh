@@ -80,7 +80,7 @@ export const shoppingPurchaseItemRelations = relations(shoppingPurchaseItem, ({ 
 
 export const stagedShoppingList = pgTable('staged_shopping_list', {
   id: text().primaryKey(),
-  userId: text().notNull().references(() => user.id, { onDelete: 'cascade' }),
+  userId: text().notNull().unique().references(() => user.id, { onDelete: 'cascade' }),
   status: text({ enum: ['validating', 'categorizing'] }).notNull()
 });
 export type StagedShoppingList = typeof stagedShoppingList.$inferSelect;
