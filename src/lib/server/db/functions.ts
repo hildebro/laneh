@@ -282,7 +282,7 @@ export const addCloseStagedItem = async (listId: string, suggestedItem: Shopping
   await db.insert(table.stagedShoppingItem).values({
     id: generateUUID(),
     listId: listId,
-    status: 'perfect_match',
+    status: 'close_match',
     name: suggestedItem.name,
     amount: amount ?? '',
     suggestedItemId: suggestedItem.id
@@ -295,7 +295,7 @@ export const addNewStagedItem = async (listId: string, name: string, amount: str
   await db.insert(table.stagedShoppingItem).values({
     id: generateUUID(),
     listId: listId,
-    status: 'perfect_match',
+    status: 'unmatched',
     name: name,
     amount: amount ?? ''
   });
