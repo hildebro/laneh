@@ -28,7 +28,7 @@ export const shoppingItem = pgTable('shopping_item', {
   name: text().notNull().unique(),
   amount: text().notNull().default(''),
   priority: integer().notNull(),
-  active: boolean().notNull(),
+  active: boolean().notNull()
 }, (shoppingItem) => [
   unique().on(shoppingItem.categoryId, shoppingItem.priority)
 ]);
@@ -75,5 +75,52 @@ export const shoppingPurchaseItemRelations = relations(shoppingPurchaseItem, ({ 
   shoppingItem: one(shoppingItem, {
     fields: [shoppingPurchaseItem.itemId],
     references: [shoppingItem.id]
+  })
+}));
+
+export const stagedShoppingList = pgTable('staged_shopping_list', {
+  id: text().primaryKey(),
+  userId: text().notNull().references(() => user.id, { onDelete: 'cascade' }),
+  status: text({ enum: ['validating', 'categorizing'] }).notNull()
+});
+export type StagedShoppingList = typeof stagedShoppingList.$inferSelect;
+
+export const stagedShoppingListRelations = relations(stagedShoppingList, ({ one, many }) => ({
+  user: one(user, { fields: [stagedShoppingList.userId], references: [user.id] }),
+  // One staged list has many staged items
+  stagedItems: many(stagedShoppingItem)
+}));
+
+export const stagedShoppingItem = pgTable('staged_shopping_item', {
+  id: text().primaryKey(),
+  listId: text().notNull().references(() => stagedShoppingList.id, { onDelete: 'cascade' }),
+  status: text({ enum: ['perfect_match', 'close_match', 'unmatched'] }).notNull(),
+  name: text().notNull(),
+  amount: text().notNull(),
+  // FK to shopping_item, non-null only if status is 'perfect_match'
+  matchedItemId: text('matched_item_id').references(() => shoppingItem.id),
+  // FK to shopping_item, non-null only if status is 'close_match'
+  suggestedItemId: text('suggested_item_id').references(() => shoppingItem.id)
+});
+export type StagedShoppingItem = typeof stagedShoppingItem.$inferSelect;
+
+export type StagedItemForValidation = StagedShoppingItem & { status: 'close_match'; suggestedItemId: string };
+export type StagedItemForCategorization = StagedShoppingItem & { status: 'unmatched' };
+export type StagedItemPerfectMatch = StagedShoppingItem & { status: 'perfect_match'; matchedItemId: string };
+
+export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one }) => ({
+  // Each staged item belongs to one staged list
+  list: one(stagedShoppingList, { fields: [stagedShoppingItem.listId], references: [stagedShoppingList.id] }),
+  // Link to the actual item if it was a perfect match
+  matchedItem: one(shoppingItem, {
+    fields: [stagedShoppingItem.matchedItemId],
+    references: [shoppingItem.id],
+    relationName: 'matchedItem' // Explicit name helps Drizzle distinguish
+  }),
+  // Link to the suggested item if it was a close match
+  suggestedItem: one(shoppingItem, {
+    fields: [stagedShoppingItem.suggestedItemId],
+    references: [shoppingItem.id],
+    relationName: 'suggestedItem' // Explicit name
   })
 }));
