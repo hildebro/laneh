@@ -1,72 +1,47 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import type { ShoppingCategory } from '$lib/server/db/schema';
-import { addShoppingItem, findAllShoppingCategories } from '$lib/server/db/functions';
-import type { MatchResult } from '../add/+page.server'; // Adjust path
+import { findStagedShoppingList, matchStagedItem, unmatchStagedItem } from '$lib/server/db/functions';
 
-// Define the structure of the item data expected from the session
-interface ItemToCategorize {
-  originalName: string;
-  originalAmount: string;
-  // Include other relevant details if needed, e.g., parsed name/amount if different
-}
-
-export const load: PageServerLoad = async ({ cookies }) => {
-  // --- 2. Retrieve items from session ---
-  // Replace with your actual session retrieval logic
-  const itemsToValidate: MatchResult[] = JSON.parse(cookies.get('validationData') ?? '');
-
-  // --- 3. Handle missing data ---
-  if (!itemsToValidate || itemsToValidate.length === 0) {
-    // No items need categorization, maybe they were already processed or user navigated directly.
-    // Redirect to the main list. Optionally add a flash message.
-    // locals.session?.flash('info', 'No items to categorize.');
-    return redirect(303, '../');
+export const load: PageServerLoad = async ({ locals }) => {
+  let stagedList = await findStagedShoppingList(locals.user?.id as string);
+  if (!stagedList) {
+    // If nothing is staged yet, go back to add.
+    return redirect(302, 'add');
   }
 
-  // --- 5. Return data to the page ---
+  // If none of the staged items need validation, we can continue to categorizing.
+  if (!stagedList.stagedItems.some(item => item.status === 'close_match')) {
+    return redirect(302, 'categorize');
+  }
+
   return {
-    items: itemsToValidate
+    items: stagedList.stagedItems
   };
 };
 
 export const actions: Actions = {
-  default: async ({ cookies, request }) => {
-    let itemsToValidate: MatchResult[] = JSON.parse(cookies.get('validationData') ?? '');
-
-    const formData = await request.formData();
-
-    const veryCloseItems = itemsToValidate.filter(item => item.status === 'very_close');
-    if (!veryCloseItems || veryCloseItems.length === 0) {
-      return redirect(302, 'categorize');
+  default: async ({ locals, request }) => {
+    const stagedList = await findStagedShoppingList(locals.user?.id as string);
+    if (!stagedList) {
+      redirect(302, '../');
     }
 
-    itemsToValidate = itemsToValidate.map(
-      item => {
-        if (item.status !== 'very_close') {
-          return item;
-        }
-
-        if (formData.has(item.originalName)) {
-          return { status: 'new', originalName: item.originalName, originalAmount: item.originalAmount };
-        } else {
-          return { status: 'perfect', item: item.suggestion, originalAmount: item.originalAmount };
-        }
+    const formData = await request.formData();
+    for (const index in stagedList.stagedItems) {
+      const item = stagedList.stagedItems[index];
+      if (item.status !== 'close_match') {
+        continue;
       }
-    );
 
-    cookies.set('validationData', JSON.stringify(itemsToValidate), { path: '/', maxAge: 300 }); // Short expiry
+      // Update all close_match items so that there is none left after the action.
+      if (formData.has(item.name)) {
+        await unmatchStagedItem(item);
+      } else {
+        await matchStagedItem(item);
+      }
+    }
 
-    // --- Success ---
-    // Option 1: Redirect on success (common pattern after POST)
-    // Replace '/path/to/success/page' with your target route
-    return redirect(303, 'categorize'); // Redirect to homepage or a confirmation page
-
-    // Option 2: Return success data (if you want the page to update without full redirect)
-    // return {
-    //   success: true,
-    //   message: 'Items processed successfully!',
-    //   processedResults: results
-    // };
+    // With all items either perfect_match or unmatched, we can continue to categorizing.
+    return redirect(303, 'categorize');
   }
 };
