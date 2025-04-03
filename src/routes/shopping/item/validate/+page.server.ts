@@ -1,6 +1,11 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { findStagedShoppingList, matchStagedItem, unmatchStagedItem } from '$lib/server/db/functions';
+import {
+  commitStagedItems,
+  findStagedShoppingList,
+  matchStagedItem,
+  unmatchStagedItem
+} from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async ({ locals }) => {
   let stagedList = await findStagedShoppingList(locals.user?.id as string);
@@ -21,7 +26,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
   default: async ({ locals, request }) => {
-    const stagedList = await findStagedShoppingList(locals.user?.id as string);
+    const userId = locals.user?.id as string;
+    const stagedList = await findStagedShoppingList(userId);
     if (!stagedList) {
       redirect(302, '../');
     }
@@ -41,7 +47,15 @@ export const actions: Actions = {
       }
     }
 
-    // With all items either perfect_match or unmatched, we can continue to categorizing.
-    return redirect(303, 'categorize');
+    const updatedList = await findStagedShoppingList(userId);
+    if (updatedList.stagedItems.some(item => item.status === 'unmatched')) {
+      // Some unmatched items exist, so we need to categorize.
+      return redirect(302, 'categorize');
+    } else {
+      // If all items are perfect_matched, we can commit the list and finish the process.
+      await commitStagedItems(userId);
+
+      return redirect(302, '../');
+    }
   }
 };
