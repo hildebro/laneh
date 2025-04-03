@@ -3,16 +3,7 @@
 
   let { data, form } = $props();
 
-  // State for item assignments: maps originalName to categoryId (or null if unassigned)
-  let assignedItems = $state(data.newItems.map(item => ({ ...item, categoryId: null })));
-
   let isSubmitting = $state(false);
-
-  function handleCategoryChange(itemName: string, categoryId: number | null) {
-    assignedItems = assignedItems.map(item =>
-      item.originalName === itemName ? { ...item, categoryId } : item
-    );
-  }
 </script>
 
 <svelte:head>
@@ -20,7 +11,7 @@
 </svelte:head>
 
 <div class="container mx-auto p-4">
-  <h1 class="text-2xl font-semibold mb-4">Categorize New Shopping Items</h1>
+  <h1 class="text-2xl font-semibold mb-4">Categorize New Items</h1>
 
   {#if form?.message}
     <div class="alert alert-error shadow-lg mb-4">
@@ -46,29 +37,19 @@
       }}
     class="space-y-6"
   >
-    <input type="hidden" name="assignments" value={JSON.stringify(assignedItems)} />
-
-    {#each assignedItems as item (item.originalName)}
-      <div class="flex items-center space-x-4">
-        <span>{item.originalName}</span>
-        <select class="select select-bordered" bind:value={item.categoryId}
-                on:change={() => handleCategoryChange(item.originalName, item.categoryId)}>
-          <option value={null}>Unassigned</option>
-          {#each data.categories as category (category.id)}
-            <option value={category.id}>{category.name}</option>
-          {/each}
-        </select>
-      </div>
+    {#each data.items as item (item.id)}
+      <label>
+        <input type="checkbox" name="itemIds" value={item.id} />
+        {item.name}
+      </label>
     {/each}
 
     <div class="mt-6 text-center">
-      <button type="submit" class="btn" disabled={isSubmitting}>
-        {#if isSubmitting}
-          <span class="loading loading-spinner loading-xs"></span> Saving...
-        {:else}
-          Continue
-        {/if}
-      </button>
+      {#each data.categories as category (category.id)}
+        <button type="submit" class="btn" name="categoryId" value={category.id} disabled={isSubmitting}>
+          {category.name}
+        </button>
+      {/each}
     </div>
   </form>
 </div>

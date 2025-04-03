@@ -334,6 +334,10 @@ export const addNewStagedItem = async (listId: string, name: string, amount: str
   });
 };
 
+export const assignStagedItemCategory = async (itemIds: string[], categoryId: string, userId: string) => {
+
+}
+
 export const commitStagedItems = async (userId: string) => {
   const db = getTx();
 
