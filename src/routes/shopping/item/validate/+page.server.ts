@@ -48,7 +48,7 @@ export const actions: Actions = {
     }
 
     const updatedList = await findStagedShoppingList(userId);
-    if (updatedList.stagedItems.some(item => item.status === 'unmatched')) {
+    if (updatedList?.stagedItems.some(item => item.status === 'unmatched')) {
       // Some unmatched items exist, so we need to categorize.
       return redirect(302, 'categorize');
     } else {
