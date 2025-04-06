@@ -50,7 +50,7 @@
     By default, your input items will be renamed to match the existing items. You can prevent the
     renaming to create new items instead by clicking the associated checkbox.
     <div class="table-container preset-filled-primary-200-800 mt-2">
-      <table class="table">
+      <table class="table text-base">
         <thead>
         <tr>
           <th>Your input</th>
