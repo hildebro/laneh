@@ -6,4 +6,7 @@
   <a class="btn" href="settings/users">
     Change user
   </a>
+  <a class="btn" href="settings/categories">
+    Edit categories
+  </a>
 </div>
