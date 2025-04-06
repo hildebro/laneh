@@ -228,6 +228,12 @@ export const addShoppingItem = async (categoryId: string, name: string, amount: 
   });
 };
 
+export const deleteCategory = async (categoryId: string): Promise<void> => {
+  const db = getTx();
+
+  await db.delete(table.shoppingCategory).where(eq(table.shoppingCategory.id, categoryId)).execute();
+};
+
 export const createPurchase = async (user: User, itemIds: string[]): Promise<void> => {
   const db = getTx();
 

@@ -1,6 +1,11 @@
 import type { PageServerLoad } from './$types';
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
-import { addShoppingCategory, findShoppingCategory, updateShoppingCategory } from '$lib/server/db/functions';
+import {
+  addShoppingCategory,
+  deleteCategory,
+  findShoppingCategory,
+  updateShoppingCategory
+} from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async ({ params }) => {
   if (params.category === 'add') {
@@ -16,7 +21,7 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-  default: async (event) => {
+  create: async (event) => {
     const formData = await event.request.formData();
     const name = formData.get('name')?.toString()?.trim();
     let items = formData.getAll('items').map((formValue) => formValue.toString());
@@ -36,5 +41,22 @@ export const actions: Actions = {
       return fail(500, { message: 'An error has occurred' });
     }
     return redirect(302, '../../shopping');
+  },
+  delete: async ({ request }) => {
+    const formData = await request.formData();
+    const categoryId = formData.get('categoryId')?.toString();
+
+    const category = await findShoppingCategory(categoryId);
+    if (!category) {
+      throw error(404, 'Category not found');
+    }
+
+    if (category.shoppingItems.length > 0) {
+      return fail(400, { message: 'Delete all items first' });
+    }
+
+    await deleteCategory(categoryId);
+
+    return redirect(302, '../');
   }
 };
