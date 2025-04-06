@@ -9,7 +9,7 @@
 
 <div class="card">
   <div class="h5 mb-4">{data.category ? 'Edit Category' : 'Add New Category'}</div>
-  <form method="POST" use:enhance>
+  <form method="POST" action="?/create" use:enhance>
     <input type="hidden" name="categoryId" value={data.category?.id}>
     <label>
       Name
@@ -38,4 +38,13 @@
       <p class="preset-filled-error-50-950 rounded mt-4 text-center">{form.message}</p>
     {/if}
   </form>
+
+  {#if data.category}
+    <form method="POST" action="?/delete" use:enhance>
+      <input type="hidden" name="categoryId" value={data.category?.id}>
+      <button type="submit" class="mt-2 btn preset-filled-error-400-600">
+        DELETE CATEGORY
+      </button>
+    </form>
+  {/if}
 </div>
