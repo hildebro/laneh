@@ -1,9 +1,8 @@
 <script lang="ts">
   // noinspection ES6UnusedImports
   import { Navigation } from '@skeletonlabs/skeleton-svelte';
-  import { Avatar } from '@skeletonlabs/skeleton-svelte';
   import { base } from '$app/paths';
-  import { CalendarDays, ShoppingCart, Star } from 'lucide-svelte';
+  import { CalendarDays, Settings, ShoppingCart, Star } from 'lucide-svelte';
 
   let { user } = $props();
 </script>
@@ -19,12 +18,8 @@
     <Navigation.Tile label="Daily Upkeep" labelClasses="disabled">
       <Star />
     </Navigation.Tile>
-    <Navigation.Tile href="{base}/users" label={user?.username ?? ''}>
-      <Avatar
-        name={user?.username ?? ''}
-        background="preset-filled-secondary-800-200"
-        classes="w-7 h-7 rounded-full text-lg flex"
-      />
+    <Navigation.Tile href="{base}/settings" label="Settings">
+      <Settings />
     </Navigation.Tile>
   </Navigation.Bar>
 </header>
