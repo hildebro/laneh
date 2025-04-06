@@ -8,7 +8,7 @@
   let { user } = $props();
 </script>
 
-<header class="sticky top-0 z-10 p-1">
+<header class="sticky top-0 z-10 p-1 text-xs">
   <Navigation.Bar>
     <Navigation.Tile href="{base}/shopping" label="Shopping">
       <ShoppingCart />
