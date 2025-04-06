@@ -70,6 +70,7 @@ export const updateShoppingCategory = async (categoryId: string, name: string, i
   await db.update(table.shoppingCategory).set({ name: name }).where(eq(table.shoppingCategory.id, categoryId)).execute();
 
   if (itemIds.length > 0) {
+    await db.delete(table.shoppingPurchaseItem).where(inArray(table.shoppingPurchaseItem.itemId, itemIds));
     await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds));
   }
 };
