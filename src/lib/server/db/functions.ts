@@ -335,7 +335,7 @@ export const addNewStagedItem = async (listId: string, name: string, amount: str
   });
 };
 
-export const assignCategoryToStagedItems = async (itemIds: string[], categoryId: string, userId: string) => {
+export const assignCategoryToStagedItems = async (itemIds: string[], categoryId: string) => {
   const db = getTx();
 
   await db.update(table.stagedShoppingItem).set({
