@@ -8,7 +8,7 @@
   {#await data.categories}
     loading...
   {:then categories}
-    <div class="flex justify-end gap-2 mb-4">
+    <div class="flex flex-wrap justify-end gap-2 mb-4">
       <a class="btn" href="shopping/item/add">Add items</a>
       <a class="btn" href="shopping/category/add">New category</a>
       <a class="btn" href="shopping/category/reorder">Reorder categories</a>
