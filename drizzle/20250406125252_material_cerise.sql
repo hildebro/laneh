@@ -1,0 +1,2 @@
+ALTER TABLE "staged_shopping_item" ADD COLUMN "selected_category_id" text;--> statement-breakpoint
+ALTER TABLE "staged_shopping_item" ADD CONSTRAINT "staged_shopping_item_selected_category_id_shopping_category_id_fk" FOREIGN KEY ("selected_category_id") REFERENCES "public"."shopping_category"("id") ON DELETE no action ON UPDATE no action;

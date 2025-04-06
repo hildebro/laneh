@@ -98,9 +98,11 @@ export const stagedShoppingItem = pgTable('staged_shopping_item', {
   name: text().notNull(),
   amount: text().notNull(),
   // FK to shopping_item, non-null only if status is 'perfect_match'
-  matchedItemId: text('matched_item_id').references(() => shoppingItem.id),
+  matchedItemId: text().references(() => shoppingItem.id),
   // FK to shopping_item, non-null only if status is 'close_match'
-  suggestedItemId: text('suggested_item_id').references(() => shoppingItem.id)
+  suggestedItemId: text().references(() => shoppingItem.id),
+  // FK to shopping_category, non-null but must be set later in status 'unmatched'
+  selectedCategoryId: text().references(() => shoppingCategory.id)
 });
 export type StagedShoppingItem = typeof stagedShoppingItem.$inferSelect;
 
@@ -122,5 +124,11 @@ export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one 
     fields: [stagedShoppingItem.suggestedItemId],
     references: [shoppingItem.id],
     relationName: 'suggestedItem' // Explicit name
+  }),
+  // Link to the selected category if it was already done by the user
+  selectedCategory: one(shoppingCategory, {
+    fields: [stagedShoppingItem.selectedCategoryId],
+    references: [shoppingCategory.id],
+    relationName: 'selectedCategory' // Explicit name
   })
 }));
