@@ -10,20 +10,11 @@
   <title>Categorize New Items</title>
 </svelte:head>
 
-<div class="container mx-auto p-4">
+<div class="card">
   <h1 class="text-2xl font-semibold mb-4">Categorize New Items</h1>
 
   {#if form?.message}
-    <div class="alert alert-error shadow-lg mb-4">
-      <div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
-             viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>Error: {form.message}</span>
-      </div>
-    </div>
+    <p class="preset-filled-error-50-950 rounded mt-4 text-center">{form.message}</p>
   {/if}
 
   <form
@@ -32,19 +23,22 @@
         isSubmitting = true;
         return async ({ update }) => {
           isSubmitting = false;
-          await update(); // Perform redirect or update UI
+          await update();
         };
       }}
-    class="space-y-6"
   >
-    {#each data.items as item (item.id)}
-      <label>
-        <input type="checkbox" name="itemIds" value={item.id} />
-        {item.name}
-      </label>
-    {/each}
+    Select items to categorize:
+    <div class="mt-2 mb-4 flex gap-6 flex-wrap text-lg justify-center">
+      {#each data.items.filter(item => item.status === 'unmatched' && item.selectedCategoryId === null) as item (item.id)}
+        <label>
+          <input type="checkbox" name="itemIds" value={item.id} />
+          {item.name}
+        </label>
+      {/each}
+    </div>
 
-    <div class="mt-6 text-center">
+    Set category for selected items:
+    <div class="mt-2 flex gap-6 flex-wrap text-lg justify-center">
       {#each data.categories as category (category.id)}
         <button type="submit" class="btn" name="categoryId" value={category.id} disabled={isSubmitting}>
           {category.name}

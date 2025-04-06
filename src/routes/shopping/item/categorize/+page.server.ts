@@ -1,11 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import {
-  assignStagedItemCategory,
+  assignCategoryToStagedItems,
   commitStagedItems,
   findAllShoppingCategories,
   findStagedShoppingList
 } from '$lib/server/db/functions';
+import type { StagedShoppingList } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const userId = locals.user?.id as string;
@@ -21,7 +22,17 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   if (!stagedList.stagedItems.some(item => item.status === 'unmatched')) {
-    // Nothing to categorize, finish the staging.
+    // Nothing unmatched items to categorize, meaning only perfect matches. Finish the staging.
+    await commitStagedItems(userId);
+
+    return redirect(302, '../');
+  }
+
+  if (
+    !stagedList.stagedItems.filter(item => item.status === 'unmatched')
+      .some(item => item.selectedCategoryId === null)
+  ) {
+    // All items that need categorizing have gotten it. Finish the staging.
     await commitStagedItems(userId);
 
     return redirect(302, '../');
@@ -47,21 +58,15 @@ export const actions: Actions = {
     const formData = await request.formData();
     const itemIds = formData.getAll('itemIds').map((formValue) => formValue.toString());
     const categoryId = formData.get('categoryId')?.toString();
-    if (!itemIds || !categoryId) {
-      return fail(400, { message: 'Missing required data' });
+    if (!categoryId) {
+      return fail(400, { message: 'Submit without category' });
+    }
+    if (!itemIds || itemIds.length === 0) {
+      return fail(400, { message: 'Please select at least one item' });
     }
 
-    await assignStagedItemCategory(itemIds, categoryId, userId);
-
-    // Check if there are no more uncategorized items for commit.
-    const stagedList = await findStagedShoppingList(userId);
-    // todo add something like && item.categoryId === null)
-    if (!stagedList?.stagedItems.some(item => item.status === 'unmatched')) {
-      await commitStagedItems(userId);
-
-      return redirect(302, '../');
-    }
-
-    // todo return remaining items to categorize for data refresh in the frontend
+    // Assign the items. Nothing to do after this, the load function will take over to check, if
+    // commit of the staged list is now possible.
+    await assignCategoryToStagedItems(itemIds, categoryId, userId);
   }
 };

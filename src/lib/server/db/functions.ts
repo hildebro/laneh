@@ -334,8 +334,12 @@ export const addNewStagedItem = async (listId: string, name: string, amount: str
   });
 };
 
-export const assignStagedItemCategory = async (itemIds: string[], categoryId: string, userId: string) => {
+export const assignCategoryToStagedItems = async (itemIds: string[], categoryId: string, userId: string) => {
+  const db = getTx();
 
+  await db.update(table.stagedShoppingItem).set({
+    selectedCategoryId: categoryId
+  }).where(inArray(table.stagedShoppingItem.id, itemIds)).execute();
 }
 
 export const commitStagedItems = async (userId: string) => {
@@ -362,8 +366,7 @@ export const commitStagedItems = async (userId: string) => {
         await reactivateShoppingItem(item.matchedItemId as string, item.amount);
         continue;
       case 'unmatched':
-        // todo implement
-        throw new Error('not implemented yet');
+        await addShoppingItem(item.selectedCategoryId, item.name, item.amount);
     }
   }
 
