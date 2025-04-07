@@ -8,7 +8,7 @@ export const load: LayoutServerLoad = async (event) => {
   }
 
   // Make sure to check for authentication first. No need to check for users before authenticating.
-  if (event.locals.authenticated && !event.locals.user && !event.route.id?.startsWith('/users')) {
+  if (event.locals.authenticated && !event.locals.user && !event.route.id?.startsWith('/settings/users')) {
     return redirect(302, `${base}/settings/users`);
   }
 
