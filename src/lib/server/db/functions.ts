@@ -373,7 +373,7 @@ export const commitStagedItems = async (userId: string) => {
         await reactivateShoppingItem(item.matchedItemId as string, item.amount);
         continue;
       case 'unmatched':
-        await addShoppingItem(item.selectedCategoryId, item.name, item.amount);
+        await addShoppingItem(item.selectedCategoryId as string, item.name, item.amount);
     }
   }
 
