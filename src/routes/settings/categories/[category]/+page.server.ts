@@ -40,11 +40,14 @@ export const actions: Actions = {
     } catch (e) {
       return fail(500, { message: 'An error has occurred' });
     }
-    return redirect(302, '../../shopping');
+    return redirect(302, './');
   },
   delete: async ({ request }) => {
     const formData = await request.formData();
     const categoryId = formData.get('categoryId')?.toString();
+    if (!categoryId) {
+      throw error(404, 'Category not found');
+    }
 
     const category = await findShoppingCategory(categoryId);
     if (!category) {
@@ -57,6 +60,6 @@ export const actions: Actions = {
 
     await deleteCategory(categoryId);
 
-    return redirect(302, '../');
+    return redirect(302, './');
   }
 };

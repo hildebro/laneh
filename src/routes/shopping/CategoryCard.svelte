@@ -6,10 +6,7 @@
 
 <div class="card preset-filled-secondary-100-900">
   <!-- Header -->
-  <div class="flex justify-between">
-    <b>{category.name}</b>
-    <a href="shopping/category/{category.id}" class="btn">Edit</a>
-  </div>
+  <b>{category.name}</b>
   <!-- Item list -->
   <div class="mb-2">
     {#each category.shoppingItems.filter((item: ShoppingItem) => item.active) as item}
