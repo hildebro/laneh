@@ -159,33 +159,6 @@ export const moveCategoryOrderDown = async (categoryId: string) => {
     .where(eq(table.shoppingCategory.id, categoryBelow.id));
 };
 
-export const updateOrdering = async (newOrder: string[]): Promise<void> => {
-  const db = getTx();
-
-  if (!Array.isArray(newOrder)) {
-    throw error(400, 'Invalid input: Expected an array of IDs.');
-  }
-
-  if (newOrder.length === 0) {
-    throw error(400, 'Invalid input: The array cannot be empty.');
-  }
-
-  // Check for duplicate IDs *within the request* (important!)
-  const uniqueIds = new Set(newOrder);
-  if (uniqueIds.size !== newOrder.length) {
-    throw error(400, 'Invalid input: Duplicate IDs are not allowed.');
-  }
-
-  await db.transaction(async (tx) => {
-    for (const [index, id] of newOrder.entries()) {
-      await tx
-        .update(table.shoppingCategory)
-        .set({ priority: index })
-        .where(eq(table.shoppingCategory.id, id));
-    }
-  });
-};
-
 export const findShoppingItem = async (name: string): Promise<ShoppingItem | undefined> => {
   const db = getTx();
 
