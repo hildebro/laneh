@@ -7,7 +7,7 @@ import {
   type StagedShoppingItem,
   type User
 } from '$lib/server/db/schema';
-import { and, asc, eq, inArray, max, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, inArray, lt, max, sql } from 'drizzle-orm';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { error } from '@sveltejs/kit';
 // *** Import fast-levenshtein using the default import for CJS compatibility ***
@@ -90,6 +90,73 @@ export const addShoppingCategory = async (name: string): Promise<void> => {
     name: name,
     priority: nextPriority
   });
+};
+
+export const moveCategoryOrderUp = async (categoryId: string) => {
+  const db = getTx();
+
+  const currentPriority = (
+    await db.select({ priority: table.shoppingCategory.priority })
+      .from(table.shoppingCategory)
+      .where(eq(table.shoppingCategory.id, categoryId))
+      .execute()
+  ).at(0)?.priority as number;
+
+  const categoryAbove = (
+    await db
+      .select()
+      .from(table.shoppingCategory)
+      .where(lt(table.shoppingCategory.priority, currentPriority))
+      .orderBy(desc(table.shoppingCategory.priority))
+  ).at(0);
+
+  if (!categoryAbove) {
+    // Nothing to do, either there is only one category or we're already at the top.
+    return;
+  }
+
+  // Up the given category to the priority of its "parent".
+  await db.update(table.shoppingCategory)
+    .set({ priority: categoryAbove.priority })
+    .where(eq(table.shoppingCategory.id, categoryId));
+  // Move the "parent" down by one.
+  await db.update(table.shoppingCategory)
+    .set({ priority: categoryAbove.priority + 1 })
+    .where(eq(table.shoppingCategory.id, categoryAbove.id));
+};
+
+
+export const moveCategoryOrderDown = async (categoryId: string) => {
+  const db = getTx();
+
+  const currentPriority = (
+    await db.select({ priority: table.shoppingCategory.priority })
+      .from(table.shoppingCategory)
+      .where(eq(table.shoppingCategory.id, categoryId))
+      .execute()
+  ).at(0)?.priority as number;
+
+  const categoryBelow = (
+    await db
+      .select()
+      .from(table.shoppingCategory)
+      .where(gt(table.shoppingCategory.priority, currentPriority))
+      .orderBy(table.shoppingCategory.priority)
+  ).at(0);
+
+  if (!categoryBelow) {
+    // Nothing to do, either there is only one category or we're already at the top.
+    return;
+  }
+
+  // Down the given category to the priority of its "child".
+  await db.update(table.shoppingCategory)
+    .set({ priority: categoryBelow.priority })
+    .where(eq(table.shoppingCategory.id, categoryId));
+  // Move the "parent" up by one.
+  await db.update(table.shoppingCategory)
+    .set({ priority: categoryBelow.priority - 1 })
+    .where(eq(table.shoppingCategory.id, categoryBelow.id));
 };
 
 export const updateOrdering = async (newOrder: string[]): Promise<void> => {
@@ -347,7 +414,7 @@ export const assignCategoryToStagedItems = async (itemIds: string[], categoryId:
   await db.update(table.stagedShoppingItem).set({
     selectedCategoryId: categoryId
   }).where(inArray(table.stagedShoppingItem.id, itemIds)).execute();
-}
+};
 
 export const commitStagedItems = async (userId: string) => {
   const db = getTx();
