@@ -1,5 +1,7 @@
-import { boolean, integer, pgTable, primaryKey, text, timestamp, unique } from 'drizzle-orm/pg-core';
+// noinspection JSUnusedGlobalSymbols
+
 import { relations } from 'drizzle-orm';
+import { boolean, integer, pgTable, primaryKey, text, timestamp, unique } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
@@ -105,10 +107,6 @@ export const stagedShoppingItem = pgTable('staged_shopping_item', {
   selectedCategoryId: text().references(() => shoppingCategory.id)
 });
 export type StagedShoppingItem = typeof stagedShoppingItem.$inferSelect;
-
-export type StagedItemForValidation = StagedShoppingItem & { status: 'close_match'; suggestedItemId: string };
-export type StagedItemForCategorization = StagedShoppingItem & { status: 'unmatched' };
-export type StagedItemPerfectMatch = StagedShoppingItem & { status: 'perfect_match'; matchedItemId: string };
 
 export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one }) => ({
   // Each staged item belongs to one staged list

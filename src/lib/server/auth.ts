@@ -1,16 +1,16 @@
-import { authenticator } from 'otplib';
-import { env } from '$env/dynamic/private';
-import { sign, unsign } from 'cookie-signature';
 import type { Cookies } from '@sveltejs/kit';
+import { sign, unsign } from 'cookie-signature';
+import { authenticator } from 'otplib';
 import { dev } from '$app/environment';
+import { env } from '$env/dynamic/private';
 
 const OTP_SECRET = env.OTP_SECRET;
 const SESSION_SECRET = env.SESSION_SECRET;
 const REFRESH_SECRET = env.REFRESH_SECRET;
-const SESSION_EXPIRY = env.SESSION_EXPIRY || '1h';  // Default to 1 hour
-const REFRESH_TOKEN_EXPIRY = env.REFRESH_TOKEN_EXPIRY || '7d'; // Default to 7 days
-const MIN_DELAY_MS = 1000; // Minimum delay of 2 seconds
-const MAX_DELAY_MS = 5000; // Maximum delay of 5 seconds (adjust as needed)
+const SESSION_EXPIRY = env.SESSION_EXPIRY || '1h';
+const REFRESH_TOKEN_EXPIRY = env.REFRESH_TOKEN_EXPIRY || '7d';
+const MIN_DELAY_MS = 1000;
+const MAX_DELAY_MS = 5000;
 
 if (!OTP_SECRET || !SESSION_SECRET || !REFRESH_SECRET) {
   console.error("Missing required environment variables for authentication!");
@@ -41,7 +41,7 @@ export async function verifyOTP(token: string): Promise<boolean> {
 }
 
 export async function createSession(cookies: Cookies): Promise<void> {
-  const sessionToken = crypto.randomUUID(); // Generate a unique session token
+  const sessionToken = crypto.randomUUID();
   const signedSessionToken = sign(sessionToken, SESSION_SECRET);
 
   cookies.set('session', signedSessionToken, {
@@ -49,10 +49,9 @@ export async function createSession(cookies: Cookies): Promise<void> {
     httpOnly: true,
     sameSite: 'strict',
     secure: !dev, // Use secure cookies in production
-    maxAge: parseDuration(SESSION_EXPIRY), // seconds
+    maxAge: parseDuration(SESSION_EXPIRY),
   });
 
-  // Optional: Create and set refresh token
   const refreshToken = crypto.randomUUID();
   const signedRefreshToken = sign(refreshToken, REFRESH_SECRET);
   cookies.set('refresh', signedRefreshToken, {
@@ -94,11 +93,6 @@ export async function refreshSession(cookies: Cookies): Promise<boolean> {
   // If refresh token is valid, create a new session
   await createSession(cookies);
   return true;
-}
-
-export function clearSession(cookies: Cookies): void {
-  cookies.delete('session', { path: '/' });
-  cookies.delete('refresh', { path: '/' });
 }
 
 // Helper to parse duration strings like "1h", "7d", etc.
