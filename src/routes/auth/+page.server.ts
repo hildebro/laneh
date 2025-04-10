@@ -1,6 +1,6 @@
 import { type Actions, fail, redirect } from '@sveltejs/kit';
-import { createSession, verifyOTP } from '$lib/server/auth';
 import { base } from '$app/paths';
+import { createSession, verifyOTP } from '$lib/server/auth';
 
 export const actions: Actions = {
   default: async ({ request, cookies }) => {

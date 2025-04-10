@@ -1,10 +1,8 @@
 <script lang="ts">
-  // noinspection ES6UnusedImports
+  // noinspection ES6UnusedImports Intellij doesn't resolve the dot annotation correctly
   import { Navigation } from '@skeletonlabs/skeleton-svelte';
-  import { base } from '$app/paths';
   import { CalendarDays, Settings, ShoppingCart, Star } from 'lucide-svelte';
-
-  let { user } = $props();
+  import { base } from '$app/paths';
 </script>
 
 <header class="sticky top-0 z-10 p-1 text-xs">
