@@ -1,11 +1,11 @@
-import { sequence } from '@sveltejs/kit/hooks';
-import { i18n } from '$lib/i18n';
 import { type Handle } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 import { USER_COOKIE } from '$lib';
-import { findUser } from '$lib/server/db/functions';
+import { transactionContext } from '$lib/context';
+import { i18n } from '$lib/i18n';
 import { getSession, refreshSession } from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import { transactionContext } from '$lib/context';
+import { findUser } from '$lib/server/db/functions';
 
 const handleAuth: Handle = async ({ event, resolve }) => {
   const session = await getSession(event.cookies);
@@ -19,7 +19,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
   const refreshed = await refreshSession(event.cookies);
   if (refreshed) {
     const sessionAfterRefresh = await getSession(event.cookies);
-    //this shouldn't happen, because refreshSession calls createSession.  but for types...
+    // This shouldn't happen, because refreshSession calls createSession. But for types...
     if (sessionAfterRefresh) {
       event.locals.authenticated = true;
     }

@@ -1,9 +1,8 @@
-// src/lib/server/context.ts  (or wherever you prefer)
-import { AsyncLocalStorage } from 'node:async_hooks';
-import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
-import type * as schema from './server/db/schema'; // Adjust path to your schema
-import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { ExtractTablesWithRelations } from 'drizzle-orm';
+import type { PgTransaction } from 'drizzle-orm/pg-core';
+import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import type * as schema from './server/db/schema';
 
 // Define the type for the value stored in the context (our transactional client)
 type TransactionalDbClient = PgTransaction<PostgresJsQueryResultHKT, typeof schema, ExtractTablesWithRelations<typeof schema>>;
@@ -22,5 +21,6 @@ export function getTx(): TransactionalDbClient {
       'Database transaction context is not available. Ensure this function runs within a request handled by the transaction hook.'
     );
   }
+
   return tx;
 }
