@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
   import { enhance } from '$app/forms';
+	import * as m from '$lib/paraglide/messages.js';
 
   export let form;
 </script>
@@ -8,14 +9,14 @@
 	<form method="POST" use:enhance>
 		<div class="mb-4">
 			<label>
-				Username
+				{m.settings_users_username()}
 				<br/>
 				<input type="text" name="username" id="username" />
 			</label>
 		</div>
 		<div class="flex flex-col sm:flex-row gap-2">
 			<button type="submit" class="btn">
-				Add User
+				{m.settings_users_add()}
 			</button>
 		</div>
 	</form>

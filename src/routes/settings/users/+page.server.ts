@@ -2,6 +2,7 @@ import { type Actions, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { base } from '$app/paths';
 import { USER_COOKIE } from '$lib';
+import * as m from '$lib/paraglide/messages';
 import { findAllUsers, findUser } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async () => {
@@ -20,7 +21,7 @@ export const actions: Actions = {
 
     const user = await findUser(userid);
     if (!user) {
-      return fail(400, { message: 'User does not exist.' });
+      return fail(400, { message: m.error_user_not_found() });
     }
 
     event.cookies.set(USER_COOKIE, user.id, {
