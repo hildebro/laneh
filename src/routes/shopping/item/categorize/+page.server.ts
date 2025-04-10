@@ -51,9 +51,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
   // Default action for saving category assignments
-  default: async ({ request, locals }) => {
-    const userId = locals.user?.id as string;
-
+  default: async ({ request  }) => {
     const formData = await request.formData();
     const itemIds = formData.getAll('itemIds').map((formValue) => formValue.toString());
     const categoryId = formData.get('categoryId')?.toString();
@@ -66,6 +64,6 @@ export const actions: Actions = {
 
     // Assign the items. Nothing to do after this, the load function will take over to check, if
     // commit of the staged list is now possible.
-    await assignCategoryToStagedItems(itemIds, categoryId, userId);
+    await assignCategoryToStagedItems(itemIds, categoryId);
   }
 };

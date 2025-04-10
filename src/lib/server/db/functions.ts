@@ -369,15 +369,14 @@ export const addNewStagedItem = async (listId: string, name: string, amount: str
   });
 };
 
-export const assignCategoryToStagedItems = async (itemIds: string[], categoryId: string, userId: string) => {
+export const assignCategoryToStagedItems = async (itemIds: string[], categoryId: string) => {
   const db = getTx();
 
-  await db.update(table.stagedShoppingItem).set({
-    selectedCategoryId: categoryId
-  }).where(and(
-    inArray(table.stagedShoppingItem.id, itemIds),
-    eq(table.stagedShoppingList.userId, userId)
-  )).execute();
+  await db.update(table.stagedShoppingItem)
+    .set({
+      selectedCategoryId: categoryId
+    })
+    .where(inArray(table.stagedShoppingItem.id, itemIds)).execute();
 };
 
 export const commitStagedItems = async (userId: string) => {
