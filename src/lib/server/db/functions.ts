@@ -1,3 +1,8 @@
+import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { and, asc, desc, eq, gt, inArray, lt, max, sql } from 'drizzle-orm';
+// *** Import fast-levenshtein using the default import for CJS compatibility ***
+import levenshteinPkg from 'fast-levenshtein';
+import { getTx } from '$lib/context';
 import * as table from '$lib/server/db/schema';
 import {
   shoppingCategory,
@@ -7,16 +12,10 @@ import {
   type StagedShoppingItem,
   type User
 } from '$lib/server/db/schema';
-import { and, asc, desc, eq, gt, inArray, lt, max, sql } from 'drizzle-orm';
-import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { error } from '@sveltejs/kit';
-// *** Import fast-levenshtein using the default import for CJS compatibility ***
-import levenshteinPkg from 'fast-levenshtein';
-import { getTx } from '$lib/context';
 // The actual function is usually on the '.get' property for this library
 const levenshtein = levenshteinPkg.get;
 
-// ------- USER RELATED -------
+// ------- USER -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
   const db = getTx();
 
@@ -37,7 +36,7 @@ export const addUser = async (username: string): Promise<void> => {
   await db.insert(table.user).values({ id: generateUUID(), username }).execute();
 };
 
-// ------- SHOPPING RELATED -------
+// ------- SHOPPING CATEGORY -------
 export const findShoppingCategory = async (categoryId: string) => {
   const db = getTx();
 
@@ -78,18 +77,26 @@ export const updateShoppingCategory = async (categoryId: string, name: string, i
 export const addShoppingCategory = async (name: string): Promise<void> => {
   const db = getTx();
 
+  // Look for the current maximum priority. If none exists, we use -1 as the fallback.
   const currentMaxPriority = (
     await db
       .select({ value: max(table.shoppingCategory.priority) })
       .from(table.shoppingCategory)
-  ).at(0);
-  const nextPriority = typeof currentMaxPriority?.value === 'number' ? currentMaxPriority.value + 1 : 0;
+  ).at(0)?.value ?? -1;
+  // Increment the current maximum to use as the next one.
+  const nextPriority = currentMaxPriority + 1;
 
   await db.insert(table.shoppingCategory).values({
     id: generateUUID(),
     name: name,
     priority: nextPriority
   });
+};
+
+export const deleteCategory = async (categoryId: string): Promise<void> => {
+  const db = getTx();
+
+  await db.delete(table.shoppingCategory).where(eq(table.shoppingCategory.id, categoryId)).execute();
 };
 
 export const moveCategoryOrderUp = async (categoryId: string) => {
@@ -125,7 +132,6 @@ export const moveCategoryOrderUp = async (categoryId: string) => {
     .where(eq(table.shoppingCategory.id, categoryAbove.id));
 };
 
-
 export const moveCategoryOrderDown = async (categoryId: string) => {
   const db = getTx();
 
@@ -159,6 +165,7 @@ export const moveCategoryOrderDown = async (categoryId: string) => {
     .where(eq(table.shoppingCategory.id, categoryBelow.id));
 };
 
+// ------- SHOPPING ITEM -------
 export const findShoppingItem = async (name: string): Promise<ShoppingItem | undefined> => {
   const db = getTx();
 
@@ -268,17 +275,12 @@ export const addShoppingItem = async (categoryId: string, name: string, amount: 
   });
 };
 
-export const deleteCategory = async (categoryId: string): Promise<void> => {
-  const db = getTx();
-
-  await db.delete(table.shoppingCategory).where(eq(table.shoppingCategory.id, categoryId)).execute();
-};
-
+// ------- SHOPPING PURCHASE -------
 export const createPurchase = async (user: User, itemIds: string[]): Promise<void> => {
   const db = getTx();
 
   // 1. Create a new purchase
-  let purchaseId = generateUUID();
+  const purchaseId = generateUUID();
   await db.insert(table.shoppingPurchase)
     .values({
       id: purchaseId,
@@ -298,6 +300,7 @@ export const createPurchase = async (user: User, itemIds: string[]): Promise<voi
   await db.update(table.shoppingItem).set({ active: false }).where(inArray(table.shoppingItem.id, itemIds)).execute();
 };
 
+// ------- STAGED SHOPPING LIST -------
 export const findStagedShoppingList = async (userId: string) => {
   const db = getTx();
 
