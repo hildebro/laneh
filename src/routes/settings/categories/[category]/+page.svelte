@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -8,17 +9,23 @@
 </script>
 
 <div class="card">
-  <div class="h5 mb-4">{data.category ? 'Edit Category' : 'Add New Category'}</div>
+  <div class="h5 mb-4">
+    {#if data.category}
+      { m.settings_categories_edit() }
+    {:else }
+      { m.settings_categories_add() }
+    {/if}
+  </div>
   <form method="POST" action="?/create" use:enhance>
     <input type="hidden" name="categoryId" value={data.category?.id}>
     <label>
-      Name
+      { m.generic_name() }
       <input class="form-input input" type="text" name="name" bind:value={categoryName} required />
     </label>
 
     {#if data.category}
       <div class="mt-2 mb-2">
-        Items to delete:
+        { m.settings_categories_delete_items() }
         {#each data.category.shoppingItems as item (item.id)}
           <div>
             <label>
@@ -26,12 +33,16 @@
               {item.name}
             </label>
           </div>
+        {:else }
+          <div class="text-surface-400-600">
+            { m.settings_categories_empty() }
+          </div>
         {/each}
       </div>
     {/if}
 
     <button type="submit" class="btn mt-1">
-      {data.category ? 'Update' : 'Create'}
+      { m.generic_save() }
     </button>
 
     {#if form?.message}
@@ -43,7 +54,7 @@
     <form method="POST" action="?/delete" use:enhance>
       <input type="hidden" name="categoryId" value={data.category?.id}>
       <button type="submit" class="mt-2 btn preset-filled-error-400-600">
-        DELETE CATEGORY
+        { m.settings_categories_delete() }
       </button>
     </form>
   {/if}

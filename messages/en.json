@@ -1,9 +1,18 @@
 {
-	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"error_user_not_found": "User not found",
-	"settings_categories_headline": "Categories",
-	"settings_users_add": "Add user",
-	"settings_users_headline": "Users",
-	"settings_users_username": "Name",
-	"settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters."
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "error_category_not_found": "Category not found",
+  "error_user_not_found": "User not found",
+  "generic_name": "Name",
+  "generic_save": "Save",
+  "settings_categories_add": "Add category",
+  "settings_categories_delete": "Delete category",
+  "settings_categories_delete_invalid": "Please delete all items before attempting to delete the category",
+  "settings_categories_delete_items": "Select items to delete. Doing so will also delete the purchase history of those items.",
+  "settings_categories_edit": "Edit category",
+  "settings_categories_empty": "This category has no items yet",
+  "settings_categories_headline": "Categories",
+  "settings_categories_name_invalid": "Invalid name",
+  "settings_users_add": "Add user",
+  "settings_users_headline": "Users",
+  "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters."
 }

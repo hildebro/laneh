@@ -9,7 +9,7 @@
 	<form method="POST" use:enhance>
 		<div class="mb-4">
 			<label>
-				{m.settings_users_username()}
+				{m.generic_name()}
 				<br/>
 				<input type="text" name="username" id="username" />
 			</label>
