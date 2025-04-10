@@ -1,15 +1,24 @@
-import type { PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 import {
   addCloseStagedItem,
   addNewStagedItem,
   addPerfectStagedItem,
-  addStagedShoppingList, commitStagedItems,
+  addStagedShoppingList,
+  commitStagedItems,
   findShoppingItem,
-  findSimilarShoppingItem
+  findSimilarShoppingItem,
+  findStagedShoppingList
 } from '$lib/server/db/functions';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+  const userId = locals.user?.id as string;
+
+  const existingList = await findStagedShoppingList(userId);
+  if (existingList) {
+    return redirect(302, 'validate')
+  }
+  
   return {};
 };
 
