@@ -1,11 +1,12 @@
 <script lang="ts">
+  import * as m from '$lib/paraglide/messages.js';
 </script>
 
 <div class="flex flex-col gap-4 card">
   <a class="btn" href="settings/users">
-    Change user
+    {m.settings_users_headline()}
   </a>
   <a class="btn" href="settings/categories">
-    Edit categories
+    {m.settings_categories_headline()}
   </a>
 </div>
