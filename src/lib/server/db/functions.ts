@@ -102,68 +102,53 @@ export const deleteCategory = async (categoryId: string): Promise<void> => {
 export const moveCategoryOrderUp = async (categoryId: string) => {
   const db = getTx();
 
-  const currentPriority = (
-    await db.select({ priority: table.shoppingCategory.priority })
-      .from(table.shoppingCategory)
-      .where(eq(table.shoppingCategory.id, categoryId))
-      .execute()
-  ).at(0)?.priority as number;
-
-  const categoryAbove = (
-    await db
-      .select()
-      .from(table.shoppingCategory)
-      .where(lt(table.shoppingCategory.priority, currentPriority))
-      .orderBy(desc(table.shoppingCategory.priority))
-  ).at(0);
-
-  if (!categoryAbove) {
-    // Nothing to do, either there is only one category or we're already at the top.
-    return;
+  const category = await findShoppingCategory(categoryId);
+  if (!category) {
+    throw new Error('Trying to move a non-existent category');
   }
 
-  // Up the given category to the priority of its "parent".
-  await db.update(table.shoppingCategory)
-    .set({ priority: categoryAbove.priority })
-    .where(eq(table.shoppingCategory.id, categoryId));
-  // Move the "parent" down by one.
-  await db.update(table.shoppingCategory)
-    .set({ priority: categoryAbove.priority + 1 })
-    .where(eq(table.shoppingCategory.id, categoryAbove.id));
+  const [categoryAbove] = await db
+    .select()
+    .from(table.shoppingCategory)
+    .where(lt(table.shoppingCategory.priority, category.priority))
+    .orderBy(desc(table.shoppingCategory.priority))
+    .limit(1);
+
+  await executePrioritySwap(categoryAbove, category);
 };
 
 export const moveCategoryOrderDown = async (categoryId: string) => {
   const db = getTx();
 
-  const currentPriority = (
-    await db.select({ priority: table.shoppingCategory.priority })
-      .from(table.shoppingCategory)
-      .where(eq(table.shoppingCategory.id, categoryId))
-      .execute()
-  ).at(0)?.priority as number;
-
-  const categoryBelow = (
-    await db
-      .select()
-      .from(table.shoppingCategory)
-      .where(gt(table.shoppingCategory.priority, currentPriority))
-      .orderBy(table.shoppingCategory.priority)
-  ).at(0);
-
-  if (!categoryBelow) {
-    // Nothing to do, either there is only one category or we're already at the top.
-    return;
+  const category = await findShoppingCategory(categoryId);
+  if (!category) {
+    throw new Error('Trying to move a non-existent category');
   }
 
-  // Down the given category to the priority of its "child".
+  const [categoryBelow] = await db
+    .select()
+    .from(table.shoppingCategory)
+    .where(gt(table.shoppingCategory.priority, category.priority))
+    .orderBy(asc(table.shoppingCategory.priority))
+    .limit(1);
+
+  await executePrioritySwap(category, categoryBelow);
+};
+
+async function executePrioritySwap(
+  categoryAbove: ShoppingCategory,
+  categoryBelow: ShoppingCategory
+) {
+  const db = getTx();
+
+  await db.update(table.shoppingCategory)
+    .set({ priority: categoryAbove.priority })
+    .where(eq(table.shoppingCategory.id, categoryBelow.id));
+
   await db.update(table.shoppingCategory)
     .set({ priority: categoryBelow.priority })
-    .where(eq(table.shoppingCategory.id, categoryId));
-  // Move the "parent" up by one.
-  await db.update(table.shoppingCategory)
-    .set({ priority: categoryBelow.priority - 1 })
-    .where(eq(table.shoppingCategory.id, categoryBelow.id));
-};
+    .where(eq(table.shoppingCategory.id, categoryAbove.id));
+}
 
 // ------- SHOPPING ITEM -------
 export const findShoppingItem = async (name: string): Promise<ShoppingItem | undefined> => {
