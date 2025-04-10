@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
 
-  let { data, form } = $props();
+  let { data } = $props();
 
   let closeMatchItems = $state(data.items.filter(item => item.status === 'close_match'));
   let perfectMatchItems = $state(data.items.filter(item => item.status === 'perfect_match'));
@@ -41,7 +41,7 @@
         isSubmitting = true;
         return async ({ update }) => {
           isSubmitting = false;
-          await update(); // Perform redirect or update UI
+          await update();
         };
       }}
   >

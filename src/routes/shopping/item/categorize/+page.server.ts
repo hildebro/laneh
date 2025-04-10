@@ -6,7 +6,6 @@ import {
   findAllShoppingCategories,
   findStagedShoppingList
 } from '$lib/server/db/functions';
-import type { StagedShoppingList } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const userId = locals.user?.id as string;
@@ -39,7 +38,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 
   // Fetch categories
-  let categories = await findAllShoppingCategories();
+  const categories = await findAllShoppingCategories();
   if (categories.length === 0) {
     throw new Error('Cannot categorize without categories');
   }
