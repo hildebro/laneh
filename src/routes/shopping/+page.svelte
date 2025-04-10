@@ -1,12 +1,13 @@
 <script lang="ts">
   import CategoryCard from './CategoryCard.svelte';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 
   let { data } = $props();
 </script>
 
 <div class="card w-full">
   {#await data.categories}
-    loading...
+    <LoadingSpinner />
   {:then categories}
     <div class="flex flex-wrap justify-end gap-2 mb-4">
       <a class="btn" href="shopping/item/add">Add items</a>
