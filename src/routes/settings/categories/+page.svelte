@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { ArrowDown, ArrowUp } from 'lucide-svelte';
+  import { ArrowDown, ArrowUp, Pencil } from 'lucide-svelte';
   import { flip } from 'svelte/animate';
   import { enhance } from '$app/forms';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 </script>
@@ -12,7 +13,7 @@
 {:then categories}
   <div class="card w-full">
     <div class="flex justify-end mb-4">
-      <a class="btn" href="categories/add">New category</a>
+      <a class="btn" href="categories/add">{ m.settings_categories_add() }</a>
     </div>
     <div class="flex flex-col gap-2">
       {#each categories as category, index (category.id)}
@@ -22,7 +23,9 @@
         >
           <span>{category.name}</span>
           <div class="flex gap-1">
-            <a href="categories/{category.id}" class="btn">Edit</a>
+            <a href="categories/{category.id}" class="btn">
+              <Pencil />
+            </a>
             <form method="POST" action="?/up" use:enhance>
               <input type="hidden" name="categoryId" value={category.id} />
               <button type="submit" class="btn" disabled={index === 0}>

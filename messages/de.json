@@ -1,9 +1,18 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "error_category_not_found": "Kategorie nicht gefunden",
   "error_user_not_found": "Benutzer:in nicht gefunden",
+  "generic_name": "Name",
+  "generic_save": "Speichern",
+  "settings_categories_add": "Kategorie hinzufügen",
+  "settings_categories_delete": "Kategorie löschen",
+  "settings_categories_delete_invalid": "Bitte lösche alle Artikel bevor du versuchst die Kategorie zu löschen",
+  "settings_categories_delete_items": "Artikel auswählen, um sie zu entfernen. Dadurch wird auch die Einkaufshistorie des Artikels entfernt.",
+  "settings_categories_edit": "Kategorie anpassen",
+  "settings_categories_empty": "Diese Kategorie hat noch keine Artikel",
   "settings_categories_headline": "Kategorien",
+  "settings_categories_name_invalid": "Fehlerhafte Name",
   "settings_users_add": "Benutzer:in hinzufügen",
   "settings_users_headline": "Benutzer:innen",
-  "settings_users_username": "Name",
-  "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters."
+  "settings_users_username_invalid": "Fehlerhafter Name. Muss eine Länge zwischen {min} und {max} haben und keine Sonderzeichen beinhalten."
 }

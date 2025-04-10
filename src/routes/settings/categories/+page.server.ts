@@ -1,4 +1,4 @@
-import { type Actions, fail } from '@sveltejs/kit';
+import { type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { findAllShoppingCategories, moveCategoryOrderDown, moveCategoryOrderUp } from '$lib/server/db/functions';
 
@@ -13,7 +13,7 @@ export const actions: Actions = {
     const formData = await request.formData();
     const categoryId = formData.get('categoryId')?.toString();
     if (!categoryId) {
-      return fail(422, { message: 'Missing category id.' });
+      throw new Error('Action called without category id. This should not happen.');
     }
 
     await moveCategoryOrderUp(categoryId);
@@ -22,7 +22,7 @@ export const actions: Actions = {
     const formData = await request.formData();
     const categoryId = formData.get('categoryId')?.toString();
     if (!categoryId) {
-      return fail(422, { message: 'Missing category id.' });
+      throw new Error('Action called without category id. This should not happen.');
     }
 
     await moveCategoryOrderDown(categoryId);
