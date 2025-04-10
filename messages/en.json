@@ -1,5 +1,9 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"error_user_not_found": "User not found",
 	"settings_categories_headline": "Categories",
-	"settings_users_headline": "Users"
+	"settings_users_add": "Add user",
+	"settings_users_headline": "Users",
+	"settings_users_username": "Name",
+	"settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters."
 }
