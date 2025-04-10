@@ -2,12 +2,13 @@
   import { ArrowDown, ArrowUp } from 'lucide-svelte';
   import { flip } from 'svelte/animate';
   import { enhance } from '$app/forms';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 
   let { data } = $props();
 </script>
 
 {#await data.categories}
-  loading...
+  <LoadingSpinner />
 {:then categories}
   <div class="card w-full">
     <div class="flex justify-end mb-4">
