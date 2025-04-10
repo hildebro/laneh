@@ -1,8 +1,8 @@
-import type { PageServerLoad } from './$types';
 import { type Actions, fail, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+import { base } from '$app/paths';
 import { USER_COOKIE } from '$lib';
 import { findAllUsers, findUser } from '$lib/server/db/functions';
-import { base } from '$app/paths';
 
 export const load: PageServerLoad = async () => {
   return {

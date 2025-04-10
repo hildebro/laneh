@@ -19,7 +19,7 @@
     {#if data.category}
       <div class="mt-2 mb-2">
         Items to delete:
-        {#each data.category.shoppingItems as item}
+        {#each data.category.shoppingItems as item (item.id)}
           <div>
             <label>
               <input type="checkbox" name="items" value={item.id} />
