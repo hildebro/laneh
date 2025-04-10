@@ -1,6 +1,6 @@
+import { type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { findAllShoppingCategories, moveCategoryOrderDown, moveCategoryOrderUp } from '$lib/server/db/functions';
-import { type Actions, fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
   return {

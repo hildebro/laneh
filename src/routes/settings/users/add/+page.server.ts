@@ -11,11 +11,8 @@ export const actions: Actions = {
       return fail(400, { message: 'Invalid username' });
     }
 
-    try {
-      await addUser(username);
-    } catch (e) {
-      return fail(500, { message: 'An error has occurred' });
-    }
+    await addUser(username);
+
     return redirect(302, '../users');
   }
 };

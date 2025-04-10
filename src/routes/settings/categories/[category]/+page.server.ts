@@ -1,5 +1,5 @@
-import type { PageServerLoad } from './$types';
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 import {
   addShoppingCategory,
   deleteCategory,
@@ -24,22 +24,19 @@ export const actions: Actions = {
   create: async (event) => {
     const formData = await event.request.formData();
     const name = formData.get('name')?.toString()?.trim();
-    let items = formData.getAll('items').map((formValue) => formValue.toString());
+    const items = formData.getAll('items').map((formValue) => formValue.toString());
     if (!name) {
       return fail(400, { message: 'No name given' });
     }
 
     const id = formData.get('categoryId')?.toString();
 
-    try {
-      if (id) {
-        await updateShoppingCategory(id, name, items);
-      } else {
-        await addShoppingCategory(name);
-      }
-    } catch (e) {
-      return fail(500, { message: 'An error has occurred' });
+    if (id) {
+      await updateShoppingCategory(id, name, items);
+    } else {
+      await addShoppingCategory(name);
     }
+
     return redirect(302, './');
   },
   delete: async ({ request }) => {

@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  import { Avatar } from '@skeletonlabs/skeleton-svelte';
+	import { Avatar } from '@skeletonlabs/skeleton-svelte';
+	import { enhance } from '$app/forms';
 
-  let { data } = $props();
+	let { data } = $props();
 </script>
 
 {#await data.users}
 	loading...
 {:then users}
 	<div class="flex flex-wrap justify-center gap-4">
-		{#each users as user}
+		{#each users as user (user.id)}
 			<form method="POST" action="?/select" use:enhance>
 				<input type="hidden" name="userId" value={user.id}>
 				<button type="submit" class="card w-40 h-40 flex flex-col items-center justify-center gap-1">
