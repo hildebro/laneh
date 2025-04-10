@@ -4,8 +4,8 @@ import { createPurchase } from '$lib/server/db/functions';
 export const actions = {
   default: async ({ request, locals }) => {
     const data = await request.formData();
-    let items = data.getAll('items').map((formValue) => formValue.toString());
-    let user = locals.user;
+    const items = data.getAll('items').map((formValue) => formValue.toString());
+    const user = locals.user;
     if (!user) {
       return fail(400, { message: 'Could not resolve user.' });
     }

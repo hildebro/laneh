@@ -8,7 +8,7 @@ import {
 } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  let stagedList = await findStagedShoppingList(locals.user?.id as string);
+  const stagedList = await findStagedShoppingList(locals.user?.id as string);
   if (!stagedList) {
     // If nothing is staged yet, go back to add.
     return redirect(302, 'add');
