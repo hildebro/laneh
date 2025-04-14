@@ -21,5 +21,8 @@
   "settings_categories_name_invalid": "Invalid name",
   "settings_users_add": "Add user",
   "settings_users_headline": "Users",
-  "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters."
+  "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters.",
+  "shopping_add_items": "Add items",
+  "shopping_finish_purchase": "Finish purchase",
+  "shopping_start_purchase": "Start purchase"
 }

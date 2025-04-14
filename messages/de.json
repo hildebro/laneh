@@ -21,5 +21,8 @@
   "settings_categories_name_invalid": "Fehlerhafte Name",
   "settings_users_add": "Benutzer:in hinzufügen",
   "settings_users_headline": "Benutzer:innen",
-  "settings_users_username_invalid": "Fehlerhafter Name. Muss eine Länge zwischen {min} und {max} haben und keine Sonderzeichen beinhalten."
+  "settings_users_username_invalid": "Fehlerhafter Name. Muss eine Länge zwischen {min} und {max} haben und keine Sonderzeichen beinhalten.",
+  "shopping_add_items": "Artikel hinzufügen",
+  "shopping_finish_purchase": "Einkauf beenden",
+  "shopping_start_purchase": "Einkauf starten"
 }
