@@ -5,6 +5,7 @@
   "auth_login": "Login",
   "error_category_not_found": "Category not found",
   "error_user_not_found": "User not found",
+  "generic_empty": "Missing data",
   "generic_name": "Name",
   "generic_save": "Save",
   "header_daily_upkeep": "Daily Upkeep",
@@ -23,6 +24,8 @@
   "settings_users_headline": "Users",
   "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters.",
   "shopping_add_items": "Add items",
+  "shopping_add_items_explanation": "Write one type of item per line.\nYou may optionally add an amount before the item.\nFor example:\n3x Tomatoes\nChocolate\n2x Milk",
+  "shopping_add_items_parse_error": "Some lines could not be parsed. Please check for mistakes.",
   "shopping_finish_purchase": "Finish purchase",
   "shopping_start_purchase": "Start purchase"
 }
