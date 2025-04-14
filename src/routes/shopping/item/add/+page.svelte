@@ -1,11 +1,12 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import * as m from '$lib/paraglide/messages.js';
 
   let textValue = $state('');
   let isSubmitting = $state(false);
 </script>
 
-<div class="card">
+<div class="card w-full">
   <form
     method="POST"
     action="?/create"
@@ -25,24 +26,18 @@
     }}
   >
     <div class="flex flex-col">
-      <h1 class="text-2xl font-semibold mb-4">Add items to shopping list</h1>
-      <span>Write one type of item per line.</span>
-      <span>You can add an amount for each line, i.e. "3 Tomatoes" or "Milk 2x".</span>
+      <h1 class="text-2xl font-semibold mb-4">{m.shopping_add_items()}</h1>
       <textarea
         bind:value={textValue}
         name="items"
-        class="textarea textarea-bordered w-full h-32"
-        placeholder="Items to add..."
+        class="textarea textarea-bordered h-64"
+        placeholder={m.shopping_add_items_explanation()}
         disabled={isSubmitting}
       ></textarea>
     </div>
 
     <button type="submit" class="btn btn-primary mt-2" disabled={isSubmitting || textValue.trim() === ''}>
-      {#if isSubmitting}
-        <span class="loading loading-spinner loading-xs"></span> Processing...
-      {:else}
-        Add Items to List
-      {/if}
+      {m.shopping_add_items()}
     </button>
   </form>
 </div>

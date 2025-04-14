@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import * as m from '$lib/paraglide/messages.js';
 import {
   addCloseStagedItem,
   addNewStagedItem,
@@ -30,7 +31,7 @@ export const actions = {
     const lines = itemsText.split('\n').map(line => line.trim()).filter(l => l !== '');
 
     if (lines.length === 0) {
-      return fail(400, { message: 'Empty data given' });
+      return fail(400, { message: m.generic_empty() });
     }
 
     // --- Get User (Essential) ---
@@ -43,7 +44,7 @@ export const actions = {
     for (const line of lines) {
       const { name, amount } = parseLine(line);
       if (!name) {
-        return fail(400, { message: 'Some line could not be parsed. Please check for mistakes.' });
+        return fail(400, { message: m.shopping_add_items_parse_error() });
       }
 
       // case `perfect_match` doesn't matter to us here.

@@ -5,6 +5,7 @@
   "auth_login": "Einloggen",
   "error_category_not_found": "Kategorie nicht gefunden",
   "error_user_not_found": "Benutzer:in nicht gefunden",
+  "generic_empty": "Fehlende Daten",
   "generic_name": "Name",
   "generic_save": "Speichern",
   "header_daily_upkeep": "Tägliche Pflege",
@@ -23,6 +24,8 @@
   "settings_users_headline": "Benutzer:innen",
   "settings_users_username_invalid": "Fehlerhafter Name. Muss eine Länge zwischen {min} und {max} haben und keine Sonderzeichen beinhalten.",
   "shopping_add_items": "Artikel hinzufügen",
+  "shopping_add_items_explanation": "Schreibe pro Zeile einen Artikel.\nDu kannst optional eine Menge für die Artikel definieren.\nZum Beispiel:\n3x Tomaten\nSchokolade\n2x Milch",
+  "shopping_add_items_parse_error": "Einige Zeilen konnten nicht verarbeitet werden. Bitte prüfe auf Fehler.",
   "shopping_finish_purchase": "Einkauf beenden",
   "shopping_start_purchase": "Einkauf starten"
 }
