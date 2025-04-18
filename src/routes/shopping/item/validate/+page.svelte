@@ -5,6 +5,8 @@
   let { data } = $props();
 
   let closeMatchItems = $state(data.items.filter(item => item.status === 'close_match'));
+  // Keep track of the checkbox states
+  let checkboxStates = $state(Object.fromEntries(data.items.map(item => [item.id, false])));
 
   let isSubmitting = $state(false);
 </script>
@@ -27,26 +29,21 @@
       }}
   >
     { m.shopping_validate_explanation() }
-    <div class="table-container preset-filled-primary-200-800 mt-2">
-      <table class="table text-base">
-        <thead>
-        <tr>
-          <th>Your input</th>
-          <th>Existing item</th>
-          <th>Prevent renaming?</th>
-        </tr>
-        </thead>
-        <tbody>
-        {#each closeMatchItems as item (item.name)}
-          <tr>
-            <td>{item.name}</td>
-            <td>{item.suggestedItem?.name}</td>
-            <td><input type="checkbox" name="{item.name}" /></td>
-          </tr>
-        {/each}
-        </tbody>
-      </table>
-    </div>
+    {#each closeMatchItems as item (item.id)}
+      <div class="mt-2 flex gap-2 items-center">
+        <input type="checkbox" name="{item.name}" bind:checked={checkboxStates[item.id]} />
+        <span
+          class:preset-filled-success-100-900={checkboxStates[item.id]}
+          class:preset-filled-error-100-900={!checkboxStates[item.id]}
+          class:line-through={!checkboxStates[item.id]}
+        >
+          {item.name}
+        </span>
+        {#if !checkboxStates[item.id]}
+          ⟶ <span class="preset-filled-success-100-900">{item.suggestedItem?.name}</span>
+        {/if}
+      </div>
+    {/each}
 
     <div class="mt-6 text-center">
       <button type="submit" class="btn" disabled={isSubmitting}>
