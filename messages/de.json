@@ -5,6 +5,7 @@
   "auth_login": "Einloggen",
   "error_category_not_found": "Kategorie nicht gefunden",
   "error_user_not_found": "Benutzer:in nicht gefunden",
+  "generic_continue": "Weiter",
   "generic_empty": "Fehlende Daten",
   "generic_name": "Name",
   "generic_save": "Speichern",
@@ -27,5 +28,8 @@
   "shopping_add_items_explanation": "Schreibe pro Zeile einen Artikel.\nDu kannst optional eine Menge für die Artikel definieren.\nZum Beispiel:\n3x Tomaten\nSchokolade\n2x Milch",
   "shopping_add_items_parse_error": "Einige Zeilen konnten nicht verarbeitet werden. Bitte prüfe auf Fehler.",
   "shopping_finish_purchase": "Einkauf beenden",
-  "shopping_start_purchase": "Einkauf starten"
+  "shopping_start_purchase": "Einkauf starten",
+  "shopping_validate_all_items": "Als Referenz findest du hier die Artikel, die du im letzten Schritt aufgeschrieben hast.",
+  "shopping_validate_headline": "Artikel prüfen",
+  "shopping_validate_explanation": "Du hast Namen definiert, die sehr ähnlich zu bereits vorhandenen Artikeln sind. Wenn du weiter machst, werden diese Namen automatisch 'behoben'. Wenn du das nicht willst, kreuze die entsprechende Checkbox an."
 }
