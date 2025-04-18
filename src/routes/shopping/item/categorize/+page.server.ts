@@ -6,6 +6,7 @@ import {
   findAllShoppingCategories,
   findStagedShoppingList
 } from '$lib/server/db/functions';
+import * as m from '$lib/paraglide/messages.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const userId = locals.user?.id as string;
@@ -54,12 +55,10 @@ export const actions: Actions = {
   default: async ({ request  }) => {
     const formData = await request.formData();
     const itemIds = formData.getAll('itemIds').map((formValue) => formValue.toString());
-    const categoryId = formData.get('categoryId')?.toString();
-    if (!categoryId) {
-      return fail(400, { message: 'Submit without category' });
-    }
+    const categoryId = formData.get('categoryId')?.toString() as string;
+
     if (!itemIds || itemIds.length === 0) {
-      return fail(400, { message: 'Please select at least one item' });
+      return fail(400, { message: m.shopping_categorize_select_items_invalid() });
     }
 
     // Assign the items. Nothing to do after this, the load function will take over to check, if
