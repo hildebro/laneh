@@ -1,12 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import * as m from '$lib/paraglide/messages.js';
 import {
   assignCategoryToStagedItems,
   commitStagedItems,
   findAllShoppingCategories,
   findStagedShoppingList
 } from '$lib/server/db/functions';
-import * as m from '$lib/paraglide/messages.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const userId = locals.user?.id as string;
