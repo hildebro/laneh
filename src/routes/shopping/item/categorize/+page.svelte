@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
 
@@ -7,14 +8,14 @@
 </script>
 
 <svelte:head>
-  <title>Categorize New Items</title>
+  <title>{ m.shopping_categorize() }</title>
 </svelte:head>
 
 <div class="card">
-  <h1 class="text-2xl font-semibold mb-4">Categorize New Items</h1>
+  <h1 class="text-2xl font-semibold mb-4">{ m.shopping_categorize() }</h1>
 
   {#if form?.message}
-    <p class="preset-filled-error-50-950 rounded mt-4 text-center">{form.message}</p>
+    <p class="preset-filled-error-50-950 rounded m-2 text-center">{form.message}</p>
   {/if}
 
   <form
@@ -27,7 +28,7 @@
         };
       }}
   >
-    Select items to categorize:
+    { m.shopping_categorize_select_items() }
     <div class="mt-2 mb-4 flex gap-6 flex-wrap text-lg justify-center">
       {#each data.items.filter(item => item.status === 'unmatched' && item.selectedCategoryId === null) as item (item.id)}
         <label>
@@ -37,7 +38,7 @@
       {/each}
     </div>
 
-    Set category for selected items:
+    { m.shopping_categorize_select_category() }
     <div class="mt-2 flex gap-6 flex-wrap text-lg justify-center">
       {#each data.categories as category (category.id)}
         <button type="submit" class="btn" name="categoryId" value={category.id} disabled={isSubmitting}>
