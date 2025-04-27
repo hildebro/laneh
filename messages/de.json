@@ -24,6 +24,8 @@
   "settings_categories_name_invalid": "Fehlerhafte Name",
   "settings_users_add": "Benutzer:in hinzufügen",
   "settings_users_headline": "Benutzer:innen",
+  "settings_users_language": "Sprache wählen",
+  "settings_users_switch": "Benutzer:in wechseln",
   "settings_users_username_invalid": "Fehlerhafter Name. Muss eine Länge zwischen {min} und {max} haben und keine Sonderzeichen beinhalten.",
   "shopping_add_items": "Artikel hinzufügen",
   "shopping_add_items_explanation": "Schreibe pro Zeile einen Artikel.\nDu kannst optional eine Menge für die Artikel definieren.\nZum Beispiel:\n3x Tomaten\nSchokolade\n2x Milch",
