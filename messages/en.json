@@ -24,6 +24,8 @@
   "settings_categories_name_invalid": "Invalid name",
   "settings_users_add": "Add user",
   "settings_users_headline": "Users",
+  "settings_users_language": "Select language",
+  "settings_users_switch": "Switch user",
   "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters.",
   "shopping_add_items": "Add items",
   "shopping_add_items_explanation": "Write one type of item per line.\nYou may optionally add an amount before the item.\nFor example:\n3x Tomatoes\nChocolate\n2x Milk",
