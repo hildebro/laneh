@@ -5,6 +5,7 @@
   "auth_login": "Einloggen",
   "error_category_not_found": "Kategorie nicht gefunden",
   "error_user_not_found": "Benutzer:in nicht gefunden",
+  "footer_user": "Eingeloggt als {name}",
   "generic_continue": "Weiter",
   "generic_empty": "Fehlende Daten",
   "generic_name": "Name",
