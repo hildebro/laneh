@@ -63,15 +63,10 @@ export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> =
   }).execute();
 };
 
-export const updateShoppingCategory = async (categoryId: string, name: string, itemIds: string[]): Promise<void> => {
+export const updateShoppingCategory = async (categoryId: string, name: string): Promise<void> => {
   const db = getTx();
 
   await db.update(table.shoppingCategory).set({ name: name }).where(eq(table.shoppingCategory.id, categoryId)).execute();
-
-  if (itemIds.length > 0) {
-    await db.delete(table.shoppingPurchaseItem).where(inArray(table.shoppingPurchaseItem.itemId, itemIds));
-    await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds));
-  }
 };
 
 export const addShoppingCategory = async (name: string): Promise<void> => {
@@ -219,6 +214,15 @@ export const reactivateShoppingItem = async (itemId: string, amount: string | un
     amount: amount
   }).where(eq(table.shoppingItem.id, itemId)).execute();
 };
+
+export const deleteShoppingItems = async (itemIds: string[]): Promise<void> => {
+  const db = getTx();
+
+  if (itemIds.length > 0) {
+    await db.delete(table.shoppingPurchaseItem).where(inArray(table.shoppingPurchaseItem.itemId, itemIds));
+    await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds));
+  }
+}
 
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
   const db = getTx();

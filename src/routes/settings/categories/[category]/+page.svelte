@@ -23,24 +23,6 @@
       <input class="form-input input" type="text" name="name" bind:value={categoryName} required />
     </label>
 
-    {#if data.category}
-      <div class="mt-2 mb-2">
-        { m.settings_categories_delete_items() }
-        {#each data.category.shoppingItems as item (item.id)}
-          <div>
-            <label>
-              <input type="checkbox" name="items" value={item.id} />
-              {item.name}
-            </label>
-          </div>
-        {:else }
-          <div class="text-surface-400-600">
-            { m.settings_categories_empty() }
-          </div>
-        {/each}
-      </div>
-    {/if}
-
     <button type="submit" class="btn mt-1">
       { m.generic_save() }
     </button>

@@ -22,6 +22,8 @@
   "settings_categories_empty": "Diese Kategorie hat noch keine Artikel",
   "settings_categories_headline": "Kategorien",
   "settings_categories_name_invalid": "Fehlerhafte Name",
+  "settings_items_delete": "Permanent entfernen",
+  "settings_items_headline": "Artikel",
   "settings_users_add": "Benutzer:in hinzufügen",
   "settings_users_headline": "Benutzer:innen",
   "settings_users_language": "Sprache wählen",
