@@ -25,7 +25,6 @@ export const actions: Actions = {
   create: async (event) => {
     const formData = await event.request.formData();
     const name = formData.get('name')?.toString()?.trim();
-    const items = formData.getAll('items').map((formValue) => formValue.toString());
     if (!name) {
       return fail(400, { message: m.settings_categories_name_invalid() });
     }
@@ -33,7 +32,7 @@ export const actions: Actions = {
     const id = formData.get('categoryId')?.toString();
 
     if (id) {
-      await updateShoppingCategory(id, name, items);
+      await updateShoppingCategory(id, name);
     } else {
       await addShoppingCategory(name);
     }
