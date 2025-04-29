@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Avatar } from '@skeletonlabs/skeleton-svelte';
   import { enhance } from '$app/forms';
-  import { goto } from '$app/navigation'; // Import available tags and the current tag function
+  import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
@@ -23,15 +23,20 @@
     <LoadingSpinner />
   </div>
 {:then users}
-  <div class="card mb-2 w-full">
+  {#if !data.has_active_user}
+    <p class="card w-full preset-filled-error-50-950 rounded m-2 text-center">
+      { m.settings_users_no_active_user() }
+    </p>
+  {/if}
+  <div class="card mb-2 w-full flex justify-between">
     <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_language() }</h1>
-    <div class="flex flex-wrap justify-center gap-4">
+    <span class="flex flex-wrap justify-center gap-4">
       {#each availableLanguageTags as lang(lang)}
         <button class="btn" onclick={() => changeLanguage(lang)}>
           {lang}
         </button>
       {/each}
-    </div>
+    </span>
   </div>
   <div class="card w-full">
     <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_switch() }</h1>
