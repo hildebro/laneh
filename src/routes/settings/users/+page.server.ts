@@ -5,9 +5,10 @@ import * as m from '$lib/paraglide/messages';
 import { setUser } from '$lib/server/auth';
 import { findAllUsers, findUser } from '$lib/server/db/functions';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
   return {
-    users: findAllUsers()
+    users: findAllUsers(),
+    has_active_user: locals.user !== undefined
   };
 };
 
