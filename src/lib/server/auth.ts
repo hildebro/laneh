@@ -3,6 +3,7 @@ import { sign, unsign } from 'cookie-signature';
 import { authenticator } from 'otplib';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
+import { USER_COOKIE } from '$lib';
 
 const OTP_SECRET = env.OTP_SECRET;
 const SESSION_SECRET = env.SESSION_SECRET;
@@ -13,8 +14,8 @@ const MIN_DELAY_MS = 1000;
 const MAX_DELAY_MS = 5000;
 
 if (!OTP_SECRET || !SESSION_SECRET || !REFRESH_SECRET) {
-  console.error("Missing required environment variables for authentication!");
-  throw new Error("Missing authentication secrets.  See console.");
+  console.error('Missing required environment variables for authentication!');
+  throw new Error('Missing authentication secrets.  See console.');
 }
 
 function getRandomDelay(min: number, max: number): number {
@@ -35,7 +36,7 @@ export async function verifyOTP(token: string): Promise<boolean> {
 
     return isValid;
   } catch (err) {
-    console.error("OTP verification error:", err);
+    console.error('OTP verification error:', err);
     return false;
   }
 }
@@ -49,7 +50,7 @@ export async function createSession(cookies: Cookies): Promise<void> {
     httpOnly: true,
     sameSite: 'strict',
     secure: !dev, // Use secure cookies in production
-    maxAge: parseDuration(SESSION_EXPIRY),
+    maxAge: parseDuration(SESSION_EXPIRY)
   });
 
   const refreshToken = crypto.randomUUID();
@@ -95,6 +96,16 @@ export async function refreshSession(cookies: Cookies): Promise<boolean> {
   return true;
 }
 
+export function setUser(cookies: Cookies, userId: string) {
+  cookies.set(USER_COOKIE, userId, {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: !dev, // Use secure cookies in production
+    maxAge: parseDuration(REFRESH_TOKEN_EXPIRY) // Very long duration
+  });
+}
+
 // Helper to parse duration strings like "1h", "7d", etc.
 function parseDuration(duration: string): number {
   const match = duration.match(/^(\d+)([smhd])$/);
@@ -104,10 +115,15 @@ function parseDuration(duration: string): number {
   const value = parseInt(match[1], 10);
   const unit = match[2];
   switch (unit) {
-    case 's': return value;
-    case 'm': return value * 60;
-    case 'h': return value * 60 * 60;
-    case 'd': return value * 60 * 60 * 24;
-    default: throw new Error(`Invalid duration unit: ${unit}`);
+    case 's':
+      return value;
+    case 'm':
+      return value * 60;
+    case 'h':
+      return value * 60 * 60;
+    case 'd':
+      return value * 60 * 60 * 24;
+    default:
+      throw new Error(`Invalid duration unit: ${unit}`);
   }
 }
