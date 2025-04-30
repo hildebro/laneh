@@ -41,6 +41,14 @@
     {#if form?.message}
       <p class="card preset-filled-error-50-950 rounded text-center">{form.message}</p>
     {/if}
+    <button type="submit"
+            class="btn preset-filled-warning-800-200"
+            name="action"
+            value="deactivate"
+            onclick={modalClose}
+    >
+      { m.settings_items_deactivate() }
+    </button>
     <Modal
       open={openState}
       onOpenChange={(e) => (openState = e.open)}
