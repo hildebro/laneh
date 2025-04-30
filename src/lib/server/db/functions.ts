@@ -224,6 +224,17 @@ export const deleteShoppingItems = async (itemIds: string[]): Promise<void> => {
   }
 }
 
+export const deactivateShoppingItems = async (itemIds: string[]): Promise<void> => {
+  const db = getTx();
+
+  if (itemIds.length > 0) {
+    await db.update(table.shoppingItem)
+      .set({ active: false })
+      .where(inArray(table.shoppingItem.id, itemIds))
+      .execute();
+  }
+}
+
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
   const db = getTx();
 
@@ -286,7 +297,7 @@ export const createPurchase = async (user: User, itemIds: string[]): Promise<voi
   await db.insert(table.shoppingPurchaseItem).values(purchaseItemInserts);
 
   // 3. Deactivate the shopping items
-  await db.update(table.shoppingItem).set({ active: false }).where(inArray(table.shoppingItem.id, itemIds)).execute();
+  await deactivateShoppingItems(itemIds);
 };
 
 // ------- STAGED SHOPPING LIST -------
