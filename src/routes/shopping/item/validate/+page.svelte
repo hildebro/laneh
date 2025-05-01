@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CancelAction from '../cancel/CancelAction.svelte';
   import { enhance } from '$app/forms';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -15,6 +16,7 @@
   <title>{ m.shopping_validate_headline() }</title>
 </svelte:head>
 
+<CancelAction />
 <div class="card">
   <h1 class="text-2xl font-semibold mb-4">{ m.shopping_validate_headline() }</h1>
 
