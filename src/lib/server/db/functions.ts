@@ -432,6 +432,12 @@ export const commitStagedItems = async (userId: string) => {
     }
   }
 
+  await deleteStagedList(userId);
+};
+
+export const deleteStagedList = async (userId: string) => {
+  const db = getTx();
+
   // Delete the staged list
   await db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId)).execute();
 };

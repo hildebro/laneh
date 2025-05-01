@@ -40,6 +40,7 @@
   "shopping_add_items": "Add items",
   "shopping_add_items_explanation": "Write one type of item per line.\nYou may optionally add an amount before the item.\nFor example:\n3x Tomatoes\nChocolate\n2x Milk",
   "shopping_add_items_parse_error": "Some lines could not be parsed. Please check for mistakes.",
+  "shopping_cancel_staging": "Cancel adding items",
   "shopping_categorize": "Categorize items",
   "shopping_categorize_select_category": "Set the category for your selected items:",
   "shopping_categorize_select_items": "Select items that you want to categorize together:",
