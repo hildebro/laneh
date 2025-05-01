@@ -24,6 +24,8 @@
   "settings_categories_empty": "Diese Kategorie hat noch keine Artikel",
   "settings_categories_headline": "Kategorien",
   "settings_categories_name_invalid": "Fehlerhafte Name",
+  "settings_items_action_empty": "Bitte wähle mindestens einen Artikel aus",
+  "settings_items_change_category": "Klicke auf eine Kategorie, um alle ausgewählten Artikel in sie zu bewegen",
   "settings_items_deactivate": "Deaktivieren",
   "settings_items_delete": "Permanent entfernen",
   "settings_items_delete_info": "Du bist dabei die ausgewählten Artikel zu löschen, inklusive ihrer Kaufhistorie. Es wäre vielleicht besser, die Artikel stattdessen zu deaktivieren oder in eine andere Kategorie zu verschieben. Bist du sicher, dass du die Artikel löschen willst?",

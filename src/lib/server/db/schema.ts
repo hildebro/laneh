@@ -31,9 +31,7 @@ export const shoppingItem = pgTable('shopping_item', {
   amount: text().notNull().default(''),
   priority: integer().notNull(),
   active: boolean().notNull()
-}, (shoppingItem) => [
-  unique().on(shoppingItem.categoryId, shoppingItem.priority)
-]);
+});
 export type ShoppingItem = typeof shoppingItem.$inferSelect;
 
 export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => ({

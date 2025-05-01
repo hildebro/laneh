@@ -41,34 +41,51 @@
     {#if form?.message}
       <p class="card preset-filled-error-50-950 rounded text-center">{form.message}</p>
     {/if}
-    <button type="submit"
-            class="btn preset-filled-warning-800-200"
-            name="action"
-            value="deactivate"
-            onclick={modalClose}
-    >
-      { m.settings_items_deactivate() }
-    </button>
-    <Modal
-      open={openState}
-      onOpenChange={(e) => (openState = e.open)}
-      triggerBase="btn preset-filled-error-800-200"
-      contentBase="card preset-filled-warning-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
-      backdropClasses="backdrop-blur-sm"
-    >
-      {#snippet trigger()}{m.settings_items_delete()}{/snippet}
-      {#snippet content()}
-        <h2 class="h2">{m.settings_items_delete()}</h2>
-        <p class="opacity-60">{ m.settings_items_delete_info() }</p>
-        <div class="flex justify-end gap-4">
-          <button type="button" class="btn preset-filled-warning-800-200" onclick={modalClose}>
-            { m.generic_cancel() }
+    <div class="card">
+      { m.settings_items_change_category() }
+      <div class="flex gap-1 flex-wrap">
+        {#each categories as category (category.id)}
+          <button type="submit"
+                  class="btn"
+                  name="category"
+                  value={category.id}
+                  onclick={modalClose}
+          >
+            {category.name}
           </button>
-          <button type="button" class="btn preset-filled-warning-800-200" onclick={handleDeleteSubmit}>
-            { m.generic_confirm() }
-          </button>
-        </div>
-      {/snippet}
-    </Modal>
+        {/each}
+      </div>
+    </div>
+    <div class="card flex gap-1 flex-wrap">
+      <button type="submit"
+              class="btn preset-filled-warning-800-200"
+              name="action"
+              value="deactivate"
+              onclick={modalClose}
+      >
+        { m.settings_items_deactivate() }
+      </button>
+      <Modal
+        open={openState}
+        onOpenChange={(e) => (openState = e.open)}
+        triggerBase="btn preset-filled-error-800-200"
+        contentBase="card preset-filled-warning-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
+        backdropClasses="backdrop-blur-sm"
+      >
+        {#snippet trigger()}{m.settings_items_delete()}{/snippet}
+        {#snippet content()}
+          <h2 class="h2">{m.settings_items_delete()}</h2>
+          <p class="opacity-60">{ m.settings_items_delete_info() }</p>
+          <div class="flex justify-end gap-4">
+            <button type="button" class="btn preset-filled-warning-800-200" onclick={modalClose}>
+              { m.generic_cancel() }
+            </button>
+            <button type="button" class="btn preset-filled-warning-800-200" onclick={handleDeleteSubmit}>
+              { m.generic_confirm() }
+            </button>
+          </div>
+        {/snippet}
+      </Modal>
+    </div>
   </form>
 {/await}

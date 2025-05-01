@@ -222,7 +222,7 @@ export const deleteShoppingItems = async (itemIds: string[]): Promise<void> => {
     await db.delete(table.shoppingPurchaseItem).where(inArray(table.shoppingPurchaseItem.itemId, itemIds));
     await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, itemIds));
   }
-}
+};
 
 export const deactivateShoppingItems = async (itemIds: string[]): Promise<void> => {
   const db = getTx();
@@ -233,7 +233,7 @@ export const deactivateShoppingItems = async (itemIds: string[]): Promise<void> 
       .where(inArray(table.shoppingItem.id, itemIds))
       .execute();
   }
-}
+};
 
 export const addShoppingItem = async (categoryId: string, name: string, amount: string | undefined): Promise<void> => {
   const db = getTx();
@@ -273,6 +273,16 @@ export const addShoppingItem = async (categoryId: string, name: string, amount: 
     priority: nextPriority,
     active: true
   });
+};
+
+export const assignCategoryToShoppingItems = async (itemIds: string[], categoryId: string) => {
+  const db = getTx();
+
+  await db.update(table.shoppingItem)
+    .set({
+      categoryId: categoryId
+    })
+    .where(inArray(table.shoppingItem.id, itemIds)).execute();
 };
 
 // ------- SHOPPING PURCHASE -------
