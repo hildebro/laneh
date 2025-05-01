@@ -1,0 +1,1 @@
+ALTER TABLE "shopping_item" DROP CONSTRAINT "shopping_item_categoryId_priority_unique";
