@@ -18,7 +18,7 @@
    * Function to handle the form submit. Can't rely on submit button, because the modal that contains that button
    * is rendered outside of the form in the DOM.
    */
-  function handleConfirmSubmit() {
+  function handleDeleteSubmit() {
     // Use requestSubmit() which is often preferred as it respects validation and behaves more like a user
     // click on a submit button. submit() would also work but might bypass some checks.
     formElement?.requestSubmit();
@@ -64,7 +64,7 @@
           <button type="button" class="btn preset-filled-warning-800-200" onclick={modalClose}>
             { m.generic_cancel() }
           </button>
-          <button type="button" class="btn preset-filled-warning-800-200" onclick={handleConfirmSubmit}>
+          <button type="button" class="btn preset-filled-warning-800-200" onclick={handleDeleteSubmit}>
             { m.generic_confirm() }
           </button>
         </div>
