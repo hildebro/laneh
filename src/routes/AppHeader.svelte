@@ -10,7 +10,7 @@
   <Navigation.Tile href="{base}/shopping" label={m.header_shopping()}>
     <ShoppingCart />
   </Navigation.Tile>
-  <Navigation.Tile label={m.header_schedule()} labelClasses="disabled">
+  <Navigation.Tile href="{base}/schedule" label={m.header_schedule()}>
     <CalendarDays />
   </Navigation.Tile>
   <Navigation.Tile label={m.header_daily_upkeep()} labelClasses="disabled">
