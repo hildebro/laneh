@@ -1,7 +1,18 @@
 // noinspection JSUnusedGlobalSymbols
 
 import { relations } from 'drizzle-orm';
-import { boolean, integer, pgTable, primaryKey, text, timestamp, unique } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  date,
+  integer,
+  jsonb,
+  numeric,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp
+} from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
@@ -128,3 +139,30 @@ export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one 
     relationName: 'selectedCategory' // Explicit name
   })
 }));
+
+export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+
+// Define the tasks table
+export const weeklyTask = pgTable('task_weekly', {
+  id: text().primaryKey(),
+  createdAt: timestamp().defaultNow().notNull(),
+  name: text().notNull(),
+  dueWeekday: weekday().notNull(),
+  nextDueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
+  nextDueDate: date().notNull(),
+});
+// Define TypeScript types for convenience (optional but recommended)
+export type WeeklyTask = typeof weeklyTask.$inferSelect;
+
+export const tasksRelations = relations(weeklyTask, ({ one }) => ({
+  nextDueUser: one(user, { fields: [weeklyTask.nextDueUserId], references: [user.id] })
+}));
+
+export const taskCompletion = pgTable('task_completion', {
+  id: text().primaryKey(),
+  taskId: text().notNull().references(() => weeklyTask.id, { onDelete: 'cascade' }),
+  // Users involved in completing the task.
+  userIds: jsonb().$type<string[]>().default([]).notNull(),
+  date: date().notNull(),
+});
+export type TaskCompletion = typeof taskCompletion.$inferSelect;

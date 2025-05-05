@@ -7,10 +7,10 @@
 		<ShoppingCart />
 		Shopping
 	</a>
-	<button class="btn cursor-not-allowed" disabled>
+	<a class="btn" href="schedule">
 		<CalendarDays />
 		Schedule
-	</button>
+	</a>
 	<button class="btn cursor-not-allowed" disabled>
 		<Star />
 		Daily Upkeep
