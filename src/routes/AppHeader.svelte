@@ -6,17 +6,19 @@
   import * as m from '$lib/paraglide/messages.js';
 </script>
 
-<header class="sticky top-0 p-1 text-xs flex">
-  <Navigation.Tile href="{base}/shopping" label={m.header_shopping()}>
-    <ShoppingCart />
-  </Navigation.Tile>
-  <Navigation.Tile href="{base}/schedule" label={m.header_schedule()}>
-    <CalendarDays />
-  </Navigation.Tile>
-  <Navigation.Tile label={m.header_daily_upkeep()} labelClasses="disabled">
-    <Star />
-  </Navigation.Tile>
-  <Navigation.Tile href="{base}/settings" label={m.header_settings()}>
-    <Settings />
-  </Navigation.Tile>
+<header class="sticky">
+  <Navigation.Bar>
+    <Navigation.Tile href="{base}/shopping" label={m.header_shopping()}>
+      <ShoppingCart />
+    </Navigation.Tile>
+    <Navigation.Tile href="{base}/schedule" label={m.header_schedule()}>
+      <CalendarDays />
+    </Navigation.Tile>
+    <Navigation.Tile label={m.header_daily_upkeep()} labelClasses="disabled">
+      <Star />
+    </Navigation.Tile>
+    <Navigation.Tile href="{base}/settings" label={m.header_settings()}>
+      <Settings />
+    </Navigation.Tile>
+  </Navigation.Bar>
 </header>
