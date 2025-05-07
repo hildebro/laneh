@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Modal, Switch } from '@skeletonlabs/skeleton-svelte';
   import { enhance } from '$app/forms';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
+
+  let showInactiveItems = $state(false);
 
   let deleteModalVisible = $state(false);
 
@@ -31,13 +33,18 @@
 {#await data.categories}
   <LoadingSpinner />
 {:then categories}
+  <div class="card mb-2 ml-auto preset-filled-primary-800-200">
+    <Switch checked={showInactiveItems} onCheckedChange={(e) => (showInactiveItems = e.checked)}>
+      { m.settings_items_show_inactive() }
+    </Switch>
+  </div>
   <form
     class="flex flex-col gap-4 items-center h-full w-full"
     method="POST"
     use:enhance
     bind:this={formElement}
   >
-    <CategorizedItemSelect {categories} unfiltered />
+    <CategorizedItemSelect {categories} unfiltered={showInactiveItems} />
     {#if form?.message}
       <p class="card preset-filled-error-50-950 rounded text-center">{form.message}</p>
     {/if}
