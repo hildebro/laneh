@@ -31,6 +31,7 @@
   "settings_items_delete_info": "You are about to delete the selected items, including their purchase history. It might be better to deactivate the item or move it to another category instead. Are you sure you want to delete it?",
   "settings_items_headline": "Items",
   "settings_items_other_actions": "Or select another action to apply to selected items:",
+  "settings_items_show_inactive": "Show deactivated items",
   "settings_users_add": "Add user",
   "settings_users_headline": "Users",
   "settings_users_language": "Select language",
