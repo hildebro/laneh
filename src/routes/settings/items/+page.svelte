@@ -5,13 +5,13 @@
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
-  let openState = $state(false);
+  let deleteModalVisible = $state(false);
 
   // Reference to the form DOM element
   let formElement: HTMLFormElement | undefined = $state();
 
   function modalClose() {
-    openState = false;
+    deleteModalVisible = false;
   }
 
   /**
@@ -66,8 +66,8 @@
           { m.settings_items_deactivate() }
         </button>
         <Modal
-          open={openState}
-          onOpenChange={(e) => (openState = e.open)}
+          open={deleteModalVisible}
+          onOpenChange={(e) => (deleteModalVisible = e.open)}
           triggerBase="btn preset-filled-error-800-200"
           contentBase="card preset-filled-warning-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
           backdropClasses="backdrop-blur-sm"
