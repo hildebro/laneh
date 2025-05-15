@@ -49,7 +49,7 @@ export async function createSession(cookies: Cookies): Promise<void> {
     path: '/',
     httpOnly: true,
     sameSite: 'none',
-    secure: !dev, // Use secure cookies in production
+    secure: true,
     maxAge: parseDuration(SESSION_EXPIRY)
   });
 
@@ -59,7 +59,7 @@ export async function createSession(cookies: Cookies): Promise<void> {
     path: '/',
     httpOnly: true,
     sameSite: 'none',
-    secure: !dev, // Use secure cookies in production
+    secure: true,
     maxAge: parseDuration(REFRESH_TOKEN_EXPIRY) //seconds
   });
 }
@@ -101,7 +101,7 @@ export function setUser(cookies: Cookies, userId: string) {
     path: '/',
     httpOnly: true,
     sameSite: 'none',
-    secure: !dev, // Use secure cookies in production
+    secure: true,
     maxAge: parseDuration(REFRESH_TOKEN_EXPIRY) // Very long duration
   });
 }
