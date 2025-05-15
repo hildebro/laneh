@@ -1,13 +1,16 @@
 <script lang="ts">
   // noinspection ES6UnusedImports Intellij doesn't resolve the dot annotation correctly
   import { Navigation } from '@skeletonlabs/skeleton-svelte';
-  import { CalendarDays, Settings, ShoppingCart, Star } from 'lucide-svelte';
+  import { CalendarDays, House, Settings, ShoppingCart, Star } from 'lucide-svelte';
   import { base } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
 </script>
 
 <header class="sticky">
   <Navigation.Bar>
+    <Navigation.Tile href="{base}" label={m.header_dashboard()}>
+      <House />
+    </Navigation.Tile>
     <Navigation.Tile href="{base}/shopping" label={m.header_shopping()}>
       <ShoppingCart />
     </Navigation.Tile>
