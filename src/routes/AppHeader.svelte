@@ -4,34 +4,44 @@
   import { CalendarDays, House, Settings, ShoppingCart, Star } from 'lucide-svelte';
   import { base } from '$app/paths';
   import { page } from '$app/state';
-  import { availableLanguageTags } from '$lib/paraglide/runtime';
   import * as m from '$lib/paraglide/messages.js';
+  import { availableLanguageTags } from '$lib/paraglide/runtime';
 
   function getActiveTileId(pathname: string): string {
     // Remove the base path and split path into segments.
     let path = pathname.substring(base.length);
     let segments = path.replace(/^\/|\/$/g, '').split('/');
 
-    // Remove language tag from the segments, if it's present
-    if ((availableLanguageTags as readonly string[]).includes(segments[0])) {
+    // Remove language tag from the segments if it's present at the beginning.
+    if (segments.length > 0 && (availableLanguageTags as readonly string[]).includes(segments[0])) {
       segments.shift();
     }
 
-    // If no segments are present, we are at the base url.
-    if (segments.length === 0) {
+    // If no segments are left, we are at the effective base URL.
+    if (segments.length === 0 || segments[0] === '') {
       return 'dashboard';
     }
 
-    // Grab the main segment, defaulting to dashboard for type safety even though it should be impossible.
-    return segments.shift() ?? 'dashboard';
+    // The first segment after base path and language code is the active tile ID.
+    return segments[0];
   }
 
-  // Initialize the state based on the current page path
+  // Initialize the state based on the current page path.
+  // This $state will hold the ID of the active navigation tile.
   let value = $state(getActiveTileId(page.url.pathname));
+
+  // Use an $effect to reactively update 'value' whenever the page URL pathname changes.
+  // This ensures the header highlight updates, even if navigation is triggered externally.
+  $effect(() => {
+    const newActiveId = getActiveTileId(page.url.pathname);
+    if (value !== newActiveId) {
+      value = newActiveId; // Update the $state variable
+    }
+  });
 </script>
 
 <header class="sticky">
-  <Navigation.Bar {value} onValueChange={(newValue) => (value = newValue)}>
+  <Navigation.Bar {value}>
     <Navigation.Tile id="dashboard" href={base} label={m.header_dashboard()}>
       <House />
     </Navigation.Tile>
