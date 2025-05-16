@@ -48,8 +48,8 @@ export async function createSession(cookies: Cookies): Promise<void> {
   cookies.set('session', signedSessionToken, {
     path: '/',
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: 'strict',
+    secure: !dev,
     maxAge: parseDuration(SESSION_EXPIRY)
   });
 
@@ -58,8 +58,8 @@ export async function createSession(cookies: Cookies): Promise<void> {
   cookies.set('refresh', signedRefreshToken, {
     path: '/',
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: 'strict',
+    secure: !dev,
     maxAge: parseDuration(REFRESH_TOKEN_EXPIRY) //seconds
   });
 }
@@ -100,8 +100,8 @@ export function setUser(cookies: Cookies, userId: string) {
   cookies.set(USER_COOKIE, userId, {
     path: '/',
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: 'strict',
+    secure: !dev,
     maxAge: parseDuration(REFRESH_TOKEN_EXPIRY) // Very long duration
   });
 }
