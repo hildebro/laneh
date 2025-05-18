@@ -10,7 +10,9 @@ import {
   type ShoppingItem,
   shoppingItem,
   type StagedShoppingItem,
-  type User
+  type User,
+  type Weekday,
+  type WeeklyTask
 } from '$lib/server/db/schema';
 // The actual function is usually on the '.get' property for this library
 const levenshtein = levenshteinPkg.get;
@@ -441,6 +443,83 @@ export const deleteStagedList = async (userId: string) => {
   // Delete the staged list
   await db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId)).execute();
 };
+
+// ------- TASKS -------
+export const findAllTasks = async (): Promise<WeeklyTask[]> => {
+  const db = getTx();
+
+  return db.select().from(table.weeklyTask).execute();
+};
+
+export const findTask = async (taskId: string) => {
+  const db = getTx();
+
+  return db.query.weeklyTask.findFirst({
+    where: eq(table.weeklyTask.id, taskId)
+  }).execute();
+};
+
+export const addTask = async (name: string, weekday: string, userId: string) => {
+  const db = getTx();
+
+  await db.insert(table.weeklyTask).values({
+    id: generateUUID(),
+    name: name,
+    dueWeekday: weekday as Weekday,
+    nextDueUserId: userId,
+    nextDueDate: formatDateToYYYYMMDD(getNextWeekdayDate(weekday))
+  });
+};
+
+/**
+ * Calculates the date of the next occurrence of a specific weekday based on the current time.
+ */
+function getNextWeekdayDate(weekdayName: string): Date {
+  const weekdayMap: { [key: string]: number } = {
+    'sun': 0,
+    'mon': 1,
+    'tue': 2,
+    'wed': 3,
+    'thu': 4,
+    'fri': 5,
+    'sat': 6
+  };
+
+  const targetDayOfWeek = weekdayMap[weekdayName];
+
+  const now = new Date();
+  const currentDayOfWeek = now.getDay();
+
+  // Calculate the difference in days
+  // If the target day is before or is the current day within the current week, we need to add 7 days
+  // to get the *next* occurrence.
+  let diff = targetDayOfWeek - currentDayOfWeek;
+  if (diff <= 0) {
+    diff += 7;
+  }
+
+  // Create a new Date object starting from 'now' and add the calculated difference in days
+  // This preserves the time of day from the 'now' object.
+  const nextDate = new Date(now);
+  nextDate.setDate(now.getDate() + diff);
+
+  return nextDate;
+}
+
+/**
+ * Formats a Date object into a 'YYYY-MM-DD' string suitable for SQL DATE type.
+ * @param date The Date object to format.
+ * @returns The date formatted as 'YYYY-MM-DD'.
+ */
+function formatDateToYYYYMMDD(date: Date): string {
+  const year = date.getFullYear();
+  // getMonth() is 0-indexed, so add 1. padStart ensures two digits (e.g., '01' instead of '1').
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  // getDate() gets the day of the month. padStart ensures two digits.
+  const day = date.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
 
 // ------- GENERIC -------
 function generateUUID() {
