@@ -18,11 +18,11 @@
 
     // Assign color based on due date relative to today
     if (dueDate.getTime() === today.getTime()) {
-      return 'preset-filled-success'; // Green for due today
+      return 'preset-filled-secondary-100-900'; // Green for due today
     } else if (dueDate.getTime() === yesterday.getTime()) {
-      return 'preset-filled-warning'; // Yellow for due yesterday
+      return 'preset-filled-warning-100-900'; // Yellow for due yesterday
     } else {
-      return 'preset-filled-error'; // Red for tasks due before yesterday
+      return 'preset-filled-error-100-900'; // Red for tasks due before yesterday
     }
   }
 
@@ -43,18 +43,18 @@
   }
 </script>
 
-<div class="container mx-auto p-4 space-y-8">
-  <a class="btn" href="schedule/add">Add task</a>
+<a class="btn mb-2 ml-auto" href="schedule/add">Add task</a>
+<div class="card w-full">
   <section class="space-y-4">
     <h2 class="h2">Due Tasks</h2>
     {#if data.dueTasks.length === 0}
       <p class="text-center text-gray-500 dark:text-gray-400">No tasks are currently due. Great job!</p>
     {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div>
         {#each data.dueTasks as task (task.id)}
-          <div transition:slide={{ duration: 300 }}>
-            <div class="card p-4 {getDueCardPreset(task)}">
-              <header class="flex justify-between items-center mb-2">
+          <div class="mb-2" transition:slide={{ duration: 300 }}>
+            <div class="card p-4 preset-filled-secondary-100-900">
+              <div class="flex justify-between items-center mb-2">
                 <h3 class="h3 text-lg font-semibold">{task.name}</h3>
                 <form
                   method="POST"
@@ -71,10 +71,10 @@
                     <span>Done</span>
                   </button>
                 </form>
-              </header>
+              </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
-                <p><strong>Due:</strong> {formatDate(task.nextDueDate)}</p>
+                <p class={getDueCardPreset(task)}><strong>Due:</strong> {formatDate(task.nextDueDate)}</p>
               </div>
             </div>
           </div>
@@ -90,11 +90,11 @@
     {:else}
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {#each data.upcomingTasks as task (task.id)}
-          <div transition:slide={{ duration: 300 }}>
-            <div class="card p-4 variant-soft">
-              <header class="mb-2">
+          <div class="mb-2" transition:slide={{ duration: 300 }}>
+            <div class="card preset-filled-secondary-100-900 p-4 variant-soft">
+              <div class="mb-2">
                 <h3 class="h3 text-lg font-semibold">{task.name}</h3>
-              </header>
+              </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
                 <p><strong>Next Due:</strong> {formatDate(task.nextDueDate)}</p>
