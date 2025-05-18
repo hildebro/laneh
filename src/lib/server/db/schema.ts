@@ -1,18 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import { relations } from 'drizzle-orm';
-import {
-  boolean,
-  date,
-  integer,
-  jsonb,
-  numeric,
-  pgEnum,
-  pgTable,
-  primaryKey,
-  text,
-  timestamp
-} from 'drizzle-orm/pg-core';
+import { boolean, date, integer, jsonb, pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
@@ -141,6 +130,8 @@ export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one 
 }));
 
 export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+
+export type Weekday = typeof weekday.enumValues[number];
 
 // Define the tasks table
 export const weeklyTask = pgTable('task_weekly', {
