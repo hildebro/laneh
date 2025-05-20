@@ -2,6 +2,7 @@
   import { CheckCircle, Pencil } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
   import { enhance } from '$app/forms';
+  import * as m from '$lib/paraglide/messages.js';
   import type { WeeklyTask } from '$lib/server/db/schema';
 
   let { data } = $props();
@@ -43,12 +44,12 @@
   }
 </script>
 
-<a class="btn mb-2 ml-auto" href="schedule/add">Add task</a>
+<a class="btn mb-2 ml-auto" href="schedule/add">{ m.schedule_add_task() }</a>
 <div class="card w-full">
   <section class="space-y-4">
-    <h2 class="h2">Due Tasks</h2>
+    <h2 class="h2">{ m.schedule_due_tasks() }</h2>
     {#if data.dueTasks.length === 0}
-      <p class="mb-2">No tasks are currently due. Great job!</p>
+      <p class="mb-2">{ m.schedule_due_tasks_empty() }</p>
     {:else}
       <div>
         {#each data.dueTasks as task (task.id)}
@@ -56,13 +57,9 @@
             <div class="card">
               <h3 class="h3 text-lg font-semibold">{task.name}</h3>
               <div class="flex justify-end gap-1 items-center mb-2">
-                <a
-                  href="schedule/{task.id}"
-                  class="btn"
-                  aria-label={`Change date of ${task.name}`}
-                >
+                <a href="schedule/{task.id}" class="btn">
                   <Pencil size={18} />
-                  <span>Edit</span>
+                  <span>{ m.generic_edit() }</span>
                 </a>
                 <form
                   method="POST"
@@ -70,20 +67,18 @@
                   use:enhance
                 >
                   <input type="hidden" name="taskId" value={task.id} />
-                  <button
-                    type="submit"
-                    class="btn"
-                    aria-label={`Mark ${task.name} as done`}
-                  >
+                  <button type="submit" class="btn">
                     <CheckCircle size={18} />
-                    <span>Done</span>
+                    <span>{ m.schedule_done() }</span>
                   </button>
                 </form>
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
-                <p>Assignee: {task.nextDueUser?.username}</p>
-                <p class={getDueCardPreset(task)}><strong>Due:</strong> {formatDate(task.nextDueDate)}</p>
+                <p>{ m.schedule_assignee() }: {task.nextDueUser?.username}</p>
+                <p class={getDueCardPreset(task)}>
+                  <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.nextDueDate)}
+                </p>
               </div>
             </div>
           </div>
@@ -93,9 +88,9 @@
   </section>
 
   <section class="space-y-4">
-    <h2 class="h2">Upcoming Tasks</h2>
+    <h2 class="h2">{ m.schedule_upcoming_tasks() }</h2>
     {#if data.upcomingTasks.length === 0}
-      <p>No upcoming tasks scheduled.</p>
+      <p>{ m.schedule_upcoming_tasks_empty() }</p>
     {:else}
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {#each data.upcomingTasks as task (task.id)}
@@ -106,8 +101,8 @@
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
-                <p>Assignee: {task.nextDueUser?.username}</p>
-                <p><strong>Next Due:</strong> {formatDate(task.nextDueDate)}</p>
+                <p>{ m.schedule_assignee() }: {task.nextDueUser?.username}</p>
+                <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.nextDueDate)}</p>
               </div>
             </div>
           </div>
