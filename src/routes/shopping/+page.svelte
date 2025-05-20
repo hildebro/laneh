@@ -6,7 +6,7 @@
   let { data } = $props();
 </script>
 
-<div class="card w-full">
+<div class="w-full">
   {#await data.categories}
     <LoadingSpinner />
   {:then categories}

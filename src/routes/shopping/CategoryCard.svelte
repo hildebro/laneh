@@ -4,7 +4,7 @@
   let { category } = $props();
 </script>
 
-<div class="card preset-filled-secondary-100-900">
+<div class="card">
   <!-- Header -->
   <b>{category.name}</b>
   <!-- Item list -->

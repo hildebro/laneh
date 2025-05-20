@@ -40,8 +40,8 @@
   });
 </script>
 
-<header class="sticky">
-  <Navigation.Bar {value}>
+<header class="sticky top-0 z-50 bg-surface-50-950/75 backdrop-blur-xs">
+  <Navigation.Bar {value} background="">
     <Navigation.Tile id="dashboard" href={base} label={m.header_dashboard()}>
       <House />
     </Navigation.Tile>

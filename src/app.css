@@ -9,23 +9,17 @@
 
 @layer base {
     main {
-        @apply preset-filled-surface-100-900;
-    }
-
-    header {
-        @apply preset-filled-primary-200-800 border-b border-b-surface-100;
-    }
-
-    footer {
-        @apply preset-filled-primary-200-800 border-t border-t-surface-100;
+        @apply bg-surface-50-950;
+        background-image:
+                radial-gradient(at 0% 0%, color-mix(in oklab, var(--color-primary-500) 25%, transparent) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, color-mix(in oklab, var(--color-success-500) 10%, transparent) 0px, transparent 35%);
     }
 
     .btn {
-        @apply preset-filled-primary-800-200 px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors
-        disabled:hover:bg-primary-800;
+        @apply preset-filled-primary-500;
     }
 
     .card {
-        @apply preset-filled-primary-100-900 p-6 rounded-xl shadow-md;
+        @apply preset-outlined-surface-200-800 bg-surface-50-950 p-5 shadow-md;
     }
 }
