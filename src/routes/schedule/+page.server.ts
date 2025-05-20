@@ -1,5 +1,6 @@
+import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { findAllTasks } from '$lib/server/db/functions';
+import { findAllTasks, markTaskAsDone } from '$lib/server/db/functions';
 import type { WeeklyTask } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async () => {
@@ -38,3 +39,15 @@ function processTasks(tasks: WeeklyTask[]) {
 
   return { dueTasks: due, upcomingTasks: upcoming };
 }
+
+export const actions: Actions = {
+  markAsDone: async ({ request }) => {
+    const formData = await request.formData();
+    const taskId = formData.get('taskId')?.toString();
+    if (!taskId) {
+      throw new Error('Action called without task id. This should not happen.');
+    }
+
+    await markTaskAsDone(taskId);
+  },
+};
