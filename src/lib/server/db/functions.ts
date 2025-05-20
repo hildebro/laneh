@@ -12,7 +12,8 @@ import {
   type StagedShoppingItem,
   type User,
   type Weekday,
-  type WeeklyTask
+  type WeeklyTask,
+  type WeeklyTaskWithRelation
 } from '$lib/server/db/schema';
 // The actual function is usually on the '.get' property for this library
 const levenshtein = levenshteinPkg.get;
@@ -441,7 +442,7 @@ export const deleteStagedList = async (userId: string) => {
 };
 
 // ------- TASKS -------
-export const findAllTasks = async (): Promise<WeeklyTask[]> => {
+export const findAllTasks = async (): Promise<WeeklyTaskWithRelation[]> => {
   const db = getTx();
 
   return db.query.weeklyTask.findMany({

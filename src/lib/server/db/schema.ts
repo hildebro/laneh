@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { relations } from 'drizzle-orm';
-import { boolean, date, integer, jsonb, pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
+import { type InferSelectModel, relations } from 'drizzle-orm';
+import { boolean, date, integer, pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
@@ -144,6 +144,10 @@ export const weeklyTask = pgTable('task_weekly', {
 });
 // Define TypeScript types for convenience (optional but recommended)
 export type WeeklyTask = typeof weeklyTask.$inferSelect;
+
+export type WeeklyTaskWithRelation = InferSelectModel<typeof weeklyTask> & {
+  nextDueUser: InferSelectModel<typeof user> | null;
+};
 
 export const tasksRelations = relations(weeklyTask, ({ one }) => ({
   nextDueUser: one(user, { fields: [weeklyTask.nextDueUserId], references: [user.id] })
