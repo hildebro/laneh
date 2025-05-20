@@ -11,14 +11,14 @@
 {#await data.categories}
   <LoadingSpinner />
 {:then categories}
-  <div class="card w-full">
+  <div class="w-full">
     <div class="flex justify-end mb-4">
       <a class="btn" href="categories/add">{ m.settings_categories_add() }</a>
     </div>
     <div class="flex flex-col gap-2">
       {#each categories as category, index (category.id)}
         <div
-          class="flex justify-between w-full card preset-filled-secondary-200-800"
+          class="flex justify-between w-full card"
           animate:flip={{ duration: 200 }}
         >
           <span>{category.name}</span>

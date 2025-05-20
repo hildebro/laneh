@@ -18,7 +18,7 @@
 
     // Assign color based on due date relative to today
     if (dueDate.getTime() === today.getTime()) {
-      return 'preset-filled-secondary-100-900'; // Green for due today
+      return ''; // Green for due today
     } else if (dueDate.getTime() === yesterday.getTime()) {
       return 'preset-filled-warning-500'; // Yellow for due yesterday
     } else {
@@ -48,17 +48,17 @@
   <section class="space-y-4">
     <h2 class="h2">Due Tasks</h2>
     {#if data.dueTasks.length === 0}
-      <p class="text-center text-gray-500 dark:text-gray-400">No tasks are currently due. Great job!</p>
+      <p class="mb-2">No tasks are currently due. Great job!</p>
     {:else}
       <div>
         {#each data.dueTasks as task (task.id)}
           <div class="mb-2" transition:slide={{ duration: 300 }}>
-            <div class="card p-4 preset-filled-secondary-100-900">
+            <div class="card">
               <h3 class="h3 text-lg font-semibold">{task.name}</h3>
               <div class="flex justify-end gap-1 items-center mb-2">
                 <a
                   href="schedule/{task.id}"
-                  class="btn variant-filled-primary btn-sm"
+                  class="btn"
                   aria-label={`Change date of ${task.name}`}
                 >
                   <Pencil size={18} />
@@ -72,7 +72,7 @@
                   <input type="hidden" name="taskId" value={task.id} />
                   <button
                     type="submit"
-                    class="btn variant-filled-primary btn-sm"
+                    class="btn"
                     aria-label={`Mark ${task.name} as done`}
                   >
                     <CheckCircle size={18} />
@@ -95,12 +95,12 @@
   <section class="space-y-4">
     <h2 class="h2">Upcoming Tasks</h2>
     {#if data.upcomingTasks.length === 0}
-      <p class="text-center text-gray-500 dark:text-gray-400">No upcoming tasks scheduled.</p>
+      <p>No upcoming tasks scheduled.</p>
     {:else}
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {#each data.upcomingTasks as task (task.id)}
           <div class="mb-2" transition:slide={{ duration: 300 }}>
-            <div class="card preset-filled-secondary-100-900 p-4 variant-soft">
+            <div class="card">
               <div class="mb-2">
                 <h3 class="h3 text-lg font-semibold">{task.name}</h3>
               </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Modal, Switch } from '@skeletonlabs/skeleton-svelte';
+  import { Trash, Undo2 } from 'lucide-svelte';
   import { enhance } from '$app/forms';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -33,7 +34,7 @@
 {#await data.categories}
   <LoadingSpinner />
 {:then categories}
-  <div class="card mb-2 ml-auto preset-filled-primary-800-200">
+  <div class="btn mb-2 ml-auto">
     <Switch checked={showInactiveItems} onCheckedChange={(e) => (showInactiveItems = e.checked)}>
       { m.settings_items_show_inactive() }
     </Switch>
@@ -76,7 +77,7 @@
           open={deleteModalVisible}
           onOpenChange={(e) => (deleteModalVisible = e.open)}
           triggerBase="btn preset-filled-error-800-200"
-          contentBase="card preset-filled-warning-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
+          contentBase="card preset-filled-error-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
           backdropClasses="backdrop-blur-sm"
         >
           {#snippet trigger()}{m.settings_items_delete()}{/snippet}
@@ -84,10 +85,12 @@
             <h2 class="h2">{m.settings_items_delete()}</h2>
             <p class="opacity-60">{ m.settings_items_delete_info() }</p>
             <div class="flex justify-end gap-4">
-              <button type="button" class="btn preset-filled-warning-800-200" onclick={modalClose}>
+              <button type="button" class="btn preset-filled-surface-800-200" onclick={modalClose}>
+                <Undo2 />
                 { m.generic_cancel() }
               </button>
-              <button type="button" class="btn preset-filled-warning-800-200" onclick={handleDeleteSubmit}>
+              <button type="button" class="btn preset-filled-error-800-200" onclick={handleDeleteSubmit}>
+                <Trash />
                 { m.generic_confirm() }
               </button>
             </div>

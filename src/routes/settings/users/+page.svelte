@@ -46,7 +46,7 @@
           <input type="hidden" name="userId" value={user.id}>
           <button type="submit" class="card w-40 h-40 flex flex-col items-center justify-center gap-1">
             <Avatar name={user?.username ?? ''}
-                    background="preset-filled-secondary-800-200"
+                    background="preset-filled-secondary-500"
                     classes="w-20 h-20"
             />
             {user?.username}
