@@ -1,7 +1,7 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { and, asc, count, desc, eq, gt, inArray, lt, max, sql } from 'drizzle-orm';
-// *** Import fast-levenshtein using the default import for CJS compatibility ***
-import levenshteinPkg from 'fast-levenshtein';
+import { and, asc, count, desc, eq, gt, inArray, lt, max, SQL, sql } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
+import levenshteinPkg from 'fast-levenshtein'; // Import fast-levenshtein using the default import for CJS compatibility
 import { getTx } from '$lib/context';
 import * as table from '$lib/server/db/schema';
 import {
@@ -153,11 +153,7 @@ export const findShoppingItem = async (name: string): Promise<ShoppingItem | und
 
   return (await db.select()
       .from(table.shoppingItem)
-      .where(sql`lower(
-      ${table.shoppingItem.name}
-      )
-      =
-      ${name.toLowerCase()}`)
+      .where(eq(lower(table.shoppingItem.name), name.toLowerCase()))
   ).at(0);
 };
 
@@ -549,7 +545,10 @@ async function findNextDueUserId(taskId: string): Promise<string> {
     .from(table.user)
     .leftJoin(
       table.taskCompletion,
-      sql`${table.user.id} = ${table.taskCompletion.userId} AND ${table.taskCompletion.taskId} = ${taskId}`
+      and(
+        eq(table.user.id, table.taskCompletion.userId),
+        eq(table.taskCompletion.taskId, taskId)
+      )
     )
     .groupBy(table.user.id)
     .orderBy(asc(count(table.taskCompletion.id)), asc(max(table.taskCompletion.date)));
@@ -578,4 +577,8 @@ function generateUUID() {
   // ID with 120 bits of entropy, or about the same as UUID v4.
   const bytes = crypto.getRandomValues(new Uint8Array(15));
   return encodeBase32LowerCase(bytes);
+}
+
+export function lower(value: AnyPgColumn): SQL {
+  return sql`lower(${value})`;
 }
