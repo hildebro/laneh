@@ -448,7 +448,11 @@ export const deleteStagedList = async (userId: string) => {
 export const findAllTasks = async (): Promise<WeeklyTask[]> => {
   const db = getTx();
 
-  return db.select().from(table.weeklyTask).execute();
+  return db.query.weeklyTask.findMany({
+    with: {
+      nextDueUser: {}
+    }
+  });
 };
 
 export const findTask = async (taskId: string) => {
