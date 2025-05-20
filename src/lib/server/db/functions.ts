@@ -472,6 +472,18 @@ export const addTask = async (name: string, weekday: string, userId: string) => 
   });
 };
 
+export const updateTask = async (taskId: string, name: string, weekday: string, userId: string) => {
+  const db = getTx();
+
+  await db.update(table.weeklyTask)
+    .set({
+      name: name,
+      dueWeekday: weekday as Weekday,
+      nextDueUserId: userId
+    })
+    .where(eq(table.weeklyTask.id, taskId));
+};
+
 /**
  * Calculates the date of the next occurrence of a specific weekday based on the current time.
  */

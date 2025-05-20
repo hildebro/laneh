@@ -1,7 +1,7 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages.js';
-import { addTask, findAllUsers, findTask } from '$lib/server/db/functions';
+import { addTask, findAllUsers, findTask, updateTask } from '$lib/server/db/functions';
 import { weekday } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -38,7 +38,7 @@ export const actions: Actions = {
     const id = formData.get('taskId')?.toString();
 
     if (id) {
-      // await updateTask(id);
+      await updateTask(id, name, weekday, userId);
     } else {
       await addTask(name, weekday, userId);
     }
