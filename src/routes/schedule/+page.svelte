@@ -56,7 +56,7 @@
           <div class="mb-2" transition:slide={{ duration: 300 }}>
             <div class="card">
               <h3 class="h3 text-lg font-semibold">{task.name}</h3>
-              <div class="flex justify-end gap-1 items-center mb-2">
+              <div class="flex justify-end gap-1 mb-2">
                 <a href="schedule/{task.id}" class="btn">
                   <Pencil size={18} />
                   <span>{ m.generic_edit() }</span>
@@ -98,6 +98,12 @@
             <div class="card">
               <div class="mb-2">
                 <h3 class="h3 text-lg font-semibold">{task.name}</h3>
+                <div class="flex justify-end gap-1 mb-2">
+                  <a href="schedule/{task.id}" class="btn">
+                    <Pencil size={18} />
+                    <span>{ m.generic_edit() }</span>
+                  </a>
+                </div>
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
