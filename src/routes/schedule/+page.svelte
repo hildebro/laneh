@@ -20,9 +20,9 @@
     if (dueDate.getTime() === today.getTime()) {
       return 'preset-filled-secondary-100-900'; // Green for due today
     } else if (dueDate.getTime() === yesterday.getTime()) {
-      return 'preset-filled-warning-100-900'; // Yellow for due yesterday
+      return 'preset-filled-warning-500'; // Yellow for due yesterday
     } else {
-      return 'preset-filled-error-100-900'; // Red for tasks due before yesterday
+      return 'preset-filled-error-500'; // Red for tasks due before yesterday
     }
   }
 
