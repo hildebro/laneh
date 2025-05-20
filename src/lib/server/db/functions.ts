@@ -1,5 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { and, asc, desc, eq, gt, inArray, lt, max, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, inArray, lt, max, sql } from 'drizzle-orm';
 // *** Import fast-levenshtein using the default import for CJS compatibility ***
 import levenshteinPkg from 'fast-levenshtein';
 import { getTx } from '$lib/context';
@@ -510,6 +510,55 @@ function getNextWeekdayDate(weekdayName: string): Date {
   return nextDate;
 }
 
+export const markTaskAsDone = async (taskId: string): Promise<void> => {
+  const db = getTx();
+
+  const task = await db.query.weeklyTask.findFirst({ where: eq(table.weeklyTask.id, taskId) }) as WeeklyTask;
+
+  await db.insert(table.taskCompletion).values({
+    id: generateUUID(),
+    taskId,
+    userId: task.nextDueUserId as string,
+    date: formatDateToYYYYMMDD(new Date())
+  });
+
+  const nextDueDate = formatDateToYYYYMMDD(getNextWeekdayDate(task.dueWeekday));
+  const nextDueUserId = await findNextDueUserId(taskId);
+
+  await db.update(table.weeklyTask)
+    .set({ nextDueDate, nextDueUserId })
+    .where(eq(table.weeklyTask.id, taskId))
+    .execute();
+};
+
+/**
+ * Sorts the db users by completion count of the task and by latest completion date. The person
+ * with the least completions (or oldest completion in case of a draw) will be picked.
+ */
+async function findNextDueUserId(taskId: string): Promise<string> {
+  const db = getTx();
+
+  const completionsPerUser = await db
+    .select({
+      id: table.user.id,
+      completionCount: count(table.taskCompletion.id)
+        .mapWith(Number)
+        .as('completionCount'),
+      latestCompletionDate: max(table.taskCompletion.date).as('latestCompletionDate')
+    })
+    .from(table.user)
+    .leftJoin(
+      table.taskCompletion,
+      sql`${table.user.id} = ${table.taskCompletion.userId} AND ${table.taskCompletion.taskId} = ${taskId}`
+    )
+    .groupBy(table.user.id)
+    .orderBy(asc(count(table.taskCompletion.id)), asc(max(table.taskCompletion.date)));
+
+  return completionsPerUser[0].id;
+}
+
+// ------- GENERIC -------
+
 /**
  * Formats a Date object into a 'YYYY-MM-DD' string suitable for SQL DATE type.
  * @param date The Date object to format.
@@ -525,7 +574,6 @@ function formatDateToYYYYMMDD(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-// ------- GENERIC -------
 function generateUUID() {
   // ID with 120 bits of entropy, or about the same as UUID v4.
   const bytes = crypto.getRandomValues(new Uint8Array(15));
