@@ -152,8 +152,7 @@ export const tasksRelations = relations(weeklyTask, ({ one }) => ({
 export const taskCompletion = pgTable('task_completion', {
   id: text().primaryKey(),
   taskId: text().notNull().references(() => weeklyTask.id, { onDelete: 'cascade' }),
-  // Users involved in completing the task.
-  userIds: jsonb().$type<string[]>().default([]).notNull(),
+  userId: text().references(() => user.id, { onDelete: 'cascade' }).notNull(),
   date: date().notNull(),
 });
 export type TaskCompletion = typeof taskCompletion.$inferSelect;
