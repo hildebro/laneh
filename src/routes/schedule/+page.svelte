@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CheckCircle } from 'lucide-svelte';
+  import { CheckCircle, Pencil } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
   import { enhance } from '$app/forms';
   import type { WeeklyTask } from '$lib/server/db/schema';
@@ -54,8 +54,16 @@
         {#each data.dueTasks as task (task.id)}
           <div class="mb-2" transition:slide={{ duration: 300 }}>
             <div class="card p-4 preset-filled-secondary-100-900">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="h3 text-lg font-semibold">{task.name}</h3>
+              <h3 class="h3 text-lg font-semibold">{task.name}</h3>
+              <div class="flex justify-end gap-1 items-center mb-2">
+                <a
+                  href="schedule/{task.id}"
+                  class="btn variant-filled-primary btn-sm"
+                  aria-label={`Change date of ${task.name}`}
+                >
+                  <Pencil size={18} />
+                  <span>Edit</span>
+                </a>
                 <form
                   method="POST"
                   action="?/markAsDone"
