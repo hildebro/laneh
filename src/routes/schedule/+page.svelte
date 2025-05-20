@@ -74,7 +74,7 @@
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
-                <p>Assignee: {task.nextDueUser.username}</p>
+                <p>Assignee: {task.nextDueUser?.username}</p>
                 <p class={getDueCardPreset(task)}><strong>Due:</strong> {formatDate(task.nextDueDate)}</p>
               </div>
             </div>
@@ -98,7 +98,7 @@
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
-                <p>Assignee: {task.nextDueUser.username}</p>
+                <p>Assignee: {task.nextDueUser?.username}</p>
                 <p><strong>Next Due:</strong> {formatDate(task.nextDueDate)}</p>
               </div>
             </div>
