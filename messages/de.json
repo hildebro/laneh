@@ -3,6 +3,15 @@
   "auth_access_code": "Zugangscode:",
   "auth_access_code_invalid": "Ungültiger Zugangscode",
   "auth_login": "Einloggen",
+  "dashboard_shopping_count": [{
+    "declarations": ["input count", "local countPlural = count: plural"],
+    "selectors": ["countPlural"],
+    "match": {
+      "countPlural=one": "Es ist ein Artikel auf der Einkaufsliste.",
+      "countPlural=other": "Es sind {count} Artikel auf der Einkaufsliste."
+    }
+  }],
+  "dashboard_shopping_last_purchase": "Letzter Einkauf am {date}",
   "error_category_not_found": "Kategorie nicht gefunden",
   "error_task_not_found": "Aufgabe nicht gefunden",
   "error_user_not_found": "Benutzer:in nicht gefunden",

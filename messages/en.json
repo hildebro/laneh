@@ -3,6 +3,15 @@
   "auth_access_code": "Access code:",
   "auth_access_code_invalid": "Invalid access code",
   "auth_login": "Login",
+  "dashboard_shopping_count": [{
+    "declarations": ["input count", "local countPlural = count: plural"],
+    "selectors": ["countPlural"],
+    "match": {
+      "countPlural=one": "There is one item on the list.",
+      "countPlural=other": "There are {count} items on the list."
+    }
+  }],
+  "dashboard_shopping_last_purchase": "Last purchase on {date}",
   "error_category_not_found": "Category not found",
   "error_task_not_found": "Task not found",
   "error_user_not_found": "User not found",

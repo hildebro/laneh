@@ -284,6 +284,16 @@ export const assignCategoryToShoppingItems = async (itemIds: string[], categoryI
     .where(inArray(table.shoppingItem.id, itemIds)).execute();
 };
 
+export const countActiveShoppingItems = async () => {
+  const db = getTx();
+
+  return (await db.select({ count: count(table.shoppingItem.id) })
+      .from(table.shoppingItem)
+      .where(eq(table.shoppingItem.active, true))
+      .execute()
+  ).at(0)?.count ?? 0;
+};
+
 // ------- SHOPPING PURCHASE -------
 export const createPurchase = async (user: User, itemIds: string[]): Promise<void> => {
   const db = getTx();
@@ -307,6 +317,15 @@ export const createPurchase = async (user: User, itemIds: string[]): Promise<voi
 
   // 3. Deactivate the shopping items
   await deactivateShoppingItems(itemIds);
+};
+
+export const fetchLastPurchaseDate = async () => {
+  const db = getTx();
+
+  return (await db.select({ date: max(table.shoppingPurchase.date) })
+      .from(table.shoppingPurchase)
+      .execute()
+  ).at(0)?.date ?? null;
 };
 
 // ------- STAGED SHOPPING LIST -------
@@ -599,5 +618,6 @@ function generateUUID() {
 }
 
 export function lower(value: AnyPgColumn): SQL {
-  return sql`lower(${value})`;
+  return sql`lower
+      (${value})`;
 }
