@@ -460,26 +460,31 @@ export const findTask = async (taskId: string) => {
   }).execute();
 };
 
-export const addTask = async (name: string, weekday: string, userId: string) => {
+export const addTask = async (name: string, weekday: string, userId: string, dueDate: string | null) => {
   const db = getTx();
+
+  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextWeekdayDate(weekday));
 
   await db.insert(table.weeklyTask).values({
     id: generateUUID(),
     name: name,
     dueWeekday: weekday as Weekday,
     nextDueUserId: userId,
-    nextDueDate: formatDateToYYYYMMDD(getNextWeekdayDate(weekday))
+    nextDueDate
   });
 };
 
-export const updateTask = async (taskId: string, name: string, weekday: string, userId: string) => {
+export const updateTask = async (taskId: string, name: string, weekday: string, userId: string, dueDate: string | null) => {
   const db = getTx();
+
+  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextWeekdayDate(weekday));
 
   await db.update(table.weeklyTask)
     .set({
       name: name,
       dueWeekday: weekday as Weekday,
-      nextDueUserId: userId
+      nextDueUserId: userId,
+      nextDueDate
     })
     .where(eq(table.weeklyTask.id, taskId));
 };

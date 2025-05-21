@@ -31,6 +31,8 @@
   "schedule_due_tasks": "Due tasks",
   "schedule_due_tasks_empty": "No tasks are currently due :)",
   "schedule_next_assignee": "Next assignee",
+  "schedule_next_date": "Next due date",
+  "schedule_next_date_info": "If you leave next due date empty, it will be set automatically based on the chosen weekday.",
   "schedule_upcoming_at": "Due at",
   "schedule_upcoming_tasks": "Upcoming tasks",
   "schedule_upcoming_tasks_empty": "No upcoming tasks.",

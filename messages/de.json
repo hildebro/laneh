@@ -31,6 +31,8 @@
   "schedule_due_tasks": "Fällige Aufgaben",
   "schedule_due_tasks_empty": "Derzeit sind keine Aufgaben fällig :)",
   "schedule_next_assignee": "Nächste/r Zuständige/r",
+  "schedule_next_date": "Nächstes Fälligkeitsdatum",
+  "schedule_next_date_info": "Wenn du kein Fälligkeitsdatum einträgst, wird es automatisch anhand des gewählten Wochentags gesetzt.",
   "schedule_upcoming_at": "Fällig am",
   "schedule_upcoming_tasks": "Anstehende Aufgaben",
   "schedule_upcoming_tasks_empty": "Keine anstehenden Aufgaben.",
