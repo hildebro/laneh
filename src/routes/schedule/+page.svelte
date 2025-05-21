@@ -68,7 +68,7 @@
                   <Pencil size={18} />
                   <span>{ m.generic_edit() }</span>
                 </a>
-                {#if data.user.id !== task.nextDueUserId }
+                {#if data.user?.id !== task.nextDueUserId }
                   <Modal
                     open={differentUserModalVisible}
                     onOpenChange={(e) => (differentUserModalVisible = e.open)}
@@ -101,7 +101,7 @@
                             <Undo2 />
                             { m.generic_cancel() }
                           </button>
-                          <button type="submit" class="btn" name="userId" value={data.user.id}>
+                          <button type="submit" class="btn" name="userId" value={data.user?.id}>
                             { m.schedule_done_who_me() }
                           </button>
                           <button type="submit" class="btn" name="userId" value={task.nextDueUserId}>
