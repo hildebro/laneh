@@ -27,12 +27,13 @@
   "schedule_done_who_headline": "Who did it?",
   "schedule_done_who_me": "I did it",
   "schedule_done_who_text": "You are not the assignee of this task. Please select who completed it:",
-  "schedule_due_tasks": "Due tasks",
   "schedule_due_since": "Due since",
+  "schedule_due_tasks": "Due tasks",
   "schedule_due_tasks_empty": "No tasks are currently due :)",
+  "schedule_next_assignee": "Next assignee",
+  "schedule_upcoming_at": "Due at",
   "schedule_upcoming_tasks": "Upcoming tasks",
   "schedule_upcoming_tasks_empty": "No upcoming tasks.",
-  "schedule_upcoming_at": "Due at",
   "schedule_weekday": "Weekday",
   "schedule_weekday_fri": "Friday",
   "schedule_weekday_mon": "Monday",
@@ -41,7 +42,6 @@
   "schedule_weekday_thu": "Thursday",
   "schedule_weekday_tue": "Tuesday",
   "schedule_weekday_wed": "Wednesday",
-  "schedule_next_assignee": "Next assignee",
   "settings_categories_add": "Add category",
   "settings_categories_delete": "Delete category",
   "settings_categories_delete_invalid": "Please delete all items before attempting to delete the category",
@@ -77,6 +77,6 @@
   "shopping_finish_purchase": "Finish purchase",
   "shopping_start_purchase": "Start purchase",
   "shopping_validate_all_items": "For reference, these are the items you wrote down in the last step:",
-  "shopping_validate_headline": "Validate items",
-  "shopping_validate_explanation": "You've entered names that are very similar to existing items. When you continue, they names will be 'fixed' automatically. If you don't want this, please tick the corresponding checkbox."
+  "shopping_validate_explanation": "You've entered names that are very similar to existing items. When you continue, they names will be 'fixed' automatically. If you don't want this, please tick the corresponding checkbox.",
+  "shopping_validate_headline": "Validate items"
 }

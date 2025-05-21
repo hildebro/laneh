@@ -27,12 +27,13 @@
   "schedule_done_who_headline": "Wer hat es erledigt?",
   "schedule_done_who_me": "Ich war es",
   "schedule_done_who_text": "Du bist nicht zuständig für diese Aufgabe. Bitte wähle aus, wer sie erledigt hat:",
-  "schedule_due_tasks": "Fällige Aufgaben",
   "schedule_due_since": "Fällig seit",
+  "schedule_due_tasks": "Fällige Aufgaben",
   "schedule_due_tasks_empty": "Derzeit sind keine Aufgaben fällig :)",
+  "schedule_next_assignee": "Nächste/r Zuständige/r",
+  "schedule_upcoming_at": "Fällig am",
   "schedule_upcoming_tasks": "Anstehende Aufgaben",
   "schedule_upcoming_tasks_empty": "Keine anstehenden Aufgaben.",
-  "schedule_upcoming_at": "Fällig am",
   "schedule_weekday": "Wochentag",
   "schedule_weekday_fri": "Freitag",
   "schedule_weekday_mon": "Montag",
@@ -41,7 +42,6 @@
   "schedule_weekday_thu": "Donnerstag",
   "schedule_weekday_tue": "Dienstag",
   "schedule_weekday_wed": "Mittwoch",
-  "schedule_next_assignee": "Nächste/r Zuständige/r",
   "settings_categories_add": "Kategorie hinzufügen",
   "settings_categories_delete": "Kategorie löschen",
   "settings_categories_delete_invalid": "Bitte lösche alle Artikel bevor du versuchst die Kategorie zu löschen",
@@ -77,6 +77,6 @@
   "shopping_finish_purchase": "Einkauf beenden",
   "shopping_start_purchase": "Einkauf starten",
   "shopping_validate_all_items": "Als Referenz findest du hier die Artikel, die du im letzten Schritt aufgeschrieben hast.",
-  "shopping_validate_headline": "Artikel prüfen",
-  "shopping_validate_explanation": "Du hast Namen definiert, die sehr ähnlich zu bereits vorhandenen Artikeln sind. Wenn du weiter machst, werden diese Namen automatisch 'behoben'. Wenn du das nicht willst, kreuze die entsprechende Checkbox an."
+  "shopping_validate_explanation": "Du hast Namen definiert, die sehr ähnlich zu bereits vorhandenen Artikeln sind. Wenn du weiter machst, werden diese Namen automatisch 'behoben'. Wenn du das nicht willst, kreuze die entsprechende Checkbox an.",
+  "shopping_validate_headline": "Artikel prüfen"
 }
