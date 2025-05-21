@@ -1,9 +1,9 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { findAllTasks, markTaskAsDone } from '$lib/server/db/functions';
-import type { User, WeeklyTaskWithRelation } from '$lib/server/db/schema';
+import type { WeeklyTaskWithRelation } from '$lib/server/db/schema';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async () => {
   const tasks = await findAllTasks();
 
   const due: WeeklyTaskWithRelation[] = [];
@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   due.sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
   upcoming.sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
 
-  return { dueTasks: due, upcomingTasks: upcoming, user: locals.user as User };
+  return { dueTasks: due, upcomingTasks: upcoming };
 };
 
 export const actions: Actions = {
