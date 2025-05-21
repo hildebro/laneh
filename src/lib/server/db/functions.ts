@@ -519,15 +519,16 @@ function getNextWeekdayDate(weekdayName: string): Date {
   return nextDate;
 }
 
-export const markTaskAsDone = async (taskId: string): Promise<void> => {
+export const markTaskAsDone = async (taskId: string, doneByUserId: string | null = null): Promise<void> => {
   const db = getTx();
 
   const task = await db.query.weeklyTask.findFirst({ where: eq(table.weeklyTask.id, taskId) }) as WeeklyTask;
+  const completionUserId = doneByUserId ?? task.nextDueUserId as string;
 
   await db.insert(table.taskCompletion).values({
     id: generateUUID(),
     taskId,
-    userId: task.nextDueUserId as string,
+    userId: completionUserId,
     date: formatDateToYYYYMMDD(new Date())
   });
 

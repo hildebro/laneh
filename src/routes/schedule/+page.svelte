@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { CheckCircle, Pencil } from 'lucide-svelte';
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { CheckCircle, Pencil, Undo2 } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
   import { enhance } from '$app/forms';
   import * as m from '$lib/paraglide/messages.js';
@@ -42,6 +43,12 @@
       return 'Invalid Date'; // Fallback for parsing errors
     }
   }
+
+  let differentUserModalVisible = $state(false);
+
+  function modalClose() {
+    differentUserModalVisible = false;
+  }
 </script>
 
 <a class="btn mb-2 ml-auto" href="schedule/add">{ m.schedule_add_task() }</a>
@@ -61,17 +68,62 @@
                   <Pencil size={18} />
                   <span>{ m.generic_edit() }</span>
                 </a>
-                <form
-                  method="POST"
-                  action="?/markAsDone"
-                  use:enhance
-                >
-                  <input type="hidden" name="taskId" value={task.id} />
-                  <button type="submit" class="btn">
-                    <CheckCircle size={18} />
-                    <span>{ m.schedule_done() }</span>
-                  </button>
-                </form>
+                {#if data.user.id !== task.nextDueUserId }
+                  <Modal
+                    open={differentUserModalVisible}
+                    onOpenChange={(e) => (differentUserModalVisible = e.open)}
+                    triggerBase="btn"
+                    contentBase="card shadow-xl max-w-screen-sm"
+                    backdropClasses="backdrop-blur-sm"
+                  >
+                    {#snippet trigger()}
+                      <CheckCircle size={18} />
+                      <span>{ m.schedule_done() }</span>
+                    {/snippet}
+                    {#snippet content()}
+                      <h2 class="h2 mb-4">{m.schedule_done_who_headline()}</h2>
+                      <p class="mb-8">{ m.schedule_done_who_text() }</p>
+                      <form
+                        method="POST"
+                        action="?/markAsDoneInTheNameOf"
+                        use:enhance={() => {
+                          // Runs after the server action completes
+                          return async ({ update }) => {
+                            modalClose();
+                            // Ensure the component updates if the action modified data
+                            // or completed a redirect.
+                            await update();
+                          };
+                        }}>
+                        <input type="hidden" name="taskId" value={task.id} />
+                        <div class="flex justify-end gap-4">
+                          <button type="button" class="btn preset-filled-surface-800-200" onclick={modalClose}>
+                            <Undo2 />
+                            { m.generic_cancel() }
+                          </button>
+                          <button type="submit" class="btn" name="userId" value={data.user.id}>
+                            { m.schedule_done_who_me() }
+                          </button>
+                          <button type="submit" class="btn" name="userId" value={task.nextDueUserId}>
+                            { m.schedule_done_who_assignee({ assignee: task.nextDueUser?.username ?? 'n/a' }) }
+                          </button>
+                        </div>
+                      </form>
+                    {/snippet}
+                  </Modal>
+                {:else }
+                  <form
+                    method="POST"
+                    action="?/markAsDone"
+                    use:enhance
+                  >
+                    <input type="hidden" name="taskId" value={task.id} />
+                    <button type="submit" class="btn">
+                      <CheckCircle size={18} />
+                      <span>{ m.schedule_done() }</span>
+                    </button>
+                  </form>
+                {/if}
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">

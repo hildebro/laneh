@@ -1,9 +1,9 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { findAllTasks, markTaskAsDone } from '$lib/server/db/functions';
-import type { WeeklyTaskWithRelation } from '$lib/server/db/schema';
+import type { User, WeeklyTaskWithRelation } from '$lib/server/db/schema';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
   const tasks = await findAllTasks();
 
   const due: WeeklyTaskWithRelation[] = [];
@@ -29,7 +29,7 @@ export const load: PageServerLoad = async () => {
   due.sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
   upcoming.sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
 
-  return { dueTasks: due, upcomingTasks: upcoming };
+  return { dueTasks: due, upcomingTasks: upcoming, user: locals.user as User };
 };
 
 export const actions: Actions = {
@@ -41,5 +41,19 @@ export const actions: Actions = {
     }
 
     await markTaskAsDone(taskId);
+  },
+  markAsDoneInTheNameOf: async ({ request }) => {
+    const formData = await request.formData();
+    const taskId = formData.get('taskId')?.toString();
+    if (!taskId) {
+      throw new Error('Action called without task id. This should not happen.');
+    }
+
+    const userId = formData.get('userId')?.toString();
+    if (!userId) {
+      throw new Error('Action called without user id. This should not happen.');
+    }
+
+    await markTaskAsDone(taskId, userId);
   }
 };
