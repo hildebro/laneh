@@ -35,12 +35,17 @@ export const actions: Actions = {
       return fail(400, { message: 'Missing user' });
     }
 
+    let dueDate = formData.get('dueDate')?.toString()?.trim() ?? null;
+    if (dueDate === '') {
+      dueDate = null;
+    }
+
     const id = formData.get('taskId')?.toString();
 
     if (id) {
-      await updateTask(id, name, weekday, userId);
+      await updateTask(id, name, weekday, userId, dueDate);
     } else {
-      await addTask(name, weekday, userId);
+      await addTask(name, weekday, userId, dueDate);
     }
 
     return redirect(302, './');
