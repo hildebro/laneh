@@ -3,6 +3,16 @@
   "auth_access_code": "Zugangscode:",
   "auth_access_code_invalid": "Ungültiger Zugangscode",
   "auth_login": "Einloggen",
+  "dashboard_schedule_count": [{
+    "declarations": ["input count", "local countPlural = count: plural"],
+    "selectors": ["countPlural"],
+    "match": {
+      "countPlural=none": "Keine Aufgaben fällig.",
+      "countPlural=one": "Eine Aufgabe fällig.",
+      "countPlural=other": "{count} Aufgaben fällig."
+    }
+  }],
+  "dashboard_schedule_go_to": "Aufgaben anzeigen",
   "dashboard_shopping_count": [{
     "declarations": ["input count", "local countPlural = count: plural"],
     "selectors": ["countPlural"],

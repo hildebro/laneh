@@ -15,6 +15,7 @@ import {
   type WeeklyTask,
   type WeeklyTaskWithRelation
 } from '$lib/server/db/schema';
+import { lte } from 'drizzle-orm/sql/expressions/conditions';
 // The actual function is usually on the '.get' property for this library
 const levenshtein = levenshteinPkg.get;
 
@@ -593,6 +594,16 @@ async function findNextDueUserId(taskId: string): Promise<string> {
 
   return completionsPerUser[0].id;
 }
+
+export const countDueTasks = async () => {
+  const db = getTx();
+
+  return (await db.select({ count: count(table.weeklyTask.id) })
+      .from(table.weeklyTask)
+      .where(lte(table.weeklyTask.nextDueDate, formatDateToYYYYMMDD(new Date())))
+      .execute()
+  ).at(0)?.count ?? 0;
+};
 
 // ------- GENERIC -------
 
