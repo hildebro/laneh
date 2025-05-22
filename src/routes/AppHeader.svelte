@@ -5,7 +5,7 @@
   import { base } from '$app/paths';
   import { page } from '$app/state';
   import * as m from '$lib/paraglide/messages.js';
-  import { availableLanguageTags } from '$lib/paraglide/runtime';
+  import { locales } from '$lib/paraglide/runtime';
 
   function getActiveTileId(pathname: string): string {
     // Remove the base path and split path into segments.
@@ -13,7 +13,7 @@
     let segments = path.replace(/^\/|\/$/g, '').split('/');
 
     // Remove language tag from the segments if it's present at the beginning.
-    if (segments.length > 0 && (availableLanguageTags as readonly string[]).includes(segments[0])) {
+    if (segments.length > 0 && (locales as readonly string[]).includes(segments[0])) {
       segments.shift();
     }
 
