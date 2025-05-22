@@ -3,6 +3,16 @@
   "auth_access_code": "Access code:",
   "auth_access_code_invalid": "Invalid access code",
   "auth_login": "Login",
+  "dashboard_schedule_count": [{
+    "declarations": ["input count", "local countPlural = count: plural"],
+    "selectors": ["countPlural"],
+    "match": {
+      "countPlural=none": "No tasks due.",
+      "countPlural=one": "1 task due.",
+      "countPlural=other": "{count} tasks due."
+    }
+  }],
+  "dashboard_schedule_go_to": "View tasks",
   "dashboard_shopping_count": [{
     "declarations": ["input count", "local countPlural = count: plural"],
     "selectors": ["countPlural"],
