@@ -1,4 +1,5 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
+import { z } from 'zod/v4';
 import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages.js';
 import {
@@ -21,20 +22,24 @@ export const load: PageServerLoad = async ({ params }) => {
   return { category };
 };
 
+const categorySchema = z.object({
+  id: z.string().nullish(),
+  name: z.string().trim().nonempty()
+});
+
 export const actions: Actions = {
   create: async (event) => {
-    const formData = await event.request.formData();
-    const name = formData.get('name')?.toString()?.trim();
-    if (!name) {
-      return fail(400, { message: m.settings_categories_name_invalid() });
+    const formData = Object.fromEntries(await event.request.formData());
+    const result = categorySchema.safeParse(formData);
+    if (!result.success) {
+      return fail(422, { issues: result.error.issues });
     }
+    const category = result.data;
 
-    const id = formData.get('categoryId')?.toString();
-
-    if (id) {
-      await updateShoppingCategory(id, name);
+    if (category.id) {
+      await updateShoppingCategory(category.id, category.name);
     } else {
-      await addShoppingCategory(name);
+      await addShoppingCategory(category.name);
     }
 
     return redirect(302, './');

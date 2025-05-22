@@ -20,15 +20,19 @@
     <input type="hidden" name="categoryId" value={data.category?.id}>
     <label>
       { m.generic_name() }
-      <input class="form-input input" type="text" name="name" bind:value={categoryName} required />
+      <input class="form-input input" type="text" name="name" bind:value={categoryName} />
     </label>
 
     <button type="submit" class="btn mt-1">
       { m.generic_save() }
     </button>
 
-    {#if form?.message}
-      <p class="preset-filled-error-50-950 rounded mt-4 text-center">{form.message}</p>
+    {#if form?.issues}
+      <p class="preset-filled-error-50-950 rounded mt-4 text-center">
+        {#each form.issues as issue(issue.path)}
+          {issue.path}: {issue.message}
+        {/each}
+      </p>
     {/if}
   </form>
 
