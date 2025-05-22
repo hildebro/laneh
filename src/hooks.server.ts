@@ -2,10 +2,10 @@ import { type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { USER_COOKIE } from '$lib';
 import { transactionContext } from '$lib/context';
+import { paraglideMiddleware } from '$lib/paraglide/server';
 import { getSession, refreshSession } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { findUser } from '$lib/server/db/functions';
-import { paraglideMiddleware } from '$lib/paraglide/server';
 
 const handleAuth: Handle = async ({ event, resolve }) => {
   const session = await getSession(event.cookies);
