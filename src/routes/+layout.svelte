@@ -1,7 +1,9 @@
 <script lang="ts">
   import '../app.css';
+  import { Toaster } from '@skeletonlabs/skeleton-svelte';
   import AppHeader from './AppHeader.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { toaster } from '$lib/toaster-ref';
 
   let { children, data } = $props();
 </script>
@@ -20,4 +22,5 @@
       { m.footer_user({ name: data.user.username }) }
     {/if}
   </footer>
+  <Toaster {toaster}></Toaster>
 </div>

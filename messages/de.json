@@ -32,6 +32,7 @@
   "generic_edit": "Bearbeiten",
   "generic_empty": "Fehlende Daten",
   "generic_name": "Name",
+  "generic_form_invalid": "Ungültige Eingabe",
   "generic_required": "Wert benötigt",
   "generic_save": "Speichern",
   "header_daily_upkeep": "Tägliche Pflege",
