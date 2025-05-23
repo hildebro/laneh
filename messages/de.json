@@ -1,7 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "auth_access_code": "Zugangscode:",
-  "auth_access_code_invalid": "Ungültiger Zugangscode",
+  "auth_access_code": "Zugangscode",
+  "auth_access_code_invalid": "Der Code ist ungültig. Bitte prüfe, ob dein 2FA korrekt eingestellt ist.",
   "auth_login": "Einloggen",
   "dashboard_schedule_count": [{
     "declarations": ["input count", "local countPlural = count: plural"],
