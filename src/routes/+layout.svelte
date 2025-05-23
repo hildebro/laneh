@@ -8,6 +8,8 @@
   let { children, data } = $props();
 </script>
 
+<Toaster titleClasses="h4" descriptionClasses="whitespace-pre-line p-4" {toaster}></Toaster>
+
 <svelte:head>
   <title>Chorehub</title>
 </svelte:head>
@@ -22,5 +24,4 @@
       { m.footer_user({ name: data.user.username }) }
     {/if}
   </footer>
-  <Toaster {toaster}></Toaster>
 </div>
