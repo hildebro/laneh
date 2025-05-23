@@ -3,7 +3,7 @@
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
-  let { data, form } = $props();
+  let { data } = $props();
 
   // Initialize form state directly from props
   let categoryName = $state(data.category?.name || '');
@@ -17,7 +17,7 @@
       { m.settings_categories_add() }
     {/if}
   </div>
-  <EnhancedForm {form} method="POST" action="?/create">
+  <EnhancedForm method="POST" action="?/create">
     <input type="hidden" name="id" value={data.category?.id}>
     <label>
       { m.generic_name() }
