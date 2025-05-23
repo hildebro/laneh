@@ -4,8 +4,12 @@ export const transPath = (path: string): string => {
   switch (path) {
     case 'code':
       return m.auth_access_code();
+    case 'dueUserId':
+      return m.schedule_next_assignee();
     case 'name':
       return m.generic_name();
+    case 'weekday':
+      return m.schedule_weekday();
     default:
       return path;
   }

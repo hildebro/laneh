@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { Weekday } from '$lib/server/db/schema';
 
-  let { data, form } = $props();
+  let { data } = $props();
 
   let name = $state(data.task?.name);
   let weekday = $state(data.task?.dueWeekday);
   let dueDate = $state(data.task?.nextDueDate);
-  let userId = $state(data.task?.nextDueUserId);
+  let dueUserId = $state(data.task?.nextDueUserId);
 
   function translateWeekday(weekday: Weekday) {
     switch (weekday) {
@@ -30,7 +30,7 @@
   }
 </script>
 
-<div class="card  max-w-screen-sm">
+<div class="card max-w-screen-sm">
   <div class="h5 mb-4">
     {#if data.task}
       { m.settings_tasks_edit() }
@@ -38,7 +38,7 @@
       { m.settings_tasks_add() }
     {/if}
   </div>
-  <form method="POST" action="?/create" use:enhance>
+  <EnhancedForm action="?/create">
     <input type="hidden" name="taskId" value={data.task?.id}>
     <label>
       { m.generic_name() }
@@ -47,7 +47,7 @@
 
     <label>
       { m.schedule_next_assignee() }
-      <select class="select mb-2" name="userId" bind:value={userId}>
+      <select class="select mb-2" name="dueUserId" bind:value={dueUserId}>
         <option value="" disabled selected>{ m.generic_required() }</option>
         {#await data.users then users}
           {#each users as user (user.id)}
@@ -79,9 +79,5 @@
     <button type="submit" class="btn mt-1">
       { m.generic_save() }
     </button>
-
-    {#if form?.message}
-      <p class="preset-filled-error-50-950 rounded mt-4 text-center">{form.message}</p>
-    {/if}
-  </form>
+  </EnhancedForm>
 </div>
