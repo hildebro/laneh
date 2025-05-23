@@ -8,6 +8,7 @@ import {
   findShoppingCategory,
   updateShoppingCategory
 } from '$lib/server/db/functions';
+import { processForm } from '$lib/server/formHandler';
 
 export const load: PageServerLoad = async ({ params }) => {
   if (params.category === 'add') {
@@ -29,20 +30,15 @@ const categorySchema = z.object({
 
 export const actions: Actions = {
   create: async (event) => {
-    const formData = Object.fromEntries(await event.request.formData());
-    const result = categorySchema.safeParse(formData);
-    if (!result.success) {
-      return fail(422, { issues: result.error.issues });
-    }
-    const category = result.data;
+    return processForm(event, categorySchema, async (category) => {
+      if (category.id) {
+        await updateShoppingCategory(category.id, category.name);
+      } else {
+        await addShoppingCategory(category.name);
+      }
 
-    if (category.id) {
-      await updateShoppingCategory(category.id, category.name);
-    } else {
-      await addShoppingCategory(category.name);
-    }
-
-    return redirect(302, './');
+      return redirect(302, './');
+    });
   },
   delete: async ({ request }) => {
     const formData = await request.formData();
