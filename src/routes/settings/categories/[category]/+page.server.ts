@@ -1,5 +1,4 @@
 import { type Actions, error, fail, redirect } from '@sveltejs/kit';
-import { z } from 'zod/v4';
 import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages.js';
 import {
@@ -9,6 +8,7 @@ import {
   updateShoppingCategory
 } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ params }) => {
   if (params.category === 'add') {
@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 const categorySchema = z.object({
   id: z.string().nullish(),
-  name: z.string().trim().nonempty(m.form_invalid_nonempty())
+  name: z.string().trim().nonempty()
 });
 
 export const actions: Actions = {
