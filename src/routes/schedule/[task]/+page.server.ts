@@ -1,8 +1,10 @@
-import { type Actions, error, fail, redirect } from '@sveltejs/kit';
+import { type Actions, error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages.js';
 import { addTask, findAllUsers, findTask, updateTask } from '$lib/server/db/functions';
 import { weekday } from '$lib/server/db/schema';
+import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ params }) => {
   if (params.task === 'add') {
@@ -17,38 +19,26 @@ export const load: PageServerLoad = async ({ params }) => {
   return { task, weekdays: weekday.enumValues, users: findAllUsers() };
 };
 
+const taskSchema = z.object({
+  id: z.string().trim().nullish(),
+  name: z.string().trim().nonempty(),
+  dueUserId: z.transform(val => val ?? '').pipe(z.string().trim().nonempty()),
+  weekday: z.enum(weekday.enumValues, { error: () => m.schedule_weekday_nonoptional() }),
+  // An empty date input will post an empty string, so we clean it up here.
+  dueDate: z.string().pipe(z.transform(val => val === '' ? null : val))
+});
+
 export const actions: Actions = {
   create: async (event) => {
-    const formData = await event.request.formData();
-    const name = formData.get('name')?.toString()?.trim();
-    if (!name) {
-      return fail(400, { message: m.settings_categories_name_invalid() });
-    }
+    return processForm(event, taskSchema, async (task) => {
+      if (task.id) {
+        await updateTask(task.id, task.name, task.weekday, task.dueUserId, task.dueDate);
+      } else {
+        await addTask(task.name, task.weekday, task.dueUserId, task.dueDate);
+      }
 
-    const weekday = formData.get('weekday')?.toString()?.trim();
-    if (!weekday) {
-      return fail(400, { message: 'Missing weekday' });
-    }
-
-    const userId = formData.get('userId')?.toString()?.trim();
-    if (!userId) {
-      return fail(400, { message: 'Missing user' });
-    }
-
-    let dueDate = formData.get('dueDate')?.toString()?.trim() ?? null;
-    if (dueDate === '') {
-      dueDate = null;
-    }
-
-    const id = formData.get('taskId')?.toString();
-
-    if (id) {
-      await updateTask(id, name, weekday, userId, dueDate);
-    } else {
-      await addTask(name, weekday, userId, dueDate);
-    }
-
-    return redirect(302, './');
+      return redirect(302, './');
+    });
   },
   delete: async ({ request }) => {
     const formData = await request.formData();

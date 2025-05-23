@@ -58,6 +58,7 @@
   "schedule_upcoming_tasks": "Anstehende Aufgaben",
   "schedule_upcoming_tasks_empty": "Keine anstehenden Aufgaben.",
   "schedule_weekday": "Wochentag",
+  "schedule_weekday_nonoptional": "Bitte wähle einen Wochentag aus",
   "schedule_weekday_fri": "Freitag",
   "schedule_weekday_mon": "Montag",
   "schedule_weekday_sat": "Samstag",
