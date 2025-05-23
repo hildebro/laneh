@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let { data, form } = $props();
@@ -16,8 +17,8 @@
       { m.settings_categories_add() }
     {/if}
   </div>
-  <form method="POST" action="?/create" use:enhance>
-    <input type="hidden" name="categoryId" value={data.category?.id}>
+  <EnhancedForm {form} method="POST" action="?/create">
+    <input type="hidden" name="id" value={data.category?.id}>
     <label>
       { m.generic_name() }
       <input class="form-input input" type="text" name="name" bind:value={categoryName} />
@@ -26,15 +27,7 @@
     <button type="submit" class="btn mt-1">
       { m.generic_save() }
     </button>
-
-    {#if form?.issues}
-      <p class="preset-filled-error-50-950 rounded mt-4 text-center">
-        {#each form.issues as issue(issue.path)}
-          {issue.path}: {issue.message}
-        {/each}
-      </p>
-    {/if}
-  </form>
+  </EnhancedForm>
 
   {#if data.category}
     <form method="POST" action="?/delete" use:enhance>
