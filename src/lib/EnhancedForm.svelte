@@ -4,6 +4,7 @@
   import { z } from 'zod/v4';
   import { enhance } from '$app/forms';
   import * as m from '$lib/paraglide/messages.js';
+  import { transPath } from '$lib/path-translations';
   import { toaster } from '$lib/toaster-ref';
 
   let {
@@ -24,10 +25,13 @@
     }) => {
       if (result.type === 'failure' && result.data?.issues) {
         const formattedIssues = result.data.issues.map(
-          (issue: z.core.$ZodIssue) => `${issue.path.join('.')}: ${issue.message}`
+          (issue: z.core.$ZodIssue) => {
+            const path = transPath(issue.path.join('.'));
+            return `${path}: ${issue.message}`;
+          }
         ).join('\n');
 
-        toaster.error({ title: m.generic_form_invalid(), description: formattedIssues });
+        toaster.error({ title: m.form_invalid(), description: formattedIssues, duration: 5000 });
       }
 
       // Call update to apply any changes to the page (e.g., if you're using $page.form)

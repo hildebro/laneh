@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 const categorySchema = z.object({
   id: z.string().nullish(),
-  name: z.string().trim().nonempty()
+  name: z.string().trim().nonempty(m.form_invalid_nonempty())
 });
 
 export const actions: Actions = {
