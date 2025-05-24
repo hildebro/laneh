@@ -11,11 +11,13 @@
     children,
     action = undefined,
     method = 'POST',
+    preUpdatedCallback = undefined,
     ...restProps // Captures any other native form attributes (e.g., id or name)
   }: {
     children: Snippet;
     action?: string;
     method?: 'dialog' | 'get' | 'post' | 'DIALOG' | 'GET' | 'POST' | undefined | null;
+    preUpdatedCallback?: () => void;
   } = $props();
 
   const handleFormSubmit = () => {
@@ -32,6 +34,10 @@
         ).join('\n');
 
         toaster.error({ title: m.form_invalid(), description: formattedIssues, duration: 5000 });
+      }
+
+      if (preUpdatedCallback) {
+        preUpdatedCallback();
       }
 
       // Call update to apply any changes to the page (e.g., if you're using $page.form)
