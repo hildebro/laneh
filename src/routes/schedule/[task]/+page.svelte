@@ -39,7 +39,7 @@
     {/if}
   </div>
   <EnhancedForm action="?/create">
-    <input type="hidden" name="taskId" value={data.task?.id}>
+    <input type="hidden" name="id" value={data.task?.id}>
     <label>
       { m.generic_name() }
       <input class="form-input input mb-2" type="text" name="name" bind:value={name} />
