@@ -85,7 +85,7 @@
                       <p class="mb-8">{ m.schedule_done_who_text() }</p>
                       <form
                         method="POST"
-                        action="?/markAsDoneInTheNameOf"
+                        action="?/markAsDone"
                         use:enhance={() => {
                           // Runs after the server action completes
                           return async ({ update }) => {
@@ -101,7 +101,7 @@
                             <Undo2 />
                             { m.generic_cancel() }
                           </button>
-                          <button type="submit" class="btn" name="userId" value={data.user?.id}>
+                          <button type="submit" class="btn">
                             { m.schedule_done_who_me() }
                           </button>
                           <button type="submit" class="btn" name="userId" value={task.nextDueUserId}>
