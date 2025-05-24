@@ -1,7 +1,9 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { findAllTasks, markTaskAsDone } from '$lib/server/db/functions';
-import type { WeeklyTaskWithRelation } from '$lib/server/db/schema';
+import { type WeeklyTaskWithRelation } from '$lib/server/db/schema';
+import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async () => {
   const tasks = await findAllTasks();
@@ -32,28 +34,17 @@ export const load: PageServerLoad = async () => {
   return { dueTasks: due, upcomingTasks: upcoming };
 };
 
+const taskCompletionSchema = z.object({
+  taskId: z.string().trim().nonempty(),
+  userId: z.string().trim().nullish()
+});
+
 export const actions: Actions = {
-  markAsDone: async ({ request }) => {
-    const formData = await request.formData();
-    const taskId = formData.get('taskId')?.toString();
-    if (!taskId) {
-      throw new Error('Action called without task id. This should not happen.');
-    }
+  markAsDone: async (event) => {
+    return processForm(event, taskCompletionSchema, async (taskCompletion, { locals }) => {
+      const completionUserId = taskCompletion.userId ?? locals.user?.id as string;
 
-    await markTaskAsDone(taskId);
+      await markTaskAsDone(taskCompletion.taskId, completionUserId);
+    });
   },
-  markAsDoneInTheNameOf: async ({ request }) => {
-    const formData = await request.formData();
-    const taskId = formData.get('taskId')?.toString();
-    if (!taskId) {
-      throw new Error('Action called without task id. This should not happen.');
-    }
-
-    const userId = formData.get('userId')?.toString();
-    if (!userId) {
-      throw new Error('Action called without user id. This should not happen.');
-    }
-
-    await markTaskAsDone(taskId, userId);
-  }
 };
