@@ -2,7 +2,7 @@
   import { Modal } from '@skeletonlabs/skeleton-svelte';
   import { CheckCircle, Pencil, Undo2 } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
-  import { enhance } from '$app/forms';
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { WeeklyTask } from '$lib/server/db/schema';
 
@@ -83,18 +83,10 @@
                     {#snippet content()}
                       <h2 class="h2 mb-4">{m.schedule_done_who_headline()}</h2>
                       <p class="mb-8">{ m.schedule_done_who_text() }</p>
-                      <form
-                        method="POST"
+                      <EnhancedForm
                         action="?/markAsDone"
-                        use:enhance={() => {
-                          // Runs after the server action completes
-                          return async ({ update }) => {
-                            modalClose();
-                            // Ensure the component updates if the action modified data
-                            // or completed a redirect.
-                            await update();
-                          };
-                        }}>
+                        preUpdatedCallback={() => modalClose()}
+                      >
                         <input type="hidden" name="taskId" value={task.id} />
                         <div class="flex justify-end gap-4">
                           <button type="button" class="btn preset-filled-surface-800-200" onclick={modalClose}>
@@ -108,21 +100,19 @@
                             { m.schedule_done_who_assignee({ assignee: task.nextDueUser?.username ?? 'n/a' }) }
                           </button>
                         </div>
-                      </form>
+                      </EnhancedForm>
                     {/snippet}
                   </Modal>
                 {:else }
-                  <form
-                    method="POST"
+                  <EnhancedForm
                     action="?/markAsDone"
-                    use:enhance
                   >
                     <input type="hidden" name="taskId" value={task.id} />
                     <button type="submit" class="btn">
                       <CheckCircle size={18} />
                       <span>{ m.schedule_done() }</span>
                     </button>
-                  </form>
+                  </EnhancedForm>
                 {/if}
               </div>
               <hr class="my-2 opacity-50" />
