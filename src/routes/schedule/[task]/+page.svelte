@@ -75,9 +75,5 @@
     <p class="opacity-60">
       { m.schedule_next_date_info() }
     </p>
-
-    <button type="submit" class="btn mt-1">
-      { m.generic_save() }
-    </button>
   </EnhancedForm>
 </div>
