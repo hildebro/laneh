@@ -4,11 +4,10 @@
 </script>
 
 <div class="card">
-  <EnhancedForm>
+  <EnhancedForm submitButtonText={m.auth_login()}>
     <label>
       {m.auth_access_code()}
       <input class="form-input input" type="text" name="code" />
     </label>
-    <button class="btn mt-1" type="submit">{m.auth_login()}</button>
   </EnhancedForm>
 </div>
