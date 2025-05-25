@@ -1,6 +1,8 @@
 import { type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { findAllShoppingCategories, moveCategoryOrderDown, moveCategoryOrderUp } from '$lib/server/db/functions';
+import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async () => {
   return {
@@ -8,23 +10,23 @@ export const load: PageServerLoad = async () => {
   };
 };
 
+const categorySchema = z.object({
+  id: z.string().nonempty()
+});
+
 export const actions: Actions = {
-  up: async ({ request }) => {
-    const formData = await request.formData();
-    const categoryId = formData.get('categoryId')?.toString();
-    if (!categoryId) {
-      throw new Error('Action called without category id. This should not happen.');
-    }
-
-    await moveCategoryOrderUp(categoryId);
+  up: async (event) => {
+    await new Promise((r) => {
+      setTimeout(r, 2000)
+    });
+    return processForm(event, categorySchema, async (category) => {
+      await moveCategoryOrderUp(category.id);
+    });
   },
-  down: async ({ request }) => {
-    const formData = await request.formData();
-    const categoryId = formData.get('categoryId')?.toString();
-    if (!categoryId) {
-      throw new Error('Action called without category id. This should not happen.');
-    }
+  down: async (event) => {
+    return processForm(event, categorySchema, async (category) => {
+      await moveCategoryOrderDown(category.id);
+    });
 
-    await moveCategoryOrderDown(categoryId);
   }
 };
