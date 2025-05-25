@@ -53,7 +53,11 @@ export const actions: Actions = {
     }
 
     if (category.shoppingItems.length > 0) {
-      return fail(400, { message: m.settings_categories_delete_invalid() });
+      return fail(422, {
+        issues: [
+          { path: ['category'], message: m.settings_categories_delete_invalid() }
+        ]
+      });
     }
 
     await deleteCategory(categoryId);

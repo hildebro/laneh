@@ -2,6 +2,8 @@ import * as m from '$lib/paraglide/messages.js';
 
 export const transPath = (path: string): string => {
   switch (path) {
+    case 'category':
+      return m.settings_categories_headline();
     case 'code':
       return m.auth_access_code();
     case 'dueUserId':

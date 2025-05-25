@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -26,11 +25,12 @@
   </EnhancedForm>
 
   {#if data.category}
-    <form method="POST" action="?/delete" use:enhance>
+    <EnhancedForm
+      action="?/delete"
+      submitButtonText={m.settings_categories_delete()}
+      submitButtonClasses="preset-filled-error-400-600"
+    >
       <input type="hidden" name="categoryId" value={data.category?.id}>
-      <button type="submit" class="mt-2 btn preset-filled-error-400-600">
-        { m.settings_categories_delete() }
-      </button>
-    </form>
+    </EnhancedForm>
   {/if}
 </div>
