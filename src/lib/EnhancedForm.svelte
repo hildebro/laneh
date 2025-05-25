@@ -10,6 +10,7 @@
 
   let {
     children,
+    additionalButtons = undefined,
     action = undefined,
     method = 'POST',
     preUpdatedCallback = undefined,
@@ -17,6 +18,7 @@
     ...restProps // Captures any other native form attributes (e.g., id or name)
   }: {
     children: Snippet;
+    additionalButtons?: Snippet<[submitting: boolean]>;
     action?: string;
     method?: 'dialog' | 'get' | 'post' | 'DIALOG' | 'GET' | 'POST' | undefined | null;
     preUpdatedCallback?: () => void;
@@ -64,10 +66,13 @@
   {...restProps}
 >
   {@render children()}
-  <button class="btn mt-4" type="submit" disabled={submitting}>
-    {submitButtonText}
-    {#if submitting}
-      <LoadingSpinner size={6} bright />
-    {/if}
-  </button>
+  <div class="mt-4">
+    {@render additionalButtons?.(submitting)}
+    <button class="btn" type="submit" disabled={submitting}>
+      {submitButtonText}
+      {#if submitting}
+        <LoadingSpinner size={6} bright />
+      {/if}
+    </button>
+  </div>
 </form>
