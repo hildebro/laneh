@@ -23,10 +23,6 @@
       { m.generic_name() }
       <input class="form-input input" type="text" name="name" bind:value={categoryName} />
     </label>
-
-    <button type="submit" class="btn mt-1">
-      { m.generic_save() }
-    </button>
   </EnhancedForm>
 
   {#if data.category}
