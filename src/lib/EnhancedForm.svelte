@@ -8,6 +8,16 @@
   import { transPath } from '$lib/path-translations';
   import { toaster } from '$lib/toaster-ref';
 
+  type EnhancedFormProps = {
+    children: Snippet;
+    additionalButtons?: Snippet<[submitting: boolean]>;
+    action?: string;
+    method?: 'dialog' | 'get' | 'post' | 'DIALOG' | 'GET' | 'POST' | undefined | null;
+    preUpdatedCallback?: () => void;
+    submitButtonText?: string;
+    submitButtonClasses?: string;
+  };
+
   let {
     children,
     additionalButtons = undefined,
@@ -16,48 +26,40 @@
     preUpdatedCallback = undefined,
     submitButtonText = m.generic_save(),
     submitButtonClasses = '',
-    ...restProps // Captures any other native form attributes (e.g., id or name)
-  }: {
-    children: Snippet;
-    additionalButtons?: Snippet<[submitting: boolean]>;
-    action?: string;
-    method?: 'dialog' | 'get' | 'post' | 'DIALOG' | 'GET' | 'POST' | undefined | null;
-    preUpdatedCallback?: () => void;
-    submitButtonText?: string;
-    submitButtonClasses?: string;
-  } = $props();
+    ...restProps
+  }: EnhancedFormProps = $props();
 
   let submitting = $state(false);
 
   const handleFormSubmit = () => {
     submitting = true;
 
-    return async ({ result, update }: {
-      result: ActionResult,
-      update: (options?: { reset?: boolean; invalidateAll?: boolean }) => Promise<void>;
-    }) => {
-      if (result.type === 'failure' && result.data?.issues) {
-        const formattedIssues = result.data.issues.map(
-          (issue: z.core.$ZodIssue) => {
-            const path = transPath(issue.path.join('.'));
-            return `${path}: ${issue.message}`;
-          }
-        ).join('\n');
+    return handlePostSubmit;
+  };
 
-        toaster.error({ title: m.form_invalid(), description: formattedIssues, duration: 5000 });
-      }
+  const handlePostSubmit = async ({ result, update }: {
+    result: ActionResult,
+    update: (options?: { reset?: boolean; invalidateAll?: boolean }) => Promise<void>;
+  }) => {
+    if (result.type === 'failure' && result.data?.issues) {
+      const formattedIssues = result.data.issues.map(
+        (issue: z.core.$ZodIssue) => {
+          const path = transPath(issue.path.join('.'));
+          return `${path}: ${issue.message}`;
+        }
+      ).join('\n');
 
-      if (preUpdatedCallback) {
-        preUpdatedCallback();
-      }
+      toaster.error({ title: m.form_invalid(), description: formattedIssues, duration: 5000 });
+    }
 
-      submitting = false;
+    if (preUpdatedCallback) {
+      preUpdatedCallback();
+    }
 
-      // Call update to apply any changes to the page (e.g., if you're using $page.form)
-      // It's important to call update() to ensure SvelteKit's progressive enhancement works correctly,
-      // especially for updating form data or error messages displayed on the page.
-      await update({ reset: result.type !== 'success' }); // Reset form only on failure or error
-    };
+    submitting = false;
+
+    // Reset form only on failure or error
+    await update({ reset: result.type !== 'success' });
   };
 </script>
 
