@@ -1,14 +1,14 @@
 import { type Actions, error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages.js';
-import { addTask, findAllUsers, findTask, updateTask } from '$lib/server/db/functions';
+import { addTask, findTask, updateTask } from '$lib/server/db/functions';
 import { weekday } from '$lib/server/db/schema';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ params }) => {
   if (params.task === 'add') {
-    return { task: null, weekdays: weekday.enumValues, users: findAllUsers() };
+    return { task: null, weekdays: weekday.enumValues };
   }
 
   const task = await findTask(params.task);
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
     throw error(404, m.error_task_not_found());
   }
 
-  return { task, weekdays: weekday.enumValues, users: findAllUsers() };
+  return { task, weekdays: weekday.enumValues };
 };
 
 const taskSchema = z.object({
