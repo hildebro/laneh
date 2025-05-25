@@ -65,7 +65,7 @@
   "schedule_weekday_wed": "Mittwoch",
   "settings_categories_add": "Kategorie hinzufügen",
   "settings_categories_delete": "Kategorie löschen",
-  "settings_categories_delete_invalid": "Bitte lösche alle Artikel bevor du versuchst die Kategorie zu löschen",
+  "settings_categories_delete_invalid": "Kategorien mit Artikeln (inklusive deaktivierter) können nicht gelöscht werden",
   "settings_categories_delete_items": "Artikel auswählen, um sie zu entfernen. Dadurch wird auch die Einkaufshistorie des Artikels entfernt.",
   "settings_categories_edit": "Kategorie anpassen",
   "settings_categories_empty": "Diese Kategorie hat noch keine Artikel",

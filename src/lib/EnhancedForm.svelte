@@ -15,6 +15,7 @@
     method = 'POST',
     preUpdatedCallback = undefined,
     submitButtonText = m.generic_save(),
+    submitButtonClasses = '',
     ...restProps // Captures any other native form attributes (e.g., id or name)
   }: {
     children: Snippet;
@@ -23,6 +24,7 @@
     method?: 'dialog' | 'get' | 'post' | 'DIALOG' | 'GET' | 'POST' | undefined | null;
     preUpdatedCallback?: () => void;
     submitButtonText?: string;
+    submitButtonClasses?: string;
   } = $props();
 
   let submitting = $state(false);
@@ -68,7 +70,7 @@
   {@render children()}
   <div class="mt-4">
     {@render additionalButtons?.(submitting)}
-    <button class="btn" type="submit" disabled={submitting}>
+    <button class={['btn', submitButtonClasses]} type="submit" disabled={submitting}>
       {submitButtonText}
       {#if submitting}
         <LoadingSpinner size={6} bright />
