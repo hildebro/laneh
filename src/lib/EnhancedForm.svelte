@@ -3,6 +3,7 @@
   import type { Snippet } from 'svelte';
   import { z } from 'zod/v4';
   import { enhance } from '$app/forms';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { transPath } from '$lib/path-translations';
   import { toaster } from '$lib/toaster-ref';
@@ -12,15 +13,21 @@
     action = undefined,
     method = 'POST',
     preUpdatedCallback = undefined,
+    submitButtonText = m.generic_save(),
     ...restProps // Captures any other native form attributes (e.g., id or name)
   }: {
     children: Snippet;
     action?: string;
     method?: 'dialog' | 'get' | 'post' | 'DIALOG' | 'GET' | 'POST' | undefined | null;
     preUpdatedCallback?: () => void;
+    submitButtonText?: string;
   } = $props();
 
+  let submitting = $state(false);
+
   const handleFormSubmit = () => {
+    submitting = true;
+
     return async ({ result, update }: {
       result: ActionResult,
       update: (options?: { reset?: boolean; invalidateAll?: boolean }) => Promise<void>;
@@ -40,6 +47,8 @@
         preUpdatedCallback();
       }
 
+      submitting = false;
+
       // Call update to apply any changes to the page (e.g., if you're using $page.form)
       // It's important to call update() to ensure SvelteKit's progressive enhancement works correctly,
       // especially for updating form data or error messages displayed on the page.
@@ -55,4 +64,10 @@
   {...restProps}
 >
   {@render children()}
+  <button class="btn mt-4" type="submit" disabled={submitting}>
+    {submitButtonText}
+    {#if submitting}
+      <LoadingSpinner size={6} bright />
+    {/if}
+  </button>
 </form>
