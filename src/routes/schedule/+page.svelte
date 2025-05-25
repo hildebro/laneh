@@ -68,52 +68,42 @@
                   <Pencil size={18} />
                   <span>{ m.generic_edit() }</span>
                 </a>
-                {#if data.user?.id !== task.nextDueUserId }
-                  <Modal
-                    open={differentUserModalVisible}
-                    onOpenChange={(e) => (differentUserModalVisible = e.open)}
-                    triggerBase="btn"
-                    contentBase="card shadow-xl max-w-screen-sm"
-                    backdropClasses="backdrop-blur-sm"
-                  >
-                    {#snippet trigger()}
-                      <CheckCircle size={18} />
-                      <span>{ m.schedule_done() }</span>
-                    {/snippet}
-                    {#snippet content()}
-                      <h2 class="h2 mb-4">{m.schedule_done_who_headline()}</h2>
-                      <p class="mb-8">{ m.schedule_done_who_text() }</p>
-                      <EnhancedForm
-                        action="?/markAsDone"
-                        preUpdatedCallback={() => modalClose()}
-                      >
-                        <input type="hidden" name="taskId" value={task.id} />
-                        <div class="flex justify-end gap-4">
-                          <button type="button" class="btn preset-filled-surface-800-200" onclick={modalClose}>
-                            <Undo2 />
-                            { m.generic_cancel() }
-                          </button>
-                          <button type="submit" class="btn">
-                            { m.schedule_done_who_me() }
-                          </button>
-                          <button type="submit" class="btn" name="userId" value={task.nextDueUserId}>
-                            { m.schedule_done_who_assignee({ assignee: task.nextDueUser?.username ?? 'n/a' }) }
-                          </button>
-                        </div>
-                      </EnhancedForm>
-                    {/snippet}
-                  </Modal>
-                {:else }
-                  <EnhancedForm
-                    action="?/markAsDone"
-                  >
-                    <input type="hidden" name="taskId" value={task.id} />
-                    <button type="submit" class="btn">
-                      <CheckCircle size={18} />
-                      <span>{ m.schedule_done() }</span>
-                    </button>
-                  </EnhancedForm>
-                {/if}
+                <Modal
+                  open={differentUserModalVisible}
+                  onOpenChange={(e) => (differentUserModalVisible = e.open)}
+                  triggerBase="btn"
+                  contentBase="card shadow-xl max-w-screen-sm"
+                  backdropClasses="backdrop-blur-sm"
+                >
+                  {#snippet trigger()}
+                    <CheckCircle size={18} />
+                    <span>{ m.schedule_done() }</span>
+                  {/snippet}
+                  {#snippet content()}
+                    <EnhancedForm
+                      action="?/markAsDone"
+                      preUpdatedCallback={() => modalClose()}
+                    >
+                      <input type="hidden" name="taskId" value={task.id} />
+                      <label>
+                        { m.schedule_done_who() }
+                        <select class="select mb-2" name="userId">
+                          {#await data.users then users}
+                            {#each users as user (user.id)}
+                              <option value={user.id} selected={user.id === task.nextDueUserId}>{user.username}</option>
+                            {/each}
+                          {/await}
+                        </select>
+                      </label>
+                      {#snippet additionalButtons(submitting)}
+                        <button type="button" class="btn preset-filled-surface-800-200" onclick={modalClose} disabled={submitting}>
+                          <Undo2 size={12} />
+                          { m.generic_cancel() }
+                        </button>
+                      {/snippet}
+                    </EnhancedForm>
+                  {/snippet}
+                </Modal>
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
