@@ -1,12 +1,14 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { and, asc, count, desc, eq, gt, inArray, lt, max, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
+import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import levenshteinPkg from 'fast-levenshtein'; // Import fast-levenshtein using the default import for CJS compatibility
 import { getTx } from '$lib/context';
 import * as table from '$lib/server/db/schema';
 import {
   shoppingCategory,
   type ShoppingCategory,
+  type ShoppingCategoryWithRelation,
   type ShoppingItem,
   shoppingItem,
   type StagedShoppingItem,
@@ -15,7 +17,6 @@ import {
   type WeeklyTask,
   type WeeklyTaskWithRelation
 } from '$lib/server/db/schema';
-import { lte } from 'drizzle-orm/sql/expressions/conditions';
 // The actual function is usually on the '.get' property for this library
 const levenshtein = levenshteinPkg.get;
 
@@ -54,7 +55,7 @@ export const findShoppingCategory = async (categoryId: string) => {
   }).execute();
 };
 
-export const findAllShoppingCategories = async (): Promise<ShoppingCategory[]> => {
+export const findAllShoppingCategories = async (): Promise<ShoppingCategoryWithRelation[]> => {
   const db = getTx();
 
   return db.query.shoppingCategory.findMany({
