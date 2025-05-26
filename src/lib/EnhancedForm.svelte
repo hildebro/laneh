@@ -16,6 +16,7 @@
     preUpdatedCallback?: () => void;
     submitButtonText?: string;
     submitButtonClasses?: string;
+    hideSubmitButton?: boolean;
   };
 
   let {
@@ -26,6 +27,7 @@
     preUpdatedCallback = undefined,
     submitButtonText = m.generic_save(),
     submitButtonClasses = '',
+    hideSubmitButton = false,
     ...restProps
   }: EnhancedFormProps = $props();
 
@@ -70,13 +72,15 @@
   {...restProps}
 >
   {@render children()}
-  <div class="mt-4">
+  <div class="mt-4 flex gap-1.5 flex-wrap">
     {@render additionalButtons?.(submitting)}
-    <button class={['btn', submitButtonClasses]} type="submit" disabled={submitting}>
-      {submitButtonText}
-      {#if submitting}
-        <LoadingSpinner size={6} bright />
-      {/if}
-    </button>
+    {#if !hideSubmitButton}
+      <button class={['btn', submitButtonClasses]} type="submit" disabled={submitting}>
+        {submitButtonText}
+        {#if submitting}
+          <LoadingSpinner size={6} bright />
+        {/if}
+      </button>
+    {/if}
   </div>
 </form>
