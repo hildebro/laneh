@@ -1,12 +1,12 @@
-import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import * as m from '$lib/paraglide/messages.js';
 import {
   assignCategoryToShoppingItems,
   deactivateShoppingItems,
   deleteShoppingItems,
   findAllShoppingCategories
 } from '$lib/server/db/functions';
+import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async () => {
   return {
@@ -14,28 +14,41 @@ export const load: PageServerLoad = async () => {
   };
 };
 
+const setCategorySchema = z.object({
+  categoryId: z.string().nonempty(),
+  itemIds: z.transform((val: string) => {
+    if (val === '') {
+      return [];
+    }
+
+    return val.split(',');
+  }).pipe(z.array(z.string().nonempty()).nonempty())
+});
+
+const itemUpdateSchema = z.object({
+  itemIds: z.transform((val: string) => {
+    if (val === '') {
+      return [];
+    }
+
+    return val.split(',');
+  }).pipe(z.array(z.string().nonempty()).nonempty())
+});
+
 export const actions = {
-  default: async ({ request }) => {
-    const data = await request.formData();
-    const itemIds = data.getAll('items').map((formValue) => formValue.toString());
-
-    if (itemIds.length === 0) {
-      return fail(400, { message: m.settings_items_action_empty() });
-    }
-
-    const categoryId = data.get('category')?.toString();
-    if (categoryId) {
-      await assignCategoryToShoppingItems(itemIds, categoryId);
-
-      return;
-    }
-
-    if (data.has('action') && data.get('action') === 'deactivate') {
-      await deactivateShoppingItems(itemIds);
-
-      return;
-    }
-
-    await deleteShoppingItems(itemIds);
+  setCategory: async (event) => {
+    return processForm(event, setCategorySchema, async (setCategory) => {
+      await assignCategoryToShoppingItems(setCategory.itemIds, setCategory.categoryId);
+    });
+  },
+  deactivateItems: async (event) => {
+    return processForm(event, itemUpdateSchema, async (itemUpdate) => {
+      await deactivateShoppingItems(itemUpdate.itemIds);
+    });
+  },
+  deleteItems: async (event) => {
+    return processForm(event, itemUpdateSchema, async (itemUpdate) => {
+      await deleteShoppingItems(itemUpdate.itemIds);
+    });
   }
 };
