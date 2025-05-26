@@ -1,26 +1,14 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-	import * as m from '$lib/paraglide/messages.js';
-
-  export let form;
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import * as m from '$lib/paraglide/messages.js';
 </script>
 
 <div class="card">
-	<form method="POST" use:enhance>
-		<div class="mb-4">
-			<label>
-				{m.generic_name()}
-				<br/>
-				<input type="text" name="username" id="username" />
-			</label>
-		</div>
-		<div class="flex flex-col sm:flex-row gap-2">
-			<button type="submit" class="btn">
-				{m.settings_users_add()}
-			</button>
-		</div>
-	</form>
-	{#if form?.message}
-		<p class="preset-filled-error-50-950 rounded mt-4 text-center">{form.message}</p>
-	{/if}
+  <EnhancedForm submitButtonText={m.settings_users_add()}>
+    <label>
+      {m.generic_name()}
+      <br />
+      <input type="text" name="username" id="username" />
+    </label>
+  </EnhancedForm>
 </div>
