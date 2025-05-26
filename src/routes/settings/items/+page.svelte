@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Modal, Switch } from '@skeletonlabs/skeleton-svelte';
   import { Trash, Undo2 } from 'lucide-svelte';
-  import { enhance } from '$app/forms';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -10,25 +10,9 @@
 
   let deleteModalVisible = $state(false);
 
-  // Reference to the form DOM element
-  let formElement: HTMLFormElement | undefined = $state();
+  let { data } = $props();
 
-  function modalClose() {
-    deleteModalVisible = false;
-  }
-
-  /**
-   * Function to handle the form submit. Can't rely on submit button, because the modal that contains that button
-   * is rendered outside of the form in the DOM.
-   */
-  function handleDeleteSubmit() {
-    // Use requestSubmit() which is often preferred as it respects validation and behaves more like a user
-    // click on a submit button. submit() would also work but might bypass some checks.
-    formElement?.requestSubmit();
-    modalClose();
-  }
-
-  let { data, form } = $props();
+  let itemIds = $state([]);
 </script>
 
 {#await data.categories}
@@ -39,64 +23,60 @@
       { m.settings_items_show_inactive() }
     </Switch>
   </div>
-  <form
-    class="flex flex-col gap-4 items-center h-full w-full"
-    method="POST"
-    use:enhance
-    bind:this={formElement}
-  >
-    <CategorizedItemSelect {categories} unfiltered={showInactiveItems} />
-    {#if form?.message}
-      <p class="card preset-filled-error-50-950 rounded text-center">{form.message}</p>
-    {/if}
+  <div class="flex flex-col gap-4 w-full">
+    <CategorizedItemSelect bind:value={itemIds} {categories} unfiltered={showInactiveItems} />
     <div class="card">
-      { m.settings_items_change_category() }
-      <div class="flex gap-1 flex-wrap mt-2">
-        {#each categories as category (category.id)}
-          <button type="submit"
-                  class="btn"
-                  name="category"
-                  value={category.id}
-                  onclick={modalClose}
-          >
-            {category.name}
-          </button>
-        {/each}
-      </div>
-      <div class="mt-4">{ m.settings_items_other_actions() }</div>
-      <div class="flex gap-1 flex-wrap mt-2">
-        <button type="submit"
-                class="btn preset-filled-warning-800-200"
-                name="action"
-                value="deactivate"
-                onclick={modalClose}
-        >
-          { m.settings_items_deactivate() }
-        </button>
+      <EnhancedForm action="?/setCategory" hideSubmitButton preUpdatedCallback={() => itemIds = []}>
+        <input type="hidden" name="itemIds" value={itemIds}>
+        { m.settings_items_change_category() }
+        {#snippet additionalButtons(submitting)}
+          {#each categories as category (category.id)}
+            <button type="submit"
+                    class="btn"
+                    name="categoryId"
+                    value={category.id}
+                    disabled={submitting}
+            >
+              {category.name}
+            </button>
+          {/each}
+        {/snippet}
+      </EnhancedForm>
+    </div>
+    <div class="card">
+      { m.settings_items_other_actions() }
+      <div class="flex gap-1.5">
+        <EnhancedForm action="?/deactivateItems" submitButtonText={m.settings_items_deactivate()}>
+          <input type="hidden" name="itemIds" value={itemIds}>
+        </EnhancedForm>
         <Modal
           open={deleteModalVisible}
           onOpenChange={(e) => (deleteModalVisible = e.open)}
-          triggerBase="btn preset-filled-error-800-200"
-          contentBase="card preset-filled-error-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm"
+          triggerBase="btn preset-filled-error-800-200 mt-4"
+          contentBase="card preset-filled-error-100-900 p-5 space-y-4 shadow-xl max-w-screen-sm"
           backdropClasses="backdrop-blur-sm"
         >
           {#snippet trigger()}{m.settings_items_delete()}{/snippet}
           {#snippet content()}
             <h2 class="h2">{m.settings_items_delete()}</h2>
             <p class="opacity-60">{ m.settings_items_delete_info() }</p>
-            <div class="flex justify-end gap-4">
-              <button type="button" class="btn preset-filled-surface-800-200" onclick={modalClose}>
-                <Undo2 />
-                { m.generic_cancel() }
-              </button>
-              <button type="button" class="btn preset-filled-error-800-200" onclick={handleDeleteSubmit}>
-                <Trash />
-                { m.generic_confirm() }
-              </button>
-            </div>
+            <EnhancedForm action="?/deleteItems" hideSubmitButton preUpdatedCallback={() => deleteModalVisible = false}>
+              <input type="hidden" name="itemIds" value={itemIds}>
+              {#snippet additionalButtons()}
+                <button type="button" class="btn preset-filled-surface-800-200"
+                        onclick={() => deleteModalVisible = false}>
+                  <Undo2 />
+                  { m.generic_cancel() }
+                </button>
+                <button type="submit" class="btn preset-filled-error-800-200">
+                  <Trash />
+                  { m.generic_confirm() }
+                </button>
+              {/snippet}
+            </EnhancedForm>
           {/snippet}
         </Modal>
       </div>
     </div>
-  </form>
+  </div>
 {/await}
