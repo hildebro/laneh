@@ -33,7 +33,7 @@
           {#each filterActive(category.shoppingItems, false) as item (item.id)}
             <label class="flex items-center gap-0.5">
               <input type="checkbox" name="items" value={item.id} />
-              <span class="preset-filled-primary-900-100">{item.name}</span>
+              <span class="opacity-50 italic">~{item.name}</span>
             </label>
           {/each}
         {/if}
