@@ -11,6 +11,7 @@ export const transPath = (path: string): string => {
     case 'itemIds':
       return m.settings_items_headline();
     case 'name':
+    case 'username':
       return m.generic_name();
     case 'weekday':
       return m.schedule_weekday();
