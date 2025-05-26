@@ -21,19 +21,17 @@
 {#each categories as category (category.id)}
   {#if shouldBeDisplayed(category) }
     <div class="card w-full">
-      <!-- Header -->
       <b>{category.name}</b>
-      <!-- Item list -->
-      <div class="flex flex-col">
+      <div class="flex flex-col text-base">
         {#each filterActive(category.shoppingItems) as item (item.id)}
-          <label>
+          <label class="flex items-center gap-0.5">
             <input type="checkbox" name="items" value={item.id} />
             {item.amount} {item.name}
           </label>
         {/each}
         {#if unfiltered}
           {#each filterActive(category.shoppingItems, false) as item (item.id)}
-            <label>
+            <label class="flex items-center gap-0.5">
               <input type="checkbox" name="items" value={item.id} />
               <span class="preset-filled-primary-900-100">{item.name}</span>
             </label>
