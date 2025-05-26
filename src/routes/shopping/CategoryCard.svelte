@@ -1,16 +1,18 @@
 <script lang="ts">
-  import type { ShoppingItem } from '$lib/server/db/schema';
+  import type { ShoppingCategoryWithRelation } from '$lib/server/db/schema';
 
-  let { category } = $props();
+  let { category }: { category: ShoppingCategoryWithRelation } = $props();
+
+  let activeItems = $state(category.shoppingItems.filter(item => item.active));
 </script>
 
-<div class="card">
-  <!-- Header -->
-  <b>{category.name}</b>
-  <!-- Item list -->
-  <div class="mb-2">
-    {#each category.shoppingItems.filter((item: ShoppingItem) => item.active) as item (item.id)}
-      - {item.amount} {item.name}<br />
-    {/each}
+{#if activeItems.length > 0}
+  <div class="card">
+    <b>{category.name}</b>
+    <div class="text-base">
+      {#each activeItems as item (item.id)}
+        - {item.amount} {item.name}<br />
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
