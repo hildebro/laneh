@@ -9,7 +9,8 @@ import {
   commitStagedItems,
   findShoppingItem,
   findSimilarShoppingItem,
-  findStagedShoppingList
+  findStagedShoppingList,
+  getItemAddSuggestions
 } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -17,10 +18,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const existingList = await findStagedShoppingList(userId);
   if (existingList) {
-    return redirect(302, 'validate')
+    return redirect(302, 'validate');
   }
-  
-  return {};
+
+  return { suggestions: getItemAddSuggestions() };
 };
 
 export const actions = {

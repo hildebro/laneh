@@ -1,5 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { and, asc, count, desc, eq, gt, inArray, lt, max, SQL, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import levenshteinPkg from 'fast-levenshtein'; // Import fast-levenshtein using the default import for CJS compatibility
@@ -294,6 +294,45 @@ export const countActiveShoppingItems = async () => {
       .where(eq(table.shoppingItem.active, true))
       .execute()
   ).at(0)?.count ?? 0;
+};
+
+export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 4) => {
+  const db = getTx();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  // Subquery to exclude recently bought items or currently active items
+  const excludedItems = db.$with('recent_purchases').as(
+    db.select({
+      itemId: table.shoppingPurchaseItem.itemId
+    })
+      .from(table.shoppingPurchaseItem)
+      .innerJoin(table.shoppingItem, eq(table.shoppingPurchaseItem.itemId, table.shoppingItem.id))
+      .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
+      .where(
+        or(
+          gte(table.shoppingPurchase.date, sevenDaysAgo),
+          eq(table.shoppingItem.active, true)
+        )
+      )
+  );
+
+  return db.with(excludedItems).select({
+    id: shoppingItem.id,
+    name: shoppingItem.name,
+    purchaseCount: count(table.shoppingPurchaseItem.itemId),
+    lastPurchaseDate: max(table.shoppingPurchase.date) as SQL<Date>
+  })
+    .from(shoppingItem)
+    .innerJoin(table.shoppingPurchaseItem, eq(shoppingItem.id, table.shoppingPurchaseItem.itemId))
+    .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
+    // Any item that isn't excluded
+    .where(sql`NOT EXISTS (SELECT 1 FROM ${excludedItems} WHERE ${excludedItems.itemId} = ${shoppingItem.id})`)
+    .groupBy(shoppingItem.id, shoppingItem.name)
+    // That has been bought at least X amount of times
+    .having(gte(count(table.shoppingPurchaseItem.itemId), frequentlyBoughtThreshold))
+    .orderBy(desc(count(table.shoppingPurchaseItem.itemId)))
+    .limit(6);
 };
 
 // ------- SHOPPING PURCHASE -------

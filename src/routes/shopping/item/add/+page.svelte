@@ -1,43 +1,86 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
+
+  let { data } = $props();
 
   let textValue = $state('');
   let isSubmitting = $state(false);
+
+  const appendText = (name: string) => {
+    // quick sanitizing
+    textValue = textValue.trim();
+
+    // empty input can be overridden
+    if (textValue === '') {
+      textValue = name;
+
+      return;
+    }
+
+    // otherwise add the item in a new row
+    textValue += `\n${name}`;
+  };
+
+  const formSubmitHandle = () => {
+    // Runs before the form submits
+    isSubmitting = true;
+
+    // Runs after the server action completes
+    return async ({ update }: {
+      update: (options?: { reset?: boolean; invalidateAll?: boolean }) => Promise<void>;
+    }) => {
+      // Reset form state after successful submission and update/redirect
+      textValue = '';
+      isSubmitting = false;
+      // Ensure the component updates if the action modified data
+      // or completed a redirect.
+      await update();
+    };
+  };
 </script>
 
 <div class="card w-full">
-  <form
-    method="POST"
-    action="?/create"
-    use:enhance={() => {
-        // Runs before the form submits
-        isSubmitting = true;
-
-        // Runs after the server action completes
-        return async ({ update }) => {
-            // Reset form state after successful submission and update/redirect
-            textValue = '';
-            isSubmitting = false;
-            // Ensure the component updates if the action modified data
-            // or completed a redirect.
-            await update();
-        };
-    }}
-  >
-    <div class="flex flex-col">
-      <h1 class="text-2xl font-semibold mb-4">{m.shopping_add_items()}</h1>
-      <textarea
-        bind:value={textValue}
-        name="items"
-        class="textarea textarea-bordered h-64"
-        placeholder={m.shopping_add_items_explanation()}
-        disabled={isSubmitting}
-      ></textarea>
+  {#await data.suggestions}
+    <LoadingSpinner />
+  {:then suggestions}
+    <div class="flex flex-col gap-3">
+      <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
+      {#if suggestions.length > 0}
+        { m.shopping_add_items_suggestions() }
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {#each suggestions as suggestion (suggestion.id)}
+            {#if !textValue.includes(suggestion.name)}
+              <div class="flex items-center gap-1">
+                <button class="btn text-sm" onclick={() => appendText(suggestion.name)} >
+                  +
+                </button>
+                {suggestion.name}
+              </div>
+            {/if}
+          {/each}
+        </div>
+      {/if}
+      <form
+        method="POST"
+        action="?/create"
+        use:enhance={formSubmitHandle}
+      >
+        <label>
+          { m.shopping_add_items_label() }
+          <textarea
+            bind:value={textValue}
+            name="items"
+            class="textarea textarea-bordered h-64"
+            placeholder={m.shopping_add_items_explanation()}
+            disabled={isSubmitting}
+          ></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary mt-2" disabled={isSubmitting || textValue.trim() === ''}>
+          {m.shopping_add_items()}
+        </button>
+      </form>
     </div>
-
-    <button type="submit" class="btn btn-primary mt-2" disabled={isSubmitting || textValue.trim() === ''}>
-      {m.shopping_add_items()}
-    </button>
-  </form>
+  {/await}
 </div>
