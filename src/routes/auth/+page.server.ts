@@ -31,8 +31,9 @@ export const actions: Actions = {
 
       await createSession(cookies);
 
-      if (url.searchParams.has('target')) {
-        return redirect(302, `${base}/${url.searchParams.get('target')}`);
+      const target = url.searchParams.get('target');
+      if (target) {
+        return redirect(302, `${base}/${decodeURI(target)}`);
       }
 
       return redirect(302, `${base}`);
