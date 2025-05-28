@@ -1,9 +1,9 @@
-import { type Actions, fail, redirect } from '@sveltejs/kit';
+import { type Actions, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { base } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import { createSession, verifyOTP } from '$lib/server/auth';
-import { processForm } from '$lib/server/formHandler';
+import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -21,12 +21,7 @@ export const actions: Actions = {
     return processForm(event, otpSchema, async (otp, { cookies, url }) => {
       const verified = await verifyOTP(otp.code);
       if (!verified) {
-        // Fill the error date with zod-like data, so it's handled the same way by the frontend.
-        return fail(422, {
-          issues: [
-            { path: ['code'], message: m.auth_access_code_invalid() }
-          ]
-        });
+        return failForm('code', m.auth_access_code_invalid());
       }
 
       await createSession(cookies);

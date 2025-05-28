@@ -1,10 +1,10 @@
-import { type Actions, fail, redirect } from '@sveltejs/kit';
+import { type Actions, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { base } from '$app/paths';
 import * as m from '$lib/paraglide/messages';
 import { setUser } from '$lib/server/auth';
 import { findAllUsers, findUser } from '$lib/server/db/functions';
-import { processForm } from '$lib/server/formHandler';
+import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -23,11 +23,7 @@ export const actions: Actions = {
     return processForm(event, switchUserSchema, async (switchUser, { cookies }) => {
       const user = await findUser(switchUser.userId);
       if (!user) {
-        return fail(422, {
-          issues: [
-            { path: ['code'], message: m.error_user_not_found() }
-          ]
-        });
+        return failForm('switchUser', m.error_user_not_found());
       }
 
       setUser(cookies, user.id);

@@ -1,4 +1,4 @@
-import { type Actions, error, fail, redirect } from '@sveltejs/kit';
+import { type Actions, error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages.js';
 import {
@@ -7,7 +7,7 @@ import {
   findShoppingCategory,
   updateShoppingCategory
 } from '$lib/server/db/functions';
-import { processForm } from '$lib/server/formHandler';
+import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -53,11 +53,7 @@ export const actions: Actions = {
     }
 
     if (category.shoppingItems.length > 0) {
-      return fail(422, {
-        issues: [
-          { path: ['category'], message: m.settings_categories_delete_invalid() }
-        ]
-      });
+      return failForm('category', m.settings_categories_delete_invalid());
     }
 
     await deleteCategory(categoryId);
