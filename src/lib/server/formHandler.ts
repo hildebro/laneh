@@ -18,3 +18,11 @@ export async function processForm<Schema extends z.ZodObject, SuccessReturnType>
 
   return onSuccess(validationResult.data, event);
 }
+
+export function failForm(path: string, message: string) {
+  return fail(422, {
+    issues: [
+      { path: [path], message }
+    ]
+  });
+}

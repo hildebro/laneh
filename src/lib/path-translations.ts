@@ -13,6 +13,8 @@ export const transPath = (path: string): string => {
     case 'name':
     case 'username':
       return m.generic_name();
+    case 'switchUser':
+      return m.settings_users_switch();
     case 'weekday':
       return m.schedule_weekday();
     default:
