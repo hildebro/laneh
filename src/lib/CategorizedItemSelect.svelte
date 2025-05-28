@@ -25,14 +25,14 @@
       <div class="flex flex-col text-base">
         {#each filterActive(category.shoppingItems) as item (item.id)}
           <label class="flex items-center gap-0.5">
-            <input type="checkbox" name="itemIds" value={item.id} bind:group={value} />
+            <input type="checkbox" name="items" value={item.id} bind:group={value} />
             {item.amount} {item.name}
           </label>
         {/each}
         {#if unfiltered}
           {#each filterActive(category.shoppingItems, false) as item (item.id)}
             <label class="flex items-center gap-0.5">
-              <input type="checkbox" name="itemIds" value={item.id} bind:group={value} />
+              <input type="checkbox" name="items" value={item.id} bind:group={value} />
               <span class="opacity-50 italic">~{item.name}</span>
             </label>
           {/each}
