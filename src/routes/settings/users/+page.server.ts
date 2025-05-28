@@ -4,6 +4,8 @@ import { base } from '$app/paths';
 import * as m from '$lib/paraglide/messages';
 import { setUser } from '$lib/server/auth';
 import { findAllUsers, findUser } from '$lib/server/db/functions';
+import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
   return {
@@ -12,21 +14,25 @@ export const load: PageServerLoad = async ({ locals }) => {
   };
 };
 
+const switchUserSchema = z.object({
+  userId: z.string().nonempty()
+});
+
 export const actions: Actions = {
-  select: async ({ request, cookies }) => {
-    const formData = await request.formData();
-    const userId = formData.get('userId')?.toString();
-    if (!userId) {
-      return;
-    }
+  select: async (event) => {
+    return processForm(event, switchUserSchema, async (switchUser, { cookies }) => {
+      const user = await findUser(switchUser.userId);
+      if (!user) {
+        return fail(422, {
+          issues: [
+            { path: ['code'], message: m.error_user_not_found() }
+          ]
+        });
+      }
 
-    const user = await findUser(userId);
-    if (!user) {
-      return fail(400, { message: m.error_user_not_found() });
-    }
+      setUser(cookies, user.id);
 
-    setUser(cookies, userId)
-
-    return redirect(302, `${base}`);
+      return redirect(302, `${base}`);
+    });
   }
 };

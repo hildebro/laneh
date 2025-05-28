@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Avatar } from '@skeletonlabs/skeleton-svelte';
-  import { enhance } from '$app/forms';
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import { transLocale } from '$lib/locale-translations.js';
   import * as m from '$lib/paraglide/messages.js';
@@ -33,7 +33,7 @@
     <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_switch() }</h1>
     <div class="flex flex-wrap justify-center gap-4">
       {#each users as user (user.id)}
-        <form method="POST" action="?/select" use:enhance>
+        <EnhancedForm action="?/select" hideSubmitButton>
           <input type="hidden" name="userId" value={user.id}>
           <button type="submit" class="btn w-40 h-40 flex flex-col items-center justify-center gap-1">
             <Avatar name={user?.username ?? ''}
@@ -42,7 +42,7 @@
             />
             {user?.username}
           </button>
-        </form>
+        </EnhancedForm>
       {/each}
       <a class="btn w-40 h-40 flex items-center justify-center" href="users/add">
         {m.settings_users_add()}
