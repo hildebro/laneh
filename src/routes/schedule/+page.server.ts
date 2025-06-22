@@ -28,11 +28,20 @@ export const load: PageServerLoad = async () => {
     }
   });
 
-  due.sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
-  upcoming.sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime());
+  due.sort((a, b) => sortTasks(a, b));
+  upcoming.sort((a, b) => sortTasks(a, b));
 
   return { dueTasks: due, upcomingTasks: upcoming };
 };
+
+function sortTasks(a: WeeklyTaskWithRelation, b: WeeklyTaskWithRelation) {
+  const timeBasedSort = new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime();
+  if (timeBasedSort !== 0) {
+    return timeBasedSort;
+  }
+
+  return a.name.localeCompare(b.name);
+}
 
 const taskCompletionSchema = z.object({
   taskId: z.string().trim().nonempty(),
@@ -46,5 +55,5 @@ export const actions: Actions = {
 
       await markTaskAsDone(taskCompletion.taskId, completionUserId);
     });
-  },
+  }
 };
