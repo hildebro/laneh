@@ -4,7 +4,7 @@
   import { slide } from 'svelte/transition';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import type { WeeklyTask } from '$lib/server/db/schema';
+  import type { WeeklyTask, WeeklyTaskWithRelation } from '$lib/server/db/schema';
 
   let { data } = $props();
 
@@ -44,10 +44,16 @@
     }
   }
 
-  let differentUserModalVisible = $state(false);
+  let showTaskCompleteModal = $state(false);
+  let taskToComplete: WeeklyTaskWithRelation | undefined = $state();
 
-  function modalClose() {
-    differentUserModalVisible = false;
+  function openModalForTask(task: WeeklyTaskWithRelation) {
+    showTaskCompleteModal = true;
+    taskToComplete = task;
+  }
+
+  function closeModal() {
+    showTaskCompleteModal = false;
   }
 </script>
 
@@ -68,42 +74,10 @@
                   <Pencil size={18} />
                   <span>{ m.generic_edit() }</span>
                 </a>
-                <Modal
-                  open={differentUserModalVisible}
-                  onOpenChange={(e) => (differentUserModalVisible = e.open)}
-                  triggerBase="btn"
-                  contentBase="card shadow-xl max-w-screen-sm"
-                  backdropClasses="backdrop-blur-sm"
-                >
-                  {#snippet trigger()}
-                    <CheckCircle size={18} />
-                    <span>{ m.schedule_done() }</span>
-                  {/snippet}
-                  {#snippet content()}
-                    <EnhancedForm
-                      action="?/markAsDone"
-                      preUpdatedCallback={() => modalClose()}
-                    >
-                      <input type="hidden" name="taskId" value={task.id} />
-                      <label>
-                        { m.schedule_done_who() }
-                        <select class="select mb-2" name="userId">
-                          {#await data.users then users}
-                            {#each users as user (user.id)}
-                              <option value={user.id} selected={user.id === task.nextDueUserId}>{user.username}</option>
-                            {/each}
-                          {/await}
-                        </select>
-                      </label>
-                      {#snippet additionalButtons(submitting)}
-                        <button type="button" class="btn preset-filled-surface-800-200" onclick={modalClose} disabled={submitting}>
-                          <Undo2 size={12} />
-                          { m.generic_cancel() }
-                        </button>
-                      {/snippet}
-                    </EnhancedForm>
-                  {/snippet}
-                </Modal>
+                <button class="btn" onclick={() => openModalForTask(task)}>
+                  <CheckCircle size={18} />
+                  <span>{ m.schedule_done() }</span>
+                </button>
               </div>
               <hr class="my-2 opacity-50" />
               <div class="text-sm space-y-1">
@@ -118,6 +92,38 @@
       </div>
     {/if}
   </section>
+
+  <Modal
+    open={showTaskCompleteModal}
+    onOpenChange={(e) => (showTaskCompleteModal = e.open)}
+    contentBase="card shadow-xl"
+    backdropClasses="backdrop-blur-xs"
+  >
+    {#snippet content()}
+      <EnhancedForm
+        action="?/markAsDone"
+        preUpdatedCallback={() => closeModal()}
+      >
+        <input type="hidden" name="taskId" value={taskToComplete?.id} />
+        <label>
+          { m.schedule_done_who() }
+          <select class="select mb-2" name="userId">
+            {#await data.users then users}
+              {#each users as user (user.id)}
+                <option value={user.id} selected={user.id === taskToComplete?.nextDueUserId}>{user.username}</option>
+              {/each}
+            {/await}
+          </select>
+        </label>
+        {#snippet additionalButtons(submitting)}
+          <button type="button" class="btn preset-filled-surface-800-200" onclick={closeModal} disabled={submitting}>
+            <Undo2 size={12} />
+            { m.generic_cancel() }
+          </button>
+        {/snippet}
+      </EnhancedForm>
+    {/snippet}
+  </Modal>
 
   <section class="space-y-4">
     <h2 class="h2">{ m.schedule_upcoming_tasks() }</h2>
