@@ -523,7 +523,7 @@ export const findTask = async (taskId: string) => {
 export const addTask = async (name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
-  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextWeekdayDate(weekday));
+  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
 
   await db.insert(table.weeklyTask).values({
     id: generateUUID(),
@@ -538,7 +538,7 @@ export const addTask = async (name: string, weekday: string, interval: number, u
 export const updateTask = async (taskId: string, name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
-  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextWeekdayDate(weekday));
+  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
 
   await db.update(table.weeklyTask)
     .set({
@@ -554,7 +554,7 @@ export const updateTask = async (taskId: string, name: string, weekday: string, 
 /**
  * Calculates the date of the next occurrence of a specific weekday based on the current time.
  */
-function getNextWeekdayDate(weekdayName: string): Date {
+function getNextDueDate(weekdayName: string, interval: number): Date {
   const weekdayMap: { [key: string]: number } = {
     'sun': 0,
     'mon': 1,
@@ -570,15 +570,19 @@ function getNextWeekdayDate(weekdayName: string): Date {
   const now = new Date();
   const currentDayOfWeek = now.getDay();
 
-  // Calculate the difference in days
-  // If the target day is before or is the current day within the current week, we need to add 7 days
-  // to get the *next* occurrence.
+  // Figure out the distance between target and current weekday.
   let diff = targetDayOfWeek - currentDayOfWeek;
-  if (diff <= 0) {
-    diff += 7;
+  // If the distance is positive, it means the closest target weekday is in the future. To make the following
+  // calculation a bit simpler, we take away 7 days so that `diff` at this point will always point to the most recent
+  // matching weekday.
+  if (diff > 0) {
+    diff -= 7;
   }
 
-  // Create a new Date object starting from 'now' and add the calculated difference in days
+  // Now we can simply add 7 days per desired interval to know how many days it takes to get to the next target weekday.
+  diff = diff + (7 * interval);
+
+  // Create a new Date object starting from 'now' and add the calculated difference in days.
   // This preserves the time of day from the 'now' object.
   const nextDate = new Date(now);
   nextDate.setDate(now.getDate() + diff);
@@ -599,7 +603,7 @@ export const markTaskAsDone = async (taskId: string, doneByUserId: string | null
     date: formatDateToYYYYMMDD(new Date())
   });
 
-  const nextDueDate = formatDateToYYYYMMDD(getNextWeekdayDate(task.dueWeekday));
+  const nextDueDate = formatDateToYYYYMMDD(getNextDueDate(task.dueWeekday, task.interval));
   const nextDueUserId = await findNextDueUserId(taskId);
 
   await db.update(table.weeklyTask)
