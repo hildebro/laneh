@@ -1,5 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, or, SQL, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import levenshteinPkg from 'fast-levenshtein'; // Import fast-levenshtein using the default import for CJS compatibility
@@ -609,8 +609,11 @@ export const markTaskAsDone = async (taskId: string, doneByUserId: string | null
 };
 
 /**
- * Sorts the db users by completion count of the task and by latest completion date. The person
- * with the least completions (or oldest completion in case of a draw) will be picked.
+ * Finds which user is supposed to do the task next. This is determined by the following ordering:
+ * 1. How often has the task been done already?
+ *   => The user with the fewest completions is picked first.
+ * 2. When was the first completion?
+ *   => When multiple people has the same completion count, the one with the oldest completion is picked first.
  */
 async function findNextDueUserId(taskId: string): Promise<string> {
   const db = getTx();
@@ -621,7 +624,7 @@ async function findNextDueUserId(taskId: string): Promise<string> {
       completionCount: count(table.taskCompletion.id)
         .mapWith(Number)
         .as('completionCount'),
-      latestCompletionDate: max(table.taskCompletion.date).as('latestCompletionDate')
+      earliestCompletionDate: min(table.taskCompletion.date).as('earliestCompletionDate')
     })
     .from(table.user)
     .leftJoin(
@@ -632,7 +635,7 @@ async function findNextDueUserId(taskId: string): Promise<string> {
       )
     )
     .groupBy(table.user.id)
-    .orderBy(asc(count(table.taskCompletion.id)), asc(max(table.taskCompletion.date)));
+    .orderBy(asc(count(table.taskCompletion.id)), asc(min(table.taskCompletion.date)));
 
   return completionsPerUser[0].id;
 }
