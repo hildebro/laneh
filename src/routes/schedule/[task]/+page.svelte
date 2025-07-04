@@ -7,6 +7,7 @@
 
   let name = $state(data.task?.name);
   let weekday = $state(data.task?.dueWeekday);
+  let interval = $state(data.task?.interval);
   let dueDate = $state(data.task?.nextDueDate);
   let dueUserId = $state(data.task?.nextDueUserId);
 
@@ -66,6 +67,15 @@
         {/each}
       </select>
     </label>
+
+    <div class="mb-2">
+      { m.schedule_interval() }
+      <div class="flex items-center gap-1">
+        <span>{ m.schedule_interval_every()}</span>
+        <input class="form-input input w-36" type="number" name="interval" bind:value={interval}>
+        <span>{ m.schedule_interval_weeks() }</span>
+      </div>
+    </div>
 
     <label>
       { m.schedule_next_date() }

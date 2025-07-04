@@ -520,7 +520,7 @@ export const findTask = async (taskId: string) => {
   }).execute();
 };
 
-export const addTask = async (name: string, weekday: string, userId: string, dueDate: string | null) => {
+export const addTask = async (name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
   const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextWeekdayDate(weekday));
@@ -529,12 +529,13 @@ export const addTask = async (name: string, weekday: string, userId: string, due
     id: generateUUID(),
     name: name,
     dueWeekday: weekday as Weekday,
+    interval,
     nextDueUserId: userId,
     nextDueDate
   });
 };
 
-export const updateTask = async (taskId: string, name: string, weekday: string, userId: string, dueDate: string | null) => {
+export const updateTask = async (taskId: string, name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
   const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextWeekdayDate(weekday));
@@ -543,6 +544,7 @@ export const updateTask = async (taskId: string, name: string, weekday: string, 
     .set({
       name: name,
       dueWeekday: weekday as Weekday,
+      interval,
       nextDueUserId: userId,
       nextDueDate
     })
