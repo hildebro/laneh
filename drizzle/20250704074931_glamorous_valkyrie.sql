@@ -1,0 +1,1 @@
+ALTER TABLE "task_weekly" ADD COLUMN "interval" integer DEFAULT 1 NOT NULL;

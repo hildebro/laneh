@@ -24,6 +24,7 @@ const taskSchema = z.object({
   name: z.string().trim().nonempty(),
   dueUserId: z.transform(val => val ?? '').pipe(z.string().trim().nonempty()),
   weekday: z.enum(weekday.enumValues, { error: () => m.schedule_weekday_nonoptional() }),
+  interval: z.transform(val => Number(val)).pipe(z.number().min(1).nonoptional()),
   // An empty date input will post an empty string, so we clean it up here.
   dueDate: z.string().pipe(z.transform(val => val === '' ? null : val))
 });
@@ -32,9 +33,9 @@ export const actions: Actions = {
   create: async (event) => {
     return processForm(event, taskSchema, async (task) => {
       if (task.id) {
-        await updateTask(task.id, task.name, task.weekday, task.dueUserId, task.dueDate);
+        await updateTask(task.id, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
       } else {
-        await addTask(task.name, task.weekday, task.dueUserId, task.dueDate);
+        await addTask(task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
       }
 
       return redirect(302, './');

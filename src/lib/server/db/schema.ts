@@ -143,6 +143,7 @@ export const weeklyTask = pgTable('task_weekly', {
   createdAt: timestamp().defaultNow().notNull(),
   name: text().notNull(),
   dueWeekday: weekday().notNull(),
+  interval: integer().notNull().default(1),
   nextDueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
   nextDueDate: date().notNull(),
 });
