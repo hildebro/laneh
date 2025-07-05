@@ -7,6 +7,8 @@
   import * as m from '$lib/paraglide/messages.js';
   import { locales } from '$lib/paraglide/runtime';
 
+  let { dueTaskCount } = $props();
+
   function getActiveTileId(pathname: string): string {
     // Remove the base path and split path into segments.
     let path = pathname.substring(base.length);
@@ -49,7 +51,15 @@
       <ShoppingCart />
     </Navigation.Tile>
     <Navigation.Tile id="schedule" href="{base}/schedule" label={m.header_schedule()}>
-      <CalendarDays />
+      <div class="relative">
+        <CalendarDays />
+        {#if dueTaskCount > 0}
+          <span
+            class="absolute -top-3.5 -right-3.5 px-2 py-1 text-xs font-bold leading-none preset-filled-error-500 rounded-full">
+            {dueTaskCount}
+          </span>
+        {/if}
+      </div>
     </Navigation.Tile>
     <Navigation.Tile label={m.header_daily_upkeep()} labelClasses="disabled">
       <Star />
