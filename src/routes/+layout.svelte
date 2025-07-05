@@ -15,7 +15,7 @@
 </svelte:head>
 
 <div class="h-screen grid grid-rows-[auto_1fr_auto] overflow-y-auto">
-  <AppHeader />
+  <AppHeader dueTaskCount={data.dueTaskCount} />
   <main class="flex flex-col items-center p-4">
     {@render children()}
   </main>

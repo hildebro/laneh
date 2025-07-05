@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { base } from '$app/paths';
+import { countDueTasks } from '$lib/server/db/functions';
 
 export const load: LayoutServerLoad = async (event) => {
   // Redirect to auth, if not authenticated and not already at that path.
@@ -20,5 +21,5 @@ export const load: LayoutServerLoad = async (event) => {
     return redirect(302, `${base}/settings/users`);
   }
 
-  return { user: event.locals.user, authenticated: event.locals.authenticated };
+  return { user: event.locals.user, authenticated: event.locals.authenticated, dueTaskCount: await countDueTasks() };
 };
