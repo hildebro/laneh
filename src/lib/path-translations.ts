@@ -8,6 +8,8 @@ export const transPath = (path: string): string => {
       return m.auth_access_code();
     case 'dueUserId':
       return m.schedule_next_assignee();
+    case 'interval':
+      return m.schedule_interval();
     case 'itemIds':
       return m.settings_items_headline();
     case 'name':
