@@ -22,9 +22,9 @@ export const load: PageServerLoad = async ({ params }) => {
 const taskSchema = z.object({
   id: z.string().trim().nullish(),
   name: z.string().trim().nonempty(),
-  dueUserId: z.transform(val => val ?? '').pipe(z.string().trim().nonempty()),
+  dueUserId: z.string().trim().nonempty(),
   weekday: z.enum(weekday.enumValues, { error: () => m.schedule_weekday_nonoptional() }),
-  interval: z.transform(val => Number(val)).pipe(z.number().min(1).nonoptional()),
+  interval: z.coerce.number().min(1).nonoptional(),
   // An empty date input will post an empty string, so we clean it up here.
   dueDate: z.string().pipe(z.transform(val => val === '' ? null : val))
 });
