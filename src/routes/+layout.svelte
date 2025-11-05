@@ -1,6 +1,6 @@
 <script lang="ts">
   import '../app.css';
-  import { Toaster } from '@skeletonlabs/skeleton-svelte';
+  import { Toast } from '@skeletonlabs/skeleton-svelte';
   import AppHeader from './AppHeader.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { toaster } from '$lib/toaster-ref';
@@ -8,7 +8,17 @@
   let { children, data } = $props();
 </script>
 
-<Toaster titleClasses="h4" descriptionClasses="whitespace-pre-line p-4" {toaster}></Toaster>
+<Toast.Group {toaster}>
+  {#snippet children(toast)}
+    <Toast {toast}>
+      <Toast.Message>
+        <Toast.Title class="h4">{toast.title}</Toast.Title>
+        <Toast.Description class="whitespace-pre-line p-4">{toast.description}</Toast.Description>
+      </Toast.Message>
+      <Toast.CloseTrigger />
+    </Toast>
+  {/snippet}
+</Toast.Group>
 
 <svelte:head>
   <title>Chorehub</title>
