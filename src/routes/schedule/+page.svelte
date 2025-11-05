@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { CheckCircle, Pencil, Undo2 } from 'lucide-svelte';
   import { slide } from 'svelte/transition';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
@@ -93,37 +93,44 @@
     {/if}
   </section>
 
-  <Modal
+  <Dialog
     open={showTaskCompleteModal}
     onOpenChange={(e) => (showTaskCompleteModal = e.open)}
-    contentBase="card shadow-xl"
-    backdropClasses="backdrop-blur-xs"
   >
-    {#snippet content()}
-      <EnhancedForm
-        action="?/markAsDone"
-        preUpdatedCallback={() => closeModal()}
-      >
-        <input type="hidden" name="taskId" value={taskToComplete?.id} />
-        <label>
-          { m.schedule_done_who() }
-          <select class="select mb-2" name="userId">
-            {#await data.users then users}
-              {#each users as user (user.id)}
-                <option value={user.id} selected={user.id === taskToComplete?.nextDueUserId}>{user.username}</option>
-              {/each}
-            {/await}
-          </select>
-        </label>
-        {#snippet additionalButtons(submitting)}
-          <button type="button" class="btn preset-filled-surface-800-200" onclick={closeModal} disabled={submitting}>
-            <Undo2 size={12} />
-            { m.generic_cancel() }
-          </button>
-        {/snippet}
-      </EnhancedForm>
-    {/snippet}
-  </Modal>
+    <Portal>
+      <Dialog.Backdrop class="fixed inset-0 z-50 backdrop-blur-xs" />
+      <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center">
+        <Dialog.Content class="card shadow-xl">
+          <Dialog.Description>
+            <EnhancedForm
+              action="?/markAsDone"
+              preUpdatedCallback={() => closeModal()}
+            >
+              <input type="hidden" name="taskId" value={taskToComplete?.id} />
+              <label>
+                { m.schedule_done_who() }
+                <select class="select mb-2" name="userId">
+                  {#await data.users then users}
+                    {#each users as user (user.id)}
+                      <option value={user.id}
+                              selected={user.id === taskToComplete?.nextDueUserId}>{user.username}</option>
+                    {/each}
+                  {/await}
+                </select>
+              </label>
+              {#snippet additionalButtons(submitting)}
+                <button type="button" class="btn preset-filled-surface-800-200" onclick={closeModal}
+                        disabled={submitting}>
+                  <Undo2 size={12} />
+                  { m.generic_cancel() }
+                </button>
+              {/snippet}
+            </EnhancedForm>
+          </Dialog.Description>
+        </Dialog.Content>
+      </Dialog.Positioner>
+    </Portal>
+  </Dialog>
 
   <section class="space-y-4">
     <h2 class="h2">{ m.schedule_upcoming_tasks() }</h2>
