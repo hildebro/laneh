@@ -20,7 +20,11 @@
 {:then categories}
   <div class="btn mb-2 ml-auto">
     <Switch checked={showInactiveItems} onCheckedChange={(e) => (showInactiveItems = e.checked)}>
-      { m.settings_items_show_inactive() }
+      <Switch.Control>
+        <Switch.Thumb />
+      </Switch.Control>
+      <Switch.Label>{ m.settings_items_show_inactive() }</Switch.Label>
+      <Switch.HiddenInput />
     </Switch>
   </div>
   <div class="flex flex-col gap-4 w-full">
