@@ -1,0 +1,2 @@
+ALTER TABLE "staged_shopping_purchase_item" DROP CONSTRAINT "staged_shopping_purchase_item_item_id_user_id_pk";--> statement-breakpoint
+ALTER TABLE "staged_shopping_purchase_item" ADD PRIMARY KEY ("item_id");
