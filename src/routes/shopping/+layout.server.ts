@@ -1,8 +1,8 @@
 import type { LayoutServerLoad } from './$types';
-import { findAllShoppingCategories } from '$lib/server/db/functions';
+import { findActiveItemsByCategory } from '$lib/server/db/functions';
 
 export const load: LayoutServerLoad = async () => {
   return {
-    categories: findAllShoppingCategories()
+    categories: findActiveItemsByCategory()
   };
 };

@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     items: stagedList.stagedItems,
-    categories: categories
+    selectableCategories: categories
   };
 };
 
