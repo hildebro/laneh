@@ -41,9 +41,9 @@ export const actions: Actions = {
 
       // Update all close_match items so that there is none left after the action.
       if (formData.has(item.name)) {
-        await unmatchStagedItem(item);
-      } else {
         await matchStagedItem(item);
+      } else {
+        await unmatchStagedItem(item);
       }
     }
 
