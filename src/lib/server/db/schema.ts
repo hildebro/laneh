@@ -145,7 +145,7 @@ export const weeklyTask = pgTable('task_weekly', {
   dueWeekday: weekday().notNull(),
   interval: integer().notNull().default(1),
   nextDueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
-  nextDueDate: date().notNull(),
+  nextDueDate: date().notNull()
 });
 // Define TypeScript types for convenience (optional but recommended)
 export type WeeklyTask = typeof weeklyTask.$inferSelect;
@@ -162,6 +162,6 @@ export const taskCompletion = pgTable('task_completion', {
   id: text().primaryKey(),
   taskId: text().notNull().references(() => weeklyTask.id, { onDelete: 'cascade' }),
   userId: text().references(() => user.id, { onDelete: 'cascade' }).notNull(),
-  date: date().notNull(),
+  date: date().notNull()
 });
 export type TaskCompletion = typeof taskCompletion.$inferSelect;
