@@ -1,17 +1,27 @@
 import { redirect } from '@sveltejs/kit';
-import { createPurchase } from '$lib/server/db/functions';
+import type { PageServerLoad } from './$types';
+import { createPurchase, findStagedPurchaseItems, stagePurchaseItem } from '$lib/server/db/functions';
 import type { User } from '$lib/server/db/schema';
 
+export const load: PageServerLoad = async () => {
+  return {
+    stagedItems: await findStagedPurchaseItems()
+  };
+};
+
 export const actions = {
-  default: async ({ request, locals }) => {
-    const data = await request.formData();
-    const items = data.getAll('items').map((formValue) => formValue.toString());
+  commit: async ({ locals }) => {
     const user = locals.user as User;
 
-    if (items.length > 0) {
-      await createPurchase(user, items);
-    }
+    await createPurchase(user.id);
 
     return redirect(302, '../shopping');
+  },
+  stage: async ({ request, locals }) => {
+    const formData = await request.formData();
+    const itemId = formData.get('itemId')?.toString() as string;
+    const user = locals.user as User;
+
+    await stagePurchaseItem(itemId, user.id)
   }
 };

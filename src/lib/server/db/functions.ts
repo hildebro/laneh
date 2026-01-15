@@ -12,6 +12,7 @@ import {
   type ShoppingItem,
   shoppingItem,
   type StagedShoppingItem,
+  stagedShoppingPurchaseItem,
   type User,
   type Weekday,
   type WeeklyTask,
@@ -363,8 +364,14 @@ export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 
 };
 
 // ------- SHOPPING PURCHASE -------
-export const createPurchase = async (user: User, itemIds: string[]): Promise<void> => {
+export const createPurchase = async (userId: string): Promise<void> => {
   const db = getTx();
+
+  const stagedItems = (await findStagedPurchaseItemsByUser(userId))
+    .map(stagedItem => stagedItem.itemId);
+  if (stagedItems.length === 0) {
+    return;
+  }
 
   // 1. Create a new purchase
   const purchaseId = generateUUID();
@@ -372,19 +379,20 @@ export const createPurchase = async (user: User, itemIds: string[]): Promise<voi
     .values({
       id: purchaseId,
       date: new Date(),
-      userId: user.id
+      userId
     })
     .execute();
 
   // 2. Create entries in the junction table (shoppingPurchaseItem)
-  const purchaseItemInserts = itemIds.map((itemId) => ({
+  const purchaseItemInserts = stagedItems.map((itemId) => ({
     purchaseId,
     itemId
   }));
   await db.insert(table.shoppingPurchaseItem).values(purchaseItemInserts);
 
-  // 3. Deactivate the shopping items
-  await deactivateShoppingItems(itemIds);
+  // 3. Remove items from staging and deactivate them
+  db.delete(table.stagedShoppingPurchaseItem).where(inArray(stagedShoppingPurchaseItem.itemId, stagedItems));
+  await deactivateShoppingItems(stagedItems);
 };
 
 export const fetchLastPurchaseDate = async () => {
@@ -394,6 +402,25 @@ export const fetchLastPurchaseDate = async () => {
       .from(table.shoppingPurchase)
       .execute()
   ).at(0)?.date ?? null;
+};
+
+export const stagePurchaseItem = async (itemId: string, userId: string) => {
+  const db = getTx();
+  await db.insert(table.stagedShoppingPurchaseItem).values({ itemId, userId }).execute();
+};
+
+export const findStagedPurchaseItems = async () => {
+  const db = getTx();
+
+  return db.query.stagedShoppingPurchaseItem.findMany().execute();
+};
+
+export const findStagedPurchaseItemsByUser = async (userId: string) => {
+  const db = getTx();
+
+  return db.query.stagedShoppingPurchaseItem.findMany({
+    where: eq(table.stagedShoppingPurchaseItem.userId, userId)
+  }).execute();
 };
 
 // ------- STAGED SHOPPING LIST -------
