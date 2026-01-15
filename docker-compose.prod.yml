@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres
+    image: postgres:17.4-bookworm
     restart: always
     # No ports exposed directly in production!
     environment:
