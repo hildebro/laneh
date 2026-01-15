@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Circle, CircleCheck } from 'lucide-svelte';
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -6,11 +7,16 @@
 
   let { data } = $props();
 
-  let stagedItems = $state(data.stagedItems);
+  let stagedItems = $derived(data.stagedItems);
   let checkedItems = $derived(stagedItems.map(stagedItem => stagedItem.itemId));
   let checkedByOtherUser = $derived(
     stagedItems
       .filter(stagedItem => stagedItem.userId !== data.user?.id)
+      .map(stagedItem => stagedItem.itemId)
+  );
+  let checkedByThisUser = $derived(
+    stagedItems
+      .filter(stagedItem => stagedItem.userId === data.user?.id)
       .map(stagedItem => stagedItem.itemId)
   );
 
@@ -42,22 +48,28 @@
 {#await data.categories}
   <LoadingSpinner />
 {:then categories}
-  <form class="flex flex-col gap-4 items-center h-full w-full" method="POST" action="?/commit" use:enhance>
-    <button class="btn ml-auto" type="submit">{m.shopping_finish_purchase()}</button>
-    {#each categories as category (category.id)}
-      <div class="card w-full">
-        <b>{category.name}</b>
-        <div class="flex flex-col text-base">
-          {#each category.shoppingItems as item (item.id)}
-            <label class="flex items-center gap-0.5">
-              <input type="checkbox" name="items" value={item.id} bind:group={checkedItems}
-                     onclick={() => stageItem(item.id)} disabled={checkedByOtherUser.includes(item.id)}
-              />
-              {item.amount} {item.name}
-            </label>
-          {/each}
-        </div>
-      </div>
-    {/each}
+  <form class="ml-auto" method="POST" action="?/commit" use:enhance>
+    <button class="btn" type="submit">{m.shopping_finish_purchase()}</button>
   </form>
+  {#each categories as category (category.id)}
+    <div class="card w-full mt-2">
+      <b>{category.name}</b>
+      <div class="flex flex-col text-base gap-1">
+        {#each category.shoppingItems as item (item.id)}
+          <button class="card flex flex-row gap-1"
+                  class:card={!checkedByOtherUser.includes(item.id)}
+                  class:preset-filled-surface-500={checkedByThisUser.includes(item.id)}
+                  disabled={checkedByOtherUser.includes(item.id)}
+                  onclick={() => stageItem(item.id)}>
+            {#if checkedItems.includes(item.id)}
+              <CircleCheck />
+            {:else }
+              <Circle />
+            {/if}
+            {item.amount} {item.name}
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/each}
 {/await}
