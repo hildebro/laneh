@@ -68,6 +68,33 @@ export const findAllShoppingCategories = async (): Promise<ShoppingCategoryWithR
   }).execute();
 };
 
+export const findActiveItemsByCategory = async (): Promise<ShoppingCategoryWithRelation[]> => {
+  const db = getTx();
+
+  return db.query.shoppingCategory.findMany({
+    // only return categories with at least one active item
+    where: (category, { exists }) =>
+      exists(
+        db.select()
+          .from(shoppingItem)
+          .where(
+            and(
+              eq(shoppingItem.categoryId, category.id),
+              eq(shoppingItem.active, true)
+            )
+          )
+      ),
+    // populate the category with its active items
+    with: {
+      shoppingItems: {
+        where: eq(shoppingItem.active, true),
+        orderBy: [asc(shoppingItem.priority)]
+      }
+    },
+    orderBy: [asc(shoppingCategory.priority)]
+  }).execute();
+};
+
 export const updateShoppingCategory = async (categoryId: string, name: string): Promise<void> => {
   const db = getTx();
 

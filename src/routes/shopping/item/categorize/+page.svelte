@@ -42,7 +42,7 @@
 
     { m.shopping_categorize_select_category() }
     <div class="mt-2 flex gap-6 flex-wrap text-lg justify-center">
-      {#each data.categories as category (category.id)}
+      {#each data.selectableCategories as category (category.id)}
         <button type="submit" class="btn" name="categoryId" value={category.id} disabled={isSubmitting}>
           {category.name}
         </button>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CategoryCard from './CategoryCard.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -16,7 +15,14 @@
     </div>
     <div class="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-4">
       {#each categories as category (category.id)}
-        <CategoryCard {category}></CategoryCard>
+        <div class="card">
+          <b>{category.name}</b>
+          <div class="text-base">
+            {#each category.shoppingItems as item (item.id)}
+              - {item.amount} {item.name}<br />
+            {/each}
+          </div>
+        </div>
       {/each}
     </div>
   {/await}
