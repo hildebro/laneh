@@ -82,6 +82,15 @@ export const shoppingPurchaseItemRelations = relations(shoppingPurchaseItem, ({ 
   })
 }));
 
+export const stagedShoppingPurchaseItem = pgTable('staged_shopping_purchase_item', {
+    itemId: text().notNull().references(() => shoppingItem.id),
+    userId: text().notNull().references(() => user.id)
+  },
+  (t) => [
+    primaryKey({ columns: [t.itemId, t.userId] })
+  ]
+);
+
 export const stagedShoppingList = pgTable('staged_shopping_list', {
   id: text().primaryKey(),
   userId: text().notNull().unique().references(() => user.id, { onDelete: 'cascade' }),
