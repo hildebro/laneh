@@ -103,6 +103,6 @@
   "shopping_finish_purchase": "Finish purchase",
   "shopping_start_purchase": "Start purchase",
   "shopping_validate_all_items": "For reference, these are the items you wrote down in the last step:",
-  "shopping_validate_explanation": "You've entered names that are very similar to existing items. When you continue, they names will be 'fixed' automatically. If you don't want this, please tick the corresponding checkbox.",
+  "shopping_validate_explanation": "You've entered names that are very similar to existing items. Chorehub will automatically 'fix' that for you by using the existing items. If you don't want this, please untick the corresponding checkboxes.",
   "shopping_validate_headline": "Validate items"
 }

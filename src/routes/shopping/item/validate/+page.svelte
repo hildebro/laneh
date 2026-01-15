@@ -7,7 +7,7 @@
 
   let closeMatchItems = $state(data.items.filter(item => item.status === 'close_match'));
   // Keep track of the checkbox states
-  let checkboxStates = $state(Object.fromEntries(data.items.map(item => [item.id, false])));
+  let checkboxStates = $state(Object.fromEntries(data.items.map(item => [item.id, true])));
 
   let isSubmitting = $state(false);
 </script>
@@ -35,13 +35,13 @@
       <div class="mt-2 flex gap-2 items-center">
         <input type="checkbox" name="{item.name}" bind:checked={checkboxStates[item.id]} />
         <span
-          class:preset-filled-success-100-900={checkboxStates[item.id]}
-          class:preset-filled-error-100-900={!checkboxStates[item.id]}
-          class:line-through={!checkboxStates[item.id]}
+          class:preset-filled-success-100-900={!checkboxStates[item.id]}
+          class:preset-filled-error-100-900={checkboxStates[item.id]}
+          class:line-through={checkboxStates[item.id]}
         >
           {item.name}
         </span>
-        {#if !checkboxStates[item.id]}
+        {#if checkboxStates[item.id]}
           ⟶ <span class="preset-filled-success-100-900">{item.suggestedItem?.name}</span>
         {/if}
       </div>
