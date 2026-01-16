@@ -413,6 +413,12 @@ export const updatePurchase = async (purchaseId: string, name: string, price: nu
   await db.update(table.shoppingPurchase).set({ name, price }).where(eq(table.shoppingPurchase.id, purchaseId)).execute();
 };
 
+export const findAllPurchases = async () => {
+  const db = getTx();
+
+  return db.query.shoppingPurchase.findMany().execute();
+}
+
 export const findPurchase = async (purchaseId: string) => {
   const db = getTx();
 
@@ -420,7 +426,6 @@ export const findPurchase = async (purchaseId: string) => {
     where: eq(table.shoppingPurchase.id, purchaseId)
   }).execute();
 };
-
 
 export const fetchLastPurchaseDate = async () => {
   const db = getTx();
