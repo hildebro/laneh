@@ -29,14 +29,23 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <a class="btn ml-auto" href={resolve('/balance/add')}>{ m.balance_add() }</a>
+  <div class="card">
+    <span class="h5 mb-4">{m.balance()}</span>
+    {#each data.users as user (user.id)}
+      <div>
+        {user.username}
+      </div>
+    {/each}
+  </div>
+  <a class="btn ml-auto" href={resolve('/balance/add')}>{ m.balance_expense_add() }</a>
   {#each data.entries as entry (entry.id)}
     <div class="card flex flex-col">
       <div>
         {getLabel(entry)}
         <span class="font-bold">{priceFormatter.format(entry.price / 100)}</span>
       </div>
-      <div class="text-primary-900-100">{dateFormatter.format(entry.date)}</div>
+      <span>{entry.user.username}</span>
+      <span class="text-primary-900-100">{dateFormatter.format(entry.date)}</span>
       <a href={resolve('/balance/[entry]', {entry: entry.id})} class="btn mt-2 ml-auto">
         {m.generic_edit()}
       </a>

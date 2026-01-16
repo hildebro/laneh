@@ -487,6 +487,9 @@ export const findAllBalanceEntries = async () => {
 
   return db.query.balanceEntry
     .findMany({
+      with: {
+        user: {}
+      },
       orderBy: [desc(table.balanceEntry.date)]
     })
     .execute();

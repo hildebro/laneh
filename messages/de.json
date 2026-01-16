@@ -3,9 +3,10 @@
   "auth_access_code": "Zugangscode",
   "auth_access_code_invalid": "Der Code ist ungültig. Bitte prüfe, ob dein 2FA korrekt eingestellt ist.",
   "auth_login": "Einloggen",
+  "balance": "Saldos",
+  "balance_expense_add": "Ausgabe hinzufügen",
+  "balance_expense_edit": "Ausgabe anpassen",
   "balance_no_name_label": "Einkauf",
-  "balance_add": "Ausgabe hinzufügen",
-  "balance_edit": "Ausgabe anpassen",
   "balance_price": "Price",
   "dashboard_schedule_count": [
     {

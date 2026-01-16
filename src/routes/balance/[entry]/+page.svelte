@@ -13,9 +13,9 @@
 <div class="card">
   <div class="h5 mb-4">
     {#if data.entry}
-      { m.balance_edit() }
+      { m.balance_expense_edit() }
     {:else }
-      { m.balance_add() }
+      { m.balance_expense_add() }
     {/if}
   </div>
   <EnhancedForm method="POST" action={data.entry ? '?/edit' : '?/create'}>
