@@ -416,7 +416,9 @@ export const updatePurchase = async (purchaseId: string, name: string, price: nu
 export const findAllPurchases = async () => {
   const db = getTx();
 
-  return db.query.shoppingPurchase.findMany().execute();
+  return db.query.shoppingPurchase.findMany({
+    orderBy: [desc(table.shoppingPurchase.date)]
+  }).execute();
 }
 
 export const findPurchase = async (purchaseId: string) => {
