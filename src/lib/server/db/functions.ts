@@ -364,7 +364,7 @@ export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 
 };
 
 // ------- SHOPPING PURCHASE -------
-export const createPurchase = async (userId: string): Promise<void> => {
+export const createShoppingPurchase = async (userId: string): Promise<void> => {
   const db = getTx();
 
   const stagedItems = (await findStagedPurchaseItemsByUser(userId))
