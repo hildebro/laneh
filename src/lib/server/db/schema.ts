@@ -148,6 +148,10 @@ export const balanceEntry = pgTable('balance_entry', {
 });
 export type BalanceEntry = typeof balanceEntry.$inferSelect;
 
+export const balanceEntryRelations = relations(balanceEntry, ({ one }) => ({
+  user: one(user, { fields: [balanceEntry.userId], references: [user.id] }),
+}));
+
 export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
 
 export type Weekday = typeof weekday.enumValues[number];

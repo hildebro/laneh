@@ -3,9 +3,10 @@
   "auth_access_code": "Access code",
   "auth_access_code_invalid": "The code is not valid. Make sure your 2FA was set up correctly.",
   "auth_login": "Login",
+  "balance": "Balances",
+  "balance_expense_add": "Add expense",
+  "balance_expense_edit": "Edit expense",
   "balance_no_name_label": "Shopping",
-  "balance_add": "Add expense",
-  "balance_edit": "Edit expense",
   "balance_price": "Price",
   "dashboard_schedule_count": [
     {
