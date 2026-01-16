@@ -395,6 +395,33 @@ export const createShoppingPurchase = async (userId: string): Promise<void> => {
   await deactivateShoppingItems(stagedItems);
 };
 
+export const createGenericPurchase = async (userId: string, name: string, price: number): Promise<void> => {
+  const db = getTx();
+
+  await db.insert(table.shoppingPurchase).values({
+    id: generateUUID(),
+    userId,
+    date: new Date(),
+    name,
+    price
+  });
+};
+
+export const updatePurchase = async (purchaseId: string, name: string, price: number): Promise<void> => {
+  const db = getTx();
+
+  await db.update(table.shoppingPurchase).set({ name, price }).where(eq(table.shoppingPurchase.id, purchaseId)).execute();
+};
+
+export const findPurchase = async (purchaseId: string) => {
+  const db = getTx();
+
+  return db.query.shoppingPurchase.findFirst({
+    where: eq(table.shoppingPurchase.id, purchaseId)
+  }).execute();
+};
+
+
 export const fetchLastPurchaseDate = async () => {
   const db = getTx();
 
