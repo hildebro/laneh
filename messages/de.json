@@ -3,24 +3,28 @@
   "auth_access_code": "Zugangscode",
   "auth_access_code_invalid": "Der Code ist ungültig. Bitte prüfe, ob dein 2FA korrekt eingestellt ist.",
   "auth_login": "Einloggen",
-  "dashboard_schedule_count": [{
-    "declarations": ["input count", "local countPlural = count: plural"],
-    "selectors": ["countPlural"],
-    "match": {
-      "countPlural=none": "Keine Aufgaben fällig.",
-      "countPlural=one": "Eine Aufgabe fällig.",
-      "countPlural=other": "{count} Aufgaben fällig."
+  "dashboard_schedule_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=none": "Keine Aufgaben fällig.",
+        "countPlural=one": "Eine Aufgabe fällig.",
+        "countPlural=other": "{count} Aufgaben fällig."
+      }
     }
-  }],
+  ],
   "dashboard_schedule_go_to": "Aufgaben anzeigen",
-  "dashboard_shopping_count": [{
-    "declarations": ["input count", "local countPlural = count: plural"],
-    "selectors": ["countPlural"],
-    "match": {
-      "countPlural=one": "Es ist ein Artikel auf der Einkaufsliste.",
-      "countPlural=other": "Es sind {count} Artikel auf der Einkaufsliste."
+  "dashboard_shopping_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Es ist ein Artikel auf der Einkaufsliste.",
+        "countPlural=other": "Es sind {count} Artikel auf der Einkaufsliste."
+      }
     }
-  }],
+  ],
   "dashboard_shopping_last_purchase": "Letzter Einkauf am {date}",
   "error_category_not_found": "Kategorie nicht gefunden",
   "error_purchase_not_found": "Einkauf nicht gefunden",
@@ -106,6 +110,7 @@
   "shopping_purchases": "Einkäufe",
   "shopping_purchases_add": "Einkauf hinzufügen",
   "shopping_purchases_edit": "Einkauf anpassen",
+  "shopping_purchases_no_name_label": "Einkauf",
   "shopping_purchases_price": "Preis",
   "shopping_start_purchase": "Einkauf starten",
   "shopping_validate_all_items": "Als Referenz findest du hier die Artikel, die du im letzten Schritt aufgeschrieben hast.",

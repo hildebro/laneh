@@ -3,24 +3,28 @@
   "auth_access_code": "Access code",
   "auth_access_code_invalid": "The code is not valid. Make sure your 2FA was set up correctly.",
   "auth_login": "Login",
-  "dashboard_schedule_count": [{
-    "declarations": ["input count", "local countPlural = count: plural"],
-    "selectors": ["countPlural"],
-    "match": {
-      "countPlural=none": "No tasks due.",
-      "countPlural=one": "1 task due.",
-      "countPlural=other": "{count} tasks due."
+  "dashboard_schedule_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=none": "No tasks due.",
+        "countPlural=one": "1 task due.",
+        "countPlural=other": "{count} tasks due."
+      }
     }
-  }],
+  ],
   "dashboard_schedule_go_to": "View tasks",
-  "dashboard_shopping_count": [{
-    "declarations": ["input count", "local countPlural = count: plural"],
-    "selectors": ["countPlural"],
-    "match": {
-      "countPlural=one": "There is one item on the list.",
-      "countPlural=other": "There are {count} items on the list."
+  "dashboard_shopping_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "There is one item on the list.",
+        "countPlural=other": "There are {count} items on the list."
+      }
     }
-  }],
+  ],
   "dashboard_shopping_last_purchase": "Last purchase on {date}",
   "error_category_not_found": "Category not found",
   "error_purchase_not_found": "Purchase not found",
@@ -106,6 +110,7 @@
   "shopping_purchases": "Purchases",
   "shopping_purchases_add": "Add purchase",
   "shopping_purchases_edit": "Edit purchase",
+  "shopping_purchases_no_name_label": "Shopping",
   "shopping_purchases_price": "Price",
   "shopping_start_purchase": "Start purchase",
   "shopping_validate_all_items": "For reference, these are the items you wrote down in the last step:",
