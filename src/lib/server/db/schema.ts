@@ -50,8 +50,6 @@ export const shoppingPurchase = pgTable('shopping_purchase', {
   id: text().primaryKey(),
   date: timestamp().notNull(),
   userId: text().references(() => user.id),
-  price: integer(),
-  name: text()
 });
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
@@ -139,6 +137,16 @@ export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one 
     relationName: 'selectedCategory' // Explicit name
   })
 }));
+
+export const balanceEntry = pgTable('balance_entry', {
+  id: text().primaryKey(),
+  date: timestamp().notNull(),
+  userId: text().notNull().references(() => user.id),
+  price: integer().notNull(),
+  name: text(),
+  purchaseId: text().references(() => shoppingPurchase.id),
+});
+export type BalanceEntry = typeof balanceEntry.$inferSelect;
 
 export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
 

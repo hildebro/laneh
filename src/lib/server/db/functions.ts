@@ -395,40 +395,6 @@ export const createShoppingPurchase = async (userId: string): Promise<void> => {
   await deactivateShoppingItems(stagedItems);
 };
 
-export const createGenericPurchase = async (userId: string, name: string, price: number): Promise<void> => {
-  const db = getTx();
-
-  await db.insert(table.shoppingPurchase).values({
-    id: generateUUID(),
-    userId,
-    date: new Date(),
-    name,
-    price
-  });
-};
-
-export const updatePurchase = async (purchaseId: string, name: string, price: number): Promise<void> => {
-  const db = getTx();
-
-  await db.update(table.shoppingPurchase).set({ name, price }).where(eq(table.shoppingPurchase.id, purchaseId)).execute();
-};
-
-export const findAllPurchases = async () => {
-  const db = getTx();
-
-  return db.query.shoppingPurchase.findMany({
-    orderBy: [desc(table.shoppingPurchase.date)]
-  }).execute();
-}
-
-export const findPurchase = async (purchaseId: string) => {
-  const db = getTx();
-
-  return db.query.shoppingPurchase.findFirst({
-    where: eq(table.shoppingPurchase.id, purchaseId)
-  }).execute();
-};
-
 export const fetchLastPurchaseDate = async () => {
   const db = getTx();
 
@@ -473,6 +439,57 @@ export const findStagedPurchaseItemsByUser = async (userId: string) => {
   return db.query.stagedShoppingPurchaseItem.findMany({
     where: eq(table.stagedShoppingPurchaseItem.userId, userId)
   }).execute();
+};
+
+// ------- BALANCE --------
+export const addBalanceEntry = async (
+  userId: string,
+  name: string,
+  price: number
+): Promise<void> => {
+  const db = getTx();
+
+  await db.insert(table.balanceEntry).values({
+    id: generateUUID(),
+    userId,
+    date: new Date(),
+    name,
+    price
+  });
+};
+
+export const updateBalanceEntry = async (
+  entryId: string,
+  name: string,
+  price: number
+): Promise<void> => {
+  const db = getTx();
+
+  await db
+    .update(table.balanceEntry)
+    .set({ name, price })
+    .where(eq(table.balanceEntry.id, entryId))
+    .execute();
+};
+
+export const findBalanceEntry = async (entryId: string) => {
+  const db = getTx();
+
+  return db.query.balanceEntry
+    .findFirst({
+      where: eq(table.balanceEntry.id, entryId)
+    })
+    .execute();
+};
+
+export const findAllBalanceEntries = async () => {
+  const db = getTx();
+
+  return db.query.balanceEntry
+    .findMany({
+      orderBy: [desc(table.balanceEntry.date)]
+    })
+    .execute();
 };
 
 // ------- STAGED SHOPPING LIST -------
