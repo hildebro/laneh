@@ -1,6 +1,11 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { createPurchase, findStagedPurchaseItems, stagePurchaseItem } from '$lib/server/db/functions';
+import {
+  createPurchase,
+  findStagedPurchaseItems,
+  stagePurchaseItem,
+  unstagePurchaseItem
+} from '$lib/server/db/functions';
 import type { User } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async () => {
@@ -23,5 +28,12 @@ export const actions = {
     const user = locals.user as User;
 
     await stagePurchaseItem(itemId, user.id)
+  },
+  unstage: async ({ request, locals }) => {
+    const formData = await request.formData();
+    const itemId = formData.get('itemId')?.toString() as string;
+    const user = locals.user as User;
+
+    await unstagePurchaseItem(itemId, user.id)
   }
 };
