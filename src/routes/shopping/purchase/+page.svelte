@@ -24,38 +24,42 @@
   let itemStates = $state<Record<string, 'loading' | 'retrying'>>({});
 
   const stageItem = async (itemId: string) => {
+    const target = checkedItems.includes(itemId)
+      ? '?/unstage'
+      : '?/stage';
+
     itemStates[itemId] = 'loading';
 
-    await performRequest(itemId);
+    await sendStagingRequest(itemId, target);
   };
 
-  const performRequest = async (itemId: string) => {
+  const sendStagingRequest = async (itemId: string, target: string) => {
     const formData = new FormData();
     formData.append('itemId', itemId);
 
     try {
-      const response = await fetch('?/stage', {
+      const response = await fetch(target, {
         method: 'POST',
         body: formData
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        await invalidateAll();
+        delete itemStates[itemId];
+      } else {
         itemStates[itemId] = 'retrying';
 
         // Retry after 3 seconds
         setTimeout(() => {
-          performRequest(itemId);
+          sendStagingRequest(itemId, target);
         }, 3000);
       }
-
-      await invalidateAll();
-      delete itemStates[itemId];
-    } catch (error) {
+    } catch {
       itemStates[itemId] = 'retrying';
 
       // Retry after 3 seconds
       setTimeout(() => {
-        performRequest(itemId);
+        sendStagingRequest(itemId, target);
       }, 3000);
     }
   };

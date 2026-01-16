@@ -417,6 +417,16 @@ export const stagePurchaseItem = async (itemId: string, userId: string) => {
   await db.insert(table.stagedShoppingPurchaseItem).values({ itemId, userId }).execute();
 };
 
+export const unstagePurchaseItem = async (itemId: string, userId: string) => {
+  const db = getTx();
+  await db.delete(table.stagedShoppingPurchaseItem).where(
+    and(
+      eq(table.stagedShoppingPurchaseItem.itemId, itemId),
+      eq(table.stagedShoppingPurchaseItem.userId, userId)
+    )
+  ).execute();
+};
+
 export const findStagedPurchaseItems = async () => {
   const db = getTx();
 
