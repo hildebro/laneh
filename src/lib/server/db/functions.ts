@@ -406,6 +406,14 @@ export const fetchLastPurchaseDate = async () => {
 
 export const stagePurchaseItem = async (itemId: string, userId: string) => {
   const db = getTx();
+  const existingStagedItem = await db.query.stagedShoppingPurchaseItem.findFirst({
+    where: eq(table.stagedShoppingPurchaseItem.itemId, itemId)
+  }).execute();
+  if (existingStagedItem) {
+    // already staged, nothing to do.
+    return;
+  }
+
   await db.insert(table.stagedShoppingPurchaseItem).values({ itemId, userId }).execute();
 };
 
