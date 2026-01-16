@@ -49,7 +49,9 @@ export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => 
 export const shoppingPurchase = pgTable('shopping_purchase', {
   id: text().primaryKey(),
   date: timestamp().notNull(),
-  userId: text().references(() => user.id)
+  userId: text().references(() => user.id),
+  price: integer(),
+  name: text()
 });
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
