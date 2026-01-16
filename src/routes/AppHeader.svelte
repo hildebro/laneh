@@ -55,9 +55,9 @@
         <ShoppingCart />
         <span>{m.header_shopping()}</span>
       </a>
-      <a href="{base}/purchases" class={anchorBar}>
+      <a href="{base}/balance" class={anchorBar}>
         <Receipt />
-        <span>{m.header_purchases()}</span>
+        <span>{m.header_balance()}</span>
       </a>
       <a href="{base}/schedule" class={anchorBar}>
         <div class="relative">

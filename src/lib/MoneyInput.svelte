@@ -40,7 +40,7 @@
 
 <div class="flex flex-col w-full max-w-sm mx-auto">
   <label>
-    { m.shopping_purchases_price() }
+    { m.balance_price() }
     <input
       type="text"
       inputmode="numeric"
