@@ -1,7 +1,7 @@
 <script lang="ts">
   // noinspection ES6UnusedImports Intellij doesn't resolve the dot annotation correctly
   import { Navigation } from '@skeletonlabs/skeleton-svelte';
-  import { CalendarDays, House, Settings, ShoppingCart } from 'lucide-svelte';
+  import { CalendarDays, House, Receipt, Settings, ShoppingCart } from 'lucide-svelte';
   import { base } from '$app/paths';
   import { page } from '$app/state';
   import * as m from '$lib/paraglide/messages.js';
@@ -46,7 +46,7 @@
 
 <header class="sticky top-0 z-50 bg-surface-50-950 backdrop-blur-xs">
   <Navigation layout="bar">
-    <Navigation.Menu class="grid grid-cols-4 gap-2">
+    <Navigation.Menu class="grid grid-cols-5 gap-2">
       <a href={base} class={anchorBar}>
         <House />
         <span>{m.header_dashboard()}</span>
@@ -54,6 +54,10 @@
       <a href="{base}/shopping" class={anchorBar}>
         <ShoppingCart />
         <span>{m.header_shopping()}</span>
+      </a>
+      <a href="{base}/purchases" class={anchorBar}>
+        <Receipt />
+        <span>{m.header_purchases()}</span>
       </a>
       <a href="{base}/schedule" class={anchorBar}>
         <div class="relative">
