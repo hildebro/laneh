@@ -5,6 +5,8 @@
   "auth_login": "Login",
   "balance": "Balances",
   "balance_expense_add": "Add expense",
+  "balance_expense_distribution": "Distribution",
+  "balance_expense_distribution_invalid_sum": "Distribution amounts must add up to exactly 100%",
   "balance_expense_edit": "Edit expense",
   "balance_no_name_label": "Shopping",
   "balance_price": "Price",

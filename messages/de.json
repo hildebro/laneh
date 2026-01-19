@@ -5,6 +5,8 @@
   "auth_login": "Einloggen",
   "balance": "Saldos",
   "balance_expense_add": "Ausgabe hinzufügen",
+  "balance_expense_distribution": "Aufteilung",
+  "balance_expense_distribution_invalid_sum": "Die Aufteilungswerte müssen zusammen exakt 100% sein.",
   "balance_expense_edit": "Ausgabe anpassen",
   "balance_no_name_label": "Einkauf",
   "balance_price": "Price",

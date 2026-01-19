@@ -1,16 +1,32 @@
 import { type ActionFailure, fail, type RequestEvent } from '@sveltejs/kit';
-import type { z } from 'zod/v4';
+import type { z } from 'zod';
 
-export async function processForm<Schema extends z.ZodObject, SuccessReturnType>(
+interface ProcessFormOptions {
+  arrays?: string[];
+}
+
+export async function processForm<Schema extends z.ZodType, SuccessReturnType>(
   event: RequestEvent,
   schema: Schema,
   onSuccess: (
     data: z.infer<Schema>,
     event: RequestEvent
-  ) => Promise<SuccessReturnType | ActionFailure>
+  ) => Promise<SuccessReturnType | ActionFailure>,
+  options?: ProcessFormOptions
 ): Promise<SuccessReturnType | ActionFailure<{ issues?: z.core.$ZodIssue[] } | undefined>> {
-  const formData = Object.fromEntries(await event.request.formData());
-  const validationResult = schema.safeParse(formData);
+  const rawFormData = await event.request.formData();
+
+  // Start with standard behavior (strings overwrite arrays)
+  const data: Record<string, unknown> = Object.fromEntries(rawFormData);
+
+  // Inject arrays if requested
+  if (options?.arrays) {
+    for (const key of options.arrays) {
+      data[key] = rawFormData.getAll(key);
+    }
+  }
+
+  const validationResult = schema.safeParse(data);
 
   if (!validationResult.success) {
     return fail(422, { issues: validationResult.error.issues });

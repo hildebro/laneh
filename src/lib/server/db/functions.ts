@@ -445,23 +445,36 @@ export const findStagedPurchaseItemsByUser = async (userId: string) => {
 export const addBalanceEntry = async (
   userId: string,
   name: string,
-  price: number
+  price: number,
+  distributions: {userId: string, percent: number}[]
 ): Promise<void> => {
   const db = getTx();
 
+  const entryId = generateUUID();
   await db.insert(table.balanceEntry).values({
-    id: generateUUID(),
+    id: entryId,
     userId,
     date: new Date(),
     name,
     price
   });
+
+  for (const distribution of distributions) {
+    if (distribution.percent > 0) {
+      await db.insert(table.balanceEntryDistribution).values({
+        entryId,
+        userId: distribution.userId,
+        percent: distribution.percent
+      })
+    }
+  }
 };
 
 export const updateBalanceEntry = async (
   entryId: string,
   name: string,
-  price: number
+  price: number,
+  distributions: {userId: string, percent: number}[]
 ): Promise<void> => {
   const db = getTx();
 
@@ -470,6 +483,20 @@ export const updateBalanceEntry = async (
     .set({ name, price })
     .where(eq(table.balanceEntry.id, entryId))
     .execute();
+
+  await db
+    .delete(table.balanceEntryDistribution)
+    .where(eq(table.balanceEntryDistribution.entryId, entryId))
+    .execute();
+  for (const distribution of distributions) {
+    if (distribution.percent > 0) {
+      await db.insert(table.balanceEntryDistribution).values({
+        entryId,
+        userId: distribution.userId,
+        percent: distribution.percent
+      })
+    }
+  }
 };
 
 export const findBalanceEntry = async (entryId: string) => {
@@ -477,6 +504,9 @@ export const findBalanceEntry = async (entryId: string) => {
 
   return db.query.balanceEntry
     .findFirst({
+      with: {
+        distributions: {}
+      },
       where: eq(table.balanceEntry.id, entryId)
     })
     .execute();
