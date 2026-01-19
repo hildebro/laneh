@@ -355,7 +355,13 @@ export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 
     .innerJoin(table.shoppingPurchaseItem, eq(shoppingItem.id, table.shoppingPurchaseItem.itemId))
     .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
     // Any item that isn't excluded
-    .where(sql`NOT EXISTS (SELECT 1 FROM ${excludedItems} WHERE ${excludedItems.itemId} = ${shoppingItem.id})`)
+    .where(sql`NOT EXISTS (SELECT 1 FROM
+    ${excludedItems}
+    WHERE
+    ${excludedItems.itemId}
+    =
+    ${shoppingItem.id}
+    )`)
     .groupBy(shoppingItem.id, shoppingItem.name)
     // That has been bought at least X amount of times
     .having(gte(count(table.shoppingPurchaseItem.itemId), frequentlyBoughtThreshold))
@@ -446,7 +452,7 @@ export const addBalanceEntry = async (
   userId: string,
   name: string,
   price: number,
-  distributions: {userId: string, percent: number}[]
+  distributions: { userId: string, percent: number }[]
 ): Promise<void> => {
   const db = getTx();
 
@@ -465,7 +471,7 @@ export const addBalanceEntry = async (
         entryId,
         userId: distribution.userId,
         percent: distribution.percent
-      })
+      });
     }
   }
 };
@@ -474,7 +480,7 @@ export const updateBalanceEntry = async (
   entryId: string,
   name: string,
   price: number,
-  distributions: {userId: string, percent: number}[]
+  distributions: { userId: string, percent: number }[]
 ): Promise<void> => {
   const db = getTx();
 
@@ -494,7 +500,7 @@ export const updateBalanceEntry = async (
         entryId,
         userId: distribution.userId,
         percent: distribution.percent
-      })
+      });
     }
   }
 };
@@ -524,6 +530,100 @@ export const findAllBalanceEntries = async () => {
     })
     .execute();
 };
+
+export const findBalanceEntriesByUser = async (userId: string) => {
+  const db = getTx();
+
+  return db.query.balanceEntry.findMany({
+    with: {
+      distributions: {}
+    },
+    where: eq(table.balanceEntry.userId, userId)
+  }).execute();
+};
+
+export type DebtResult = {
+  creditor_user_id: string;
+  debtor_user_id: string;
+  amount: number;
+};
+
+export async function calculateUserDebts(): Promise<DebtResult[]> {
+  const db = getTx();
+
+  const entries = await db.query.balanceEntry.findMany({
+    with: {
+      distributions: true,
+    },
+  });
+
+  // Map structure: debtMap[debtorId][creditorId] = amount
+  const debtMap: Record<string, Record<string, number>> = {};
+
+  for (const entry of entries) {
+    const creditorId = entry.userId; // The person who paid
+    const entryPrice = entry.price;
+
+    for (const distribution of entry.distributions) {
+      const debtorId = distribution.userId;
+      if (creditorId === debtorId) continue;
+
+      // We Math.round to ensure we stay in integer cents if price is integer
+      const share = Math.round(entryPrice * (distribution.percent / 100));
+
+      // Initialize map keys if they don't exist
+      if (!debtMap[debtorId]) debtMap[debtorId] = {};
+      if (!debtMap[debtorId][creditorId]) debtMap[debtorId][creditorId] = 0;
+
+      // Add to gross debt
+      debtMap[debtorId][creditorId] += share;
+    }
+  }
+
+  // 3. Calculate "Net" debt (Pairwise check)
+  const results: DebtResult[] = [];
+
+  // We need to track processed pairs to avoid duplicates (A->B and B->A)
+  const processedPairs = new Set<string>();
+
+  const allDebtors = Object.keys(debtMap);
+
+  for (const debtorA of allDebtors) {
+    const creditors = Object.keys(debtMap[debtorA]);
+
+    for (const userB of creditors) {
+      // Create a unique key for this pair to ensure we only check them once
+      // Sort IDs to ensure A->B is treated the same as B->A for the check
+      const pairKey = [debtorA, userB].sort().join(':');
+
+      if (processedPairs.has(pairKey)) continue;
+      processedPairs.add(pairKey);
+
+      // Check both directions
+      const amountAowesB = debtMap[debtorA]?.[userB] || 0;
+      const amountBowesA = debtMap[userB]?.[debtorA] || 0;
+
+      if (amountAowesB > amountBowesA) {
+        // A owes B more, so A is the debtor
+        results.push({
+          debtor_user_id: debtorA,
+          creditor_user_id: userB,
+          amount: amountAowesB - amountBowesA,
+        });
+      } else if (amountBowesA > amountAowesB) {
+        // B owes A more, so B is the debtor
+        results.push({
+          debtor_user_id: userB,
+          creditor_user_id: debtorA,
+          amount: amountBowesA - amountAowesB,
+        });
+      }
+      // If equal, they cancel out completely and nothing is pushed
+    }
+  }
+
+  return results;
+}
 
 // ------- STAGED SHOPPING LIST -------
 export const findStagedShoppingList = async (userId: string) => {

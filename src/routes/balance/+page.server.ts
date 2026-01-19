@@ -1,6 +1,10 @@
 import type { PageServerLoad } from './$types';
-import { findAllBalanceEntries, findAllUsers } from '$lib/server/db/functions';
+import { calculateUserDebts, findAllBalanceEntries, findAllUsers } from '$lib/server/db/functions';
 
 export const load: PageServerLoad = async () => {
-  return { users: await findAllUsers(), entries: await findAllBalanceEntries() };
+  return {
+    users: await findAllUsers(),
+    userDebts: await calculateUserDebts(),
+    entries: await findAllBalanceEntries()
+  };
 };
