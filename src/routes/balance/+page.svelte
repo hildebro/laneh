@@ -29,15 +29,20 @@
 
   const getUsername = (userId: string) => {
     return data.users.find(user => user.id === userId)?.username as string;
-  }
+  };
 </script>
 
 <div class="flex flex-col gap-2">
   <div class="card">
     <span class="h5 mb-4">{m.balance()}</span>
-    {#each data.userDebts as userDebt (`${userDebt.debtor_user_id}-${userDebt.creditor_user_id}`)}
+    {#each data.userDebts as userDebt (userDebt.creditor_user_id)}
       <div>
-        {getUsername(userDebt.creditor_user_id)} is owed {userDebt.amount / 100} by {getUsername(userDebt.debtor_user_id)}
+        {getUsername(userDebt.creditor_user_id)} is owed:
+        {#each userDebt.debtor_data as debtor (debtor.debtor_id)}
+          <div class="px-2">
+            {debtor.amount / 100} by {getUsername(debtor.debtor_id)}
+          </div>
+        {/each}
       </div>
     {/each}
   </div>

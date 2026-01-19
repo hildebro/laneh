@@ -544,8 +544,10 @@ export const findBalanceEntriesByUser = async (userId: string) => {
 
 export type DebtResult = {
   creditor_user_id: string;
-  debtor_user_id: string;
-  amount: number;
+  debtor_data: {
+    debtor_id: string;
+    amount: number;
+  }[];
 };
 
 export async function calculateUserDebts(): Promise<DebtResult[]> {
@@ -553,8 +555,13 @@ export async function calculateUserDebts(): Promise<DebtResult[]> {
 
   const entries = await db.query.balanceEntry.findMany({
     with: {
-      distributions: true,
-    },
+      user: {},
+      distributions: {
+        with: {
+          user: {}
+        }
+      }
+    }
   });
 
   // Map structure: debtMap[debtorId][creditorId] = amount
@@ -604,19 +611,39 @@ export async function calculateUserDebts(): Promise<DebtResult[]> {
       const amountBowesA = debtMap[userB]?.[debtorA] || 0;
 
       if (amountAowesB > amountBowesA) {
-        // A owes B more, so A is the debtor
-        results.push({
-          debtor_user_id: debtorA,
-          creditor_user_id: userB,
-          amount: amountAowesB - amountBowesA,
-        });
+        // A owes B more, so B is the creditor
+        const creditorIndex = results.findIndex(result => result.creditor_user_id === userB);
+        if (creditorIndex !== -1) {
+          results[creditorIndex] = {
+            ...results[creditorIndex],
+            debtor_data: [
+              ...results[creditorIndex].debtor_data,
+              { debtor_id: debtorA, amount: amountAowesB - amountBowesA }
+            ]
+          };
+        } else {
+          results.push({
+            creditor_user_id: userB,
+            debtor_data: [{ debtor_id: debtorA, amount: amountAowesB - amountBowesA }]
+          });
+        }
       } else if (amountBowesA > amountAowesB) {
-        // B owes A more, so B is the debtor
-        results.push({
-          debtor_user_id: userB,
-          creditor_user_id: debtorA,
-          amount: amountBowesA - amountAowesB,
-        });
+        // B owes A more, so A is the creditor
+        const creditorIndex = results.findIndex((result) => result.creditor_user_id === debtorA);
+        if (creditorIndex !== -1) {
+          results[creditorIndex] = {
+            ...results[creditorIndex],
+            debtor_data: [
+              ...results[creditorIndex].debtor_data,
+              { debtor_id: userB, amount: amountBowesA - amountAowesB }
+            ]
+          };
+        } else {
+          results.push({
+            creditor_user_id: debtorA,
+            debtor_data: [{ debtor_id: userB, amount: amountBowesA - amountAowesB }]
+          });
+        }
       }
       // If equal, they cancel out completely and nothing is pushed
     }
