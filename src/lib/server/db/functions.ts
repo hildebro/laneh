@@ -543,9 +543,9 @@ export const findBalanceEntriesByUser = async (userId: string) => {
 };
 
 export type DebtResult = {
-  creditor_user_id: string;
-  debtor_data: {
-    debtor_id: string;
+  creditor: User;
+  debtorData: {
+    debtor: User;
     amount: number;
   }[];
 };
@@ -555,101 +555,61 @@ export async function calculateUserDebts(): Promise<DebtResult[]> {
 
   const entries = await db.query.balanceEntry.findMany({
     with: {
-      user: {},
-      distributions: {
-        with: {
-          user: {}
-        }
-      }
+      user: true,
+      distributions: { with: { user: true } }
     }
   });
 
-  // Map structure: debtMap[debtorId][creditorId] = amount
-  const debtMap: Record<string, Record<string, number>> = {};
+  const userRegistry = new Map<string, User>();
+  const grossDebtMap: Record<string, Record<string, number>> = {};
 
+  // Accumulate Gross Debts
   for (const entry of entries) {
-    const creditorId = entry.userId; // The person who paid
-    const entryPrice = entry.price;
+    const creditorId = entry.userId;
+    userRegistry.set(creditorId, entry.user);
 
     for (const distribution of entry.distributions) {
+      if (creditorId === distribution.userId) continue;
+
+      userRegistry.set(distribution.userId, distribution.user);
+
       const debtorId = distribution.userId;
-      if (creditorId === debtorId) continue;
+      const share = Math.round(entry.price * (distribution.percent / 100));
 
-      // We Math.round to ensure we stay in integer cents if price is integer
-      const share = Math.round(entryPrice * (distribution.percent / 100));
-
-      // Initialize map keys if they don't exist
-      if (!debtMap[debtorId]) debtMap[debtorId] = {};
-      if (!debtMap[debtorId][creditorId]) debtMap[debtorId][creditorId] = 0;
-
-      // Add to gross debt
-      debtMap[debtorId][creditorId] += share;
+      grossDebtMap[debtorId] ??= {};
+      grossDebtMap[debtorId][creditorId] = (grossDebtMap[debtorId][creditorId] || 0) + share;
     }
   }
 
-  // 3. Calculate "Net" debt (Pairwise check)
-  const results: DebtResult[] = [];
+  // Calculate Net Debts & Group by Creditor
+  const resultsByCreditor = new Map<string, DebtResult>();
 
-  // We need to track processed pairs to avoid duplicates (A->B and B->A)
-  const processedPairs = new Set<string>();
+  for (const debtorId of Object.keys(grossDebtMap)) {
+    for (const creditorId of Object.keys(grossDebtMap[debtorId])) {
 
-  const allDebtors = Object.keys(debtMap);
+      const amountAtoB = grossDebtMap[debtorId]?.[creditorId] || 0;
+      const amountBtoA = grossDebtMap[creditorId]?.[debtorId] || 0;
+      const netAmount = amountAtoB - amountBtoA;
 
-  for (const debtorA of allDebtors) {
-    const creditors = Object.keys(debtMap[debtorA]);
+      // Only process positive net flow.
+      // The reverse case (B owes A) is handled when the loop encounters that key pair.
+      if (netAmount <= 0) continue;
 
-    for (const userB of creditors) {
-      // Create a unique key for this pair to ensure we only check them once
-      // Sort IDs to ensure A->B is treated the same as B->A for the check
-      const pairKey = [debtorA, userB].sort().join(':');
-
-      if (processedPairs.has(pairKey)) continue;
-      processedPairs.add(pairKey);
-
-      // Check both directions
-      const amountAowesB = debtMap[debtorA]?.[userB] || 0;
-      const amountBowesA = debtMap[userB]?.[debtorA] || 0;
-
-      if (amountAowesB > amountBowesA) {
-        // A owes B more, so B is the creditor
-        const creditorIndex = results.findIndex(result => result.creditor_user_id === userB);
-        if (creditorIndex !== -1) {
-          results[creditorIndex] = {
-            ...results[creditorIndex],
-            debtor_data: [
-              ...results[creditorIndex].debtor_data,
-              { debtor_id: debtorA, amount: amountAowesB - amountBowesA }
-            ]
-          };
-        } else {
-          results.push({
-            creditor_user_id: userB,
-            debtor_data: [{ debtor_id: debtorA, amount: amountAowesB - amountBowesA }]
-          });
-        }
-      } else if (amountBowesA > amountAowesB) {
-        // B owes A more, so A is the creditor
-        const creditorIndex = results.findIndex((result) => result.creditor_user_id === debtorA);
-        if (creditorIndex !== -1) {
-          results[creditorIndex] = {
-            ...results[creditorIndex],
-            debtor_data: [
-              ...results[creditorIndex].debtor_data,
-              { debtor_id: userB, amount: amountBowesA - amountAowesB }
-            ]
-          };
-        } else {
-          results.push({
-            creditor_user_id: debtorA,
-            debtor_data: [{ debtor_id: userB, amount: amountBowesA - amountAowesB }]
-          });
-        }
+      if (!resultsByCreditor.has(creditorId)) {
+        resultsByCreditor.set(creditorId, {
+          creditor: userRegistry.get(creditorId) as User,
+          debtorData: []
+        });
       }
-      // If equal, they cancel out completely and nothing is pushed
+
+      resultsByCreditor.get(creditorId)!.debtorData.push({
+        debtor: userRegistry.get(debtorId) as User,
+        amount: netAmount
+      });
     }
   }
 
-  return results;
+  return Array.from(resultsByCreditor.values());
 }
 
 // ------- STAGED SHOPPING LIST -------
