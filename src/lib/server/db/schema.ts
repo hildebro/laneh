@@ -1,7 +1,17 @@
 // noinspection JSUnusedGlobalSymbols
 
 import { type InferSelectModel, relations } from 'drizzle-orm';
-import { boolean, date, integer, pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  date,
+  doublePrecision,
+  integer,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp
+} from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
@@ -49,7 +59,7 @@ export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => 
 export const shoppingPurchase = pgTable('shopping_purchase', {
   id: text().primaryKey(),
   date: timestamp().notNull(),
-  userId: text().references(() => user.id),
+  userId: text().references(() => user.id)
 });
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
@@ -144,12 +154,30 @@ export const balanceEntry = pgTable('balance_entry', {
   userId: text().notNull().references(() => user.id),
   price: integer().notNull(),
   name: text(),
-  purchaseId: text().references(() => shoppingPurchase.id),
+  purchaseId: text().references(() => shoppingPurchase.id)
 });
 export type BalanceEntry = typeof balanceEntry.$inferSelect;
 
-export const balanceEntryRelations = relations(balanceEntry, ({ one }) => ({
+export const balanceEntryRelations = relations(balanceEntry, ({ one, many }) => ({
   user: one(user, { fields: [balanceEntry.userId], references: [user.id] }),
+  distributions: many(balanceEntryDistribution)
+}));
+
+export const balanceEntryDistribution = pgTable('balance_entry_distribution', {
+    entryId: text().notNull().references(() => balanceEntry.id),
+    userId: text().notNull().references(() => user.id),
+    percent: doublePrecision().notNull()
+  },
+  (t) => [
+    primaryKey({ columns: [t.entryId, t.userId] })
+  ]
+);
+
+export const balanceEntryDistributionRelations = relations(balanceEntryDistribution, ({ one }) => ({
+  balanceEntry: one(balanceEntry, {
+    fields: [balanceEntryDistribution.entryId],
+    references: [balanceEntry.id]
+  })
 }));
 
 export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
