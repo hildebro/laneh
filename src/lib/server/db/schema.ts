@@ -177,7 +177,11 @@ export const balanceEntryDistributionRelations = relations(balanceEntryDistribut
   balanceEntry: one(balanceEntry, {
     fields: [balanceEntryDistribution.entryId],
     references: [balanceEntry.id]
-  })
+  }),
+  user: one(user, {
+    fields: [balanceEntryDistribution.userId],
+    references: [user.id]
+  }),
 }));
 
 export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);

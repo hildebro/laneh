@@ -26,14 +26,18 @@
 
     return m.balance_no_name_label();
   };
+
+  const getUsername = (userId: string) => {
+    return data.users.find(user => user.id === userId)?.username as string;
+  }
 </script>
 
 <div class="flex flex-col gap-2">
   <div class="card">
     <span class="h5 mb-4">{m.balance()}</span>
-    {#each data.users as user (user.id)}
+    {#each data.userDebts as userDebt (`${userDebt.debtor_user_id}-${userDebt.creditor_user_id}`)}
       <div>
-        {user.username}
+        {getUsername(userDebt.creditor_user_id)} is owed {userDebt.amount / 100} by {getUsername(userDebt.debtor_user_id)}
       </div>
     {/each}
   </div>
