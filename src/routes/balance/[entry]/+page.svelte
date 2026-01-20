@@ -7,13 +7,14 @@
 
   const getInitialDistributions = () => {
     const equalSplit = 100 / data.users.length;
+    const useEqualSplit = !data.users.some(user => user.defaultDistribution !== null);
 
     return data.users.map((user) => {
       if (!data.entry) {
         return {
           userId: user.id,
           username: user.username,
-          percent: equalSplit
+          percent: useEqualSplit ? equalSplit : (user.defaultDistribution ?? 0)
         };
       }
 
@@ -45,9 +46,9 @@
     <MoneyInput bind:value={purchasePrice} />
     <div>
       { m.balance_expense_distribution() }
-      <div>
+      <div class="flex flex-row flex-wrap gap-4">
         {#each distributions as dist (dist.userId)}
-          <label>
+          <label class="w-17">
             {dist.username}
             <input type="hidden" name="userIds" value={dist.userId} />
             <input
