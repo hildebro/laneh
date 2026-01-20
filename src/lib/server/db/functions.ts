@@ -384,7 +384,7 @@ export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 
 };
 
 // ------- SHOPPING PURCHASE -------
-export const createShoppingPurchase = async (userId: string): Promise<void> => {
+export const createShoppingPurchase = async (userId: string) => {
   const db = getTx();
 
   const stagedItems = (await findStagedPurchaseItemsByUser(userId))
@@ -413,6 +413,8 @@ export const createShoppingPurchase = async (userId: string): Promise<void> => {
   // 3. Remove items from staging and deactivate them
   db.delete(table.stagedShoppingPurchaseItem).where(inArray(stagedShoppingPurchaseItem.itemId, stagedItems));
   await deactivateShoppingItems(stagedItems);
+
+  return purchaseId;
 };
 
 export const fetchLastPurchaseDate = async () => {
@@ -466,7 +468,8 @@ export const addBalanceEntry = async (
   userId: string,
   name: string,
   price: number,
-  distributions: { userId: string, percent: number }[]
+  distributions: { userId: string, percent: number }[],
+  purchaseId: string|null
 ): Promise<void> => {
   const db = getTx();
 
@@ -476,7 +479,8 @@ export const addBalanceEntry = async (
     userId,
     date: new Date(),
     name,
-    price
+    price,
+    purchaseId
   });
 
   for (const distribution of distributions) {

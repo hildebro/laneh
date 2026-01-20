@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { resolve } from '$app/paths';
 import {
   createShoppingPurchase,
   findStagedPurchaseItems,
@@ -18,9 +19,12 @@ export const actions = {
   commit: async ({ locals }) => {
     const user = locals.user as User;
 
-    await createShoppingPurchase(user.id);
+    const purchaseId = await createShoppingPurchase(user.id);
+    if (!purchaseId) {
+      return redirect(302, resolve('/shopping'))
+    }
 
-    return redirect(302, '../shopping');
+    return redirect(302, resolve(`/balance/add?purchaseId=${purchaseId}`));
   },
   stage: async ({ request, locals }) => {
     const formData = await request.formData();

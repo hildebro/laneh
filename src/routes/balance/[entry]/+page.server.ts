@@ -7,10 +7,12 @@ import type { User } from '$lib/server/db/schema';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
+  const purchaseId = url.searchParams.get('purchaseId');
+
   const users = await findAllUsers();
   if (params.entry === 'add') {
-    return { entry: null, users };
+    return { entry: null, users, purchaseId };
   }
 
   const entry = await findBalanceEntry(params.entry);
@@ -18,11 +20,12 @@ export const load: PageServerLoad = async ({ params }) => {
     throw error(404, m.error_balance_entry_not_found());
   }
 
-  return { entry, users };
+  return { entry, users, purchaseId };
 };
 
 const expenseSchema = z.object({
   id: z.string().nullable(),
+  purchaseId: z.transform(val => val !== '' ? val : null).pipe(z.string().nullable()),
   name: z.string().min(1, 'Name is required'),
   price: z.coerce.number().min(0.01),
   userIds: z.array(z.string()),
@@ -53,9 +56,9 @@ export const actions: Actions = {
 
     return processForm(event, expenseSchema, async (expense) => {
       if (expense.id) {
-        await updateBalanceEntry(expense.id, expense.name, expense.price, expense.distributions)
+        await updateBalanceEntry(expense.id, expense.name, expense.price, expense.distributions);
       } else {
-        await addBalanceEntry(user.id, expense.name, expense.price, expense.distributions);
+        await addBalanceEntry(user.id, expense.name, expense.price, expense.distributions, expense.purchaseId);
       }
 
       return redirect(302, resolve('/balance'));
