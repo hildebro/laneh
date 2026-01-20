@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import MoneyInput from '$lib/MoneyInput.svelte';
   import * as m from '$lib/paraglide/messages.js';
@@ -32,6 +33,13 @@
   let distributions = $state(getInitialDistributions());
 </script>
 
+{#if data.purchaseId}
+  <div class="card preset-filled-error-100-900 p-5 space-y-4 shadow-xl font-semibold mb-2">
+    { m.shopping_purchase_finished() }
+    <br/>
+    <a href={resolve('/shopping')} class="btn">{ m.shopping_purchase_finished_skip() }</a>
+  </div>
+{/if}
 <div class="card">
   <div class="h5 mb-4">
     {data.entry ? m.balance_expense_edit() : m.balance_expense_add()}
@@ -39,6 +47,7 @@
 
   <EnhancedForm method="POST">
     <input type="hidden" name="id" value={data.entry?.id}>
+    <input type="hidden" name="purchaseId" value={data.purchaseId}>
     <label>
       { m.generic_name() }
       <input class="form-input input" type="text" name="name" bind:value={purchaseName} />
