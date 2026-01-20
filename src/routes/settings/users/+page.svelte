@@ -29,6 +29,25 @@
       {/each}
     </span>
   </div>
+  <div class="card mb-2 w-full">
+    <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_default_distribution() }</h1>
+    <EnhancedForm action="?/distribution">
+      <div class="flex flex-row flex-wrap gap-4">
+        {#each users as user (user.id)}
+          <label class="w-17">
+            {user.username}
+            <input type="hidden" name="userIds" value={user.id} />
+            <input
+              class="form-input input"
+              type="text"
+              name="percents"
+              bind:value={user.defaultDistribution}
+            />
+          </label>
+        {/each}
+      </div>
+    </EnhancedForm>
+  </div>
   <div class="card w-full">
     <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_switch() }</h1>
     <div class="flex flex-wrap justify-center gap-4">

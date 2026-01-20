@@ -15,7 +15,8 @@ import {
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
-  username: text().notNull().unique()
+  username: text().notNull().unique(),
+  defaultDistribution: doublePrecision()
 });
 export type User = typeof user.$inferSelect;
 

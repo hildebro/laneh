@@ -100,6 +100,7 @@
   "settings_tasks_add": "Add task",
   "settings_tasks_edit": "Edit task",
   "settings_users_add": "Add user",
+  "settings_users_default_distribution": "Default expense distribution",
   "settings_users_headline": "Users",
   "settings_users_language": "Select language",
   "settings_users_no_active_user": "You are not logged in. Please select a user.",
