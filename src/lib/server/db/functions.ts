@@ -411,7 +411,7 @@ export const createShoppingPurchase = async (userId: string) => {
   await db.insert(table.shoppingPurchaseItem).values(purchaseItemInserts);
 
   // 3. Remove items from staging and deactivate them
-  db.delete(table.stagedShoppingPurchaseItem).where(inArray(stagedShoppingPurchaseItem.itemId, stagedItems));
+  await db.delete(table.stagedShoppingPurchaseItem).where(inArray(stagedShoppingPurchaseItem.itemId, stagedItems));
   await deactivateShoppingItems(stagedItems);
 
   return purchaseId;
