@@ -53,7 +53,7 @@
           {#each suggestions as suggestion (suggestion.id)}
             {#if !textValue.includes(suggestion.name)}
               <div class="flex items-center gap-1">
-                <button class="btn text-sm" onclick={() => appendText(suggestion.name)} >
+                <button class="btn text-sm" onclick={() => appendText(suggestion.name)}>
                   +
                 </button>
                 {suggestion.name}
@@ -67,19 +67,21 @@
         action="?/create"
         use:enhance={formSubmitHandle}
       >
-        <label>
-          { m.shopping_add_items_label() }
-          <textarea
-            bind:value={textValue}
-            name="items"
-            class="textarea textarea-bordered h-64"
-            placeholder={m.shopping_add_items_explanation()}
-            disabled={isSubmitting}
-          ></textarea>
-        </label>
-        <button type="submit" class="btn btn-primary mt-2" disabled={isSubmitting || textValue.trim() === ''}>
-          {m.shopping_add_items()}
-        </button>
+        <div class="flex flex-col gap-2">
+          <button type="submit" class="btn btn-primary ml-auto" disabled={isSubmitting || textValue.trim() === ''}>
+            {m.shopping_add_items()}
+          </button>
+          <label>
+            { m.shopping_add_items_label() }
+            <textarea
+              bind:value={textValue}
+              name="items"
+              class="textarea textarea-bordered h-64 input form-input"
+              placeholder={m.shopping_add_items_explanation()}
+              disabled={isSubmitting}
+            ></textarea>
+          </label>
+        </div>
       </form>
     </div>
   {/await}
