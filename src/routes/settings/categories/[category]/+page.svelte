@@ -20,7 +20,7 @@
     <input type="hidden" name="id" value={data.category?.id}>
     <label>
       { m.generic_name() }
-      <input class="form-input input" type="text" name="name" bind:value={categoryName} />
+      <input class="input" type="text" name="name" bind:value={categoryName} />
     </label>
   </EnhancedForm>
 
