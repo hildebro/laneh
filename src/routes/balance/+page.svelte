@@ -28,17 +28,22 @@
   };
 </script>
 
-<div class="flex flex-col gap-2">
-  <div class="card">
-    <span class="h5 mb-4">{m.balance()}</span>
+<div class="flex flex-col gap-3">
+  <div class="card flex flex-col gap-2">
+    <span class="h5">{m.balance()}</span>
     {#each data.userDebts as userDebt (userDebt.creditor.id)}
-      <div>
-        {userDebt.creditor.username} is owed:
-        {#each userDebt.debtorData as debtorEntry (debtorEntry.debtor.id)}
-          <div class="px-2">
-            {debtorEntry.amount / 100} by {debtorEntry.debtor.username}
-          </div>
-        {/each}
+      <div class="flex flex-row justify-center">
+        <span>{m.balance_owed({ user: userDebt.creditor.username })}</span>
+        <div>
+          {#each userDebt.debtorData as debtorEntry (debtorEntry.debtor.id)}
+            <div class="px-2 font-bold">
+              {m.balance_owed_debtor({
+                amount: priceFormatter.format(debtorEntry.amount / 100),
+                debtor: debtorEntry.debtor.username
+              })}
+            </div>
+          {/each}
+        </div>
       </div>
     {/each}
   </div>
