@@ -42,6 +42,20 @@ export const addUser = async (username: string): Promise<void> => {
   await db.insert(table.user).values({ id: generateUUID(), username }).execute();
 };
 
+export const updateDefaultDistribution = async (
+  distributions: { userId: string; percent: number }[]
+): Promise<void> => {
+  const db = getTx();
+
+  for (const distribution of distributions) {
+    await db
+      .update(table.user)
+      .set({ defaultDistribution: distribution.percent })
+      .where(eq(table.user.id, distribution.userId))
+      .execute();
+  }
+};
+
 // ------- SHOPPING CATEGORY -------
 export const findShoppingCategory = async (categoryId: string) => {
   const db = getTx();

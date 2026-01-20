@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 import { base } from '$app/paths';
 import * as m from '$lib/paraglide/messages';
 import { setUser } from '$lib/server/auth';
-import { findAllUsers, findUser } from '$lib/server/db/functions';
+import { findAllUsers, findUser, updateDefaultDistribution } from '$lib/server/db/functions';
 import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
@@ -18,6 +18,32 @@ const switchUserSchema = z.object({
   userId: z.string().nonempty()
 });
 
+const distributionSchema = z
+  .object({
+    userIds: z.array(z.string()),
+    percents: z.array(z.coerce.number())
+  })
+  .transform((data) => {
+    const distributions = data.userIds.map((userId, index) => ({
+      userId,
+      percent: data.percents[index] ?? 0
+    }));
+
+    return {
+      distributions
+    };
+  })
+  .refine(
+    (data) => {
+      const total = data.distributions.reduce((sum, d) => sum + d.percent, 0);
+      return Math.abs(total - 100) < 0.1;
+    },
+    {
+      message: m.balance_expense_distribution_invalid_sum(),
+      path: ['distributions']
+    }
+  );
+
 export const actions: Actions = {
   select: async (event) => {
     return processForm(event, switchUserSchema, async (switchUser, { cookies }) => {
@@ -30,5 +56,10 @@ export const actions: Actions = {
 
       return redirect(302, `${base}`);
     });
+  },
+  distribution: async (event) => {
+    return processForm(event, distributionSchema, async (distributionData) => {
+      await updateDefaultDistribution(distributionData.distributions);
+    }, { arrays: ['userIds', 'percents'] });
   }
 };

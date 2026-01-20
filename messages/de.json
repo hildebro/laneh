@@ -100,6 +100,7 @@
   "settings_tasks_add": "Aufgabe hinzufügen",
   "settings_tasks_edit": "Aufgabe anpassen",
   "settings_users_add": "Benutzer:in hinzufügen",
+  "settings_users_default_distribution": "Standard Ausgabenverteilung",
   "settings_users_headline": "Benutzer:innen",
   "settings_users_language": "Sprache wählen",
   "settings_users_no_active_user": "Du bist nicht eingeloggt. Bitte wähle eine:n Benutzer:in aus.",
