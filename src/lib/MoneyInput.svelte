@@ -38,7 +38,7 @@
   }
 </script>
 
-<div class="flex flex-col w-full max-w-sm mx-auto">
+<div class="flex flex-col w-full mx-auto">
   <label>
     { m.balance_price() }
     <input
@@ -46,7 +46,7 @@
       inputmode="numeric"
       value={formattedValue}
       onkeydown={handleKeyDown}
-      class="input form-input"
+      class="input"
       placeholder="0,00 €"
     />
   </label>

@@ -8,7 +8,7 @@
     <label>
       {m.generic_name()}
       <br />
-      <input type="text" name="username" id="username" />
+      <input class="input" type="text" name="username" id="username" />
     </label>
   </EnhancedForm>
 </div>

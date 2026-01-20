@@ -38,7 +38,7 @@
             {user.username}
             <input type="hidden" name="userIds" value={user.id} />
             <input
-              class="form-input input"
+              class="input"
               type="text"
               name="percents"
               bind:value={user.defaultDistribution}

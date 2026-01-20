@@ -36,7 +36,7 @@
 {#if data.purchaseId}
   <div class="card preset-filled-error-100-900 p-5 space-y-4 shadow-xl font-semibold mb-2">
     { m.shopping_purchase_finished() }
-    <br/>
+    <br />
     <a href={resolve('/shopping')} class="btn">{ m.shopping_purchase_finished_skip() }</a>
   </div>
 {/if}
@@ -46,28 +46,30 @@
   </div>
 
   <EnhancedForm method="POST">
-    <input type="hidden" name="id" value={data.entry?.id}>
-    <input type="hidden" name="purchaseId" value={data.purchaseId}>
-    <label>
-      { m.generic_name() }
-      <input class="form-input input" type="text" name="name" bind:value={purchaseName} />
-    </label>
-    <MoneyInput bind:value={purchasePrice} />
-    <div>
-      { m.balance_expense_distribution() }
-      <div class="flex flex-row flex-wrap gap-4">
-        {#each distributions as dist (dist.userId)}
-          <label class="w-17">
-            {dist.username}
-            <input type="hidden" name="userIds" value={dist.userId} />
-            <input
-              class="form-input input"
-              type="text"
-              name="percents"
-              bind:value={dist.percent}
-            />
-          </label>
-        {/each}
+    <div class="flex flex-col gap-3">
+      <input type="hidden" name="id" value={data.entry?.id}>
+      <input type="hidden" name="purchaseId" value={data.purchaseId}>
+      <label>
+        { m.generic_name() }
+        <input class="input" type="text" name="name" bind:value={purchaseName} />
+      </label>
+      <MoneyInput bind:value={purchasePrice} />
+      <div>
+        { m.balance_expense_distribution() }
+        <div class="flex flex-row flex-wrap gap-4">
+          {#each distributions as dist (dist.userId)}
+            <label class="w-17">
+              {dist.username}
+              <input type="hidden" name="userIds" value={dist.userId} />
+              <input
+                class="input"
+                type="text"
+                name="percents"
+                bind:value={dist.percent}
+              />
+            </label>
+          {/each}
+        </div>
       </div>
     </div>
   </EnhancedForm>
