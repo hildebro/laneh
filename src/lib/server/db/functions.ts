@@ -426,6 +426,18 @@ export const fetchLastPurchaseDate = async () => {
   ).at(0)?.date ?? null;
 };
 
+export const findAllPurchases = async () => {
+  const db = getTx();
+
+  return db.query.shoppingPurchase.findMany({
+    with: {
+      shoppingItems: {},
+      user: {}
+    },
+    orderBy: [desc(table.shoppingPurchase.date)]
+  }).execute();
+};
+
 export const stagePurchaseItem = async (itemId: string, userId: string) => {
   const db = getTx();
   const existingStagedItem = await db.query.stagedShoppingPurchaseItem.findFirst({
