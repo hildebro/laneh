@@ -432,7 +432,8 @@ export const findAllPurchases = async () => {
   return db.query.shoppingPurchase.findMany({
     with: {
       shoppingItems: {},
-      user: {}
+      user: {},
+      balanceEntry: {}
     },
     orderBy: [desc(table.shoppingPurchase.date)]
   }).execute();
