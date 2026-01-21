@@ -119,6 +119,8 @@
   "shopping_finish_purchase": "Finish purchase",
   "shopping_purchase_finished": "Purchase recorded. You may now add an expense which will be linked to that purchase.",
   "shopping_purchase_finished_skip": "Skip expense creation",
+  "shopping_purchase_list": "Past purchases",
+  "shopping_purchase_list_entry": "{user} bought {count} item(s)",
   "shopping_start_purchase": "Start purchase",
   "shopping_validate_all_items": "For reference, these are the items you wrote down in the last step:",
   "shopping_validate_explanation": "You've entered names that are very similar to existing items. Chorehub will automatically 'fix' that for you by using the existing items. If you don't want this, please untick the corresponding checkboxes.",

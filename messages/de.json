@@ -119,6 +119,8 @@
   "shopping_finish_purchase": "Einkauf beenden",
   "shopping_purchase_finished": "Einkauf gespeichert. Du kannst nun eine Ausgabe hinzufügen, die automatisch mit dem Einkauf verlinkt wird.",
   "shopping_purchase_finished_skip": "Ausgabenerstellung überspringen",
+  "shopping_purchase_list": "Vergangene Einkäufe",
+  "shopping_purchase_list_entry": "{user} hat {count} Artikel gekauft",
   "shopping_start_purchase": "Einkauf starten",
   "shopping_validate_all_items": "Als Referenz findest du hier die Artikel, die du im letzten Schritt aufgeschrieben hast.",
   "shopping_validate_explanation": "Du hast Namen eingegeben, die sehr ähnlich zu bereits vorhandenen Artikeln sind. Chorehub wird das automatisch für Dich 'beheben', indem es die vorhandenen Artikel benutzt. Wenn du das nicht willst, entferne den Haken des jeweiligen Artikels.",
