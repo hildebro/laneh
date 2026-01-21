@@ -1,0 +1,1 @@
+ALTER TABLE "shopping_purchase" ALTER COLUMN "user_id" SET NOT NULL;

@@ -60,7 +60,7 @@ export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => 
 export const shoppingPurchase = pgTable('shopping_purchase', {
   id: text().primaryKey(),
   date: timestamp().notNull(),
-  userId: text().references(() => user.id)
+  userId: text().references(() => user.id).notNull()
 });
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
@@ -69,7 +69,7 @@ export const shoppingPurchaseRelations = relations(shoppingPurchase, ({ one, man
     fields: [shoppingPurchase.userId],
     references: [user.id]
   }),
-  shoppingItems: many(shoppingItem)
+  shoppingItems: many(shoppingPurchaseItem)
 }));
 
 // Junction table for many-to-many relationship between shoppingPurchase and shoppingItem
