@@ -491,9 +491,16 @@ export const addBalanceEntry = async (
     userId,
     date: new Date(),
     name,
-    price,
-    purchaseId
+    price
   });
+
+  if (purchaseId) {
+    await db
+      .update(table.shoppingPurchase)
+      .set({ balanceEntryId: entryId })
+      .where(eq(table.shoppingPurchase.id, purchaseId))
+      .execute();
+  }
 
   for (const distribution of distributions) {
     if (distribution.percent > 0) {

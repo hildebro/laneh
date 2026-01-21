@@ -60,7 +60,8 @@ export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => 
 export const shoppingPurchase = pgTable('shopping_purchase', {
   id: text().primaryKey(),
   date: timestamp().notNull(),
-  userId: text().references(() => user.id).notNull()
+  userId: text().references(() => user.id).notNull(),
+  balanceEntryId: text().references(() => balanceEntry.id),
 });
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
@@ -68,6 +69,10 @@ export const shoppingPurchaseRelations = relations(shoppingPurchase, ({ one, man
   user: one(user, {
     fields: [shoppingPurchase.userId],
     references: [user.id]
+  }),
+  balanceEntry: one(balanceEntry, {
+    fields: [shoppingPurchase.balanceEntryId],
+    references: [balanceEntry.id]
   }),
   shoppingItems: many(shoppingPurchaseItem)
 }));
@@ -154,8 +159,7 @@ export const balanceEntry = pgTable('balance_entry', {
   date: timestamp().notNull(),
   userId: text().notNull().references(() => user.id),
   price: integer().notNull(),
-  name: text(),
-  purchaseId: text().references(() => shoppingPurchase.id)
+  name: text()
 });
 export type BalanceEntry = typeof balanceEntry.$inferSelect;
 
