@@ -117,6 +117,8 @@
   "shopping_categorize_select_items": "Select items that you want to categorize together:",
   "shopping_categorize_select_items_invalid": "Please select at least one item to categorize",
   "shopping_finish_purchase": "Finish purchase",
+  "shopping_purchase_filter_age": "Limit to last 7 days",
+  "shopping_purchase_filter_unmatched": "Hide expensed purchases",
   "shopping_purchase_finished": "Purchase recorded. You may now add an expense which will be linked to that purchase.",
   "shopping_purchase_finished_skip": "Skip expense creation",
   "shopping_purchase_list": "Past purchases",
