@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Circle, CircleCheck, LoaderCircle, RefreshCw } from 'lucide-svelte';
+  import { onMount } from 'svelte';
   import { enhance } from '$app/forms';
-  import { invalidateAll } from '$app/navigation';
+  import { beforeNavigate, invalidateAll } from '$app/navigation';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -22,6 +23,7 @@
 
   // Track local state for items: 'loading' | 'retrying' | undefined
   let itemStates = $state<Record<string, 'loading' | 'retrying'>>({});
+  let isDirty = $derived(Object.keys(itemStates).length > 0);
 
   const stageItem = async (itemId: string) => {
     const target = checkedItems.includes(itemId)
@@ -63,6 +65,28 @@
       }, 3000);
     }
   };
+
+  onMount(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty) {
+        e.preventDefault();
+        // Standard browsers requirereturnValue to be set
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  });
+
+  beforeNavigate(({ cancel }) => {
+    if (isDirty) {
+      const confirmLeave = confirm("You have unsaved changes. Are you sure you want to leave?");
+      if (!confirmLeave) {
+        cancel();
+      }
+    }
+  });
 </script>
 
 {#await data.categories}
