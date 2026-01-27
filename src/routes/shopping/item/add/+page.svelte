@@ -47,21 +47,6 @@
   {:then suggestions}
     <div class="flex flex-col gap-3">
       <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
-      {#if suggestions.length > 0}
-        { m.shopping_add_items_suggestions() }
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {#each suggestions as suggestion (suggestion.id)}
-            {#if !textValue.includes(suggestion.name)}
-              <div class="flex items-center gap-1">
-                <button class="btn text-sm" onclick={() => appendText(suggestion.name)}>
-                  +
-                </button>
-                {suggestion.name}
-              </div>
-            {/if}
-          {/each}
-        </div>
-      {/if}
       <form
         method="POST"
         action="?/create"
@@ -71,12 +56,27 @@
           <button type="submit" class="btn btn-primary ml-auto" disabled={isSubmitting || textValue.trim() === ''}>
             {m.shopping_add_items()}
           </button>
+          {#if suggestions.length > 0}
+            { m.shopping_add_items_suggestions() }
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {#each suggestions as suggestion (suggestion.id)}
+                {#if !textValue.includes(suggestion.name)}
+                  <div class="flex items-center gap-1">
+                    <button class="btn text-sm" onclick={() => appendText(suggestion.name)}>
+                      +
+                    </button>
+                    {suggestion.name}
+                  </div>
+                {/if}
+              {/each}
+            </div>
+          {/if}
           <label>
             { m.shopping_add_items_label() }
             <textarea
               bind:value={textValue}
               name="items"
-              class="textarea textarea-bordered h-64 input form-input"
+              class="textarea textarea-bordered h-48 input form-input"
               placeholder={m.shopping_add_items_explanation()}
               disabled={isSubmitting}
             ></textarea>
