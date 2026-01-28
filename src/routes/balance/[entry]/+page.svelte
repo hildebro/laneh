@@ -29,6 +29,7 @@
   };
 
   let purchaseName = $state(data.entry?.name || '');
+  let purchaseUserId = $state(data.entry?.userId || data.user?.id);
   let purchasePrice = $state(data.entry?.price || '0');
   let distributions = $state(getInitialDistributions());
 </script>
@@ -52,6 +53,14 @@
       <label>
         { m.generic_name() }
         <input class="input" type="text" name="name" bind:value={purchaseName} />
+      </label>
+      <label>
+        { m.balance_expense_user() }
+        <select class="select" name="creditorId" bind:value={purchaseUserId}>
+          {#each data.users as user (user.id)}
+            <option value={user.id}>{user.username}</option>
+          {/each}
+        </select>
       </label>
       <MoneyInput bind:value={purchasePrice} />
       <div>

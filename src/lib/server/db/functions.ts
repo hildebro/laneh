@@ -644,15 +644,16 @@ export const addBalanceEntry = async (
 
 export const updateBalanceEntry = async (
   entryId: string,
+  userId: string,
   name: string,
   price: number,
-  distributions: { userId: string, percent: number }[]
+  distributions: { userId: string; percent: number }[]
 ): Promise<void> => {
   const db = getTx();
 
   await db
     .update(table.balanceEntry)
-    .set({ name, price })
+    .set({ name, userId, price })
     .where(eq(table.balanceEntry.id, entryId))
     .execute();
 
