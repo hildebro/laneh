@@ -3,15 +3,21 @@ import type { PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
 import {
   createShoppingPurchase,
-  findStagedPurchaseItems,
+  findStagedPurchaseCategoriesForOtherUsers,
+  findStagedPurchaseCategoriesForUser,
+  findUnstagedPurchaseItems,
   stagePurchaseItem,
   unstagePurchaseItem
 } from '$lib/server/db/functions';
 import type { User } from '$lib/server/db/schema';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+  const userId = locals.user?.id as string;
+
   return {
-    stagedItems: await findStagedPurchaseItems()
+    unstagedItemsByCategory: await findUnstagedPurchaseItems(),
+    stagedItemsForUser: await findStagedPurchaseCategoriesForUser(userId),
+    stagedItemsForOtherUser: await findStagedPurchaseCategoriesForOtherUsers(userId)
   };
 };
 

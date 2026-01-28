@@ -54,6 +54,10 @@ export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => 
     fields: [shoppingItem.categoryId],
     references: [shoppingCategory.id]
   }),
+  stagedPurchase: one(stagedShoppingPurchaseItem, {
+    fields: [shoppingItem.id],
+    references: [stagedShoppingPurchaseItem.itemId]
+  }),
   shoppingPurchases: many(shoppingPurchaseItem)
 }));
 

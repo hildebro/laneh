@@ -3,32 +3,22 @@
   import { onMount } from 'svelte';
   import { enhance } from '$app/forms';
   import { beforeNavigate, invalidateAll } from '$app/navigation';
-  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
-  let stagedItems = $derived(data.stagedItems);
-  let checkedItems = $derived(stagedItems.map(stagedItem => stagedItem.itemId));
-  let checkedByOtherUser = $derived(
-    stagedItems
-      .filter(stagedItem => stagedItem.userId !== data.user?.id)
-      .map(stagedItem => stagedItem.itemId)
-  );
-  let checkedByThisUser = $derived(
-    stagedItems
-      .filter(stagedItem => stagedItem.userId === data.user?.id)
-      .map(stagedItem => stagedItem.itemId)
-  );
+  const isUnchecked = (itemId: string) => {
+    return data.unstagedItemsByCategory.some((category) => category.shoppingItems.some(item => item.id === itemId));
+  };
 
   // Track local state for items: 'loading' | 'retrying' | undefined
   let itemStates = $state<Record<string, 'loading' | 'retrying'>>({});
   let isDirty = $derived(Object.keys(itemStates).length > 0);
 
   const stageItem = async (itemId: string) => {
-    const target = checkedItems.includes(itemId)
-      ? '?/unstage'
-      : '?/stage';
+    const target = isUnchecked(itemId)
+      ? '?/stage'
+      : '?/unstage';
 
     itemStates[itemId] = 'loading';
 
@@ -81,7 +71,7 @@
 
   beforeNavigate(({ cancel }) => {
     if (isDirty) {
-      const confirmLeave = confirm("You have unsaved changes. Are you sure you want to leave?");
+      const confirmLeave = confirm('You have unsaved changes. Are you sure you want to leave?');
       if (!confirmLeave) {
         cancel();
       }
@@ -89,45 +79,78 @@
   });
 </script>
 
-{#await data.categories}
-  <LoadingSpinner />
-{:then categories}
-  <form class="ml-auto" method="POST" action="?/commit" use:enhance>
-    <button class="btn" type="submit">{m.shopping_finish_purchase()}</button>
-  </form>
-  {#each categories as category (category.id)}
-    <div class="card w-full mt-2">
-      <b>{category.name}</b>
-      <div class="flex flex-col text-base gap-1">
-        {#each category.shoppingItems as item (item.id)}
-          {@const isProcessing = !!itemStates[item.id]}
-          {@const isRetrying = itemStates[item.id] === 'retrying'}
-          {@const isChecked = checkedItems.includes(item.id)}
-          {@const isCheckedByOtherUser = checkedByOtherUser.includes(item.id)}
-          {@const isCheckedByThisUser = checkedByThisUser.includes(item.id)}
+<form class="ml-auto" method="POST" action="?/commit" use:enhance>
+  <button class="btn" type="submit">{m.shopping_finish_purchase()}</button>
+</form>
+{#each data.unstagedItemsByCategory as category (category.id)}
+  <div class="card w-full mt-2">
+    <b>{category.name}</b>
+    <div class="flex flex-col text-base gap-1">
+      {#each category.shoppingItems as item (item.id)}
+        {@const isProcessing = !!itemStates[item.id]}
+        {@const isRetrying = itemStates[item.id] === 'retrying'}
 
-          <button
-            class="card flex flex-row gap-1 items-center transition-colors duration-200"
-            class:card={!isCheckedByOtherUser}
-            class:preset-filled-surface-500={isCheckedByThisUser && !isProcessing}
-            class:preset-filled-warning-500={isRetrying}
-            disabled={isProcessing || isCheckedByOtherUser}
-            onclick={() => stageItem(item.id)}
-          >
-            {#if isRetrying}
-              <RefreshCw class="animate-spin" size={20} />
-            {:else if isProcessing}
-              <LoaderCircle class="animate-spin" size={20} />
-            {:else if isChecked}
-              <CircleCheck size={20} />
-            {:else }
-              <Circle size={20} />
-            {/if}
+        <button
+          class="card flex flex-row gap-1 items-center transition-colors duration-200"
+          class:preset-filled-warning-500={isRetrying}
+          disabled={isProcessing}
+          onclick={() => stageItem(item.id)}
+        >
+          {#if isRetrying}
+            <RefreshCw class="animate-spin" size={20} />
+          {:else if isProcessing}
+            <LoaderCircle class="animate-spin" size={20} />
+          {:else }
+            <Circle size={20} />
+          {/if}
 
-            <span>{item.amount} {item.name}</span>
-          </button>
-        {/each}
-      </div>
+          <span>{item.amount} {item.name}</span>
+        </button>
+      {/each}
     </div>
-  {/each}
-{/await}
+  </div>
+{/each}
+{#each data.stagedItemsForUser as category (category.id)}
+  <div class="card w-full mt-2">
+    <b>{category.name}</b>
+    <div class="flex flex-col text-base gap-1">
+      {#each category.shoppingItems as item (item.id)}
+        {@const isProcessing = !!itemStates[item.id]}
+        {@const isRetrying = itemStates[item.id] === 'retrying'}
+
+        <button
+          class="card flex flex-row gap-1 items-center transition-colors duration-200"
+          class:preset-filled-surface-500={!isProcessing}
+          class:preset-filled-warning-500={isRetrying}
+          disabled={isProcessing}
+          onclick={() => stageItem(item.id)}
+        >
+          {#if isRetrying}
+            <RefreshCw class="animate-spin" size={20} />
+          {:else if isProcessing}
+            <LoaderCircle class="animate-spin" size={20} />
+          {:else }
+            <CircleCheck size={20} />
+          {/if}
+
+          <span>{item.amount} {item.name}</span>
+        </button>
+      {/each}
+    </div>
+  </div>
+{/each}
+{#each data.stagedItemsForOtherUser as category (category.id)}
+  <div class="card w-full mt-2">
+    <b>{category.name}</b>
+    <div class="flex flex-col text-base gap-1">
+      {#each category.shoppingItems as item (item.id)}
+        <button
+          class="flex flex-row gap-1 items-center transition-colors duration-200"
+          disabled
+        >
+          <span>{item.amount} {item.name}</span>
+        </button>
+      {/each}
+    </div>
+  </div>
+{/each}
