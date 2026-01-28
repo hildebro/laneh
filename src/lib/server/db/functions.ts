@@ -1,5 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, not, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import levenshteinPkg from 'fast-levenshtein'; // Import fast-levenshtein using the default import for CJS compatibility
@@ -462,10 +462,138 @@ export const unstagePurchaseItem = async (itemId: string, userId: string) => {
   ).execute();
 };
 
-export const findStagedPurchaseItems = async () => {
+export const findUnstagedPurchaseItems = async () => {
   const db = getTx();
 
-  return db.query.stagedShoppingPurchaseItem.findMany().execute();
+  return db.query.shoppingCategory
+    .findMany({
+      // only return categories with at least one unstaged item
+      where: (category, { exists }) =>
+        and(
+          not(exists(
+            db
+              .select()
+              .from(stagedShoppingPurchaseItem)
+              .innerJoin(shoppingItem, eq(stagedShoppingPurchaseItem.itemId, shoppingItem.id))
+              .where(eq(shoppingItem.categoryId, category.id))
+          )),
+          exists(
+            db
+              .select()
+              .from(shoppingItem)
+              .where(and(
+                eq(shoppingItem.categoryId, category.id),
+                eq(shoppingItem.active, true)
+              ))
+          )
+        ),
+      // populate the category with its unstaged items
+      with: {
+        shoppingItems: {
+          where: (item, { exists }) =>
+            and(
+              not(exists(
+                db
+                  .select()
+                  .from(stagedShoppingPurchaseItem)
+                  .where(and(
+                    eq(stagedShoppingPurchaseItem.itemId, item.id)
+                  ))
+              )),
+              eq(shoppingItem.active, true)
+            ),
+          orderBy: [asc(shoppingItem.priority)]
+        }
+      },
+      orderBy: [asc(shoppingCategory.priority)]
+    })
+    .execute();
+};
+
+export const findStagedPurchaseCategoriesForUser = async (userId: string) => {
+  const db = getTx();
+
+  return db.query.shoppingCategory
+    .findMany({
+      // only return categories with at least one staged item
+      where: (category, { exists }) =>
+        exists(
+          db
+            .select()
+            .from(stagedShoppingPurchaseItem)
+            .innerJoin(shoppingItem, eq(stagedShoppingPurchaseItem.itemId, shoppingItem.id))
+            .where(and(
+              eq(shoppingItem.categoryId, category.id),
+              eq(stagedShoppingPurchaseItem.userId, userId)
+            ))
+        ),
+      // populate the category with its staged items
+      with: {
+        shoppingItems: {
+          where: (item, { exists }) =>
+            exists(
+              db
+                .select()
+                .from(stagedShoppingPurchaseItem)
+                .where(and(
+                  eq(stagedShoppingPurchaseItem.itemId, item.id),
+                  eq(stagedShoppingPurchaseItem.userId, userId)
+                ))
+            ),
+          with: {
+            stagedPurchase: {}
+          },
+          orderBy: [asc(shoppingItem.priority)]
+        }
+      },
+      orderBy: [asc(shoppingCategory.priority)]
+    })
+    .execute();
+};
+
+export const findStagedPurchaseCategoriesForOtherUsers = async (userId: string) => {
+  const db = getTx();
+
+  return db.query.shoppingCategory
+    .findMany({
+      // only return categories with at least one staged item
+      where: (category, { exists }) =>
+        exists(
+          db
+            .select()
+            .from(stagedShoppingPurchaseItem)
+            .innerJoin(shoppingItem, eq(stagedShoppingPurchaseItem.itemId, shoppingItem.id))
+            .where(
+              and(
+                eq(shoppingItem.categoryId, category.id),
+                not(eq(stagedShoppingPurchaseItem.userId, userId))
+              )
+            )
+        ),
+      // populate the category with its staged items
+      with: {
+        shoppingItems: {
+          where: (item, { exists }) =>
+            exists(
+              db
+                .select()
+                .from(stagedShoppingPurchaseItem)
+                .where(
+                  and(
+                    eq(stagedShoppingPurchaseItem.itemId, item.id),
+                    not(eq(stagedShoppingPurchaseItem.userId, userId))
+                  )
+                )
+            ),
+          with: {
+            stagedPurchase: {}
+          },
+          orderBy: [asc(shoppingItem.priority)]
+        }
+      },
+      orderBy: [asc(shoppingCategory.priority)]
+    })
+    .execute();
 };
 
 export const findStagedPurchaseItemsByUser = async (userId: string) => {
