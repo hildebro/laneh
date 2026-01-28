@@ -8,6 +8,7 @@
   "balance_expense_distribution": "Aufteilung (%)",
   "balance_expense_distribution_invalid_sum": "Die Aufteilungswerte müssen zusammen exakt 100% sein.",
   "balance_expense_edit": "Ausgabe anpassen",
+  "balance_expense_user": "Käufer:in",
   "balance_no_name_label": "Einkauf",
   "balance_owed": "{user} erhält",
   "balance_owed_debtor": "{amount} von {debtor}",
