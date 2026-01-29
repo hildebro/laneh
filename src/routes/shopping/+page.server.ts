@@ -1,7 +1,7 @@
-import type { LayoutServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import { findActiveItemsByCategory } from '$lib/server/db/functions';
 
-export const load: LayoutServerLoad = async () => {
+export const load: PageServerLoad = async () => {
   return {
     categories: findActiveItemsByCategory()
   };
