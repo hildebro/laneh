@@ -32,7 +32,9 @@ export const shoppingCategory = pgTable('shopping_category', {
 export type ShoppingCategory = typeof shoppingCategory.$inferSelect;
 
 export type ShoppingCategoryWithRelation = InferSelectModel<typeof shoppingCategory> & {
-  shoppingItems: InferSelectModel<typeof shoppingItem>[];
+  shoppingItems: (InferSelectModel<typeof shoppingItem> & {
+    stagedPurchase: InferSelectModel<typeof stagedShoppingPurchaseItem>
+  })[];
 };
 
 export const shoppingCategoryRelations = relations(shoppingCategory, ({ many }) => ({

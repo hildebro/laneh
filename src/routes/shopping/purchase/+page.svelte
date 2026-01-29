@@ -110,47 +110,45 @@
     </div>
   </div>
 {/each}
-{#each data.stagedItemsForUser as category (category.id)}
-  <div class="card w-full mt-2">
-    <b>{category.name}</b>
-    <div class="flex flex-col text-base gap-1">
-      {#each category.shoppingItems as item (item.id)}
-        {@const isProcessing = !!itemStates[item.id]}
-        {@const isRetrying = itemStates[item.id] === 'retrying'}
+<div class="card w-full mt-2">
+  <b>{ m.shopping_purchase_staged_by_you() }</b>
+  <div
+    class="flex flex-col text-base gap-1"
+  >
+    {#each data.stagedItemsForUser as item (item.id)}
+      {@const isProcessing = !!itemStates[item.id]}
+      {@const isRetrying = itemStates[item.id] === 'retrying'}
 
-        <button
-          class="card flex flex-row gap-1 items-center transition-colors duration-200"
-          class:preset-filled-surface-500={!isProcessing}
-          class:preset-filled-warning-500={isRetrying}
-          disabled={isProcessing}
-          onclick={() => stageItem(item.id)}
-        >
-          {#if isRetrying}
-            <RefreshCw class="animate-spin" size={20} />
-          {:else if isProcessing}
-            <LoaderCircle class="animate-spin" size={20} />
-          {:else }
-            <CircleCheck size={20} />
-          {/if}
+      <button
+        class="card flex flex-row gap-1 items-center transition-colors duration-200"
+        class:preset-filled-surface-500={!isProcessing}
+        class:preset-filled-warning-500={isRetrying}
+        disabled={isProcessing}
+        onclick={() => stageItem(item.id)}
+      >
+        {#if isRetrying}
+          <RefreshCw class="animate-spin" size={20} />
+        {:else if isProcessing}
+          <LoaderCircle class="animate-spin" size={20} />
+        {:else }
+          <CircleCheck size={20} />
+        {/if}
 
-          <span>{item.amount} {item.name}</span>
-        </button>
-      {/each}
-    </div>
+        <span>{item.amount} {item.name}</span>
+      </button>
+    {/each}
   </div>
-{/each}
-{#each data.stagedItemsForOtherUser as category (category.id)}
-  <div class="card w-full mt-2">
-    <b>{category.name}</b>
+</div>
+<div class="card w-full mt-2">
+  <b>{ m.shopping_purchase_staged_by_others() }</b>
+  {#each data.stagedItemsForOtherUsers as item (item.id)}
     <div class="flex flex-col text-base gap-1">
-      {#each category.shoppingItems as item (item.id)}
-        <button
-          class="flex flex-row gap-1 items-center transition-colors duration-200"
-          disabled
-        >
-          <span>{item.amount} {item.name}</span>
-        </button>
-      {/each}
+      <button
+        class="flex flex-row gap-1 items-center transition-colors duration-200"
+        disabled
+      >
+        <span>{item.amount} {item.name}</span>
+      </button>
     </div>
-  </div>
-{/each}
+  {/each}
+</div>
