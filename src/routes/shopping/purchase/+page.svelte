@@ -117,7 +117,7 @@
           in:receive={{ key: item.id }}
           out:send={{ key: item.id }}
           animate:flip={{ duration: 600 }}
-          class="card flex flex-row gap-1 items-center transition-colors duration-200"
+          class="card flex flex-row gap-1 items-center transition-colors duration-200 p-3"
           class:preset-filled-warning-500={isRetrying}
           disabled={isProcessing}
           onclick={() => stageItem(item.id)}
@@ -149,7 +149,7 @@
         in:receive={{ key: item.id }}
         out:send={{ key: item.id }}
         animate:flip={{ duration: 600 }}
-        class="card flex flex-row gap-1 items-center transition-colors duration-200"
+        class="card flex flex-row gap-1 items-center transition-colors duration-200 p-3"
         class:preset-filled-surface-500={!isProcessing}
         class:preset-filled-warning-500={isRetrying}
         disabled={isProcessing}
