@@ -1,9 +1,32 @@
 <script lang="ts">
   import { Circle, CircleCheck, LoaderCircle, RefreshCw } from 'lucide-svelte';
   import { onMount } from 'svelte';
+  import { flip } from 'svelte/animate';
+  import { quintOut } from 'svelte/easing';
+  import { crossfade } from 'svelte/transition';
   import { enhance } from '$app/forms';
   import { beforeNavigate, invalidateAll } from '$app/navigation';
   import * as m from '$lib/paraglide/messages.js';
+
+  const [send, receive] = crossfade({
+    duration: (d) => Math.sqrt(d * 200),
+
+    // fallback is used if the item is just appearing/disappearing
+    // without moving to another list (e.g. initial load)
+    fallback(node, params) {
+      const style = getComputedStyle(node);
+      const transform = style.transform === 'none' ? '' : style.transform;
+
+      return {
+        duration: 800,
+        easing: quintOut,
+        css: (t) => `
+          transform: ${transform} scale(${t});
+          opacity: ${t}
+        `
+      };
+    }
+  });
 
   let { data } = $props();
 
@@ -91,6 +114,9 @@
         {@const isRetrying = itemStates[item.id] === 'retrying'}
 
         <button
+          in:receive={{ key: item.id }}
+          out:send={{ key: item.id }}
+          animate:flip={{ duration: 600 }}
           class="card flex flex-row gap-1 items-center transition-colors duration-200"
           class:preset-filled-warning-500={isRetrying}
           disabled={isProcessing}
@@ -120,6 +146,9 @@
       {@const isRetrying = itemStates[item.id] === 'retrying'}
 
       <button
+        in:receive={{ key: item.id }}
+        out:send={{ key: item.id }}
+        animate:flip={{ duration: 600 }}
         class="card flex flex-row gap-1 items-center transition-colors duration-200"
         class:preset-filled-surface-500={!isProcessing}
         class:preset-filled-warning-500={isRetrying}
