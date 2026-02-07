@@ -85,6 +85,16 @@
                 <p class={getDueCardPreset(task)}>
                   <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.nextDueDate)}
                 </p>
+                {#await data.users}
+                  <span></span>
+                {:then users}
+                  <p>{ m.schedule_completions() }</p>
+                  {#each users as user (user.id)}
+                    <p>
+                      {user.username}: { task.completions.filter(completion => completion.userId === user.id).length }
+                    </p>
+                  {/each}
+                {/await}
               </div>
             </div>
           </div>

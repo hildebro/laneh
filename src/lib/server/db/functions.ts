@@ -789,7 +789,8 @@ export const findAllTasks = async (): Promise<WeeklyTaskWithRelation[]> => {
 
   return db.query.weeklyTask.findMany({
     with: {
-      nextDueUser: {}
+      nextDueUser: {},
+      completions: {}
     }
   });
 };
