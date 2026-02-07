@@ -214,10 +214,12 @@ export type WeeklyTask = typeof weeklyTask.$inferSelect;
 
 export type WeeklyTaskWithRelation = InferSelectModel<typeof weeklyTask> & {
   nextDueUser: InferSelectModel<typeof user> | null;
+  completions: InferSelectModel<typeof taskCompletion>[];
 };
 
-export const tasksRelations = relations(weeklyTask, ({ one }) => ({
-  nextDueUser: one(user, { fields: [weeklyTask.nextDueUserId], references: [user.id] })
+export const tasksRelations = relations(weeklyTask, ({ one, many }) => ({
+  nextDueUser: one(user, { fields: [weeklyTask.nextDueUserId], references: [user.id] }),
+  completions: many(taskCompletion)
 }));
 
 export const taskCompletion = pgTable('task_completion', {
@@ -227,3 +229,7 @@ export const taskCompletion = pgTable('task_completion', {
   date: date().notNull()
 });
 export type TaskCompletion = typeof taskCompletion.$inferSelect;
+
+export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
+  task: one(weeklyTask, { fields: [taskCompletion.taskId], references: [weeklyTask.id] }),
+}));

@@ -59,6 +59,7 @@
   "header_shopping": "Shopping",
   "schedule_add_task": "Add task",
   "schedule_assignee": "Assignee",
+  "schedule_completions": "Completions by user",
   "schedule_done": "Done",
   "schedule_done_who": "Who completed the task?",
   "schedule_due_since": "Due since",
