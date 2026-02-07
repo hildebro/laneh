@@ -1,7 +1,9 @@
 <script lang="ts">
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { CheckCircle, Pencil, Undo2 } from 'lucide-svelte';
+  import { Check, Pencil, Undo2 } from 'lucide-svelte';
+  import { SvelteDate } from 'svelte/reactivity';
   import { slide } from 'svelte/transition';
+  import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { WeeklyTask, WeeklyTaskWithRelation } from '$lib/server/db/schema';
@@ -10,12 +12,12 @@
 
   // Function to determine the Skeleton UI card preset based on how overdue a task is
   function getDueCardPreset(task: WeeklyTask): string {
-    const today = new Date();
+    const today = new SvelteDate();
     today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
+    const yesterday = new SvelteDate(today);
     yesterday.setDate(today.getDate() - 1); // Get yesterday's date
 
-    const dueDate = new Date(task.nextDueDate + 'T00:00:00');
+    const dueDate = new SvelteDate(task.nextDueDate + 'T00:00:00');
     dueDate.setHours(0, 0, 0, 0);
 
     // Assign color based on due date relative to today
@@ -57,7 +59,7 @@
   }
 </script>
 
-<a class="btn mb-2 ml-auto" href="schedule/add">{ m.schedule_add_task() }</a>
+<a class="btn mb-2 ml-auto" href={resolve('/schedule/add')}>{ m.schedule_add_task() }</a>
 <div class="card w-full">
   <section class="space-y-4">
     <h2 class="h2">{ m.schedule_due_tasks() }</h2>
@@ -70,12 +72,12 @@
             <div class="card">
               <h3 class="h3 text-lg font-semibold">{task.name}</h3>
               <div class="flex justify-end gap-1 mb-2">
-                <a href="schedule/{task.id}" class="btn">
+                <a href={resolve('/schedule/[task]', {task: task.id})} class="btn">
                   <Pencil size={18} />
                   <span>{ m.generic_edit() }</span>
                 </a>
                 <button class="btn" onclick={() => openModalForTask(task)}>
-                  <CheckCircle size={18} />
+                  <Check size={18} />
                   <span>{ m.schedule_done() }</span>
                 </button>
               </div>
@@ -154,7 +156,7 @@
               <div class="mb-2">
                 <h3 class="h3 text-lg font-semibold">{task.name}</h3>
                 <div class="flex justify-end gap-1 mb-2">
-                  <a href="schedule/{task.id}" class="btn">
+                  <a href={resolve('/schedule/[task]', {task: task.id})} class="btn">
                     <Pencil size={18} />
                     <span>{ m.generic_edit() }</span>
                   </a>
