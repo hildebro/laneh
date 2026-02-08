@@ -1,5 +1,6 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import {
   addCloseStagedItem,
@@ -12,6 +13,8 @@ import {
   findStagedShoppingList,
   getItemAddSuggestions
 } from '$lib/server/db/functions';
+import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const userId = locals.user?.id as string;
@@ -24,88 +27,62 @@ export const load: PageServerLoad = async ({ locals }) => {
   return { suggestions: getItemAddSuggestions() };
 };
 
+const addingItemsSchema = z
+  .object({
+    amounts: z.array(z.string()),
+    names: z.array(z.string().nonempty())
+  })
+  .transform((data) => {
+    return data.amounts.map((amount, index) => ({
+      amount,
+      name: data.names[index] ?? 0
+    }));
+  })
+  .refine(
+    (data) => {
+      return data.length > 0;
+    },
+    {
+      message: m.generic_empty(),
+      path: ['names']
+    }
+  );
+
 export const actions = {
-  create: async ({ request, locals }) => {
-    // --- Process Input Lines ---
-    const formData = await request.formData();
-    const itemsText = formData.get('items') as string || '';
-    const lines = itemsText.split('\n').map(line => line.trim()).filter(l => l !== '');
+  default: async (event) => {
+    return processForm(event, addingItemsSchema, async (items, event) => {
+      // --- Get User (Essential) ---
+      const userId = event.locals.user?.id as string;
+      const listId = await addStagedShoppingList(userId);
 
-    if (lines.length === 0) {
-      return fail(400, { message: m.generic_empty() });
-    }
-
-    // --- Get User (Essential) ---
-    const userId = locals.user?.id as string;
-    const listId = await addStagedShoppingList(userId);
-
-    // --- Process lines and prepare staged data ---
-    let needsValidation = false;
-    let needsCategorization = false;
-    for (const line of lines) {
-      const { name, amount } = parseLine(line);
-      if (!name) {
-        return fail(400, { message: m.shopping_add_items_parse_error() });
+      // --- Process lines and prepare staged data ---
+      let needsValidation = false;
+      let needsCategorization = false;
+      for (const item of items) {
+        // case `perfect_match` doesn't matter to us here.
+        const result = await persistStagedItem(item.name, item.amount, listId);
+        switch (result) {
+          case 'close_match':
+            needsValidation = true;
+            continue;
+          case 'unmatched':
+            needsCategorization = true;
+        }
       }
 
-      // case `perfect_match` doesn't matter to us here.
-      const result = await persistStagedItem(name, amount, listId);
-      switch (result) {
-        case 'close_match':
-          needsValidation = true;
-          continue;
-        case 'unmatched':
-          needsCategorization = true;
+      if (needsValidation) {
+        return redirect(303, resolve('/shopping/item/validate'));
+      } else if (needsCategorization) {
+        return redirect(303, resolve('/shopping/item/categorize'));
+      } else {
+        // If all items are perfect matches, we can just commit them
+        await commitStagedItems(userId);
+
+        return redirect(303, resolve('/shopping'));
       }
-    }
-
-    // --- Decision Logic ---
-    if (needsValidation) {
-      return redirect(303, `validate`);
-    } else if (needsCategorization) {
-      return redirect(303, `categorize`);
-    } else {
-      // If all items are perfect matches, we can just commit them
-      await commitStagedItems(userId);
-
-      return redirect(303, '../');
-    }
+    }, { arrays: ['amounts', 'names'] });
   }
 };
-
-// --- Helper: Parsing (Keep your existing function) ---
-function parseLine(line: string): { name: string; amount: string } {
-  line = line.trim();
-  let name = line;
-  let amount = '1x'; // Default amount
-
-  // Regex to find amount at start (e.g., "2x ", "5 ") or end (e.g., " 6", " x3")
-  // This regex can be quite complex depending on allowed formats.
-  const amountRegex = /^(?:(\d+(?:\.\d+)?)\s*x?\s+)(.+)|(.+?)(?:\s+(?:x?\s*)?(\d+(?:\.\d+)?))$/i;
-  const match = line.match(amountRegex);
-
-  if (match) {
-    if (match[1] !== undefined && match[2] !== undefined) {
-      // Amount at start: "2x Apples"
-      amount = match[1];
-      name = match[2].trim();
-    } else if (match[3] !== undefined && match[4] !== undefined) {
-      // Amount at end: "Apples 3"
-      amount = match[4];
-      name = match[3].trim();
-    }
-    // Ensure amount has 'x' if it's just a number, adjust as needed
-    if (!/x$/i.test(amount) && !isNaN(parseFloat(amount))) {
-      amount = amount + 'x';
-    }
-  } else {
-    // No clear amount pattern found, use default
-    name = line;
-    amount = '1x';
-  }
-
-  return { name: name.trim(), amount };
-}
 
 type MatchResult = 'perfect_match' | 'close_match' | 'unmatched';
 

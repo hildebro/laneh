@@ -1,29 +1,32 @@
 <script lang="ts">
   import { CirclePlus, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
-  let items: { units: string, name: string }[] = $state([{ units: '', name: '' }]);
+  let items: { amount: string, name: string }[] = $state([{ amount: '', name: '' }]);
 
-  let unitRefs: HTMLInputElement[] = [];
+  let amountRefs: HTMLInputElement[] = [];
   let nameRefs: HTMLInputElement[] = [];
 
   async function addItem() {
-    items.push({ units: '', name: '' });
+    items.push({ amount: '', name: '' });
 
     // Wait for DOM update
     await tick();
 
-    // Focus the 'units' field of the newly created last item
+    // Focus the 'amount' field of the newly created last item
     const lastIndex = items.length - 1;
-    unitRefs[lastIndex]?.focus();
+    amountRefs[lastIndex]?.focus();
   }
 
   function deleteItem(index: number) {
-    items.splice(index, 1);
+    if (items.length > 1) {
+      items.splice(index, 1);
+    }
   }
 
-  async function handleKeyDown(e: KeyboardEvent, index: number, field: 'unit' | 'name') {
+  async function handleKeyDown(e: KeyboardEvent, index: number, field: 'amount' | 'name') {
     const isEnter = e.key === 'Enter';
     const isTabForward = e.key === 'Tab' && !e.shiftKey;
 
@@ -31,7 +34,7 @@
 
     e.preventDefault();
 
-    if (field === 'unit') {
+    if (field === 'amount') {
       // Jump to Name in same row
       nameRefs[index]?.focus();
     } else {
@@ -41,47 +44,55 @@
       if (isLastItem) {
         await addItem();
       } else {
-        unitRefs[index + 1]?.focus();
+        amountRefs[index + 1]?.focus();
       }
     }
   }
 </script>
 
-<div class="card w-full p-4 space-y-4">
-  <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
+<div class="card w-full">
+  <EnhancedForm submitButtonClasses="ml-auto">
+    <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
+    <div class="flex flex-col gap-1">
+      {#each items as item, index (index)}
+        <div class="flex gap-1">
+          <input
+            name="amounts"
+            bind:this={amountRefs[index]}
+            class="input flex-4"
+            type="text"
+            placeholder="1"
+            bind:value={item.amount}
+            onkeydown={(e) => handleKeyDown(e, index, 'amount')}
+          />
 
-  {#each items as item, index (index)}
-    <div class="flex gap-2 items-center">
-      <input
-        bind:this={unitRefs[index]}
-        class="input w-20"
-        type="text"
-        placeholder="1"
-        bind:value={item.units}
-        onkeydown={(e) => handleKeyDown(e, index, 'unit')}
-      />
+          <input
+            name="names"
+            bind:this={nameRefs[index]}
+            class="input flex-12"
+            type="text"
+            placeholder="Item Name"
+            bind:value={item.name}
+            onkeydown={(e) => handleKeyDown(e, index, 'name')}
+          />
 
-      <input
-        bind:this={nameRefs[index]}
-        class="input flex-1"
-        type="text"
-        placeholder=""
-        bind:value={item.name}
-        onkeydown={(e) => handleKeyDown(e, index, 'name')}
-      />
+          <button
+            type="button"
+            class="btn preset-filled-error-800-200 btn-sm flex-1"
+            tabindex="-1"
+            onclick={() => deleteItem(index)}
+            aria-label="Delete row"
+          >
+            <Trash2 />
+          </button>
+        </div>
+      {/each}
 
-      <button
-        class="btn btn-square btn-error btn-sm"
-        tabindex="-1"
-        onclick={() => deleteItem(index)}
-        aria-label="Delete row"
-      >
-        <Trash2/>
-      </button>
+      <div class="flex gap-2">
+        <button type="button" class="btn" onclick={addItem}>
+          <CirclePlus />
+        </button>
+      </div>
     </div>
-  {/each}
-
-  <button class="btn btn-primary" onclick={addItem}>
-    <CirclePlus/>
-  </button>
+  </EnhancedForm>
 </div>
