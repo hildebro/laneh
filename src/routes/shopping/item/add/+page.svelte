@@ -2,14 +2,17 @@
   import { CirclePlus, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
+
+  let { data } = $props();
 
   let items: { amount: string, name: string }[] = $state([{ amount: '', name: '' }]);
 
   let amountRefs: HTMLInputElement[] = [];
   let nameRefs: HTMLInputElement[] = [];
 
-  async function addItem() {
+  async function addEmptyRow() {
     items.push({ amount: '', name: '' });
 
     // Wait for DOM update
@@ -18,6 +21,14 @@
     // Focus the 'amount' field of the newly created last item
     const lastIndex = items.length - 1;
     amountRefs[lastIndex]?.focus();
+  }
+
+  function addSuggestion(name: string) {
+    items.push({ amount: '', name });
+  }
+
+  function suggestionNotPresent(name: string) {
+    return !items.find(item => item.name === name);
   }
 
   function deleteItem(index: number) {
@@ -42,7 +53,7 @@
       const isLastItem = index === items.length - 1;
 
       if (isLastItem) {
-        await addItem();
+        await addEmptyRow();
       } else {
         amountRefs[index + 1]?.focus();
       }
@@ -86,12 +97,23 @@
           </button>
         </div>
       {/each}
-
       <div class="flex gap-2">
-        <button type="button" class="btn btn-sm" onclick={addItem}>
+        <button type="button" class="btn btn-sm" onclick={addEmptyRow}>
           <CirclePlus />
         </button>
       </div>
+      {#await data.suggestions}
+        <LoadingSpinner />
+      {:then suggestions}
+        {m.shopping_add_items_suggestions()}
+        {#each suggestions as suggestion(suggestion.name)}
+          {#if suggestionNotPresent(suggestion.name)}
+            <button type="button" class="btn" onclick={() => addSuggestion(suggestion.name)}>
+              {suggestion.name}
+            </button>
+          {/if}
+        {/each}
+      {/await}
     </div>
   </EnhancedForm>
 </div>
