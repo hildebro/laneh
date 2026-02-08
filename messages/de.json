@@ -43,6 +43,7 @@
   "footer_user": "Eingeloggt als {name}",
   "form_invalid": "Ungültige Eingabe",
   "form_invalid_nonempty": "Darf nicht leergelassen werden",
+  "generic_amount": "Menge",
   "generic_cancel": "Abbrechen",
   "generic_confirm": "Bestätigen",
   "generic_continue": "Weiter",

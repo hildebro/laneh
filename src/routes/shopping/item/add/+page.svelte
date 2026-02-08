@@ -65,12 +65,16 @@
   <EnhancedForm submitButtonClasses="ml-auto">
     <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
     <div class="flex flex-col gap-1">
+      <div class="flex gap-1">
+        <div class="w-18">{ m.generic_amount() }</div>
+        <div>{ m.generic_name() }</div>
+      </div>
       {#each items as item, index (index)}
         <div class="flex gap-1">
           <input
             name="amounts"
             bind:this={amountRefs[index]}
-            class="input flex-4"
+            class="input w-18"
             type="text"
             placeholder="1"
             bind:value={item.amount}
@@ -80,16 +84,15 @@
           <input
             name="names"
             bind:this={nameRefs[index]}
-            class="input flex-12"
+            class="input"
             type="text"
-            placeholder="Item Name"
             bind:value={item.name}
             onkeydown={(e) => handleKeyDown(e, index, 'name')}
           />
 
           <button
             type="button"
-            class="btn preset-filled-error-800-200 btn-sm flex-1"
+            class="btn preset-filled-error-800-200 btn-sm"
             tabindex="-1"
             onclick={() => deleteItem(index)}
           >
