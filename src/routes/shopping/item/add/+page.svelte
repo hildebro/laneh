@@ -81,7 +81,6 @@
             class="btn preset-filled-error-800-200 btn-sm flex-1"
             tabindex="-1"
             onclick={() => deleteItem(index)}
-            aria-label="Delete row"
           >
             <Trash2 />
           </button>
@@ -89,7 +88,7 @@
       {/each}
 
       <div class="flex gap-2">
-        <button type="button" class="btn" onclick={addItem}>
+        <button type="button" class="btn btn-sm" onclick={addItem}>
           <CirclePlus />
         </button>
       </div>
