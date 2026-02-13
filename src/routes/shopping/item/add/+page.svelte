@@ -1,13 +1,22 @@
 <script lang="ts">
+  import levenshteinPkg from 'fast-levenshtein';
   import { CirclePlus, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  // The actual function is usually on the '.get' property for this library
+  const levenshtein = levenshteinPkg.get;
 
   let { data } = $props();
 
-  let items: { amount: string, name: string }[] = $state([{ amount: '', name: '' }]);
+  let items: { amount: string, name: string, overwrittenName?: string }[] = $state(
+    [{
+      amount: '',
+      name: '',
+      overwrittenName: undefined
+    }]
+  );
 
   let amountRefs: HTMLInputElement[] = [];
   let nameRefs: HTMLInputElement[] = [];
@@ -59,6 +68,41 @@
       }
     }
   }
+
+  function handleCorrection(index: number) {
+    const maxDistance = 2;
+
+    const name = items[index].name;
+
+    const lowerCaseName = name.toLowerCase();
+
+    let closestItem = null;
+    let minDistanceFound = Infinity; // Start with a distance larger than any possible outcome
+
+    for (const item of data.allItems) {
+      const itemNameLower = item.name.toLowerCase();
+
+      // Avoid comparing the item with itself (exact match)
+      if (itemNameLower === lowerCaseName) {
+        continue; // Skip to the next item
+      }
+
+      // Calculate Levenshtein distance
+      const distance = levenshtein(lowerCaseName, itemNameLower);
+
+      // Check if this item is within the threshold AND closer than the current best match found
+      if (distance > 0 && distance <= maxDistance && distance < minDistanceFound) {
+        // We found a new closest item
+        minDistanceFound = distance;
+        closestItem = item;
+      }
+    }
+
+    if (closestItem) {
+      items[index].overwrittenName = name;
+      items[index].name = closestItem.name;
+    }
+  }
 </script>
 
 <div class="card w-full">
@@ -88,7 +132,11 @@
             type="text"
             bind:value={item.name}
             onkeydown={(e) => handleKeyDown(e, index, 'name')}
+            onfocusout={() => handleCorrection(index)}
           />
+          {#if item.overwrittenName}
+            {item.overwrittenName}
+          {/if}
 
           <button
             type="button"

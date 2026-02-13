@@ -344,6 +344,12 @@ export const countActiveShoppingItems = async () => {
   ).at(0)?.count ?? 0;
 };
 
+export const findAllShoppingItems = async () => {
+  const db = getTx();
+
+  return db.query.shoppingItem.findMany().execute();
+}
+
 export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 4) => {
   const db = getTx();
   const sevenDaysAgo = new Date();
