@@ -8,6 +8,7 @@ import {
   addPerfectStagedItem,
   addStagedShoppingList,
   commitStagedItems,
+  findAllShoppingItems,
   findShoppingItem,
   findSimilarShoppingItem,
   findStagedShoppingList,
@@ -21,10 +22,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const existingList = await findStagedShoppingList(userId);
   if (existingList) {
-    return redirect(302, 'validate');
+    return redirect(302, resolve('/shopping/item/validate'));
   }
 
-  return { suggestions: getItemAddSuggestions() };
+  return { allItems: await findAllShoppingItems(), suggestions: getItemAddSuggestions() };
 };
 
 const addingItemsSchema = z
