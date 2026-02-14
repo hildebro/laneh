@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { Collapsible } from '@skeletonlabs/skeleton-svelte';
   import levenshteinPkg from 'fast-levenshtein';
-  import { CirclePlus, Trash2 } from 'lucide-svelte';
+  import { CirclePlus, FileExclamationPoint, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -73,6 +74,9 @@
     const maxDistance = 2;
 
     const name = items[index].name;
+    if (name.length === 0) {
+      return;
+    }
 
     const lowerCaseName = name.toLowerCase();
 
@@ -103,6 +107,13 @@
       items[index].name = closestItem.name;
     }
   }
+
+  function handleRestore(index: number) {
+    if (items[index].overwrittenName) {
+      items[index].name = items[index].overwrittenName;
+      items[index].overwrittenName = undefined;
+    }
+  }
 </script>
 
 <div class="card w-full">
@@ -125,18 +136,30 @@
             onkeydown={(e) => handleKeyDown(e, index, 'amount')}
           />
 
-          <input
-            name="names"
-            bind:this={nameRefs[index]}
-            class="input"
-            type="text"
-            bind:value={item.name}
-            onkeydown={(e) => handleKeyDown(e, index, 'name')}
-            onfocusout={() => handleCorrection(index)}
-          />
-          {#if item.overwrittenName}
-            {item.overwrittenName}
-          {/if}
+          <div class="flex grow">
+            <input
+              name="names"
+              bind:this={nameRefs[index]}
+              class="input grow"
+              type="text"
+              bind:value={item.name}
+              onkeydown={(e) => handleKeyDown(e, index, 'name')}
+              onfocusout={() => handleCorrection(index)}
+            />
+            {#if item.overwrittenName}
+              <div>
+                <Collapsible>
+                  <Collapsible.Trigger>
+                    <FileExclamationPoint/>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content>
+                    Original value: {item.overwrittenName}
+                    <button type="button" class="btn" onclick={() => handleRestore(index)}>reset</button>
+                  </Collapsible.Content>
+                </Collapsible>
+              </div>
+            {/if}
+          </div>
 
           <button
             type="button"
