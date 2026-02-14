@@ -29,13 +29,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 const addingItemsSchema = z
   .object({
     amounts: z.array(z.string()),
-    names: z.array(z.string().nonempty())
+    names: z.array(z.string())
   })
   .transform((data) => {
-    return data.amounts.map((amount, index) => ({
-      amount,
-      name: data.names[index] ?? 0
-    }));
+    return data.names
+      .filter(name => name.trim().length > 0)
+      .map((name, index) => ({
+        amount: data.amounts[index]?.trim()?.toLowerCase() ?? 0,
+        name: name.trim().toLowerCase(),
+      }));
   })
   .refine(
     (data) => {
