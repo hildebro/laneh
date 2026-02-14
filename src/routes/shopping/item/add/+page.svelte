@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Collapsible } from '@skeletonlabs/skeleton-svelte';
   import levenshteinPkg from 'fast-levenshtein';
-  import { CirclePlus, FileExclamationPoint, Trash2 } from 'lucide-svelte';
+  import { CircleAlert, CirclePlus, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -11,10 +11,11 @@
 
   let { data } = $props();
 
-  let items: { amount: string, name: string, overwrittenName?: string }[] = $state(
+  let items: { amount: string, name: string, collapsibleOpen: boolean, overwrittenName?: string }[] = $state(
     [{
       amount: '',
       name: '',
+      collapsibleOpen: false,
       overwrittenName: undefined
     }]
   );
@@ -23,7 +24,7 @@
   let nameRefs: HTMLInputElement[] = [];
 
   async function addEmptyRow() {
-    items.push({ amount: '', name: '' });
+    items.push({ amount: '', name: '', collapsibleOpen: false });
 
     // Wait for DOM update
     await tick();
@@ -34,7 +35,7 @@
   }
 
   function addSuggestion(name: string) {
-    items.push({ amount: '', name });
+    items.push({ amount: '', name, collapsibleOpen: false });
   }
 
   function suggestionNotPresent(name: string) {
@@ -112,6 +113,7 @@
     if (items[index].overwrittenName) {
       items[index].name = items[index].overwrittenName;
       items[index].overwrittenName = undefined;
+      items[index].collapsibleOpen = false;
     }
   }
 </script>
@@ -136,31 +138,42 @@
             onkeydown={(e) => handleKeyDown(e, index, 'amount')}
           />
 
-          <div class="flex grow">
-            <input
-              name="names"
-              bind:this={nameRefs[index]}
-              class="input grow"
-              type="text"
-              bind:value={item.name}
-              onkeydown={(e) => handleKeyDown(e, index, 'name')}
-              onfocusout={() => handleCorrection(index)}
-            />
-            {#if item.overwrittenName}
-              <div>
-                <Collapsible>
-                  <Collapsible.Trigger>
-                    <FileExclamationPoint/>
-                  </Collapsible.Trigger>
-                  <Collapsible.Content>
-                    Original value: {item.overwrittenName}
-                    <button type="button" class="btn" onclick={() => handleRestore(index)}>reset</button>
-                  </Collapsible.Content>
-                </Collapsible>
-              </div>
-            {/if}
-          </div>
-
+          <Collapsible
+            open={item.collapsibleOpen}
+            onOpenChange={(details) => (item.collapsibleOpen = details.open)}
+          >
+            <div class="flex gap-0.5">
+              <input
+                name="names"
+                bind:this={nameRefs[index]}
+                class="input"
+                type="text"
+                bind:value={item.name}
+                onkeydown={(e) => handleKeyDown(e, index, 'name')}
+                onfocusout={() => handleCorrection(index)}
+              />
+              {#if item.overwrittenName}
+                <Collapsible.Trigger>
+                  <button
+                    type="button"
+                    class="btn preset-filled-warning-800-200 btn-sm"
+                    tabindex="-1"
+                  >
+                    <CircleAlert />
+                  </button>
+                </Collapsible.Trigger>
+              {/if}
+            </div>
+            <Collapsible.Content>
+              { m.shopping_add_items_original_value({ value: item.overwrittenName ?? '' }) }
+              <button type="button"
+                      class="btn"
+                      onclick={() => handleRestore(index)}
+              >
+                { m.shopping_add_items_original_value_revert() }
+              </button>
+            </Collapsible.Content>
+          </Collapsible>
           <button
             type="button"
             class="btn preset-filled-error-800-200 btn-sm"

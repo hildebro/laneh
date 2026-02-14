@@ -111,6 +111,8 @@
   "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters.",
   "shopping_add_items": "Add items",
   "shopping_add_items_label": "Items to add:",
+  "shopping_add_items_original_value": "You typed: {value}",
+  "shopping_add_items_original_value_revert": "Revert correction",
   "shopping_add_items_parse_error": "Some lines could not be parsed. Please check for mistakes.",
   "shopping_add_items_suggestions": "These popular items haven't been bought in a while. You can add them by pressing the button:",
   "shopping_cancel_staging": "Cancel adding items",
