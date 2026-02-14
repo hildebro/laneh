@@ -74,26 +74,24 @@
   function handleCorrection(index: number) {
     const maxDistance = 2;
 
-    const name = items[index].name;
+    const name = items[index].name.trim().toLowerCase();
     if (name.length === 0) {
       return;
     }
-
-    const lowerCaseName = name.toLowerCase();
 
     let closestItem = null;
     let minDistanceFound = Infinity; // Start with a distance larger than any possible outcome
 
     for (const item of data.allItems) {
-      const itemNameLower = item.name.toLowerCase();
+      const compareName = item.name.trim().toLowerCase();
 
       // Avoid comparing the item with itself (exact match)
-      if (itemNameLower === lowerCaseName) {
+      if (compareName === name) {
         continue; // Skip to the next item
       }
 
       // Calculate Levenshtein distance
-      const distance = levenshtein(lowerCaseName, itemNameLower);
+      const distance = levenshtein(name, compareName);
 
       // Check if this item is within the threshold AND closer than the current best match found
       if (distance > 0 && distance <= maxDistance && distance < minDistanceFound) {
@@ -104,7 +102,7 @@
     }
 
     if (closestItem) {
-      items[index].overwrittenName = name;
+      items[index].overwrittenName = items[index].name;
       items[index].name = closestItem.name;
     }
   }
