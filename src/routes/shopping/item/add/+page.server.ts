@@ -3,14 +3,12 @@ import type { PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import {
-  addCloseStagedItem,
   addNewStagedItem,
   addPerfectStagedItem,
   addStagedShoppingList,
   commitStagedItems,
   findAllShoppingItems,
   findShoppingItem,
-  findSimilarShoppingItem,
   findStagedShoppingList,
   getItemAddSuggestions
 } from '$lib/server/db/functions';
@@ -22,7 +20,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const existingList = await findStagedShoppingList(userId);
   if (existingList) {
-    return redirect(302, resolve('/shopping/item/validate'));
+    return redirect(302, resolve('/shopping/item/categorize'));
   }
 
   return { allItems: await findAllShoppingItems(), suggestions: getItemAddSuggestions() };
@@ -57,23 +55,16 @@ export const actions = {
       const listId = await addStagedShoppingList(userId);
 
       // --- Process lines and prepare staged data ---
-      let needsValidation = false;
       let needsCategorization = false;
       for (const item of items) {
         // case `perfect_match` doesn't matter to us here.
-        const result = await persistStagedItem(item.name, item.amount, listId);
-        switch (result) {
-          case 'close_match':
-            needsValidation = true;
-            continue;
-          case 'unmatched':
-            needsCategorization = true;
+        const isNewItem = await persistStagedItem(item.name, item.amount, listId);
+        if (isNewItem) {
+          needsCategorization = true;
         }
       }
 
-      if (needsValidation) {
-        return redirect(303, resolve('/shopping/item/validate'));
-      } else if (needsCategorization) {
+      if (needsCategorization) {
         return redirect(303, resolve('/shopping/item/categorize'));
       } else {
         // If all items are perfect matches, we can just commit them
@@ -85,26 +76,18 @@ export const actions = {
   }
 };
 
-type MatchResult = 'perfect_match' | 'close_match' | 'unmatched';
+/**
+ * Returns true, if the item is new.
+ */
+async function persistStagedItem(name: string, amount: string, listId: string): Promise<boolean> {
+  const matchedItem = await findShoppingItem(name);
+  if (matchedItem) {
+    await addPerfectStagedItem(listId, matchedItem, amount);
 
-async function persistStagedItem(name: string, amount: string, listId: string): Promise<MatchResult> {
-  // 1. Perfect Match (case-insensitive, check active & inactive)
-  const perfectMatch = await findShoppingItem(name);
-  if (perfectMatch) {
-    await addPerfectStagedItem(listId, perfectMatch, amount);
-
-    return 'perfect_match';
-  }
-
-  // 2. Very Close Match
-  const similarItem = await findSimilarShoppingItem(name);
-  if (similarItem) {
-    await addCloseStagedItem(listId, similarItem, name, amount);
-
-    return 'close_match';
+    return false;
   }
 
   await addNewStagedItem(listId, name, amount);
 
-  return 'unmatched';
+  return true;
 }
