@@ -85,9 +85,9 @@
     for (const item of data.allItems) {
       const compareName = item.name.trim().toLowerCase();
 
-      // Avoid comparing the item with itself (exact match)
+      // If an exact match exists, we don't need to correct.
       if (compareName === name) {
-        continue; // Skip to the next item
+        return;
       }
 
       // Calculate Levenshtein distance
