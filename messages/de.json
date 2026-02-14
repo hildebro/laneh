@@ -111,6 +111,8 @@
   "settings_users_username_invalid": "Fehlerhafter Name. Muss eine Länge zwischen {min} und {max} haben und keine Sonderzeichen beinhalten.",
   "shopping_add_items": "Artikel hinzufügen",
   "shopping_add_items_label": "Artikel zum Hinzufügen:",
+  "shopping_add_items_original_value": "Deine Eingabe: {value}",
+  "shopping_add_items_original_value_revert": "Korrektur zurücksetzen",
   "shopping_add_items_parse_error": "Einige Zeilen konnten nicht verarbeitet werden. Bitte prüfe auf Fehler.",
   "shopping_add_items_suggestions": "Diese beliebten Artikel sind seit einer Weile nicht mehr gekauft worden. Du kannst sie per Knopfdruck hinzufügen:",
   "shopping_cancel_staging": "Hinzufüge-Prozess abbrechen",
