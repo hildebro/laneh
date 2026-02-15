@@ -5,8 +5,8 @@ Install `docker` `docker compose` and `docker-buildx`.
 
 ### Setup
 - Clone the repository.
-- Copy `.env.exmaple` to `.env` and adjust based on your needs.
-- Create a TOTP entry in the password manager of your choice. With the default secrets, it could look like this:
+- Copy `.env.exmaple` to `.env` and replace all placeholder secrets with proper values.
+- Create a TOTP entry in the password manager of your choice. With the default secrets, it would look like this:
 ```
 otpauth://totp/Chorehub:shared?secret=OTP_SECRET&issuer=Chorehub&algorithm=SHA1&digits=6&period=30
 ```
