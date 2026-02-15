@@ -40,3 +40,38 @@ RestartSec=5s
 [Install]
 WantedBy=multi-user.target
 ```
+
+Example `webhook` config:
+```json
+[
+  {
+    "id": "deploy-chorehub",
+    "execute-command": "/my/working/dir/deploy.sh",
+    "command-working-directory": "/my/working/dir",
+    "trigger-rule": {
+      "match": {
+        "type": "value",
+        "value": "YOUR_SECRET_TOKEN_HERE",
+        "parameter": {
+          "source": "header",
+          "name": "X-Deploy-Token"
+        }
+      }
+    }
+  }
+]
+```
+
+Example `deploy.sh` script:
+```shell
+#!/bin/bash
+set -e
+
+cd /my/working/dir
+
+git pull origin main
+
+# This specific command needs to be added to sudoers file so that it can be 
+# executed without password prompt.
+sudo systemctl restart chorehub
+```
