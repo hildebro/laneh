@@ -1,3 +1,4 @@
+# Build
 node_modules
 .yarn/.cache
 .pnp.*
@@ -28,3 +29,6 @@ vite.config.ts.timestamp-*
 
 # Paraglide
 src/lib/paraglide
+
+# Deploy script
+deploy.sh

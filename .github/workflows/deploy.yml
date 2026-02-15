@@ -9,20 +9,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up SSH
+      - name: Trigger deploy webhook
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to Server
-        run: |
-          ssh -i ~/.ssh/id_rsa -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} \
-            "cd /srv/chorehub && \
-            git pull origin main && \
-            sudo systemctl restart chorehub"
+          curl -X POST http://${{ secrets.SERVER_IP }}:9000/hooks/deploy-chorehub \
+          -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
+          --fail
