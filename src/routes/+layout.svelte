@@ -1,11 +1,27 @@
 <script lang="ts">
   import '../app.css';
+  import { Capacitor } from '@capacitor/core';
+  import { StatusBar } from '@capacitor/status-bar';
   import { Toast } from '@skeletonlabs/skeleton-svelte';
+  import { onMount } from 'svelte';
   import AppHeader from './AppHeader.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { toaster } from '$lib/toaster-ref';
 
   let { children, data } = $props();
+
+  onMount(async () => {
+    if (Capacitor.isNativePlatform()) {
+      // Option A: Make the status bar transparent (Content goes BEHIND it)
+      // You MUST use Method 1 (CSS padding) with this for it to look good.
+      await StatusBar.setOverlaysWebView({ overlay: true });
+
+      // Since your header is "bg-surface-50-950" (likely dark in dark mode, light in light mode),
+      // you might want to dynamically set this, or just stick to Style.Default which adapts.
+      // If your header is always dark-ish, force Light icons:
+      // await StatusBar.setStyle({ style: Style.Dark });
+    }
+  });
 </script>
 
 <Toast.Group {toaster}>
@@ -24,7 +40,7 @@
   <title>Chorehub</title>
 </svelte:head>
 
-<div class="h-screen grid grid-rows-[auto_1fr_auto] overflow-y-auto">
+<div class="h-screen grid grid-rows-[auto_1fr_auto] overflow-y-auto app-shell">
   <AppHeader dueTaskCount={data.dueTaskCount} />
   <main class="flex flex-col items-center p-4">
     {@render children()}
@@ -35,3 +51,12 @@
     {/if}
   </footer>
 </div>
+
+<style>
+    /* This ensures the background color extends BEHIND the status bar,
+       but your content starts BELOW it.
+    */
+    .app-shell {
+        min-height: 100vh;
+    }
+</style>

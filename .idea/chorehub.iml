@@ -6,6 +6,9 @@
       <excludeFolder url="file://$MODULE_DIR$/.svelte-kit" />
       <excludeFolder url="file://$MODULE_DIR$/src/lib/paraglide" />
       <excludeFolder url="file://$MODULE_DIR$/project.inlang/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/mobile-shell/android/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/mobile-shell/android/app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/mobile-shell/android/app/src/main/assets/public" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

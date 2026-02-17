@@ -44,7 +44,10 @@
   let anchorBar = 'btn preset-filled-surface-100-900 hover:preset-tonal flex-col items-center gap-1';
 </script>
 
-<header class="sticky top-0 z-50 bg-surface-50-950 backdrop-blur-xs">
+<header
+  class="sticky top-0 z-50 bg-surface-50-950 backdrop-blur-xs"
+  style="padding-top: env(safe-area-inset-top);"
+>
   <Navigation layout="bar">
     <Navigation.Menu class="grid grid-cols-5 gap-2">
       <a href={base} class={anchorBar}>
