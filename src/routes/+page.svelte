@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
@@ -22,15 +23,15 @@
       <p>{ m.dashboard_shopping_last_purchase({ date: lastPurchaseDate }) }</p>
     {/if}
     <div class="flex gap-2 mt-4">
-      <a class="btn" href="shopping/item/add">{m.shopping_add_items()}</a>
-      <a class="btn" href="shopping/purchase">{m.shopping_start_purchase()}</a>
+      <a class="btn" href={resolve('/shopping/item/add')}>{m.shopping_add_items()}</a>
+      <a class="btn" href={resolve('/shopping/purchase')}>{m.shopping_start_purchase()}</a>
     </div>
   </div>
   <div class="card">
     <h2 class="h2 mb-2">{ m.header_schedule() }</h2>
     <p>{ m.dashboard_schedule_count({ count: data.due_task_count }) }</p>
     <div class="flex gap-2 mt-4">
-      <a class="btn" href="schedule">{ m.dashboard_schedule_go_to() }</a>
+      <a class="btn" href={resolve('/schedule')}>{ m.dashboard_schedule_go_to() }</a>
     </div>
   </div>
 </div>
