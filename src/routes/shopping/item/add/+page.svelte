@@ -130,35 +130,48 @@
    * Returns true, if the item has been corrected.
    */
   function handleCorrection(index: number): boolean {
-    const maxDistance = 2;
-
     let itemToCorrect = items[index];
     if (itemToCorrect.preventCorrection) {
       return false;
     }
 
-    const name = itemToCorrect.name.trim().toLowerCase();
-    if (name.length === 0) {
+    const nameToCorrect = itemToCorrect.name.trim().toLowerCase();
+    if (nameToCorrect.length === 0) {
       return false;
     }
 
+    // Dynamic maximum distance: Shorter words get less leeway.
+    // Length <= 4: max 1 typo
+    // Length 5-7: max 2 typos
+    // Length 8+: max 3 typos
+    let maxDistance = 1;
+    if (nameToCorrect.length >= 5) maxDistance = 2;
+    if (nameToCorrect.length >= 8) maxDistance = 3;
+
     let closestItem = null;
-    let minDistanceFound = Infinity; // Start with a distance larger than any possible outcome
+    let minDistanceFound = Infinity;
 
     for (const item of data.allItems) {
       const compareName = item.name.trim().toLowerCase();
 
-      // If an exact match exists, we don't need to correct.
-      if (compareName === name) {
+      // If an exact match exists on the ORIGINAL string, abort correction.
+      if (compareName === nameToCorrect) {
         return false;
       }
 
-      // Calculate Levenshtein distance
-      const distance = levenshtein(name, compareName);
+      let distance = levenshtein(nameToCorrect, compareName);
 
-      // Check if this item is within the threshold AND closer than the current best match found
-      if (distance > 0 && distance <= maxDistance && distance < minDistanceFound) {
-        // We found a new closest item
+      // Substring Bonus: If one word entirely contains the other, we can artificially lower the
+      // distance by 1 to be more forgiving.
+      if (
+        (compareName.startsWith(nameToCorrect) || nameToCorrect.startsWith(compareName))
+        && distance > 0
+      ) {
+        distance -= 1;
+      }
+
+      // Check against our dynamic threshold
+      if (distance >= 0 && distance <= maxDistance && distance < minDistanceFound) {
         minDistanceFound = distance;
         closestItem = item;
       }
