@@ -54,6 +54,11 @@
   function deleteItem(index: number) {
     if (items.length > 1) {
       items.splice(index, 1);
+    } else {
+      // If we only have a single line, we clear it instead of removing it. It's not a great UX to
+      // have no input fields at all.
+      items[index].amount = '';
+      items[index].name = '';
     }
   }
 
