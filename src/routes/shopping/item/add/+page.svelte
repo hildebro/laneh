@@ -35,6 +35,15 @@
   }
 
   function addSuggestion(name: string) {
+    for (const index in items) {
+      if(items[index].name.trim().length === 0 && items[index].amount.trim().length === 0) {
+        items[index].name = name;
+
+        return;
+      }
+    }
+
+    // Push a new line, if no empty line was present to fill.
     items.push({ amount: '', name, collapsibleOpen: false });
   }
 
