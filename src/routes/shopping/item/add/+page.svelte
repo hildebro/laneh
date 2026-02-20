@@ -104,7 +104,7 @@
   function applyCorrections(e: MouseEvent) {
     let anyItemCorrected = false;
     for (const index in items) {
-      anyItemCorrected = anyItemCorrected || handleCorrection(parseInt(index));
+      anyItemCorrected = handleCorrection(parseInt(index)) || anyItemCorrected;
     }
 
     if (anyItemCorrected) {
