@@ -35,8 +35,8 @@ const addingItemsSchema = z
     return data.names
       .filter(name => name.trim().length > 0)
       .map((name, index) => ({
-        amount: data.amounts[index]?.trim()?.toLowerCase() ?? 0,
-        name: name.trim().toLowerCase(),
+        amount: data.amounts[index]?.trim() ?? 0,
+        name: name.trim(),
       }));
   })
   .refine(
