@@ -69,7 +69,12 @@
     const isEnter = e.key === 'Enter';
     const isTabForward = e.key === 'Tab' && !e.shiftKey;
 
-    if (!isEnter && !isTabForward) return;
+    if (!isEnter && !isTabForward) {
+      // Any kind of manual change to the input fields should force corrections again.
+      correctionRequired = true;
+
+      return;
+    }
 
     e.preventDefault();
 
