@@ -14,11 +14,18 @@
 
   let correctionRequired = $state(true);
 
-  let items: { amount: string, name: string, collapsibleOpen: boolean, overwrittenName?: string }[] = $state(
+  let items: {
+    amount: string,
+    name: string,
+    collapsibleOpen: boolean,
+    preventCorrection: boolean,
+    overwrittenName?: string
+  }[] = $state(
     [{
       amount: '',
       name: '',
       collapsibleOpen: false,
+      preventCorrection: false,
       overwrittenName: undefined
     }]
   );
@@ -27,7 +34,7 @@
   let nameRefs: HTMLInputElement[] = [];
 
   async function addEmptyRow() {
-    items.push({ amount: '', name: '', collapsibleOpen: false });
+    items.push({ amount: '', name: '', collapsibleOpen: false, preventCorrection: false });
 
     // Wait for DOM update
     await tick();
@@ -47,7 +54,7 @@
     }
 
     // Push a new line, if no empty line was present to fill.
-    items.push({ amount: '', name, collapsibleOpen: false });
+    items.push({ amount: '', name, collapsibleOpen: false, preventCorrection: false });
   }
 
   function suggestionNotPresent(name: string) {
@@ -72,6 +79,7 @@
     if (!isEnter && !isTabForward) {
       // Any kind of manual change to the input fields should force corrections again.
       correctionRequired = true;
+      items[index].preventCorrection = false;
 
       return;
     }
@@ -121,7 +129,12 @@
   function handleCorrection(index: number): boolean {
     const maxDistance = 2;
 
-    const name = items[index].name.trim().toLowerCase();
+    let itemToCorrect = items[index];
+    if (itemToCorrect.preventCorrection) {
+      return false;
+    }
+
+    const name = itemToCorrect.name.trim().toLowerCase();
     if (name.length === 0) {
       return false;
     }
@@ -149,8 +162,8 @@
     }
 
     if (closestItem) {
-      items[index].overwrittenName = items[index].name;
-      items[index].name = closestItem.name;
+      itemToCorrect.overwrittenName = itemToCorrect.name;
+      itemToCorrect.name = closestItem.name;
     }
 
     return !!closestItem;
@@ -161,6 +174,9 @@
       items[index].name = items[index].overwrittenName;
       items[index].overwrittenName = undefined;
       items[index].collapsibleOpen = false;
+      // After a correction is reverted, we don't want that field to be corrected again (unless that
+      // field is modified later).
+      items[index].preventCorrection = true;
     }
   }
 </script>
