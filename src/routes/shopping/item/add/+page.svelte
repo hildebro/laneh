@@ -126,6 +126,9 @@
     }
   }
 
+  /**
+   * Returns true, if the item has been corrected.
+   */
   function handleCorrection(index: number): boolean {
     const maxDistance = 2;
 
