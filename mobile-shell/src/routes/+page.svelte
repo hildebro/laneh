@@ -11,6 +11,21 @@
 
 	// Auto-fill the URL when the app opens
 	onMount(async () => {
+		const urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.get('action') === 'disconnect') {
+
+			// 2. Clear the native storage from within the safe wrapper context
+			await Preferences.remove({ key: 'savedServerUrl' });
+
+			// 3. Clean up the URL so a simple page refresh doesn't trigger this again
+			window.history.replaceState({}, '', '/');
+
+			alert('Successfully disconnected and URL cleared!');
+
+			// 4. Stop execution so it doesn't auto-redirect!
+			return;
+		}
+
 		const { value } = await Preferences.get({ key: 'savedServerUrl' });
 		if (value) {
 			url = value;
