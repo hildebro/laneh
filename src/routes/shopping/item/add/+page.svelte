@@ -194,6 +194,7 @@
                 name="names"
                 bind:this={nameRefs[index]}
                 class="input"
+                class:preset-filled-warning-800-200={!!item.overwrittenName}
                 type="text"
                 bind:value={item.name}
                 onkeydown={(e) => handleKeyDown(e, index, 'name')}
