@@ -6,10 +6,13 @@
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { toaster } from '$lib/toaster-ref';
   // The actual function is usually on the '.get' property for this library
   const levenshtein = levenshteinPkg.get;
 
   let { data } = $props();
+
+  let correctionRequired = $state(true);
 
   let items: { amount: string, name: string, collapsibleOpen: boolean, overwrittenName?: string }[] = $state(
     [{
@@ -36,7 +39,7 @@
 
   function addSuggestion(name: string) {
     for (const index in items) {
-      if(items[index].name.trim().length === 0 && items[index].amount.trim().length === 0) {
+      if (items[index].name.trim().length === 0 && items[index].amount.trim().length === 0) {
         items[index].name = name;
 
         return;
@@ -85,12 +88,37 @@
     }
   }
 
-  function handleCorrection(index: number) {
+  function applyCorrections(e: MouseEvent) {
+    let anyItemCorrected = false;
+    for (const index in items) {
+      anyItemCorrected = anyItemCorrected || handleCorrection(parseInt(index));
+    }
+
+    if (anyItemCorrected) {
+      // Prevent the button from causing a submit.
+      e.preventDefault();
+      // Let the user know about executed corrections.
+      toaster.warning({
+        title: m.shopping_add_items_correction_title(),
+        description: m.shopping_add_items_correction_description(),
+        duration: 5000
+      });
+      // Flip the value, so the next submit won't execute corrections again. Note that it's
+      // technically more appropriate to update this flag outside the if-clause. Whether something
+      // was corrected doesn't really matter for this flag: It could be set to false regardless.
+      // But that would cause the correction button to be removed from the DOM and in turn prevent
+      // the submit action. Since we only want to prevent it, if an item was corrected, we are
+      // forced to keep it here.
+      correctionRequired = false;
+    }
+  }
+
+  function handleCorrection(index: number): boolean {
     const maxDistance = 2;
 
     const name = items[index].name.trim().toLowerCase();
     if (name.length === 0) {
-      return;
+      return false;
     }
 
     let closestItem = null;
@@ -101,7 +129,7 @@
 
       // If an exact match exists, we don't need to correct.
       if (compareName === name) {
-        return;
+        return false;
       }
 
       // Calculate Levenshtein distance
@@ -119,6 +147,8 @@
       items[index].overwrittenName = items[index].name;
       items[index].name = closestItem.name;
     }
+
+    return !!closestItem;
   }
 
   function handleRestore(index: number) {
@@ -131,7 +161,7 @@
 </script>
 
 <div class="card w-full">
-  <EnhancedForm submitButtonClasses="ml-auto">
+  <EnhancedForm submitButtonClasses="ml-auto" hideSubmitButton={correctionRequired}>
     <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
     <div class="flex flex-col gap-1">
       <div class="flex gap-1">
@@ -162,7 +192,6 @@
                 type="text"
                 bind:value={item.name}
                 onkeydown={(e) => handleKeyDown(e, index, 'name')}
-                onfocusout={() => handleCorrection(index)}
               />
               {#if item.overwrittenName}
                 <Collapsible.Trigger>
@@ -214,5 +243,10 @@
         {/each}
       {/await}
     </div>
+    {#snippet additionalButtons()}
+      {#if correctionRequired}
+        <button class="btn ml-auto" type="submit" onclick={applyCorrections}>{ m.generic_save() }</button>
+      {/if}
+    {/snippet}
   </EnhancedForm>
 </div>
