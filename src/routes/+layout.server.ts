@@ -21,5 +21,10 @@ export const load: LayoutServerLoad = async (event) => {
     return redirect(302, `${base}/settings/users`);
   }
 
-  return { user: event.locals.user, authenticated: event.locals.authenticated, dueTaskCount: await countDueTasks() };
+  return {
+    user: event.locals.user,
+    authenticated: event.locals.authenticated,
+    dueTaskCount: await countDueTasks(),
+    returnUrl: event.cookies.get('returnUrl')
+  };
 };

@@ -1,11 +1,33 @@
-import { type Handle } from '@sveltejs/kit';
+import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
+import { dev } from '$app/environment';
 import { USER_COOKIE } from '$lib';
 import { transactionContext } from '$lib/context';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { getSession, refreshSession } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { findUser } from '$lib/server/db/functions';
+
+/**
+ * If a return url is provided via params, we save it as a cookie and then drop that param.
+ */
+const handleReturnUrl: Handle = async ({ event, resolve }) => {
+  const returnUrl = event.url.searchParams.get('returnUrl');
+  if (!returnUrl) {
+    return resolve(event);
+  }
+
+  event.cookies.set('returnUrl', returnUrl, {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: !dev
+  });
+
+  const cleanUrl = new URL(event.url);
+  cleanUrl.searchParams.delete('returnUrl');
+  return redirect(302, cleanUrl.toString());
+};
 
 const handleAuth: Handle = async ({ event, resolve }) => {
   const session = await getSession(event.cookies);
@@ -69,4 +91,4 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     });
   });
 
-export const handle: Handle = sequence(handleAuth, handleDatabase, handleUser, handleParaglide);
+export const handle: Handle = sequence(handleReturnUrl, handleAuth, handleDatabase, handleUser, handleParaglide);
