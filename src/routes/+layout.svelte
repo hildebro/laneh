@@ -12,13 +12,13 @@
   const isNative = Capacitor.isNativePlatform();
 
   function disconnectFromWrapper() {
-    const platform = Capacitor.getPlatform();
-    const localBaseUrl = platform === 'ios'
-      ? 'capacitor://localhost'
-      : 'http://localhost';
+    if (!data.returnUrl) {
+      alert('No returnUrl provided.');
+      return;
+    }
 
     // Bounce back to the wrapper, appending a query parameter
-    window.location.replace(`${localBaseUrl}?action=disconnect`);
+    window.location.replace(`${data.returnUrl}?action=disconnect`);
   }
 
   let { children, data } = $props();
@@ -59,6 +59,9 @@
     {@render children()}
   </main>
   <footer class="text-right text-xs p-1">
+    {#if data.returnUrl}
+      {data.returnUrl}
+    {/if}
     {#if isNative}
       <div class="native-controls">
         <button type="button" onclick={disconnectFromWrapper} class="btn">

@@ -53,7 +53,8 @@
         await Preferences.set({ key: 'savedServerUrl', value: url });
 
         // 2. Navigate the webview to the hosted app
-        window.location.href = url;
+        const currentOrigin = encodeURIComponent(window.location.origin);
+        window.location.href = `${url}?returnUrl=${currentOrigin}`;
       } else {
         errorMessage = `Server responded with status: ${response.status}`;
       }
