@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { Preferences } from '@capacitor/preferences';
 
@@ -6,26 +6,10 @@
 	let isLoading = false;
 	let errorMessage = '';
 
-	let abortController = null;
-	const TIMEOUT_MS = 10000; // 10 seconds
+	let abortController: AbortController|null = null;
+	const TIMEOUT_MS = 10000;
 
-	// Auto-fill the URL when the app opens
 	onMount(async () => {
-		const urlParams = new URLSearchParams(window.location.search);
-		if (urlParams.get('action') === 'disconnect') {
-
-			// 2. Clear the native storage from within the safe wrapper context
-			await Preferences.remove({ key: 'savedServerUrl' });
-
-			// 3. Clean up the URL so a simple page refresh doesn't trigger this again
-			window.history.replaceState({}, '', '/');
-
-			alert('Successfully disconnected and URL cleared!');
-
-			// 4. Stop execution so it doesn't auto-redirect!
-			return;
-		}
-
 		const { value } = await Preferences.get({ key: 'savedServerUrl' });
 		if (value) {
 			url = value;
@@ -76,11 +60,16 @@
 		} catch (error) {
 			clearTimeout(timeoutId);
 
-			if (error.name === 'AbortError') {
-				errorMessage = 'Connection timed out or was cancelled.';
-			} else {
-				errorMessage = 'Failed to reach the server. Is the URL correct?';
-			}
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = 'Connection timed out or was cancelled.';
+        } else {
+          errorMessage = `Failed to reach the server: ${error.message}`;
+        }
+      } else {
+        // Fallback for weird cases where a non-Error was thrown
+        errorMessage = 'Failed to reach the server. Is the URL correct?';
+      }
 		} finally {
 			isLoading = false;
 			abortController = null;
