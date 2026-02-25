@@ -36,10 +36,13 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
-export const addUser = async (username: string): Promise<void> => {
+export const addUser = async (username: string): Promise<string> => {
   const db = getTx();
 
-  await db.insert(table.user).values({ id: generateUUID(), username }).execute();
+  const userId = generateUUID();
+  await db.insert(table.user).values({ id: userId, username }).execute();
+
+  return userId
 };
 
 export const updateDefaultDistribution = async (
