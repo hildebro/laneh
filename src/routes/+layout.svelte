@@ -53,9 +53,11 @@
   <title>Chorehub</title>
 </svelte:head>
 
-<div class="h-screen grid grid-rows-[auto_1fr_auto] overflow-y-auto app-shell">
-  <AppHeader dueTaskCount={data.dueTaskCount} />
-  <main class="flex flex-col items-center p-4">
+<div class="min-h-screen flex flex-col bg-surface-50-950 app-shell">
+  <header class="sticky top-0 z-50 w-full bg-surface-100-800 shadow-md pt-[env(safe-area-inset-top)]">
+    <AppHeader dueTaskCount={data.dueTaskCount} />
+  </header>
+  <main class="flex flex-1 flex-col items-center p-4">
     {@render children()}
   </main>
   <footer class="text-right text-xs p-1">
