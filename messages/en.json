@@ -4,6 +4,7 @@
   "auth_access_code_invalid": "The code is not valid. Make sure your 2FA was set up correctly.",
   "auth_login": "Login",
   "balance": "Balances",
+  "balance_none": "There are no balances between users yet.",
   "balance_expense_add": "Add expense",
   "balance_expense_distribution": "Distribution (%)",
   "balance_expense_distribution_invalid_sum": "Distribution amounts must add up to exactly 100%",
@@ -13,6 +14,7 @@
   "balance_owed": "{user} is owed",
   "balance_owed_debtor": "{amount} by {debtor}",
   "balance_price": "Price",
+  "dashboard_balance_go_to": "View balances",
   "dashboard_schedule_count": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],

@@ -31,6 +31,9 @@
 <div class="flex flex-col gap-3">
   <div class="card flex flex-col gap-2">
     <span class="h5">{m.balance()}</span>
+    {#if data.userDebts.length === 0}
+      { m.balance_none() }
+    {/if}
     {#each data.userDebts as userDebt (userDebt.creditor.id)}
       <div class="flex flex-row justify-center">
         <span>{m.balance_owed({ user: userDebt.creditor.username })}</span>

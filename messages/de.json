@@ -4,6 +4,7 @@
   "auth_access_code_invalid": "Der Code ist ungültig. Bitte prüfe, ob dein 2FA korrekt eingestellt ist.",
   "auth_login": "Einloggen",
   "balance": "Saldos",
+  "balance_none": "Es gibt noch keine Saldos zwischen Nutzer:innen",
   "balance_expense_add": "Ausgabe hinzufügen",
   "balance_expense_distribution": "Aufteilung (%)",
   "balance_expense_distribution_invalid_sum": "Die Aufteilungswerte müssen zusammen exakt 100% sein.",
@@ -13,6 +14,7 @@
   "balance_owed": "{user} erhält",
   "balance_owed_debtor": "{amount} von {debtor}",
   "balance_price": "Price",
+  "dashboard_balance_go_to": "Saldos ansehen",
   "dashboard_schedule_count": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],
