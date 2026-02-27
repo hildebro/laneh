@@ -221,7 +221,7 @@
             open={item.collapsibleOpen}
             onOpenChange={(details) => (item.collapsibleOpen = details.open)}
           >
-            <div class="flex gap-0.5">
+            <div class="flex gap-0.5 w-full">
               <input
                 name="names"
                 bind:this={nameRefs[index]}
@@ -232,14 +232,11 @@
                 onkeydown={(e) => handleKeyDown(e, index, 'name')}
               />
               {#if item.overwrittenName}
-                <Collapsible.Trigger>
-                  <button
-                    type="button"
-                    class="btn preset-filled-warning-800-200 btn-sm"
-                    tabindex="-1"
-                  >
-                    <CircleAlert />
-                  </button>
+                <Collapsible.Trigger
+                  type="button"
+                  class="btn preset-filled-warning-800-200 btn-sm"
+                >
+                  <CircleAlert />
                 </Collapsible.Trigger>
               {/if}
             </div>
