@@ -10,7 +10,7 @@
     { label: m.header_dashboard(), href: resolve('/'), icon: House },
     { label: m.header_shopping(), href: resolve('/shopping'), icon: ShoppingCart },
     { label: m.header_balance(), href: resolve('/balance'), icon: Receipt },
-    { label: m.header_settings(), href: resolve('/schedule'), icon: CalendarDays },
+    { label: m.header_schedule(), href: resolve('/schedule'), icon: CalendarDays },
     { label: m.header_settings(), href: resolve('/settings'), icon: Settings }
   ];
 </script>
