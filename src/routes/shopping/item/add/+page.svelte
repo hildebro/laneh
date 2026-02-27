@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Collapsible } from '@skeletonlabs/skeleton-svelte';
+  import { Collapsible, Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import levenshteinPkg from 'fast-levenshtein';
-  import { CircleAlert, CirclePlus, Trash2 } from 'lucide-svelte';
+  import { CircleAlert, CirclePlus, CircleQuestionMark, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -195,11 +195,37 @@
       items[index].preventCorrection = true;
     }
   }
+
+  const animation = 'transition transition-discrete opacity-0 translate-y-[100px] starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-y-[100px] data-[state=open]:opacity-100 data-[state=open]:translate-y-0';
 </script>
 
 <div class="card w-full">
   <EnhancedForm submitButtonClasses="ml-auto" hideSubmitButton={correctionRequired}>
-    <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
+    <div class="flex justify-between">
+      <h1 class="text-2xl font-semibold">{m.shopping_add_items()}</h1>
+      <Dialog>
+        <Dialog.Trigger class="btn preset-filled-tertiary-500">
+          <CircleQuestionMark />
+          {m.generic_help()}
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
+          <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
+            <Dialog.Content class="card bg-surface-200-800 w-full max-w-xl p-4 space-y-4 shadow-xl {animation}">
+              <header class="flex justify-between items-center">
+                <Dialog.Title class="text-lg font-bold">{m.shopping_add_items()}</Dialog.Title>
+                <Dialog.CloseTrigger class="btn-icon hover:preset-tonal">
+                </Dialog.CloseTrigger>
+              </header>
+              <Dialog.Description class="whitespace-pre-line">{m.shopping_add_items_help()}</Dialog.Description>
+              <footer class="flex justify-end gap-2">
+                <Dialog.CloseTrigger class="btn">{m.generic_close()}</Dialog.CloseTrigger>
+              </footer>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog>
+    </div>
     <div class="flex flex-col gap-1">
       <div class="flex gap-1">
         <div class="w-18">{ m.generic_amount() }</div>
@@ -212,7 +238,6 @@
             bind:this={amountRefs[index]}
             class="input w-18"
             type="text"
-            placeholder="1"
             bind:value={item.amount}
             onkeydown={(e) => handleKeyDown(e, index, 'amount')}
           />
