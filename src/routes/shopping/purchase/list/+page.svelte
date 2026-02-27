@@ -46,14 +46,14 @@
 
 <div class="ml-auto mb-2">
   <Switch class="btn" checked={filterByAge} onCheckedChange={(e) => (filterByAge = e.checked)}>
-    <Switch.Control>
+    <Switch.Control class="data-[state=checked]:preset-filled-primary-800-200">
       <Switch.Thumb />
     </Switch.Control>
     <Switch.Label>{ m.shopping_purchase_filter_age() }</Switch.Label>
     <Switch.HiddenInput />
   </Switch>
   <Switch class="btn" checked={filterByUnmatched} onCheckedChange={(e) => (filterByUnmatched = e.checked)}>
-    <Switch.Control>
+    <Switch.Control class="data-[state=checked]:preset-filled-primary-800-200">
       <Switch.Thumb />
     </Switch.Control>
     <Switch.Label>{ m.shopping_purchase_filter_unmatched() }</Switch.Label>

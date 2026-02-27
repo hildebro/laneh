@@ -20,7 +20,7 @@
 {:then categories}
   <div class="btn mb-2 ml-auto">
     <Switch checked={showInactiveItems} onCheckedChange={(e) => (showInactiveItems = e.checked)}>
-      <Switch.Control>
+      <Switch.Control class="data-[state=checked]:preset-filled-primary-800-200">
         <Switch.Thumb />
       </Switch.Control>
       <Switch.Label>{ m.settings_items_show_inactive() }</Switch.Label>
