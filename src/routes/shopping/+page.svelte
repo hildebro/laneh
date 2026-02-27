@@ -7,16 +7,16 @@
 </script>
 
 <div class="w-full">
+  <div class="flex flex-row items-end justify-between">
+    <a class="underline" href={resolve('/shopping/purchase/list')}>{m.shopping_purchase_list()}</a>
+    <div class="flex flex-wrap justify-end gap-2 mb-4">
+      <a class="btn" href={resolve('/shopping/item/add')}>{m.shopping_add_items()}</a>
+      <a class="btn" href={resolve('/shopping/purchase')}>{m.shopping_start_purchase()}</a>
+    </div>
+  </div>
   {#await data.categories}
     <LoadingSpinner />
   {:then categories}
-    <div class="flex flex-row items-end justify-between">
-      <a class="underline" href={resolve('/shopping/purchase/list')}>{m.shopping_purchase_list()}</a>
-      <div class="flex flex-wrap justify-end gap-2 mb-4">
-        <a class="btn" href={resolve('/shopping/item/add')}>{m.shopping_add_items()}</a>
-        <a class="btn" href={resolve('/shopping/purchase')}>{m.shopping_start_purchase()}</a>
-      </div>
-    </div>
     <div class="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-4">
       {#each categories as category (category.id)}
         <div class="card">
