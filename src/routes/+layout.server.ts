@@ -1,9 +1,27 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { resolve } from '$app/paths';
-import { countDueTasks, findAllUsers } from '$lib/server/db/functions';
+import { countDueTasks, findAllUsers, hasRootPassword } from '$lib/server/db/functions';
 
 export const load: LayoutServerLoad = async (event) => {
+  // Normal case: user is logged in.
+  if (event.locals.user) {
+    return {
+      user: event.locals.user,
+      dueTaskCount: await countDueTasks(),
+      returnUrl: event.cookies.get('returnUrl')
+    };
+  }
+
+  const rootPassword = await hasRootPassword();
+  if (!rootPassword) {
+    if (event.route.id !== '/auth/setup') {
+      return redirect(302, resolve('/auth/setup'));
+    } else {
+      return {};
+    }
+  }
+
   // Redirect to auth, if not authenticated and not already at that path.
   if (!event.locals.authenticated && !event.route.id?.startsWith('/auth')) {
     let redirectTarget = resolve('/auth');
@@ -25,11 +43,4 @@ export const load: LayoutServerLoad = async (event) => {
   if (event.locals.authenticated && !event.locals.user && !event.route.id?.startsWith('/settings/users')) {
     return redirect(302, resolve('/settings/users'));
   }
-
-  return {
-    user: event.locals.user,
-    authenticated: event.locals.authenticated,
-    dueTaskCount: await countDueTasks(),
-    returnUrl: event.cookies.get('returnUrl')
-  };
 };

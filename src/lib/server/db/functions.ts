@@ -1,4 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import * as argon2 from 'argon2';
 import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
@@ -22,6 +23,30 @@ import {
 const levenshtein = levenshteinPkg.get;
 
 // ------- USER -------
+export const hasRootPassword = async (): Promise<boolean> => {
+  const db = getTx();
+
+  const result = await db.select().from(table.systemState).where(eq(table.systemState.key, 'rootPassword'));
+
+  return !!result.at(0);
+};
+
+export const setRootPassword = async (password: string): Promise<void> => {
+  const db = getTx();
+
+  // Argon2 requires explicit tuning. These are sensible OWASP-recommended defaults
+  // for a standard web server (roughly 64MB RAM and ~0.5s compute time).
+  const hashingOptions = {
+    type: argon2.argon2id,
+    memoryCost: 65536, // 64 MB (passed in kilobytes)
+    timeCost: 3,       // Number of iterations
+    parallelism: 1    // Number of threads to use
+  };
+
+  const hashedPassword = await argon2.hash(password, hashingOptions);
+  await db.insert(table.systemState).values({ key: "rootPassword", value: hashedPassword }).execute();
+};
+
 export const findUser = async (userId: string): Promise<User | undefined> => {
   const db = getTx();
 
@@ -36,13 +61,13 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
-export const addUser = async (username: string): Promise<string> => {
+export const addUser = async (username: string, passwordHash: string): Promise<string> => {
   const db = getTx();
 
   const userId = generateUUID();
-  await db.insert(table.user).values({ id: userId, username }).execute();
+  await db.insert(table.user).values({ id: userId, username, password: passwordHash }).execute();
 
-  return userId
+  return userId;
 };
 
 export const updateDefaultDistribution = async (
@@ -351,7 +376,7 @@ export const findAllShoppingItems = async () => {
   const db = getTx();
 
   return db.query.shoppingItem.findMany().execute();
-}
+};
 
 export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 4) => {
   const db = getTx();
@@ -491,7 +516,7 @@ export const addBalanceEntry = async (
   name: string,
   price: number,
   distributions: { userId: string, percent: number }[],
-  purchaseId: string|null
+  purchaseId: string | null
 ): Promise<void> => {
   const db = getTx();
 
