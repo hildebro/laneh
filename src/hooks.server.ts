@@ -1,12 +1,26 @@
 import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { dev } from '$app/environment';
+import { building, dev } from '$app/environment';
 import { USER_COOKIE } from '$lib';
 import { transactionContext } from '$lib/context';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { getSession, refreshSession } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { findUser } from '$lib/server/db/functions';
+import { seed } from '$lib/server/db/seed';
+
+async function startup() {
+  // Don't run this during the build process (adapter generation)
+  if (building) return;
+
+  try {
+    await seed();
+  } catch (e) {
+    console.error('Database seed failed:', e);
+  }
+}
+
+await startup();
 
 /**
  * If a return url is provided via params, we save it as a cookie and then drop that param.

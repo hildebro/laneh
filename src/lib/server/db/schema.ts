@@ -13,6 +13,12 @@ import {
   timestamp
 } from 'drizzle-orm/pg-core';
 
+export const systemState = pgTable('system_state', {
+  key: text().primaryKey(),
+  value: text().notNull(),
+  updatedAt: timestamp().notNull().defaultNow(),
+})
+
 export const user = pgTable('user', {
   id: text().primaryKey(),
   username: text().notNull().unique(),
