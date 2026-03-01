@@ -127,6 +127,13 @@
       "when": 1772377430870,
       "tag": "20260301150350_wonderful_santa_claus",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1772383566761,
+      "tag": "20260301164606_hard_white_queen",
+      "breakpoints": true
     }
   ]
 }

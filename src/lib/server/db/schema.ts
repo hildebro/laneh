@@ -22,6 +22,7 @@ export const systemState = pgTable('system_state', {
 export const user = pgTable('user', {
   id: text().primaryKey(),
   username: text().notNull().unique(),
+  password: text().notNull(),
   defaultDistribution: doublePrecision()
 });
 export type User = typeof user.$inferSelect;
