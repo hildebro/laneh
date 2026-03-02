@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Avatar } from '@skeletonlabs/skeleton-svelte';
+  import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import { transLocale } from '$lib/locale-translations.js';
@@ -63,7 +64,7 @@
           </button>
         </EnhancedForm>
       {/each}
-      <a class="btn w-40 h-40 flex items-center justify-center" href="users/add">
+      <a class="btn w-40 h-40 flex items-center justify-center" href={resolve('/auth/register')}>
         {m.settings_users_add()}
       </a>
     </div>
