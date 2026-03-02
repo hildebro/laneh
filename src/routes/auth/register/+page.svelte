@@ -14,8 +14,11 @@
   <EnhancedForm submitButtonText={m.settings_users_add()}>
     <label>
       {m.generic_name()}
-      <br />
       <input class="input" type="text" name="username" id="username" />
+    </label>
+    <label>
+      {m.auth_register_password()}
+      <input class="input" type="password" name="password" id="password" />
     </label>
   </EnhancedForm>
 </div>

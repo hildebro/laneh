@@ -19,13 +19,14 @@ const userSchema = z.object({
   username: z.string()
     .regex(/^[a-zA-Z0-9_-]*$/)
     .min(minUsernameLength)
-    .max(maxUsernameLength)
+    .max(maxUsernameLength),
+  password: z.string().min(8).max(64)
 });
 
 export const actions: Actions = {
   default: async (event) => {
     return processForm(event, userSchema, async (user) => {
-      const userId = await addUser(user.username);
+      const userId = await addUser(user.username, user.password);
 
       const users = await findAllUsers();
       if (users.length > 1) {

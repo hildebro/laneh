@@ -3,6 +3,7 @@
   "auth_access_code": "Zugangscode",
   "auth_access_code_invalid": "Der Code ist ungültig. Bitte prüfe, ob dein 2FA korrekt eingestellt ist.",
   "auth_login": "Einloggen",
+  "auth_register_password": "Passwort",
   "balance": "Saldos",
   "balance_none": "Es gibt noch keine Saldos zwischen Nutzer:innen",
   "balance_expense_add": "Ausgabe hinzufügen",

@@ -1,0 +1,2 @@
+ALTER TABLE "user" ADD COLUMN "password" text NOT NULL DEFAULT '$argon2id$v=19$m=65536,t=3,p=1$MjQI7cwv9LJKtzoC87JQGg$VJyWUBoNxFybBj0ZGr2EicvAjhTQMujTDpeagvt7zBQ';--> statement-breakpoint
+ALTER TABLE "user" ALTER COLUMN "password" DROP DEFAULT;--> statement-breakpoint

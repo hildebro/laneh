@@ -3,6 +3,7 @@
   "auth_access_code": "Access code",
   "auth_access_code_invalid": "The code is not valid. Make sure your 2FA was set up correctly.",
   "auth_login": "Login",
+  "auth_register_password": "Password",
   "balance": "Balances",
   "balance_none": "There are no balances between users yet.",
   "balance_expense_add": "Add expense",

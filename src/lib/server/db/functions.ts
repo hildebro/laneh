@@ -1,4 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import * as argon2 from 'argon2';
 import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
@@ -36,13 +37,22 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
-export const addUser = async (username: string): Promise<string> => {
+export const addUser = async (username: string, password: string): Promise<string> => {
   const db = getTx();
 
   const userId = generateUUID();
-  await db.insert(table.user).values({ id: userId, username }).execute();
+  const hashingOptions = {
+    type: argon2.argon2id,
+    memoryCost: 65536, // 64 MB (passed in kilobytes)
+    timeCost: 3,       // Number of iterations
+    parallelism: 1    // Number of threads to use
+  };
 
-  return userId
+  const hashedPassword = await argon2.hash(password, hashingOptions);
+
+  await db.insert(table.user).values({ id: userId, username, password: hashedPassword }).execute();
+
+  return userId;
 };
 
 export const updateDefaultDistribution = async (
@@ -351,7 +361,7 @@ export const findAllShoppingItems = async () => {
   const db = getTx();
 
   return db.query.shoppingItem.findMany().execute();
-}
+};
 
 export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 4) => {
   const db = getTx();
@@ -491,7 +501,7 @@ export const addBalanceEntry = async (
   name: string,
   price: number,
   distributions: { userId: string, percent: number }[],
-  purchaseId: string|null
+  purchaseId: string | null
 ): Promise<void> => {
   const db = getTx();
 
