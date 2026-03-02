@@ -1,8 +1,9 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "auth_access_code": "Access code",
-  "auth_access_code_invalid": "The code is not valid. Make sure your 2FA was set up correctly.",
   "auth_login": "Login",
+  "auth_login_invalid": "Credentials invalid",
+  "auth_logout": "Logout",
   "auth_register_password": "Password",
   "balance": "Balances",
   "balance_none": "There are no balances between users yet.",

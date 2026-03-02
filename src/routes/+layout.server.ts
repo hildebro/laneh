@@ -21,5 +21,9 @@ export const load: LayoutServerLoad = async (event) => {
     }
   }
 
-  return redirect(302, resolve('/auth'));
+  if (event.route.id !== '/auth') {
+    return redirect(302, resolve('/auth'));
+  }
+
+  return {};
 };

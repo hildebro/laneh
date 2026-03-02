@@ -55,6 +55,23 @@ export const addUser = async (username: string, password: string): Promise<strin
   return userId;
 };
 
+export const findUserByPassword = async (username: string, password: string): Promise<User | undefined> => {
+  const db = getTx();
+
+  const user = await db.query.user.findFirst({
+    where: eq(table.user.username, username)
+  }).execute();
+  if (!user) {
+    return undefined;
+  }
+
+  if (await argon2.verify(user.password, password)) {
+    return user;
+  }
+
+  return undefined;
+};
+
 export const updateDefaultDistribution = async (
   distributions: { userId: string; percent: number }[]
 ): Promise<void> => {

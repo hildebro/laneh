@@ -2,7 +2,7 @@ import { type Actions, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { base } from '$app/paths';
 import * as m from '$lib/paraglide/messages';
-import { setUser } from '$lib/server/auth';
+import { deleteUser, setUser } from '$lib/server/auth';
 import { findAllUsers, findUser, updateDefaultDistribution } from '$lib/server/db/functions';
 import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
@@ -61,5 +61,8 @@ export const actions: Actions = {
     return processForm(event, distributionSchema, async (distributionData) => {
       await updateDefaultDistribution(distributionData.distributions);
     }, { arrays: ['userIds', 'percents'] });
+  },
+  logout: async (event) => {
+    deleteUser(event.cookies);
   }
 };
