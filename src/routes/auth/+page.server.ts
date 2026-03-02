@@ -1,8 +1,9 @@
 import { type Actions, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { base } from '$app/paths';
+import { base, resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
-import { createSession, verifyOTP } from '$lib/server/auth';
+import { setUser } from '$lib/server/auth';
+import { findUserByPassword } from '$lib/server/db/functions';
 import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
@@ -12,26 +13,27 @@ export const load: PageServerLoad = async ({ locals }) => {
   }
 };
 
-const otpSchema = z.object({
-  code: z.string().trim().nonempty()
+const userSchema = z.object({
+  username: z.string().trim().nonempty(),
+  password: z.string().nonempty()
 });
 
 export const actions: Actions = {
   default: async (event) => {
-    return processForm(event, otpSchema, async (otp, { cookies, url }) => {
-      const verified = await verifyOTP(otp.code);
-      if (!verified) {
-        return failForm('code', m.auth_access_code_invalid());
+    return processForm(event, userSchema, async (user, { cookies, url }) => {
+      const matchingUser = await findUserByPassword(user.username, user.password);
+      if (!matchingUser) {
+        return failForm('username', m.auth_login_invalid());
       }
 
-      await createSession(cookies);
+      setUser(cookies, matchingUser.id);
 
       const target = url.searchParams.get('target');
       if (target) {
         return redirect(302, `${base}/${decodeURI(target)}`);
       }
 
-      return redirect(302, `${base}`);
+      return redirect(302, resolve('/'));
     });
   }
 };

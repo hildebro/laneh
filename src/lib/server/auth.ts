@@ -106,6 +106,15 @@ export function setUser(cookies: Cookies, userId: string) {
   });
 }
 
+export function deleteUser(cookies: Cookies) {
+  cookies.delete(USER_COOKIE, {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: !dev
+  });
+}
+
 // Helper to parse duration strings like "1h", "7d", etc.
 function parseDuration(duration: string): number {
   const match = duration.match(/^(\d+)([smhd])$/);

@@ -6,8 +6,12 @@
 <div class="card">
   <EnhancedForm submitButtonText={m.auth_login()}>
     <label>
-      {m.auth_access_code()}
-      <input class="form-input input" type="text" name="code" />
+      {m.generic_name()}
+      <input class="input" type="text" name="username" />
+    </label>
+    <label>
+      {m.auth_register_password()}
+      <input class="input" type="password" name="password" id="password" />
     </label>
   </EnhancedForm>
 </div>
