@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import { setSessionCookie } from '$lib/server/auth';
-import { addUser, findAllUsers, isUsernameTaken } from '$lib/server/db/functions';
+import { addUser, createSession, findAllUsers, isUsernameTaken } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
@@ -41,7 +41,8 @@ export const actions: Actions = {
       }
 
       // If we only have a single user, we might as well log in and redirect to dashboard.
-      setSessionCookie(event.cookies, userId);
+      const session = await createSession(userId);
+      setSessionCookie(event.cookies, session);
       return redirect(302, resolve('/'));
     });
   }
