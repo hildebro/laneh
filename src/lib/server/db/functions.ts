@@ -55,6 +55,16 @@ export const addUser = async (username: string, password: string): Promise<strin
   return userId;
 };
 
+export const isUsernameTaken = async (username: string) => {
+  const db = getTx();
+
+  const user = await db.query.user
+    .findFirst({ where: eq(table.user.username, username) })
+    .execute();
+
+  return !!user;
+};
+
 export const findAndVerifyUser = async (username: string, password: string): Promise<User | undefined> => {
   const db = getTx();
 
