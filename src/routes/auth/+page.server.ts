@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 import { base, resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import { setUser } from '$lib/server/auth';
-import { findUserByPassword } from '$lib/server/db/functions';
+import { findAndVerifyUser } from '$lib/server/db/functions';
 import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
@@ -21,7 +21,7 @@ const userSchema = z.object({
 export const actions: Actions = {
   default: async (event) => {
     return processForm(event, userSchema, async (user, { cookies, url }) => {
-      const matchingUser = await findUserByPassword(user.username, user.password);
+      const matchingUser = await findAndVerifyUser(user.username, user.password);
       if (!matchingUser) {
         return failForm('username', m.auth_login_invalid());
       }

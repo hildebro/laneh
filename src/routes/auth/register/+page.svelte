@@ -6,6 +6,7 @@
 </script>
 
 <div class="card">
+  <h1 class="h1">{ m.settings_users_add() }</h1>
   {#if data.users.length === 0}
     <p class="card w-full preset-filled-error-50-950 rounded m-2 text-center">
       { m.settings_users_add_disclaimer_no_users() }
