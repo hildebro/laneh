@@ -4,8 +4,9 @@ import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
 import { transactionContext } from '$lib/context';
 import { paraglideMiddleware } from '$lib/paraglide/server';
+import { needsRefresh, setSessionCookie } from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import { findUserBySession } from '$lib/server/db/functions';
+import { createSession, findSession, findUser } from '$lib/server/db/functions';
 
 /**
  * If a return url is provided via params, we save it as a cookie and then drop that param.
@@ -47,14 +48,25 @@ const handleDatabase: Handle = async ({ event, resolve }) => {
 };
 
 const handleUser: Handle = async ({ event, resolve }) => {
-  const userCookie = event.cookies.get(SESSION_COOKIE);
-  if (!userCookie) {
+  const sessionToken = event.cookies.get(SESSION_COOKIE);
+  if (!sessionToken) {
     event.locals.user = undefined;
 
     return resolve(event);
   }
 
-  event.locals.user = await findUserBySession(userCookie);
+  const session = await findSession(sessionToken);
+  if (!session) {
+    event.locals.user = undefined;
+
+    return resolve(event);
+  }
+
+  event.locals.user = await findUser(session.userId);
+  if (needsRefresh(session.expiresAt)) {
+    const newSession = await createSession(session.userId);
+    setSessionCookie(event.cookies, newSession);
+  }
 
   return resolve(event);
 };

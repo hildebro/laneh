@@ -14,9 +14,23 @@ const REFRESH_TOKEN_EXPIRY = env.REFRESH_TOKEN_EXPIRY || '7d';
 const MIN_DELAY_MS = 1000;
 const MAX_DELAY_MS = 5000;
 
+const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+const THREE_DAYS_IN_MS = 3 * ONE_DAY_IN_MS;
+
 if (!OTP_SECRET || !SESSION_SECRET || !REFRESH_SECRET) {
   console.error('Missing required environment variables for authentication!');
   throw new Error('Missing authentication secrets.  See console.');
+}
+
+export function needsRefresh(expiresAt: Date): boolean {
+  const now = Date.now();
+  const expirationTime = expiresAt.getTime();
+
+  // Calculate milliseconds until expiration
+  const timeRemaining = expirationTime - now;
+
+  // If less than 3 days remaining AND it hasn't already expired
+  return timeRemaining < THREE_DAYS_IN_MS && timeRemaining > 0;
 }
 
 function getRandomDelay(min: number, max: number): number {
