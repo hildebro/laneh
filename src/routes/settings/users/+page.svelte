@@ -54,16 +54,11 @@
     <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_switch() }</h1>
     <div class="flex flex-wrap justify-center gap-4">
       {#each users as user (user.id)}
-        <EnhancedForm action="?/select" hideSubmitButton>
-          <input type="hidden" name="userId" value={user.id}>
-          <button type="submit" class="btn w-40 h-40 flex flex-col items-center justify-center gap-1">
-            <Avatar name={user?.username ?? ''}
-                    background="preset-filled-secondary-500"
-                    classes="w-20 h-20"
-            />
-            {user?.username}
-          </button>
-        </EnhancedForm>
+        <Avatar name={user?.username ?? ''}
+                background="preset-filled-secondary-500"
+                classes="w-20 h-20"
+        />
+        {user?.username}
       {/each}
       <a class="btn w-40 h-40 flex items-center justify-center" href={resolve('/auth/register')}>
         {m.settings_users_add()}

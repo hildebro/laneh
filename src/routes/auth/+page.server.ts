@@ -2,8 +2,8 @@ import { type Actions, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { base, resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
-import { setUser } from '$lib/server/auth';
-import { findAndVerifyUser } from '$lib/server/db/functions';
+import { setSessionCookie } from '$lib/server/auth';
+import { createSession, findAndVerifyUser } from '$lib/server/db/functions';
 import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
@@ -26,7 +26,8 @@ export const actions: Actions = {
         return failForm('username', m.auth_login_invalid());
       }
 
-      setUser(cookies, matchingUser.id);
+      const session = await createSession(matchingUser.id);
+      setSessionCookie(cookies, session);
 
       const target = url.searchParams.get('target');
       if (target) {

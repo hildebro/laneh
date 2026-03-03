@@ -1,11 +1,11 @@
 import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { dev } from '$app/environment';
-import { USER_COOKIE } from '$lib';
+import { SESSION_COOKIE } from '$lib';
 import { transactionContext } from '$lib/context';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { db } from '$lib/server/db';
-import { findUser } from '$lib/server/db/functions';
+import { findUserBySession } from '$lib/server/db/functions';
 
 /**
  * If a return url is provided via params, we save it as a cookie and then drop that param.
@@ -47,14 +47,14 @@ const handleDatabase: Handle = async ({ event, resolve }) => {
 };
 
 const handleUser: Handle = async ({ event, resolve }) => {
-  const userCookie = event.cookies.get(USER_COOKIE);
+  const userCookie = event.cookies.get(SESSION_COOKIE);
   if (!userCookie) {
     event.locals.user = undefined;
 
     return resolve(event);
   }
 
-  event.locals.user = await findUser(userCookie);
+  event.locals.user = await findUserBySession(userCookie);
 
   return resolve(event);
 };

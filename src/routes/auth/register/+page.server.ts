@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
-import { setUser } from '$lib/server/auth';
+import { setSessionCookie } from '$lib/server/auth';
 import { addUser, findAllUsers, isUsernameTaken } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
@@ -41,7 +41,7 @@ export const actions: Actions = {
       }
 
       // If we only have a single user, we might as well log in and redirect to dashboard.
-      setUser(event.cookies, userId);
+      setSessionCookie(event.cookies, userId);
       return redirect(302, resolve('/'));
     });
   }
