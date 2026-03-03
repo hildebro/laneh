@@ -6,7 +6,6 @@ declare global {
   namespace App {
     interface Locals {
       user: User | undefined;
-      authenticated: boolean;
     }
   }
 }

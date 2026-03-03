@@ -8,8 +8,8 @@ import { failForm, processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  if (locals.authenticated) {
-    return redirect(302, base);
+  if (locals.user) {
+    return redirect(302, resolve('/'));
   }
 };
 
