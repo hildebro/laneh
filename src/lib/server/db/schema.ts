@@ -25,6 +25,13 @@ export const userRelations = relations(user, ({ many }) => ({
   shoppingPurchases: many(shoppingPurchase) // Relation for one-to-many with shoppingPurchase
 }));
 
+export const session = pgTable('session', {
+  id: text().primaryKey(),
+  userId: text().references(() => user.id),
+  expiresAt: timestamp().notNull(),
+});
+export type Session = typeof session.$inferSelect;
+
 export const shoppingCategory = pgTable('shopping_category', {
   id: text().primaryKey(),
   name: text().notNull().unique(),

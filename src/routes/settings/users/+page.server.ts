@@ -1,10 +1,9 @@
-import { type Actions, redirect } from '@sveltejs/kit';
+import { type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { base } from '$app/paths';
 import * as m from '$lib/paraglide/messages';
-import { deleteUser, setUser } from '$lib/server/auth';
-import { findAllUsers, findUser, updateDefaultDistribution } from '$lib/server/db/functions';
-import { failForm, processForm } from '$lib/server/formHandler';
+import { deleteSessionCookie } from '$lib/server/auth';
+import { findAllUsers, updateDefaultDistribution } from '$lib/server/db/functions';
+import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -13,10 +12,6 @@ export const load: PageServerLoad = async ({ locals }) => {
     has_active_user: locals.user !== undefined
   };
 };
-
-const switchUserSchema = z.object({
-  userId: z.string().nonempty()
-});
 
 const distributionSchema = z
   .object({
@@ -45,24 +40,12 @@ const distributionSchema = z
   );
 
 export const actions: Actions = {
-  select: async (event) => {
-    return processForm(event, switchUserSchema, async (switchUser, { cookies }) => {
-      const user = await findUser(switchUser.userId);
-      if (!user) {
-        return failForm('switchUser', m.error_user_not_found());
-      }
-
-      setUser(cookies, user.id);
-
-      return redirect(302, `${base}`);
-    });
-  },
   distribution: async (event) => {
     return processForm(event, distributionSchema, async (distributionData) => {
       await updateDefaultDistribution(distributionData.distributions);
     }, { arrays: ['userIds', 'percents'] });
   },
   logout: async (event) => {
-    deleteUser(event.cookies);
+    deleteSessionCookie(event.cookies);
   }
 };

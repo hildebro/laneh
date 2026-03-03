@@ -3,7 +3,8 @@ import { sign, unsign } from 'cookie-signature';
 import { authenticator } from 'otplib';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
-import { USER_COOKIE } from '$lib';
+import { SESSION_COOKIE } from '$lib';
+import type { Session } from '$lib/server/db/schema';
 
 const OTP_SECRET = env.OTP_SECRET;
 const SESSION_SECRET = env.SESSION_SECRET;
@@ -96,18 +97,18 @@ export async function refreshSession(cookies: Cookies): Promise<boolean> {
   return true;
 }
 
-export function setUser(cookies: Cookies, userId: string) {
-  cookies.set(USER_COOKIE, userId, {
+export function setSessionCookie(cookies: Cookies, session: Session) {
+  cookies.set(SESSION_COOKIE, session.id, {
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
     secure: !dev,
-    maxAge: parseDuration(REFRESH_TOKEN_EXPIRY) // Very long duration
+    expires: session.expiresAt
   });
 }
 
-export function deleteUser(cookies: Cookies) {
-  cookies.delete(USER_COOKIE, {
+export function deleteSessionCookie(cookies: Cookies) {
+  cookies.delete(SESSION_COOKIE, {
     path: '/',
     httpOnly: true,
     sameSite: 'lax',

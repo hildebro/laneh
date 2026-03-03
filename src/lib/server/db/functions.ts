@@ -1,4 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
@@ -29,6 +30,17 @@ export const findUser = async (userId: string): Promise<User | undefined> => {
   const result = await db.select().from(table.user).where(eq(table.user.id, userId));
 
   return result.at(0);
+};
+
+export const findUserBySession = async (sessionToken: string): Promise<User | undefined> => {
+  const db = getTx();
+
+  const result = await db.select()
+    .from(table.user)
+    .leftJoin(table.session, eq(table.user.id, table.session.userId))
+    .where(eq(table.session.id, sessionToken));
+
+  return result.at(0)?.user;
 };
 
 export const findAllUsers = async (): Promise<User[]> => {
@@ -95,6 +107,27 @@ export const updateDefaultDistribution = async (
       .execute();
   }
 };
+
+// ------- SESSION -------
+export const createSession = async (userId: string) => {
+  const db = getTx();
+
+  const sessionToken = randomBytes(32).toString('hex');
+
+  const daysToKeepAlive = 30;
+  const secondsToKeepAlive = 60 * 60 * 24 * daysToKeepAlive;
+  const expiresAt = new Date(Date.now() + secondsToKeepAlive * 1000);
+
+  const session = {
+    id: sessionToken,
+    userId,
+    expiresAt
+  };
+  await db.insert(table.session).values(session);
+
+  return session;
+};
+
 
 // ------- SHOPPING CATEGORY -------
 export const findShoppingCategory = async (categoryId: string) => {
