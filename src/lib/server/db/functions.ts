@@ -1,6 +1,6 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
+import { randomBytes } from 'crypto';
 import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
@@ -8,6 +8,7 @@ import levenshteinPkg from 'fast-levenshtein'; // Import fast-levenshtein using 
 import { getTx } from '$lib/context';
 import * as table from '$lib/server/db/schema';
 import {
+  type Session,
   shoppingCategory,
   type ShoppingCategory,
   type ShoppingCategoryWithRelation,
@@ -30,20 +31,6 @@ export const findUser = async (userId: string): Promise<User | undefined> => {
   const result = await db.select().from(table.user).where(eq(table.user.id, userId));
 
   return result.at(0);
-};
-
-export const findUserBySession = async (sessionToken: string): Promise<User | undefined> => {
-  const db = getTx();
-
-  const result = await db.select()
-    .from(table.user)
-    .leftJoin(table.session, eq(table.user.id, table.session.userId))
-    .where(and(
-      eq(table.session.id, sessionToken),
-      gt(table.session.expiresAt, new Date())
-    ));
-
-  return result.at(0)?.user;
 };
 
 export const findAllUsers = async (): Promise<User[]> => {
@@ -117,7 +104,7 @@ export const createSession = async (userId: string) => {
 
   const sessionToken = randomBytes(32).toString('hex');
 
-  const daysToKeepAlive = 30;
+  const daysToKeepAlive = 10;
   const secondsToKeepAlive = 60 * 60 * 24 * daysToKeepAlive;
   const expiresAt = new Date(Date.now() + secondsToKeepAlive * 1000);
 
@@ -131,6 +118,18 @@ export const createSession = async (userId: string) => {
   return session;
 };
 
+export const findSession = async (sessionToken: string): Promise<Session | undefined> => {
+  const db = getTx();
+
+  const result = await db.select()
+    .from(table.session)
+    .where(and(
+      eq(table.session.id, sessionToken),
+      gt(table.session.expiresAt, new Date())
+    ));
+
+  return result.at(0);
+};
 
 // ------- SHOPPING CATEGORY -------
 export const findShoppingCategory = async (categoryId: string) => {

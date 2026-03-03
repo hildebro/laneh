@@ -27,7 +27,7 @@ export const userRelations = relations(user, ({ many }) => ({
 
 export const session = pgTable('session', {
   id: text().primaryKey(),
-  userId: text().references(() => user.id),
+  userId: text().references(() => user.id).notNull(),
   expiresAt: timestamp().notNull(),
 });
 export type Session = typeof session.$inferSelect;
