@@ -4,6 +4,7 @@
   "auth_login": "Login",
   "auth_login_invalid": "Credentials invalid",
   "auth_logout": "Logout",
+  "auth_register_error_taken": "Name already taken.",
   "auth_register_password": "Password",
   "balance": "Balances",
   "balance_none": "There are no balances between users yet.",

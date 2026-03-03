@@ -4,6 +4,7 @@
   "auth_login": "Einloggen",
   "auth_login_invalid": "Daten sind nicht valide",
   "auth_logout": "Ausloggen",
+  "auth_register_error_taken": "Name bereits vergeben.",
   "auth_register_password": "Passwort",
   "balance": "Saldos",
   "balance_none": "Es gibt noch keine Saldos zwischen Nutzer:innen",

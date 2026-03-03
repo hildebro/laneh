@@ -1,8 +1,9 @@
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
+import * as m from '$lib/paraglide/messages.js';
 import { setUser } from '$lib/server/auth';
-import { addUser, findAllUsers } from '$lib/server/db/functions';
+import { addUser, findAllUsers, isUsernameTaken } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
@@ -26,6 +27,12 @@ const userSchema = z.object({
 export const actions: Actions = {
   default: async (event) => {
     return processForm(event, userSchema, async (user) => {
+      if (await isUsernameTaken(user.username)) {
+        return fail(422, {
+          issues: [{ path: ['username'], message: m.auth_register_error_taken() }]
+        });
+      }
+
       const userId = await addUser(user.username, user.password);
 
       const users = await findAllUsers();
