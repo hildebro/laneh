@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import {
   assignCategoryToStagedItems,
@@ -13,19 +14,14 @@ export const load: PageServerLoad = async ({ locals }) => {
   const stagedList = await findStagedShoppingList(userId);
   if (!stagedList) {
     // No staged list is active, return to overview.
-    return redirect(302, '../');
-  }
-
-  if (stagedList.stagedItems.some(item => item.status === 'close_match')) {
-    // The staged list has some items that require validation.
-    return redirect(302, 'validate');
+    return redirect(302, resolve('/shopping'));
   }
 
   if (!stagedList.stagedItems.some(item => item.status === 'unmatched')) {
     // Nothing unmatched items to categorize, meaning only perfect matches. Finish the staging.
     await commitStagedItems(userId);
 
-    return redirect(302, '../');
+    return redirect(302, resolve('/shopping'));
   }
 
   if (
@@ -35,7 +31,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     // All items that need categorizing have gotten it. Finish the staging.
     await commitStagedItems(userId);
 
-    return redirect(302, '../');
+    return redirect(302, resolve('/shopping'));
   }
 
   // Fetch categories

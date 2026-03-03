@@ -4,7 +4,6 @@ import { randomBytes } from 'crypto';
 import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
-import levenshteinPkg from 'fast-levenshtein'; // Import fast-levenshtein using the default import for CJS compatibility
 import { getTx } from '$lib/context';
 import * as table from '$lib/server/db/schema';
 import {
@@ -14,15 +13,12 @@ import {
   type ShoppingCategoryWithRelation,
   type ShoppingItem,
   shoppingItem,
-  type StagedShoppingItem,
   stagedShoppingPurchaseItem,
   type User,
   type Weekday,
   type WeeklyTask,
   type WeeklyTaskWithRelation
 } from '$lib/server/db/schema';
-// The actual function is usually on the '.get' property for this library
-const levenshtein = levenshteinPkg.get;
 
 // ------- USER -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
@@ -281,53 +277,6 @@ export const findShoppingItem = async (name: string): Promise<ShoppingItem | und
       .from(table.shoppingItem)
       .where(eq(lower(table.shoppingItem.name), name.toLowerCase()))
   ).at(0);
-};
-
-/**
- * Finds shopping items with names similar to the input name using Levenshtein distance.
- * Calculates distance in the application code using the 'fast-levenshtein' library.
- *
- * @param name The name to search for similar items.
- * @param maxDistance The maximum Levenshtein distance to consider an item "similar". Defaults to 2.
- */
-export const findSimilarShoppingItem = async (
-  name: string,
-  maxDistance: number = 2
-): Promise<ShoppingItem | null> => {
-  const db = getTx();
-
-  // Fetch all items from the database.
-  // Consider optimizations for very large lists if needed.
-  const allItems = await db.select()
-    .from(table.shoppingItem)
-    .execute();
-
-  const lowerCaseName = name.toLowerCase();
-
-  let closestItem = null;
-  let minDistanceFound = Infinity; // Start with a distance larger than any possible outcome
-
-  for (const item of allItems) {
-    const itemNameLower = item.name.toLowerCase();
-
-    // Avoid comparing the item with itself (exact match)
-    if (itemNameLower === lowerCaseName) {
-      continue; // Skip to the next item
-    }
-
-    // Calculate Levenshtein distance
-    const distance = levenshtein(lowerCaseName, itemNameLower);
-
-    // Check if this item is within the threshold AND closer than the current best match found
-    if (distance > 0 && distance <= maxDistance && distance < minDistanceFound) {
-      // We found a new closest item
-      minDistanceFound = distance;
-      closestItem = item;
-    }
-  }
-
-  // Return the single closest item found (or null if none met the criteria)
-  return closestItem;
 };
 
 export const reactivateShoppingItem = async (itemId: string, amount: string | undefined): Promise<void> => {
@@ -651,17 +600,6 @@ export const findAllBalanceEntries = async () => {
     .execute();
 };
 
-export const findBalanceEntriesByUser = async (userId: string) => {
-  const db = getTx();
-
-  return db.query.balanceEntry.findMany({
-    with: {
-      distributions: {}
-    },
-    where: eq(table.balanceEntry.userId, userId)
-  }).execute();
-};
-
 export type DebtResult = {
   creditor: User;
   debtorData: {
@@ -775,35 +713,6 @@ export const addPerfectStagedItem = async (listId: string, matchedItem: Shopping
   });
 };
 
-export const addCloseStagedItem = async (listId: string, suggestedItem: ShoppingItem, name: string, amount: string | undefined): Promise<void> => {
-  const db = getTx();
-
-  await db.insert(table.stagedShoppingItem).values({
-    id: generateUUID(),
-    listId: listId,
-    status: 'close_match',
-    name: name,
-    amount: amount ?? '',
-    suggestedItemId: suggestedItem.id
-  });
-};
-
-export const matchStagedItem = async (item: StagedShoppingItem): Promise<void> => {
-  const db = getTx();
-
-  await db.update(table.stagedShoppingItem)
-    .set({ matchedItemId: item.suggestedItemId, suggestedItemId: null, status: 'perfect_match' })
-    .where(eq(table.stagedShoppingItem.id, item.id));
-};
-
-export const unmatchStagedItem = async (item: StagedShoppingItem): Promise<void> => {
-  const db = getTx();
-
-  await db.update(table.stagedShoppingItem)
-    .set({ suggestedItemId: null, status: 'unmatched' })
-    .where(eq(table.stagedShoppingItem.id, item.id));
-};
-
 export const addNewStagedItem = async (listId: string, name: string, amount: string | undefined): Promise<void> => {
   const db = getTx();
 
@@ -844,8 +753,6 @@ export const commitStagedItems = async (userId: string) => {
   // Commit every item.
   for (const item of list.stagedItems) {
     switch (item.status) {
-      case 'close_match':
-        throw new Error('Trying to commit an unfinished list.');
       case 'perfect_match':
         await reactivateShoppingItem(item.matchedItemId as string, item.amount);
         continue;

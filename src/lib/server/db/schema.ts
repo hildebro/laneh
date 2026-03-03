@@ -133,7 +133,7 @@ export const stagedShoppingListRelations = relations(stagedShoppingList, ({ one,
 export const stagedShoppingItem = pgTable('staged_shopping_item', {
   id: text().primaryKey(),
   listId: text().notNull().references(() => stagedShoppingList.id, { onDelete: 'cascade' }),
-  status: text({ enum: ['perfect_match', 'close_match', 'unmatched'] }).notNull(),
+  status: text({ enum: ['perfect_match', 'unmatched'] }).notNull(),
   name: text().notNull(),
   amount: text().notNull(),
   // FK to shopping_item, non-null only if status is 'perfect_match'
