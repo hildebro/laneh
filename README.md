@@ -5,18 +5,11 @@ Install `docker` `docker compose` and `docker-buildx`.
 
 ### Setup
 - Clone the repository.
-- Copy `.env.exmaple` to `.env` and replace all placeholder secrets with proper values.
-- Create a TOTP entry in the password manager of your choice. With the default secrets, it would look like this:
-```
-otpauth://totp/Chorehub:shared?secret=OTP_SECRET&issuer=Chorehub&algorithm=SHA1&digits=6&period=30
-```
-- Run the following:
-```bash
-docker compose up
-docker compose exec app npm run db:migrate
-```
-
-You can access the app via http://localhost:5173.
+- Copy `.env.exmaple` to `.env` and replace the placeholder value for the database password.
+- Start the container via `docker compose up -d`
+- Initiate the database via `docker compose exec app npm run db:migrate`
+- Access the app via http://localhost:5173
+- Creating the first user is done without any authentication. Further users have to be created by an existing user through the settings.
 
 ### Deployment
 
