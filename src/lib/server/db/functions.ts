@@ -38,7 +38,10 @@ export const findUserBySession = async (sessionToken: string): Promise<User | un
   const result = await db.select()
     .from(table.user)
     .leftJoin(table.session, eq(table.user.id, table.session.userId))
-    .where(eq(table.session.id, sessionToken));
+    .where(and(
+      eq(table.session.id, sessionToken),
+      gt(table.session.expiresAt, new Date())
+    ));
 
   return result.at(0)?.user;
 };
