@@ -55,7 +55,7 @@ export const addUser = async (username: string, password: string): Promise<strin
   return userId;
 };
 
-export const findUserByPassword = async (username: string, password: string): Promise<User | undefined> => {
+export const findAndVerifyUser = async (username: string, password: string): Promise<User | undefined> => {
   const db = getTx();
 
   const user = await db.query.user.findFirst({
