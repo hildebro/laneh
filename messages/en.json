@@ -48,6 +48,7 @@
   "error_task_not_found": "Task not found",
   "error_user_not_found": "User not found",
   "footer_user": "Logged in as {name}",
+  "footer_version": "Version {app_version}",
   "form_invalid": "Invalid input",
   "form_invalid_nonempty": "Cannot be left empty",
   "generic_amount": "Amount",

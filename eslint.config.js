@@ -19,11 +19,12 @@ export default ts.config(
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.node
+        ...globals.node,
+        __APP_VERSION__: 'readonly'
       }
     },
     plugins: {
-      import: await import('eslint-plugin-import').then(m => m.default)
+      import: await import('eslint-plugin-import').then((m) => m.default)
     },
     rules: {
       'import/order': [
