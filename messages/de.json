@@ -110,6 +110,8 @@
   "settings_items_headline": "Artikel",
   "settings_items_other_actions": "Oder wähle eine andere Aktion für die ausgewählten Artikel:",
   "settings_items_show_inactive": "Deaktivierte Artikel anzeigen",
+  "settings_mobile_label": "Android Einstellungen",
+  "settings_mobile_return_to_wrapper": "Instanz verlassen",
   "settings_tasks_add": "Aufgabe hinzufügen",
   "settings_tasks_edit": "Aufgabe anpassen",
   "settings_user_data_edit": "Kontodaten ändern",

@@ -110,6 +110,8 @@
   "settings_items_headline": "Items",
   "settings_items_other_actions": "Or select another action to apply to selected items:",
   "settings_items_show_inactive": "Show deactivated items",
+  "settings_mobile_label": "Android settings",
+  "settings_mobile_return_to_wrapper": "Exit instance",
   "settings_tasks_add": "Add task",
   "settings_tasks_edit": "Edit task",
   "settings_user_data_edit": "Update account data",

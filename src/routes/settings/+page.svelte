@@ -1,7 +1,15 @@
 <script lang="ts">
+  import { Capacitor } from '@capacitor/core';
   import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
+
+  const isNative = Capacitor.isNativePlatform();
+
+  function disconnectFromWrapper() {
+    // Bounce back to the wrapper, appending a query parameter
+    window.location.replace(`${data.returnUrl}?action=disconnect`);
+  }
 
   let { data } = $props();
 </script>
@@ -31,4 +39,12 @@
       </label>
     </EnhancedForm>
   </div>
+  {#if isNative}
+    <div class="card native-controls">
+      <h2 class="h2 mb-2">{m.settings_mobile_label()}</h2>
+      <button type="button" onclick={disconnectFromWrapper} class="btn">
+        {m.settings_mobile_return_to_wrapper()}
+      </button>
+    </div>
+  {/if}
 </div>
