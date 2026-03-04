@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Avatar } from '@skeletonlabs/skeleton-svelte';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import { transLocale } from '$lib/locale-translations.js';
@@ -47,17 +46,5 @@
         {/each}
       </div>
     </EnhancedForm>
-  </div>
-  <div class="card w-full mb-2">
-    <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_switch() }</h1>
-    <div class="flex flex-wrap justify-center gap-4">
-      {#each users as user (user.id)}
-        <Avatar name={user?.username ?? ''}
-                background="preset-filled-secondary-500"
-                classes="w-20 h-20"
-        />
-        {user?.username}
-      {/each}
-    </div>
   </div>
 {/await}

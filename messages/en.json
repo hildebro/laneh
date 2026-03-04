@@ -123,7 +123,6 @@
   "settings_users_headline": "Users",
   "settings_users_language": "Select language",
   "settings_users_no_active_user": "You are not logged in. Please select a user.",
-  "settings_users_switch": "Switch user",
   "settings_users_username_invalid": "Invalid name. Must have a length of {min} to {max} and contain no special characters.",
   "shopping_add_items": "Add items",
   "shopping_add_items_correction_description": "Some items were detected as misspelled and corrected. Use the exclamation button to check/revert the correction.",
