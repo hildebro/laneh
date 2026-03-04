@@ -1,3 +1,13 @@
+## [1.1.1](https://github.com/hildebro/chorehub/compare/v1.1.0...v1.1.1) (2026-03-04)
+
+
+### Bug Fixes
+
+* move add-user to main settings ([01c5234](https://github.com/hildebro/chorehub/commit/01c5234fd700458edfd44c9e1b2715f375318312))
+* move locale picker to main settings ([fda0297](https://github.com/hildebro/chorehub/commit/fda0297e1cf8f74cbaa4b0e3b004797cb19447d9))
+* move logout to main settings page ([af981ac](https://github.com/hildebro/chorehub/commit/af981ac62b731681f5e80add3ed333ad71a63d35))
+* remove broken user switch ([6684ed2](https://github.com/hildebro/chorehub/commit/6684ed2cee7cdde364d5dc08569adf862d2a9455))
+
 # [1.1.0](https://github.com/hildebro/chorehub/compare/v1.0.0...v1.1.0) (2026-03-04)
 
 
