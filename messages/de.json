@@ -117,7 +117,7 @@
   "settings_tasks_edit": "Aufgabe anpassen",
   "settings_user_data": "Kontodaten",
   "settings_user_data_password": "Passwort (leer lassen, um bestehenden Wert zu behalten)",
-  "settings_users_add": "Benutzer:in hinzufügen",
+  "settings_users_add": "Benutzer:in neu hinzufügen",
   "settings_users_add_disclaimer_no_users": "Diese Instanz hat noch keine Nutzer:innen. Bitte lege eine/n an.",
   "settings_users_default_distribution": "Standard Ausgabenverteilung (%)",
   "settings_users_headline": "Benutzer:innen",
