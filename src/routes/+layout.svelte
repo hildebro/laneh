@@ -8,19 +8,6 @@
   import * as m from '$lib/paraglide/messages.js';
   import { toaster } from '$lib/toaster-ref';
 
-  // 1. Only show the button if we are running inside the native wrapper
-  const isNative = Capacitor.isNativePlatform();
-
-  function disconnectFromWrapper() {
-    if (!data.returnUrl) {
-      alert('No returnUrl provided.');
-      return;
-    }
-
-    // Bounce back to the wrapper, appending a query parameter
-    window.location.replace(`${data.returnUrl}?action=disconnect`);
-  }
-
   let { children, data } = $props();
 
   onMount(async () => {
@@ -60,19 +47,14 @@
   <main class="flex flex-1 flex-col items-center p-4">
     {@render children()}
   </main>
-  <footer class="text-right text-xs p-1">
-    {#if data.returnUrl}
-      {data.returnUrl}
-    {/if}
-    {#if isNative}
-      <div class="native-controls">
-        <button type="button" onclick={disconnectFromWrapper} class="btn">
-          Disconnect / Change Server
-        </button>
-      </div>
-    {/if}
+  <footer class="flex justify-between text-xs">
+    <div>
+      {m.footer_version({ app_version: __APP_VERSION__ })}
+    </div>
     {#if data.user}
-      { m.footer_user({ name: data.user.username }) }
+      <div>
+        { m.footer_user({ name: data.user.username }) }
+      </div>
     {/if}
   </footer>
 </div>

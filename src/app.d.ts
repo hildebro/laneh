@@ -8,6 +8,7 @@ declare global {
       user: User | undefined;
     }
   }
+  const __APP_VERSION__: string;
 }
 
 export {};
