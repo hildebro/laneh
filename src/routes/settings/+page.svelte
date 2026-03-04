@@ -37,16 +37,19 @@
   <div class="card">
     <h2 class="h2 mb-2">{m.settings_actions()}</h2>
     <div class="flex flex-row gap-4">
-    <form action="?/logout" method="POST" use:enhance>
-      <button type="submit" class="btn">{m.auth_logout()}</button>
-    </form>
-    {#if Capacitor.isNativePlatform()}
-      <div class="native-controls">
-        <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)} class="btn">
-          {m.settings_mobile_return_to_wrapper()}
-        </button>
-      </div>
-    {/if}
+      <a class="btn" href={resolve('/auth/register')}>
+        {m.settings_users_add()}
+      </a>
+      <form action="?/logout" method="POST" use:enhance>
+        <button type="submit" class="btn">{m.auth_logout()}</button>
+      </form>
+      {#if Capacitor.isNativePlatform()}
+        <div class="native-controls">
+          <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)} class="btn">
+            {m.settings_mobile_return_to_wrapper()}
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 </div>
