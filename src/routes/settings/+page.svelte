@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Capacitor } from '@capacitor/core';
+  import { enhance } from '$app/forms';
   import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import { disconnectFromWrapper } from '$lib/mobile-shell';
@@ -22,7 +23,7 @@
   </div>
   <div class="card">
     <EnhancedForm action="?/updateUser">
-      <h2 class="h2">{m.settings_user_data_edit()}</h2>
+      <h2 class="h2">{m.settings_user_data()}</h2>
       <label>
         {m.generic_name()}
         <input class="input" type="text" name="username" value={data.user?.username} />
@@ -33,12 +34,19 @@
       </label>
     </EnhancedForm>
   </div>
-  {#if Capacitor.isNativePlatform()}
-    <div class="card native-controls">
-      <h2 class="h2 mb-2">{m.settings_mobile_label()}</h2>
-      <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)} class="btn">
-        {m.settings_mobile_return_to_wrapper()}
-      </button>
+  <div class="card">
+    <h2 class="h2 mb-2">{m.settings_actions()}</h2>
+    <div class="flex flex-row gap-4">
+    <form action="?/logout" method="POST" use:enhance>
+      <button type="submit" class="btn">{m.auth_logout()}</button>
+    </form>
+    {#if Capacitor.isNativePlatform()}
+      <div class="native-controls">
+        <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)} class="btn">
+          {m.settings_mobile_return_to_wrapper()}
+        </button>
+      </div>
+    {/if}
     </div>
-  {/if}
+  </div>
 </div>

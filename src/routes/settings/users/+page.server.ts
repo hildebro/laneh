@@ -1,7 +1,6 @@
 import { type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages';
-import { deleteSessionCookie } from '$lib/server/auth';
 import { findAllUsers, updateDefaultDistribution } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
@@ -45,7 +44,4 @@ export const actions: Actions = {
       await updateDefaultDistribution(distributionData.distributions);
     }, { arrays: ['userIds', 'percents'] });
   },
-  logout: async (event) => {
-    deleteSessionCookie(event.cookies);
-  }
 };
