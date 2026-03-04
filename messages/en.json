@@ -111,6 +111,8 @@
   "settings_items_show_inactive": "Show deactivated items",
   "settings_tasks_add": "Add task",
   "settings_tasks_edit": "Edit task",
+  "settings_user_data_edit": "Update account data",
+  "settings_user_data_password": "Password (leave empty to keep existing value)",
   "settings_users_add": "Add user",
   "settings_users_add_disclaimer_no_users": "This instance has no users yet. Please create one.",
   "settings_users_default_distribution": "Default expense distribution (%)",

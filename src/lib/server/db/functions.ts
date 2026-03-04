@@ -53,6 +53,25 @@ export const addUser = async (username: string, password: string): Promise<strin
   return userId;
 };
 
+export const updateUser = async (userId: string, username: string, password: string | undefined): Promise<void> => {
+  const db = getTx();
+
+  const hashingOptions = {
+    type: argon2.argon2id,
+    memoryCost: 65536, // 64 MB (passed in kilobytes)
+    timeCost: 3, // Number of iterations
+    parallelism: 1 // Number of threads to use
+  };
+
+  let update: { username: string, password?: string } = { username };
+  if (password) {
+    const hashedPassword = await argon2.hash(password, hashingOptions);
+    update = { ...update, password: hashedPassword };
+  }
+
+  await db.update(table.user).set(update).where(eq(table.user.id, userId)).execute();
+};
+
 export const isUsernameTaken = async (username: string) => {
   const db = getTx();
 

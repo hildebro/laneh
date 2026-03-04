@@ -111,6 +111,8 @@
   "settings_items_show_inactive": "Deaktivierte Artikel anzeigen",
   "settings_tasks_add": "Aufgabe hinzufügen",
   "settings_tasks_edit": "Aufgabe anpassen",
+  "settings_user_data_edit": "Kontodaten ändern",
+  "settings_user_data_password": "Passwort (leer lassen, um bestehenden Wert zu behalten)",
   "settings_users_add": "Benutzer:in hinzufügen",
   "settings_users_add_disclaimer_no_users": "Diese Instanz hat noch keine Nutzer:innen. Bitte lege eine/n an.",
   "settings_users_default_distribution": "Standard Ausgabenverteilung (%)",
