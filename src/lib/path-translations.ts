@@ -17,8 +17,6 @@ export const transPath = (path: string): string => {
       return m.generic_name();
     case 'password':
       return m.auth_register_password();
-    case 'switchUser':
-      return m.settings_users_switch();
     case 'weekday':
       return m.schedule_weekday();
     default:
