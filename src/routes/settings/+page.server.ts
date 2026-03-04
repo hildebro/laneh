@@ -1,4 +1,5 @@
 import { type Actions } from '@sveltejs/kit';
+import { deleteSessionCookie } from '$lib/server/auth';
 import { updateUser } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
@@ -17,9 +18,12 @@ const userSchema = z.object({
 export const actions: Actions = {
   updateUser: async (event) => {
     return processForm(event, userSchema, async (user, event) => {
-      const userId = event.locals.user?.id as string
+      const userId = event.locals.user?.id as string;
 
       await updateUser(userId, user.username, user.password);
     });
+  },
+  logout: async (event) => {
+    deleteSessionCookie(event.cookies);
   }
 };

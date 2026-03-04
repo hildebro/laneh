@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Avatar } from '@skeletonlabs/skeleton-svelte';
-  import { enhance } from '$app/forms';
   import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -64,10 +63,5 @@
         {m.settings_users_add()}
       </a>
     </div>
-  </div>
-  <div class="card">
-    <form action="?/logout" method="POST" use:enhance>
-      <button type="submit" class="btn">{m.auth_logout()}</button>
-    </form>
   </div>
 {/await}
