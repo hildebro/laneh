@@ -49,12 +49,18 @@
       if (items[index].name.trim().length === 0 && items[index].amount.trim().length === 0) {
         items[index].name = name;
 
+        // Ensure we still have an empty line at the end after insertion.
+        if (items[items.length - 1].name.trim().length > 0) {
+          items.push({ amount: '', name: '', collapsibleOpen: false, preventCorrection: false });
+        }
+
         return;
       }
     }
 
-    // Push a new line, if no empty line was present to fill.
+    // Push the suggestion and a new empty line, if no empty line was present to fill.
     items.push({ amount: '', name, collapsibleOpen: false, preventCorrection: false });
+    items.push({ amount: '', name: '', collapsibleOpen: false, preventCorrection: false });
   }
 
   function suggestionNotPresent(name: string) {
