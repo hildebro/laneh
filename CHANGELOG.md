@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/hildebro/chorehub/compare/v1.1.1...v1.1.2) (2026-03-12)
+
+
+### Bug Fixes
+
+* state to derived in usages of props.data ([77cab3b](https://github.com/hildebro/chorehub/commit/77cab3b864f6425ce90d772d6cee0b2ce21043a1))
+
 ## [1.1.1](https://github.com/hildebro/chorehub/compare/v1.1.0...v1.1.1) (2026-03-04)
 
 
