@@ -4,8 +4,7 @@
 
   let { data } = $props();
 
-  // Initialize form state directly from props
-  let categoryName = $state(data.category?.name || '');
+  let categoryName = $derived(data.category?.name || '');
 </script>
 
 <div class="card">
