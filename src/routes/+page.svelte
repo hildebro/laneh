@@ -10,7 +10,7 @@
     minimumFractionDigits: 2
   });
 
-  let lastPurchaseDate = $state(
+  let lastPurchaseDate = $derived(
     !data.last_purchase_date
       ? null
       : new Intl.DateTimeFormat('en-US', {

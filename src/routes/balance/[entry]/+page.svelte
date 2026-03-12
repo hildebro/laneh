@@ -28,10 +28,10 @@
     });
   };
 
-  let purchaseName = $state(data.entry?.name || '');
-  let purchaseUserId = $state(data.entry?.userId || data.user?.id);
-  let purchasePrice = $state(data.entry?.price || '0');
-  let distributions = $state(getInitialDistributions());
+  let purchaseName = $derived(data.entry?.name || '');
+  let purchaseUserId = $derived(data.entry?.userId || data.user?.id);
+  let purchasePrice = $derived(data.entry?.price || '0');
+  let distributions = $derived(getInitialDistributions());
 </script>
 
 {#if data.purchaseId}

@@ -5,11 +5,11 @@
 
   let { data } = $props();
 
-  let name = $state(data.task?.name);
-  let weekday = $state(data.task?.dueWeekday);
-  let interval = $state(data.task?.interval);
-  let dueDate = $state(data.task?.nextDueDate);
-  let dueUserId = $state(data.task?.nextDueUserId);
+  let name = $derived(data.task?.name);
+  let weekday = $derived(data.task?.dueWeekday);
+  let interval = $derived(data.task?.interval);
+  let dueDate = $derived(data.task?.nextDueDate);
+  let dueUserId = $derived(data.task?.nextDueUserId);
 
   function translateWeekday(weekday: Weekday) {
     switch (weekday) {
