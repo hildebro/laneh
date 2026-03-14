@@ -63,7 +63,6 @@
 		"drizzle-orm": "^0.45.1",
 		"fast-levenshtein": "^3.0.0",
 		"lucide-svelte": "^0.577.0",
-		"otplib": "^12.0.1",
 		"postgres": "^3.4.8",
 		"tar-stream": "^3.1.8",
 		"zod": "^4.3.6"
