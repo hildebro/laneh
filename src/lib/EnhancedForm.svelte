@@ -13,6 +13,7 @@
     additionalButtons?: Snippet<[submitting: boolean]>;
     action?: string;
     method?: 'dialog' | 'get' | 'post' | 'DIALOG' | 'GET' | 'POST' | undefined | null;
+    enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data';
     preUpdatedCallback?: () => void;
     submitButtonText?: string;
     submitButtonClasses?: string;
@@ -24,6 +25,7 @@
     additionalButtons = undefined,
     action = undefined,
     method = 'POST',
+    enctype = 'application/x-www-form-urlencoded',
     preUpdatedCallback = undefined,
     submitButtonText = m.generic_save(),
     submitButtonClasses = '',
@@ -68,6 +70,7 @@
 <form
   method={method}
   action={action}
+  {enctype}
   use:enhance={handleFormSubmit}
   {...restProps}
 >
