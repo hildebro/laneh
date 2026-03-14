@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/hildebro/chorehub/compare/v1.3.0...v1.4.0) (2026-03-14)
+
+
+### Features
+
+* database export ([8f2e236](https://github.com/hildebro/chorehub/commit/8f2e236018f35e9a5e39fb5e99baa264d29ed925))
+* database import ([096bc36](https://github.com/hildebro/chorehub/commit/096bc3697212967d0268d9e61f8b17e5c70870a8))
+
 # [1.3.0](https://github.com/hildebro/chorehub/compare/v1.2.0...v1.3.0) (2026-03-14)
 
 
