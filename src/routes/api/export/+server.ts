@@ -1,6 +1,7 @@
-import archiver from 'archiver';
-import { getTableColumns, getTableName, type Table } from 'drizzle-orm'; // Added getTableColumns
+import { getTableColumns, getTableName, type Table } from 'drizzle-orm';
 import { PassThrough, Readable } from 'node:stream';
+import { createGzip } from 'node:zlib';
+import tar from 'tar-stream';
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';
 
@@ -20,11 +21,24 @@ function toSnakeCase(str: string) {
 }
 
 export async function GET() {
-  const archive = archiver('tar', { gzip: true });
+  const pack = tar.pack();
+  const gzip = createGzip();
 
   // Create a PassThrough stream to bridge Node streams to Web streams
   const passThrough = new PassThrough();
-  archive.pipe(passThrough);
+
+  // Pipe the tar stream through gzip, then to the passthrough
+  pack.pipe(gzip).pipe(passThrough);
+
+  // Helper to append entries as Promises for proper backpressure handling
+  const appendEntry = (name: string, content: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      pack.entry({ name }, content, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  };
 
   // Process tables asynchronously without blocking the stream
   const processTables = async () => {
@@ -45,7 +59,7 @@ export async function GET() {
         const rows = await db.select().from(entity as Table);
 
         if (rows.length === 0) {
-          archive.append('-- No data\n', { name: `${tableName}.sql` });
+          await appendEntry(`${tableName}.sql`, '-- No data\n');
           continue;
         }
 
@@ -68,20 +82,21 @@ export async function GET() {
         for (const row of rows) {
           const values = Object.values(row).map(escapeSqlValue).join(', ');
           sql += `INSERT INTO "${tableName}" (${columns})
-                  VALUES (${values});  `;
+                  VALUES (${values});  \n`;
         }
 
-        archive.append(sql, { name: `${tableName}.sql` });
+        await appendEntry(`${tableName}.sql`, sql);
       }
     } catch (error) {
       console.error('Export error:', error);
-      archive.append('ERROR GENERATING DUMP', { name: 'error.log' });
+      await appendEntry('error.log', 'ERROR GENERATING DUMP');
     } finally {
-      await archive.finalize();
+      // Finalize the tar stream to end it, which will propagate to gzip and passThrough
+      pack.finalize();
     }
   };
 
-  // Start processing in the background (the stream will flow as data is appended)
+  // Start processing in the background
   // noinspection ES6MissingAwait
   processTables();
 
