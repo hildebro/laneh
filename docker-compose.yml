@@ -17,6 +17,7 @@ services:
     build:
       context: .
       target: builder
+    user: "${UID:-1000}:${GID:-1000}"
     ports:
       - "5173:5173"
     env_file:
@@ -26,12 +27,11 @@ services:
       NODE_ENV: development
     volumes:
       - ./:/app
-      - /app/node_modules  # Named volume for faster node_modules
     depends_on:
       - db
     networks:
       - app-network
-    command: npm run dev -- --host 0.0.0.0
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
 volumes:
   postgres_data:
