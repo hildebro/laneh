@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/hildebro/chorehub/compare/v1.2.0...v1.3.0) (2026-03-14)
+
+
+### Features
+
+* db-migrator in docker prod ([5bfa8d0](https://github.com/hildebro/chorehub/commit/5bfa8d065551c65d49d78838fbf4c571a2449d18))
+
 # [1.2.0](https://github.com/hildebro/chorehub/compare/v1.1.2...v1.2.0) (2026-03-14)
 
 
