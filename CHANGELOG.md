@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/hildebro/chorehub/compare/v1.1.2...v1.2.0) (2026-03-14)
+
+
+### Features
+
+* notify about new version ([c08891d](https://github.com/hildebro/chorehub/commit/c08891d678e2d8a9fdaa6126f6a434fc55264af8))
+
 ## [1.1.2](https://github.com/hildebro/chorehub/compare/v1.1.1...v1.1.2) (2026-03-12)
 
 
