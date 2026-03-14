@@ -95,6 +95,7 @@
   "schedule_weekday_tue": "Dienstag",
   "schedule_weekday_wed": "Mittwoch",
   "settings_actions": "Aktionen",
+  "settings_actions_export": "Datenbank exportieren",
   "settings_categories_add": "Kategorie hinzufügen",
   "settings_categories_delete": "Kategorie löschen",
   "settings_categories_delete_invalid": "Kategorien mit Artikeln (inklusive deaktivierter) können nicht gelöscht werden",

@@ -47,6 +47,9 @@
       {/each}
     </div>
     <div class="flex flex-row gap-4">
+      <a class="btn" href={resolve('/api/export')} download="database-dump.tar.gz">
+        {m.settings_actions_export()}
+      </a>
       <a class="btn" href={resolve('/auth/register')}>
         {m.settings_users_add()}
       </a>
