@@ -5,10 +5,14 @@
   import { Toast } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import AppHeader from './AppHeader.svelte';
+  import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
   import { toaster } from '$lib/toaster-ref';
 
   let { children, data } = $props();
+
+  let updateAvailable = $state(false);
+  let latestVersion = $state('');
 
   onMount(async () => {
     if (Capacitor.isNativePlatform()) {
@@ -20,6 +24,18 @@
       // you might want to dynamically set this, or just stick to Style.Default which adapts.
       // If your header is always dark-ish, force Light icons:
       // await StatusBar.setStyle({ style: Style.Dark });
+    }
+
+    // Check for updates
+    try {
+      const res = await fetch(resolve('/api/update'));
+      const updateData = await res.json();
+      if (updateData.hasUpdate) {
+        updateAvailable = true;
+        latestVersion = updateData.latestVersion;
+      }
+    } catch {
+      console.error('Failed to check for updates');
     }
   });
 </script>
@@ -51,6 +67,9 @@
     <div>
       {m.footer_version({ app_version: __APP_VERSION__ })}
     </div>
+    {#if updateAvailable}
+      <span class="font-bold">⚠️ Update available</span>
+    {/if}
     {#if data.user}
       <div>
         { m.footer_user({ name: data.user.username }) }
