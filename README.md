@@ -1,10 +1,10 @@
-## Usage
+# Chorehub
 
-### Preconditions
+## Preconditions
 
 Install `docker` `docker compose` and `docker-buildx`.
 
-### Setup
+## Setup
 
 - Clone this repository.
 - Copy `.env.exmaple` to `.env` and replace the placeholder value for the database password.
@@ -12,7 +12,7 @@ Install `docker` `docker compose` and `docker-buildx`.
 - Initiate the database via `docker compose exec app npm run db:migrate`
 - Access the app via http://localhost:5173
 
-### Production
+## Production
 
 This project has a separate `prod` file for Docker Compose. Apart from building the production version of the node app,
 that file also has a database migrator included. So you don't have to run the `db:migrate` command after starting the
@@ -42,3 +42,7 @@ RestartSec=5s
 [Install]
 WantedBy=multi-user.target
 ```
+
+## Development
+
+Run `git config core.hooksPath .githooks` to ensure your commit messages are clean.
