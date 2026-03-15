@@ -1,3 +1,11 @@
+## [1.4.1](https://github.com/hildebro/chorehub/compare/v1.4.0...v1.4.1) (2026-03-15)
+
+
+### Bug Fixes
+
+* improve update-available footer ([79114d6](https://github.com/hildebro/chorehub/commit/79114d66ae173a136b5c50081b3fa6a1312c9126))
+* resolve routes correctly ([a081892](https://github.com/hildebro/chorehub/commit/a081892ce7a1e1064b5fb4c4a63760c3ab5b5ef8))
+
 # [1.4.0](https://github.com/hildebro/chorehub/compare/v1.3.0...v1.4.0) (2026-03-14)
 
 
