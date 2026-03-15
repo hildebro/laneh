@@ -1,23 +1,154 @@
-@import 'tailwindcss';
-@import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/themes/vox';
-@import '@skeletonlabs/skeleton-svelte';
+/* =========================================
+   1. Base & Theme Variables
+   ========================================= */
+:root {
+    /* Light Mode Defaults */
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #666666;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --border: #e5e7eb;
+    --error-bg: #ef4444;
+    --error-text: #ffffff;
 
-@plugin '@tailwindcss/forms';
+    --radius: 6px;
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --max-width: 800px;
+}
 
-@layer base {
-    main {
-        @apply bg-surface-50-950;
-        background-image:
-                radial-gradient(at 0% 0%, color-mix(in oklab, var(--color-primary-500) 25%, transparent) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, color-mix(in oklab, var(--color-success-500) 10%, transparent) 0px, transparent 35%);
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Dark Mode Overrides */
+        --bg: #121212;
+        --text: #f3f4f6;
+        --text-muted: #9ca3af;
+        --accent: #3b82f6;
+        --accent-hover: #60a5fa;
+        --border: #374151;
+        --error-bg: #f87171;
+        --error-text: #ffffff;
+    }
+}
+
+/* CSS Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans), sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+
+    /* Flexbox magic to keep the footer at the bottom */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* =========================================
+   2. Typography
+   ========================================= */
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+
+p, ul, ol, blockquote {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+
+    /* Native CSS nesting! */
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+/* =========================================
+   3. Layout Containers
+   ========================================= */
+header, main, footer {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+}
+
+main {
+    flex: 1; /* Pushes footer to the bottom */
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+
+header {
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer {
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   4. Navigation
+   ========================================= */
+nav {
+    & ul {
+        list-style: none;
+        display: flex;
+        gap: 1.5rem;
     }
 
-    .btn {
-        @apply preset-filled-primary-500;
+    & a {
+        color: var(--text);
+        font-weight: 500;
+
+        &:hover {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    }
+}
+
+/* =========================================
+   5. Buttons
+   ========================================= */
+button,
+input[type="submit"] {
+    display: inline-block;
+    background-color: var(--accent);
+    color: #ffffff; /* Explicitly white, even in dark mode */
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+
+    &:hover {
+        background-color: var(--accent-hover);
     }
 
-    .card {
-        @apply preset-outlined-surface-200-800 bg-surface-50-950 p-5 shadow-md;
+    &:active {
+        transform: translateY(1px);
     }
 }
