@@ -1,4 +1,4 @@
-// noinspection JSUnusedGlobalSymbols
+// noinspection JSUnusedGlobalSymbols The entities are referenced through svelte magic.
 
 import { type InferSelectModel, relations } from 'drizzle-orm';
 import {
@@ -22,7 +22,7 @@ export const user = pgTable('user', {
 export type User = typeof user.$inferSelect;
 
 export const userRelations = relations(user, ({ many }) => ({
-  shoppingPurchases: many(shoppingPurchase) // Relation for one-to-many with shoppingPurchase
+  shoppingPurchases: many(shoppingPurchase)
 }));
 
 export const session = pgTable('session', {
@@ -126,7 +126,6 @@ export type StagedShoppingList = typeof stagedShoppingList.$inferSelect;
 
 export const stagedShoppingListRelations = relations(stagedShoppingList, ({ one, many }) => ({
   user: one(user, { fields: [stagedShoppingList.userId], references: [user.id] }),
-  // One staged list has many staged items
   stagedItems: many(stagedShoppingItem)
 }));
 
@@ -207,7 +206,6 @@ export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sa
 
 export type Weekday = typeof weekday.enumValues[number];
 
-// Define the tasks table
 export const weeklyTask = pgTable('task_weekly', {
   id: text().primaryKey(),
   createdAt: timestamp().defaultNow().notNull(),
@@ -217,7 +215,6 @@ export const weeklyTask = pgTable('task_weekly', {
   nextDueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
   nextDueDate: date().notNull()
 });
-// Define TypeScript types for convenience (optional but recommended)
 export type WeeklyTask = typeof weeklyTask.$inferSelect;
 
 export type WeeklyTaskWithRelation = InferSelectModel<typeof weeklyTask> & {
