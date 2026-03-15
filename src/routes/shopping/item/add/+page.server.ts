@@ -52,14 +52,11 @@ const addingItemsSchema = z
 export const actions = {
   default: async (event) => {
     return processForm(event, addingItemsSchema, async (items, event) => {
-      // --- Get User (Essential) ---
       const userId = event.locals.user?.id as string;
       const listId = await addStagedShoppingList(userId);
 
-      // --- Process lines and prepare staged data ---
       let needsCategorization = false;
       for (const item of items) {
-        // case `perfect_match` doesn't matter to us here.
         const isNewItem = await persistStagedItem(item.name, item.amount, listId);
         if (isNewItem) {
           needsCategorization = true;
