@@ -1,3 +1,11 @@
+## [1.4.2](https://github.com/hildebro/chorehub/compare/v1.4.1...v1.4.2) (2026-03-15)
+
+
+### Bug Fixes
+
+* move dev dependencies ([34c8edc](https://github.com/hildebro/chorehub/commit/34c8edc41bfa8b69b3160cb6b37fbaf38ce96c01))
+* remove unused package ([6d8968e](https://github.com/hildebro/chorehub/commit/6d8968ec1f7f207b95d65dfe9054225bd64fe200))
+
 ## [1.4.1](https://github.com/hildebro/chorehub/compare/v1.4.0...v1.4.1) (2026-03-15)
 
 
