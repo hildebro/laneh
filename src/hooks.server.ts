@@ -29,6 +29,9 @@ const handleReturnUrl: Handle = async ({ event, resolve }) => {
   return redirect(302, cleanUrl.toString());
 };
 
+/**
+ * Ensures every request has a db transaction.
+ */
 const handleDatabase: Handle = async ({ event, resolve }) => {
   try {
     // Start the Drizzle transaction using the main db client
@@ -44,9 +47,11 @@ const handleDatabase: Handle = async ({ event, resolve }) => {
     // Re-throw to let SvelteKit handle it
     throw error;
   }
-
 };
 
+/**
+ * Loads the user into locals based on session cookie.
+ */
 const handleUser: Handle = async ({ event, resolve }) => {
   const sessionToken = event.cookies.get(SESSION_COOKIE);
   if (!sessionToken) {
@@ -71,6 +76,9 @@ const handleUser: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
+/**
+ * Translates the app.
+ */
 const handleParaglide: Handle = ({ event, resolve }) =>
   paraglideMiddleware(event.request, ({ request: localizedRequest, locale }) => {
     event.request = localizedRequest;

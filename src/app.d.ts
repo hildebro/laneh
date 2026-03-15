@@ -1,4 +1,5 @@
-// noinspection JSUnusedGlobalSymbols Intellij doesn't see the usage, because it's through auto-generated files.
+// noinspection JSUnusedGlobalSymbols Intellij doesn't see the usage, because it's through
+// auto-generated files.
 
 import type { User } from '$lib/server/db/schema';
 
