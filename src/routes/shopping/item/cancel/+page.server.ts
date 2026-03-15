@@ -1,5 +1,5 @@
 import { type Actions, redirect } from '@sveltejs/kit';
-import { base } from '$app/paths';
+import { resolve } from '$app/paths';
 import { deleteStagedList } from '$lib/server/db/functions';
 
 export const actions: Actions = {
@@ -8,6 +8,6 @@ export const actions: Actions = {
 
     await deleteStagedList(userId);
 
-    return redirect(302, `${base}/shopping`)
+    return redirect(302, resolve('/shopping'))
   }
 };

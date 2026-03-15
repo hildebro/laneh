@@ -4,6 +4,7 @@
   import { flip } from 'svelte/animate';
   import { z } from 'zod/v4';
   import { enhance } from '$app/forms';
+  import { resolve } from '$app/paths';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { transPath } from '$lib/path-translations';
@@ -46,7 +47,7 @@
 {:then categories}
   <div class="w-full">
     <div class="flex justify-end mb-4">
-      <a class="btn" href="categories/add">{ m.settings_categories_add() }</a>
+      <a class="btn" href={resolve('/settings/categories/add')}>{ m.settings_categories_add() }</a>
     </div>
     <div class="flex flex-col gap-2">
       {#each categories as category, index (category.id)}
@@ -56,7 +57,7 @@
         >
           <span>{category.name}</span>
           <div class="flex gap-1">
-            <a href="categories/{category.id}" class="btn">
+            <a href={resolve('/settings/categories/[category]', {category: category.id})} class="btn">
               <Pencil />
             </a>
             <form method="POST" action="?/up" use:enhance={handleFormSubmit}>
