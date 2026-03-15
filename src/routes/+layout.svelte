@@ -3,6 +3,7 @@
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
   import { Toast } from '@skeletonlabs/skeleton-svelte';
+  import { CloudAlert } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import AppHeader from './AppHeader.svelte';
   import { resolve } from '$app/paths';
@@ -12,7 +13,6 @@
   let { children, data } = $props();
 
   let updateAvailable = $state(false);
-  let latestVersion = $state('');
 
   onMount(async () => {
     if (Capacitor.isNativePlatform()) {
@@ -32,7 +32,6 @@
       const updateData = await res.json();
       if (updateData.hasUpdate) {
         updateAvailable = true;
-        latestVersion = updateData.latestVersion;
       }
     } catch {
       console.error('Failed to check for updates');
@@ -64,12 +63,15 @@
     {@render children()}
   </main>
   <footer class="flex justify-between text-xs">
-    <div>
+    <div
+      class="flex gap-1"
+      class:text-error-800-200={updateAvailable}
+    >
       {m.footer_version({ app_version: __APP_VERSION__ })}
+      {#if updateAvailable}
+        <CloudAlert size={20} />
+      {/if}
     </div>
-    {#if updateAvailable}
-      <span class="font-bold">⚠️ Update available</span>
-    {/if}
     {#if data.user}
       <div>
         { m.footer_user({ name: data.user.username }) }
