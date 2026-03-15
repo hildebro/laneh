@@ -3,7 +3,8 @@
    ========================================= */
 :root {
     /* Light Mode Defaults */
-    --bg: #ffffff;
+    --bg: #f9fafb;
+    --bg-surface: #ffffff;
     --text: #1a1a1a;
     --text-muted: #666666;
     --accent: #2563eb;
@@ -12,15 +13,17 @@
     --error-bg: #ef4444;
     --error-text: #ffffff;
 
-    --radius: 6px;
+    --radius: 8px;
     --font-sans: system-ui, -apple-system, sans-serif;
-    --max-width: 800px;
+    --max-width: 1000px;
+    --sm: 40rem;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         /* Dark Mode Overrides */
-        --bg: #121212;
+        --bg: #0f172a;
+        --bg-surface: #1e293b;
         --text: #f3f4f6;
         --text-muted: #9ca3af;
         --accent: #3b82f6;
@@ -105,6 +108,63 @@ footer {
     color: var(--text-muted);
     text-align: center;
     font-size: 0.9rem;
+}
+
+/* =========================================
+   3. Main section styling
+   ========================================= */
+main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+    main {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+main > article {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+
+    /* Flexbox magic to control the internal layout */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card Titles */
+main > article > h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+/* Arbitrary Content Area */
+main > article > *:not(h2):not(footer) {
+    /* Gives the main text room to breathe */
+    margin-bottom: 1rem;
+}
+
+/* Card Actions (Footer) */
+main > article > footer {
+    /* This is the magic line. It pushes the footer to the absolute
+       bottom of the card, filling any empty vertical space above it. */
+    margin-top: auto;
+
+    display: flex;
+    justify-content: flex-end; /* Aligns buttons to the right */
+    align-items: center;
+    gap: 0.75rem; /* Space between the two buttons */
+
+    padding-top: 1rem;
+    border-top: 1px solid var(--border); /* Optional: visual separator */
 }
 
 /* =========================================
