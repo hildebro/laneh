@@ -448,7 +448,7 @@ export const createShoppingPurchase = async (userId: string) => {
     return;
   }
 
-  // 1. Create a new purchase
+  // Create a new purchase
   const purchaseId = generateUUID();
   await db.insert(table.shoppingPurchase)
     .values({
@@ -458,14 +458,14 @@ export const createShoppingPurchase = async (userId: string) => {
     })
     .execute();
 
-  // 2. Create entries in the junction table (shoppingPurchaseItem)
+  // Create entries in the junction table
   const purchaseItemInserts = stagedItems.map((itemId) => ({
     purchaseId,
     itemId
   }));
   await db.insert(table.shoppingPurchaseItem).values(purchaseItemInserts);
 
-  // 3. Remove items from staging and deactivate them
+  // Remove items from staging and deactivate them
   await db.delete(table.stagedShoppingPurchaseItem).where(inArray(stagedShoppingPurchaseItem.itemId, stagedItems));
   await deactivateShoppingItems(stagedItems);
 
@@ -500,7 +500,6 @@ export const stagePurchaseItem = async (itemId: string, userId: string) => {
     where: eq(table.stagedShoppingPurchaseItem.itemId, itemId)
   }).execute();
   if (existingStagedItem) {
-    // already staged, nothing to do.
     return;
   }
 
@@ -757,7 +756,6 @@ export const assignCategoryToStagedItems = async (itemIds: string[], categoryId:
 export const commitStagedItems = async (userId: string) => {
   const db = getTx();
 
-  // Get the staged list.
   const list = await db.query.stagedShoppingList.findFirst({
     with: {
       stagedItems: {}
@@ -769,7 +767,6 @@ export const commitStagedItems = async (userId: string) => {
     throw new Error('Trying to commit nonexistent list.');
   }
 
-  // Commit every item.
   for (const item of list.stagedItems) {
     switch (item.status) {
       case 'perfect_match':
@@ -786,7 +783,6 @@ export const commitStagedItems = async (userId: string) => {
 export const deleteStagedList = async (userId: string) => {
   const db = getTx();
 
-  // Delete the staged list
   await db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId)).execute();
 };
 
@@ -872,8 +868,8 @@ function getNextDueDate(weekdayName: string, interval: number): Date {
   // Now we can simply add 7 days per desired interval to know how many days it takes to get to the next target weekday.
   diff = diff + (7 * interval);
 
-  // Create a new Date object starting from 'now' and add the calculated difference in days.
-  // This preserves the time of day from the 'now' object.
+  // Create a new `Date` object starting from `now` and add the calculated difference in days.
+  // This preserves the time of day from the `now` object.
   const nextDate = new Date(now);
   nextDate.setDate(now.getDate() + diff);
 
@@ -968,6 +964,7 @@ function generateUUID() {
 }
 
 export function lower(value: AnyPgColumn): SQL {
+  // Formatting would be a bit ugly, if this call was inlined rather than being in this helper function.
   return sql`lower
       (${value})`;
 }
