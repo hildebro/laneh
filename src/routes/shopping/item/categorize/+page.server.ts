@@ -47,7 +47,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  // Default action for saving category assignments
   default: async ({ request  }) => {
     const formData = await request.formData();
     const itemIds = formData.getAll('itemIds').map((formValue) => formValue.toString());
