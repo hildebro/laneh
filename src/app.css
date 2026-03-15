@@ -108,27 +108,6 @@ footer {
 }
 
 /* =========================================
-   4. Navigation
-   ========================================= */
-nav {
-    & ul {
-        list-style: none;
-        display: flex;
-        gap: 1.5rem;
-    }
-
-    & a {
-        color: var(--text);
-        font-weight: 500;
-
-        &:hover {
-            color: var(--accent);
-            text-decoration: none;
-        }
-    }
-}
-
-/* =========================================
    5. Buttons
    ========================================= */
 button,
