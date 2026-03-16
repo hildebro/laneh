@@ -98,11 +98,6 @@ header, main  {
     padding: 1rem;
 }
 
-footer {
-    width: 100%;
-    max-width: var(--max-width);
-}
-
 main {
     flex: 1; /* Pushes footer to the bottom */
     padding-top: 2rem;
@@ -166,7 +161,7 @@ main > article > footer {
     align-items: center;
     gap: 0.75rem; /* Space between the two buttons */
 
-    padding-top: 1rem;
+    padding: 1rem 0 0;
     border-top: 1px solid var(--border); /* Optional: visual separator */
 }
 
