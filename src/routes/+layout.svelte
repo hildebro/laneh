@@ -7,6 +7,7 @@
   import { onMount } from 'svelte';
   import AppHeader from './AppHeader.svelte';
   import { resolve } from '$app/paths';
+  import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { toaster } from '$lib/toaster-ref';
 
@@ -38,6 +39,8 @@
     }
   });
 </script>
+
+<ToastContainer />
 
 <Toast.Group {toaster}>
   {#snippet children(toast)}
