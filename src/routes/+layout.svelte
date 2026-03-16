@@ -66,10 +66,10 @@
     {@render children()}
   </main>
   <footer>
-    <div>
+    <div class:warning={updateAvailable}>
       {m.footer_version({ app_version: __APP_VERSION__ })}
       {#if updateAvailable}
-        <CloudAlert size={20} />
+        <CloudAlert size={20} class="icon" />
       {/if}
     </div>
     {#if data.user}
@@ -81,16 +81,24 @@
 </div>
 
 <style>
-    /* This ensures the background color extends BEHIND the status bar,
-       but your content starts BELOW it.
-    */
+    /* This ensures the background color extends BEHIND the status bar, but content starts BELOW it. */
     .app-shell {
         min-height: 100vh;
+    }
+
+    .warning {
+        color: var(--warning-text);
     }
 
     footer {
         display: flex;
         justify-content: space-between;
         padding: 0.5rem;
+
+        div {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
     }
 </style>
