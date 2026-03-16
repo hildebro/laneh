@@ -168,6 +168,25 @@ main > article > footer {
 }
 
 /* =========================================
+   4. Action Bar
+   ========================================= */
+.action-bar {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+
+    /* Layout */
+    display: flex;
+    flex-wrap: wrap; /* Prevents buttons from squishing on mobile */
+    align-items: center;
+    justify-content: end;
+    gap: 0.75rem;
+
+    /* Optional: Adds a subtle separator between the bar and the articles */
+}
+
+
+/* =========================================
    Lists
    ========================================= */
 ul, ol {
