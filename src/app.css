@@ -91,11 +91,16 @@ a {
 /* =========================================
    3. Layout Containers
    ========================================= */
-header, main, footer {
+header, main  {
     width: 100%;
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 1.5rem 2rem;
+    padding: 1rem;
+}
+
+footer {
+    width: 100%;
+    max-width: var(--max-width);
 }
 
 main {
@@ -127,7 +132,7 @@ main {
     gap: 1.5rem;
 
     margin: 0 auto;
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 @media (min-width: 640px) {
@@ -152,12 +157,6 @@ main > article > h2 {
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: 1.25rem;
-}
-
-/* Arbitrary Content Area */
-main > article > *:not(h2):not(footer) {
-    /* Gives the main text room to breathe */
-    margin-bottom: 1rem;
 }
 
 /* Card Actions (Footer) */
