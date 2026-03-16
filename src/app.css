@@ -12,6 +12,7 @@
     --border: #e5e7eb;
     --error-bg: #ef4444;
     --error-text: #ffffff;
+    --warning-text: #92400e;
 
     --radius: 8px;
     --font-sans: system-ui, -apple-system, sans-serif;
@@ -31,6 +32,7 @@
         --border: #374151;
         --error-bg: #f87171;
         --error-text: #ffffff;
+        --warning-text: #fde68a;
     }
 }
 
