@@ -58,18 +58,15 @@
   <title>Chorehub</title>
 </svelte:head>
 
-<div class="min-h-screen flex flex-col bg-surface-50-950 app-shell">
-  <header class="sticky top-0 z-50 w-full bg-surface-100-800 shadow-md pt-[env(safe-area-inset-top)]">
+<div class="app-shell">
+  <header>
     <AppHeader dueTaskCount={data.dueTaskCount} />
   </header>
-  <main class="flex flex-1 flex-col items-center p-4">
+  <main>
     {@render children()}
   </main>
-  <footer class="flex justify-between text-xs">
-    <div
-      class="flex gap-1"
-      class:text-error-800-200={updateAvailable}
-    >
+  <footer>
+    <div>
       {m.footer_version({ app_version: __APP_VERSION__ })}
       {#if updateAvailable}
         <CloudAlert size={20} />
@@ -89,5 +86,11 @@
     */
     .app-shell {
         min-height: 100vh;
+    }
+
+    footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
     }
 </style>
