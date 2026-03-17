@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Switch } from '@skeletonlabs/skeleton-svelte';
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -44,36 +43,30 @@
   });
 </script>
 
-<div class="ml-auto mb-2">
-  <Switch class="btn" checked={filterByAge} onCheckedChange={(e) => (filterByAge = e.checked)}>
-    <Switch.Control class="data-[state=checked]:preset-filled-primary-800-200">
-      <Switch.Thumb />
-    </Switch.Control>
-    <Switch.Label>{ m.shopping_purchase_filter_age() }</Switch.Label>
-    <Switch.HiddenInput />
-  </Switch>
-  <Switch class="btn" checked={filterByUnmatched} onCheckedChange={(e) => (filterByUnmatched = e.checked)}>
-    <Switch.Control class="data-[state=checked]:preset-filled-primary-800-200">
-      <Switch.Thumb />
-    </Switch.Control>
-    <Switch.Label>{ m.shopping_purchase_filter_unmatched() }</Switch.Label>
-    <Switch.HiddenInput />
-  </Switch>
+<div class="action-bar">
+  <label>
+    { m.shopping_purchase_filter_age() }
+    <input type="checkbox" checked={filterByAge} onclick={() => (filterByAge = !filterByAge)} />
+  </label>
+  <label>
+    { m.shopping_purchase_filter_unmatched() }
+    <input type="checkbox" checked={filterByUnmatched} onclick={() => (filterByUnmatched = !filterByUnmatched)} />
+  </label>
 </div>
-<div class="flex flex-row flex-wrap gap-2 justify-center">
-  {#each filteredPurchases as purchase (purchase.id)}
-    <div class="card flex flex-col gap-0.5 w-64">
+{#each filteredPurchases as purchase (purchase.id)}
+  <article>
     <span>
       { m.shopping_purchase_list_entry({ user: purchase.user.username, count: purchase.shoppingItems.length }) }
     </span>
-      <span class="text-primary-900-100">{dateFormatter.format(purchase.date)}</span>
+    <span>{dateFormatter.format(purchase.date)}</span>
+    <footer>
       {#if purchase.balanceEntry}
         {priceFormatter.format(purchase.balanceEntry.price / 100)}
       {:else }
-        <a href={resolve(`/balance/add?purchaseId=${purchase.id}`)} class="btn">
+        <a role="button" href={resolve(`/balance/add?purchaseId=${purchase.id}`)}>
           { m.balance_expense_add() }
         </a>
       {/if}
-    </div>
-  {/each}
-</div>
+    </footer>
+  </article>
+{/each}
