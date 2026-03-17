@@ -9,7 +9,6 @@
 <div class="action-bar">
   <a href={resolve('/shopping/purchase/list')}>{m.shopping_purchase_list()}</a>
   <button
-    class="btn"
     disabled={data.hasNoCategories}
     onclick={() => goto(resolve('/shopping/item/add'))}
   >
