@@ -14,6 +14,10 @@
     --error-text: #ffffff;
     --warning-text: #92400e;
 
+    --disabled-bg: #e5e7eb;
+    --disabled-hover: #d1d5db;
+    --disabled-text: #9ca3af;
+
     --radius: 8px;
     --font-sans: system-ui, -apple-system, sans-serif;
     --max-width: 1000px;
@@ -226,6 +230,26 @@ a[role="button"] {
     &:active {
         transform: translateY(1px);
     }
+
+    &.warning {
+        background-color: var(--warning-text);
+    }
+
+    &:disabled {
+        background-color: var(--disabled-bg);
+        color: var(--disabled-text);
+        cursor: not-allowed;
+        transform: none; /* Prevents the click animation */
+
+        &.warning {
+            background-color: var(--warning-text);
+        }
+    }
+
+    /* Prevents the hover color from changing when disabled */
+    &:disabled:hover {
+        background-color: var(--disabled-bg);
+    }
 }
 
 /* =========================================
@@ -306,4 +330,20 @@ input[type="checkbox"] {
             background-color: var(--accent);
         }
     }
+}
+
+/* =========================================
+   7. Animations & Utilities
+   ========================================= */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
 }

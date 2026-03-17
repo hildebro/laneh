@@ -102,13 +102,15 @@
   });
 </script>
 
-<form class="ml-auto" method="POST" action="?/commit" use:enhance>
-  <button class="btn" type="submit">{m.shopping_finish_purchase()}</button>
-</form>
+<div class="action-bar">
+  <form method="POST" action="?/commit" use:enhance>
+    <button type="submit">{m.shopping_finish_purchase()}</button>
+  </form>
+</div>
 {#each data.unstagedItemsByCategory as category (category.id)}
-  <div class="card w-full mt-2">
-    <b>{category.name}</b>
-    <div class="flex flex-col text-base gap-1">
+  <article>
+    <h4>{category.name}</h4>
+    <div class="item-box">
       {#each category.shoppingItems as item (item.id)}
         {@const isProcessing = !!itemStates[item.id]}
         {@const isRetrying = itemStates[item.id] === 'retrying'}
@@ -117,8 +119,8 @@
           in:receive={{ key: item.id }}
           out:send={{ key: item.id }}
           animate:flip={{ duration: 600 }}
-          class="card flex flex-row gap-1 items-center transition-colors duration-200 p-3"
-          class:preset-filled-warning-500={isRetrying}
+          class="icon-button"
+          class:warning={isRetrying}
           disabled={isProcessing}
           onclick={() => stageItem(item.id)}
         >
@@ -134,13 +136,11 @@
         </button>
       {/each}
     </div>
-  </div>
+  </article>
 {/each}
-<div class="card w-full mt-2">
-  <b>{ m.shopping_purchase_staged_by_you() }</b>
-  <div
-    class="flex flex-col text-base gap-1"
-  >
+<article>
+  <h4>{ m.shopping_purchase_staged_by_you() }</h4>
+  <div class="item-box">
     {#each data.stagedItemsForUser as item (item.id)}
       {@const isProcessing = !!itemStates[item.id]}
       {@const isRetrying = itemStates[item.id] === 'retrying'}
@@ -149,9 +149,8 @@
         in:receive={{ key: item.id }}
         out:send={{ key: item.id }}
         animate:flip={{ duration: 600 }}
-        class="card flex flex-row gap-1 items-center transition-colors duration-200 p-3"
-        class:preset-filled-surface-500={!isProcessing}
-        class:preset-filled-warning-500={isRetrying}
+        class="icon-button checked-item"
+        class:warning={isRetrying}
         disabled={isProcessing}
         onclick={() => stageItem(item.id)}
       >
@@ -167,17 +166,37 @@
       </button>
     {/each}
   </div>
-</div>
-<div class="card w-full mt-2">
+</article>
+<article>
   <b>{ m.shopping_purchase_staged_by_others() }</b>
   {#each data.stagedItemsForOtherUsers as item (item.id)}
-    <div class="flex flex-col text-base gap-1">
-      <button
-        class="flex flex-row gap-1 items-center transition-colors duration-200"
-        disabled
-      >
-        <span>{item.amount} {item.name}</span>
-      </button>
+    <div>
+      {item.amount} {item.name}
     </div>
   {/each}
-</div>
+</article>
+
+<style>
+    .item-box {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .icon-button {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .checked-item {
+        background-color: var(--disabled-bg);
+        color: var(--disabled-text);
+
+        &:hover {
+            background-color: var(--disabled-hover);
+        }
+    }
+</style>
