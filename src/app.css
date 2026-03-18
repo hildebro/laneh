@@ -1,43 +1,9 @@
 /* =========================================
-   1. Base & Theme Variables
+   1. Base Variables
    ========================================= */
 :root {
-    /* Light Mode Defaults */
-    --bg: #f9fafb;
-    --bg-surface: #ffffff;
-    --text: #1a1a1a;
-    --text-muted: #666666;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --border: #e5e7eb;
-    --error-bg: #ef4444;
-    --error-text: #ffffff;
-    --warning-text: #92400e;
-
-    --disabled-bg: #e5e7eb;
-    --disabled-hover: #d1d5db;
-    --disabled-text: #9ca3af;
-
-    --radius: 8px;
-    --font-sans: system-ui, -apple-system, sans-serif;
     --max-width: 1000px;
     --sm: 40rem;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Dark Mode Overrides */
-        --bg: #0f172a;
-        --bg-surface: #1e293b;
-        --text: #f3f4f6;
-        --text-muted: #9ca3af;
-        --accent: #3b82f6;
-        --accent-hover: #60a5fa;
-        --border: #374151;
-        --error-bg: #f87171;
-        --error-text: #ffffff;
-        --warning-text: #fde68a;
-    }
 }
 
 /* CSS Reset */
@@ -48,10 +14,12 @@
 }
 
 .app-shell {
-    font-family: var(--font-sans), sans-serif;
-    background-color: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
+    /*noinspection CssNoGenericFontName*/
+    font-family: var(--base-font-family);
+    background-color: var(--body-background-color);
+    color: var(--base-font-color);
+    line-height: var(--base-line-height);
+    font-weight: var(--base-font-weight);
 
     /* Flexbox magic to keep the footer at the bottom */
     display: flex;
@@ -64,34 +32,30 @@
    ========================================= */
 h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
+    font-weight: var(--heading-font-weight);
+    color: var(--heading-font-color);
 }
 
-h1, h2, h3 {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-}
+h1, h2, h3 { margin-top: 2rem; margin-bottom: 1rem; }
+h4, h5, h6 { margin-bottom: 0.5rem; }
 
-h4, h5, h6 {
-    margin-bottom: 0.5rem;
-}
-
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.1rem; }
+h1 { font-size: calc(2.5rem * var(--text-scaling)); }
+h2 { font-size: calc(2rem * var(--text-scaling)); }
+h3 { font-size: calc(1.5rem * var(--text-scaling)); }
+h4 { font-size: calc(1.1rem * var(--text-scaling)); }
 
 p, ul, ol, blockquote {
     margin-bottom: 1rem;
 }
 
 a {
-    color: var(--accent);
-    text-decoration: none;
+    color: var(--anchor-font-color);
+    text-decoration: var(--anchor-text-decoration);
+    font-weight: var(--anchor-font-weight);
 
-    /* Native CSS nesting! */
-    &:hover {
-        text-decoration: underline;
-    }
+    &:hover { text-decoration: var(--anchor-text-decoration-hover); }
+    &:active { text-decoration: var(--anchor-text-decoration-active); }
+    &:focus-visible { text-decoration: var(--anchor-text-decoration-focus); }
 }
 
 /* =========================================
@@ -105,42 +69,35 @@ header, main  {
 }
 
 header {
-    border-bottom: 1px solid var(--border);
+    border-bottom: var(--default-border-width) solid var(--color-surface-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 footer {
-    border-top: 1px solid var(--border);
-    color: var(--text-muted);
+    border-top: var(--default-border-width) solid var(--color-surface-200);
+    color: var(--color-surface-600);
     text-align: center;
     font-size: 0.9rem;
 }
 
 /* =========================================
-   3. Main section styling
+   4. Main section styling & Cards
    ========================================= */
 main {
     flex: 1;
-
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-content: flex-start;
     gap: 1.5rem;
-
-    width: 100%;
-    max-width: var(--max-width);
-    margin: 0 auto;
-
-    padding: 1rem;
 }
 
 main > article {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    background-color: var(--color-surface-50);
+    border: var(--default-border-width) solid var(--color-surface-200);
+    border-radius: var(--radius-container);
     padding: 1.5rem;
 
     display: flex;
@@ -148,49 +105,40 @@ main > article {
     flex-direction: column;
 }
 
-/* Card Titles */
 main > article > h2 {
     margin-top: 0;
     margin-bottom: 1rem;
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--text-scaling));
 }
 
-/* Card Actions (Footer) */
 main > article > footer {
-    /* This is the magic line. It pushes the footer to the absolute
-       bottom of the card, filling any empty vertical space above it. */
     margin-top: auto;
-
     display: flex;
-    justify-content: flex-end; /* Aligns buttons to the right */
+    justify-content: flex-end;
     align-items: center;
-    gap: 0.75rem; /* Space between the two buttons */
+    gap: 0.75rem;
 
     padding: 1rem 0 0;
-    border-top: 1px solid var(--border); /* Optional: visual separator */
+    border-top: var(--default-border-width) solid var(--color-surface-200);
 }
 
 /* =========================================
-   4. Action Bar
+   5. Action Bar
    ========================================= */
 .action-bar {
     width: 100%;
     max-width: var(--max-width);
     margin: 0 auto;
 
-    /* Layout */
     display: flex;
-    flex-wrap: wrap; /* Prevents buttons from squishing on mobile */
+    flex-wrap: wrap;
     align-items: center;
     justify-content: end;
     gap: 0.75rem;
-
-    /* Optional: Adds a subtle separator between the bar and the articles */
 }
 
-
 /* =========================================
-   Lists
+   6. Lists
    ========================================= */
 ul, ol {
     padding-left: 1.5rem;
@@ -198,7 +146,7 @@ ul, ol {
 }
 
 li {
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--spacing);
 }
 
 ul ul, ol ol, ul ol, ol ul {
@@ -206,16 +154,16 @@ ul ul, ol ol, ul ol, ol ul {
 }
 
 /* =========================================
-   5. Buttons
+   7. Buttons
    ========================================= */
 button,
 input[type="submit"],
 a[role="button"] {
     display: inline-block;
-    background-color: var(--accent);
-    color: #ffffff; /* Explicitly white, even in dark mode */
+    background-color: var(--color-primary-500);
+    color: var(--color-primary-contrast-500);
     border: none;
-    border-radius: var(--radius);
+    border-radius: var(--radius-base);
     padding: 0.5rem 1.2rem;
     font-size: 1rem;
     font-family: inherit;
@@ -223,37 +171,38 @@ a[role="button"] {
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 
-    &:hover {
-        background-color: var(--accent-hover);
-    }
-
-    &:active {
-        transform: translateY(1px);
-    }
+    &:hover { background-color: var(--color-primary-600); }
+    &:active { transform: translateY(1px); }
 
     &.warning {
-        background-color: var(--warning-text);
+        background-color: var(--color-warning-500);
+        color: var(--color-warning-contrast-500);
+    }
+
+    &.error {
+        background-color: var(--color-error-500);
+        color: var(--color-error-contrast-500);
     }
 
     &:disabled {
-        background-color: var(--disabled-bg);
-        color: var(--disabled-text);
+        background-color: var(--color-surface-200);
+        color: var(--color-surface-400);
         cursor: not-allowed;
-        transform: none; /* Prevents the click animation */
+        transform: none;
 
-        &.warning {
-            background-color: var(--warning-text);
+        &.warning, &.error {
+            background-color: var(--color-surface-200);
+            color: var(--color-surface-400);
         }
     }
 
-    /* Prevents the hover color from changing when disabled */
     &:disabled:hover {
-        background-color: var(--disabled-bg);
+        background-color: var(--color-surface-200);
     }
 }
 
 /* =========================================
-   6. Toggle Switches (Checkboxes)
+   8. Toggle Switches (Checkboxes)
    ========================================= */
 label:has(input[type="checkbox"]) {
     display: inline-flex;
@@ -266,22 +215,21 @@ label:has(input[type="checkbox"]) {
     cursor: pointer;
     user-select: none;
 
-    background-color: var(--accent);
-    color: #ffffff;
-    border-radius: var(--radius);
+    background-color: var(--color-primary-500);
+    color: var(--color-primary-contrast-500);
+    border-radius: var(--radius-base);
     transition: background-color 0.2s ease;
 
-    &:hover {
-        background-color: var(--accent-hover);
-    }
+    &:hover { background-color: var(--color-primary-600); }
 
-    /* Accessibility focus ring (using --text so it contrasts with the accent bg) */
     &:has(input[type="checkbox"]:focus-visible) {
-        outline: 2px solid var(--text);
+        outline: 2px solid var(--base-font-color);
         outline-offset: 2px;
     }
 
     &:has(input[type="checkbox"]:disabled) {
+        background-color: var(--color-surface-200);
+        color: var(--color-surface-400);
         opacity: 0.6;
         cursor: not-allowed;
     }
@@ -296,18 +244,14 @@ input[type="checkbox"] {
     height: 1.25rem;
     flex-shrink: 0;
 
-    /* Off State: Semi-transparent dark track to contrast the accent wrapper */
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 9999px;
     position: relative;
     cursor: inherit;
     transition: background-color 0.2s ease;
 
-    &:focus-visible {
-        outline: none;
-    }
+    &:focus-visible { outline: none; }
 
-    /* The Knob */
     &::after {
         content: '';
         position: absolute;
@@ -315,33 +259,112 @@ input[type="checkbox"] {
         left: 2px;
         width: calc(1.25rem - 4px);
         height: calc(1.25rem - 4px);
-        background-color: #ffffff;
+        background-color: var(--color-surface-50);
         border-radius: 50%;
         transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), background-color 0.2s ease;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
-    /* Checked State */
     &:checked {
-        background-color: #ffffff;
-
+        background-color: var(--color-surface-50);
         &::after {
             transform: translateX(1.25rem);
-            background-color: var(--accent);
+            background-color: var(--color-primary-500);
         }
     }
 }
 
 /* =========================================
-   7. Animations & Utilities
+   9. Dark Mode Component Overrides
+   ========================================= */
+@media (prefers-color-scheme: dark) {
+    .app-shell {
+        background-color: var(--body-background-color-dark);
+        color: var(--base-font-color-dark);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--heading-font-color-dark);
+    }
+
+    a {
+        color: var(--anchor-font-color-dark);
+    }
+
+    /* Update borders for dark mode */
+    header,
+    footer,
+    main > article,
+    main > article > footer {
+        border-color: var(--color-surface-700);
+    }
+
+    footer {
+        color: var(--color-surface-400);
+    }
+
+    main > article {
+        background-color: var(--color-surface-900);
+    }
+
+    /* Buttons */
+    button,
+    input[type="submit"],
+    a[role="button"] {
+        background-color: var(--color-primary-400);
+        color: var(--color-primary-contrast-400);
+
+        &:hover { background-color: var(--color-primary-300); }
+
+        &.warning {
+            background-color: var(--color-warning-400);
+            color: var(--color-warning-contrast-400);
+        }
+
+        &.error {
+            background-color: var(--color-error-400);
+            color: var(--color-error-contrast-400);
+        }
+
+        &:disabled, &:disabled:hover, &.warning:disabled, &.error:disabled {
+            background-color: var(--color-surface-700);
+            color: var(--color-surface-400);
+        }
+    }
+
+    /* Toggles */
+    label:has(input[type="checkbox"]) {
+        background-color: var(--color-primary-400);
+        color: var(--color-primary-contrast-400);
+
+        &:hover { background-color: var(--color-primary-300); }
+
+        &:has(input[type="checkbox"]:focus-visible) {
+            outline-color: var(--base-font-color-dark);
+        }
+
+        &:has(input[type="checkbox"]:disabled) {
+            background-color: var(--color-surface-700);
+            color: var(--color-surface-400);
+        }
+    }
+
+    input[type="checkbox"] {
+        &::after { background-color: var(--color-surface-900); }
+
+        &:checked {
+            background-color: var(--color-surface-900);
+            &::after { background-color: var(--color-primary-400); }
+        }
+    }
+}
+
+/* =========================================
+   10. Utilities
    ========================================= */
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .animate-spin {
