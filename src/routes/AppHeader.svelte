@@ -61,13 +61,13 @@
         flex-direction: column;
         align-items: center;
         gap: 0.4rem;
-        color: var(--text-muted);
+        color: var(--color-surface-500);
         text-decoration: none;
         transition: color 0.2s ease, transform 0.1s ease;
     }
 
     a:hover {
-        color: var(--accent);
+        color: var(--color-primary-500);
     }
 
     /* Tiny click effect */
@@ -100,8 +100,8 @@
         right: -0.6rem;
         z-index: 10;
 
-        background-color: var(--error-bg); /* Sits nicely against most themes */
-        color: var(--error-text);
+        background-color: var(--color-error-500);
+        color: var(--color-error-contrast-500);
         font-size: 0.65rem;
         font-weight: bold;
         line-height: 1;
