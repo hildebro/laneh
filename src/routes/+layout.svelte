@@ -87,7 +87,7 @@
     }
 
     .warning {
-        color: var(--warning-text);
+        color: var(--color-warning-500);
     }
 
     footer {

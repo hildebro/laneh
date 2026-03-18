@@ -192,11 +192,12 @@
     }
 
     .checked-item {
-        background-color: var(--disabled-bg);
-        color: var(--disabled-text);
+        background-color: var(--color-primary-100);
+        color: var(--color-primary-contrast-100);
 
         &:hover {
-            background-color: var(--disabled-hover);
+            background-color: var(--color-primary-200);
+            color: var(--color-primary-contrast-200);
         }
     }
 </style>
