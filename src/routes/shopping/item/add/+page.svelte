@@ -238,10 +238,10 @@
     </button>
   </div>
   <EnhancedForm hideSubmitButton={correctionRequired}>
-    <table style="margin-bottom: 1rem; margin-top: 1rem;">
+    <table class="items-table">
       <thead>
       <tr>
-        <th style="width: 5rem;">{ m.generic_amount() }</th>
+        <th class="col-amount">{ m.generic_amount() }</th>
         <th>{ m.generic_name() }</th>
         <th></th>
       </tr>
@@ -267,7 +267,7 @@
               onkeydown={(e) => handleKeyDown(e, index, 'name')}
             />
           </td>
-          <td style="display: flex">
+          <td class="actions-cell">
             {#if !!item.overwrittenName}
               <button
                 type="button"
@@ -327,10 +327,21 @@
         white-space: pre-line;
     }
 
-    div {
-        &.header {
-            display: flex;
-            justify-content: space-between;
-        }
+    .header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .items-table {
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+    }
+
+    .col-amount {
+        width: 5rem;
+    }
+
+    .actions-cell {
+        display: flex;
     }
 </style>
