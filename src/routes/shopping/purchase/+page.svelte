@@ -184,13 +184,6 @@
         gap: 0.5rem;
     }
 
-    .icon-button {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.25rem;
-    }
-
     .checked-item {
         background-color: var(--color-primary-100);
         color: var(--color-primary-contrast-100);
