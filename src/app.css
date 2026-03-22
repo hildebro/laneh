@@ -282,6 +282,78 @@ input[type="checkbox"] {
 }
 
 /* =========================================
+   11. Dialogs
+   ========================================= */
+dialog {
+    /* Centering and sizing */
+    margin: auto;
+    width: 90%;
+    max-width: var(--sm);
+
+    /* Matching the article card styling */
+    background-color: var(--color-surface-50);
+    color: var(--base-font-color);
+    border: var(--default-border-width) solid var(--color-surface-200);
+    border-radius: var(--radius-container);
+    padding: 1.5rem;
+
+    /* Subtle shadow for depth */
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dimmed background behind the dialog */
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Typography adjustments inside dialog */
+dialog h2:first-child,
+dialog h3:first-child {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+/* Action bar for dialog buttons (usually wrapped in a form) */
+dialog form[method="dialog"],
+dialog .dialog-actions {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: var(--default-border-width) solid var(--color-surface-200);
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Entrance Animations */
+dialog[open] {
+    animation: dialog-pop-in 0.2s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+dialog[open]::backdrop {
+    animation: dialog-backdrop-fade 0.2s ease-out forwards;
+}
+
+@keyframes dialog-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes dialog-backdrop-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* =========================================
    9. Dark Mode Component Overrides
    ========================================= */
 @media (prefers-color-scheme: dark) {
@@ -363,6 +435,22 @@ input[type="checkbox"] {
             background-color: var(--color-surface-900);
             &::after { background-color: var(--color-primary-400); }
         }
+    }
+
+    dialog {
+        background-color: var(--color-surface-900);
+        color: var(--base-font-color-dark);
+        border-color: var(--color-surface-700);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    dialog form[method="dialog"],
+    dialog .dialog-actions {
+        border-top-color: var(--color-surface-700);
     }
 }
 
