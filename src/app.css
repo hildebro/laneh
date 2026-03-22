@@ -201,6 +201,13 @@ a[role="button"] {
     }
 }
 
+.icon-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+}
+
 /* =========================================
    8. Toggle Switches (Checkboxes)
    ========================================= */
