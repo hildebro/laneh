@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Collapsible } from '@skeletonlabs/skeleton-svelte';
   import levenshteinPkg from 'fast-levenshtein';
   import { CircleAlert, CirclePlus, CircleQuestionMark, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
@@ -14,17 +13,17 @@
 
   let correctionRequired = $state(true);
 
-  let items: {
+  type RowItem = {
     amount: string,
     name: string,
-    collapsibleOpen: boolean,
     preventCorrection: boolean,
     overwrittenName?: string
-  }[] = $state(
+  };
+
+  let items: RowItem[] = $state(
     [{
       amount: '',
       name: '',
-      collapsibleOpen: false,
       preventCorrection: false,
       overwrittenName: undefined
     }]
@@ -34,7 +33,7 @@
   let nameRefs: HTMLInputElement[] = [];
 
   async function addEmptyRow() {
-    items.push({ amount: '', name: '', collapsibleOpen: false, preventCorrection: false });
+    items.push({ amount: '', name: '', preventCorrection: false });
 
     // Wait for DOM update
     await tick();
@@ -51,7 +50,7 @@
 
         // Ensure we still have an empty line at the end after insertion.
         if (items[items.length - 1].name.trim().length > 0) {
-          items.push({ amount: '', name: '', collapsibleOpen: false, preventCorrection: false });
+          items.push({ amount: '', name: '', preventCorrection: false });
         }
 
         return;
@@ -59,8 +58,8 @@
     }
 
     // Push the suggestion and a new empty line, if no empty line was present to fill.
-    items.push({ amount: '', name, collapsibleOpen: false, preventCorrection: false });
-    items.push({ amount: '', name: '', collapsibleOpen: false, preventCorrection: false });
+    items.push({ amount: '', name, preventCorrection: false });
+    items.push({ amount: '', name: '', preventCorrection: false });
   }
 
   function suggestionNotPresent(name: string) {
@@ -75,6 +74,8 @@
       // have no input fields at all.
       items[index].amount = '';
       items[index].name = '';
+      items[index].preventCorrection = false;
+      items[index].overwrittenName = undefined;
     }
   }
 
@@ -86,6 +87,7 @@
       // Any kind of manual change to the input fields should force corrections again.
       correctionRequired = true;
       items[index].preventCorrection = false;
+      items[index].overwrittenName = undefined;
 
       return;
     }
@@ -195,7 +197,6 @@
     if (items[index].overwrittenName) {
       items[index].name = items[index].overwrittenName;
       items[index].overwrittenName = undefined;
-      items[index].collapsibleOpen = false;
       // After a correction is reverted, we don't want that field to be corrected again (unless that
       // field is modified later).
       items[index].preventCorrection = true;
@@ -203,12 +204,27 @@
   }
 
   let helpDialog: HTMLDialogElement;
+
+  let correctionDialog: HTMLDialogElement;
+  let correctionItemIndex: number | undefined = $state();
 </script>
 
 <dialog bind:this={helpDialog}>
   <h3>{m.shopping_add_items()}</h3>
   <p>{m.shopping_add_items_help()}</p>
   <form method="dialog">
+    <button>{m.generic_close()}</button>
+  </form>
+</dialog>
+
+<dialog bind:this={correctionDialog}>
+  <p>
+    { m.shopping_add_items_original_value({ value: items[correctionItemIndex]?.overwrittenName ?? '' }) }
+  </p>
+  <form method="dialog">
+    <button onclick={() => handleRestore(correctionItemIndex)}>
+      { m.shopping_add_items_original_value_revert() }
+    </button>
     <button>{m.generic_close()}</button>
   </form>
 </dialog>
@@ -221,87 +237,86 @@
       {m.generic_help()}
     </button>
   </div>
-  <EnhancedForm submitButtonClasses="ml-auto" hideSubmitButton={correctionRequired}>
-    <div class="flex flex-col gap-1">
-      <div class="flex gap-1">
-        <div class="w-18">{ m.generic_amount() }</div>
-        <div>{ m.generic_name() }</div>
-      </div>
+  <EnhancedForm hideSubmitButton={correctionRequired}>
+    <table style="margin-bottom: 1rem; margin-top: 1rem;">
+      <thead>
+      <tr>
+        <th style="width: 5rem;">{ m.generic_amount() }</th>
+        <th>{ m.generic_name() }</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
       {#each items as item, index (index)}
-        <div class="flex gap-1">
-          <input
-            name="amounts"
-            bind:this={amountRefs[index]}
-            class="input w-18"
-            type="text"
-            bind:value={item.amount}
-            onkeydown={(e) => handleKeyDown(e, index, 'amount')}
-          />
-
-          <Collapsible
-            open={item.collapsibleOpen}
-            onOpenChange={(details) => (item.collapsibleOpen = details.open)}
-          >
-            <div class="flex gap-0.5 w-full">
-              <input
-                name="names"
-                bind:this={nameRefs[index]}
-                class="input"
-                class:preset-filled-warning-800-200={!!item.overwrittenName}
-                type="text"
-                bind:value={item.name}
-                onkeydown={(e) => handleKeyDown(e, index, 'name')}
-              />
-              {#if item.overwrittenName}
-                <Collapsible.Trigger
-                  type="button"
-                  class="btn preset-filled-warning-800-200 btn-sm"
-                >
-                  <CircleAlert />
-                </Collapsible.Trigger>
-              {/if}
-            </div>
-            <Collapsible.Content>
-              { m.shopping_add_items_original_value({ value: item.overwrittenName ?? '' }) }
-              <button type="button"
-                      class="btn"
-                      onclick={() => handleRestore(index)}
+        <tr>
+          <td>
+            <input
+              name="amounts"
+              bind:this={amountRefs[index]}
+              type="text"
+              bind:value={item.amount}
+              onkeydown={(e) => handleKeyDown(e, index, 'amount')}
+            />
+          </td>
+          <td>
+            <input
+              name="names"
+              bind:this={nameRefs[index]}
+              type="text"
+              bind:value={item.name}
+              onkeydown={(e) => handleKeyDown(e, index, 'name')}
+            />
+          </td>
+          <td style="display: flex">
+            {#if !!item.overwrittenName}
+              <button
+                type="button"
+                class:warning={!!item.overwrittenName}
+                onclick={() => {
+                  correctionItemIndex = index;
+                  correctionDialog.showModal();
+                }}
               >
-                { m.shopping_add_items_original_value_revert() }
+                <CircleAlert />
               </button>
-            </Collapsible.Content>
-          </Collapsible>
-          <button
-            type="button"
-            class="btn preset-filled-error-800-200 btn-sm"
-            tabindex="-1"
-            onclick={() => deleteItem(index)}
-          >
-            <Trash2 />
-          </button>
-        </div>
-      {/each}
-      <div class="flex gap-2">
-        <button type="button" class="btn btn-sm" onclick={addEmptyRow}>
-          <CirclePlus />
-        </button>
-      </div>
-      {#await data.suggestions}
-        <LoadingSpinner />
-      {:then suggestions}
-        {m.shopping_add_items_suggestions()}
-        {#each suggestions as suggestion(suggestion.name)}
-          {#if suggestionNotPresent(suggestion.name)}
-            <button type="button" class="btn" onclick={() => addSuggestion(suggestion.name)}>
-              {suggestion.name}
+            {/if}
+            <button
+              type="button"
+              tabindex="-1"
+              onclick={() => deleteItem(index)}
+            >
+              <Trash2 />
             </button>
-          {/if}
-        {/each}
-      {/await}
-    </div>
+          </td>
+        </tr>
+      {/each}
+      <tr>
+        <td>
+          <button type="button" onclick={addEmptyRow}>
+            <CirclePlus />
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    {#await data.suggestions}
+      <LoadingSpinner />
+    {:then suggestions}
+      {#if suggestions.length > 0}
+        {m.shopping_add_items_suggestions()}
+      {/if}
+      {#each suggestions as suggestion(suggestion.name)}
+        {#if suggestionNotPresent(suggestion.name)}
+          <button type="button" onclick={() => addSuggestion(suggestion.name)}>
+            {suggestion.name}
+          </button>
+        {/if}
+      {/each}
+    {/await}
     {#snippet additionalButtons()}
       {#if correctionRequired}
-        <button class="btn ml-auto" type="submit" onclick={applyCorrections}>{ m.generic_save() }</button>
+        <button type="submit" onclick={applyCorrections}>{ m.generic_save() }</button>
       {/if}
     {/snippet}
   </EnhancedForm>

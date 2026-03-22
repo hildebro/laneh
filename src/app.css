@@ -101,7 +101,7 @@ main > article {
     padding: 1.5rem;
 
     display: flex;
-    flex: 0 1 20.5rem;
+    flex: 0 1 23.5rem;
     flex-direction: column;
 }
 
@@ -135,6 +135,14 @@ main > article > footer {
     align-items: center;
     justify-content: end;
     gap: 0.75rem;
+}
+
+/* =========================================
+   6. Lists
+   ========================================= */
+.warning {
+    background-color: var(--color-warning-500);
+    color: var(--color-warning-contrast-500);
 }
 
 /* =========================================
@@ -407,6 +415,113 @@ summary::-webkit-details-marker {
 }
 
 /* =========================================
+   13. Tables
+   ========================================= */
+
+/* --- Base Table Layout --- */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Enables horizontal scrolling on small screens */
+    margin-bottom: 1.5rem;
+    background-color: var(--color-surface-50);
+    border: var(--default-border-width) solid var(--color-surface-200);
+    border-radius: var(--radius-container);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap; /* Keeps content from squishing on mobile */
+}
+
+th, td {
+    padding: 0.5rem;
+    border-bottom: var(--default-border-width) solid var(--color-surface-200);
+}
+
+th {
+    font-weight: var(--heading-font-weight);
+    color: var(--heading-font-color);
+    background-color: rgba(0, 0, 0, 0.02); /* Subtle tint */
+}
+
+/* Subtle row hover effect */
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* =========================================
+   Interactive Cells (Inputs & Buttons)
+   ========================================= */
+
+/* 1. Reset the cell itself if it contains an input, select, or button */
+tbody td:has(> input, > select, > button) {
+    padding: 0;
+    position: relative; /* Helps with focus ring z-indexing */
+
+    /* Optional: Your original code added full borders to input cells.
+       Uncomment the next line if you want all 4 sides bordered instead of just the bottom. */
+     border: var(--default-border-width) solid var(--color-surface-200);
+}
+
+/* 2. Stretch elements to fill the entire cell */
+tbody td > input,
+tbody td > select,
+tbody td > button {
+    display: block; /* Ensures reliable height stretching inside cells */
+    width: 100%;
+    height: 100%;
+    min-height: 3rem; /* Good touch target height */
+    padding: 0.75rem 0.5rem;
+    margin: 0;
+
+    /* Reset borders and radius so they sit flush */
+    border: none;
+    border-radius: 0;
+
+    /* Inherit typography */
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+
+    background-color: transparent;
+    transition: background-color 0.2s ease, outline 0.1s ease;
+}
+
+/* 3. Button specific overrides */
+tbody td > button {
+    color: var(--color-primary-500);
+    text-align: center;
+    cursor: pointer;
+}
+
+tbody td > button:hover {
+    background-color: var(--color-surface-200);
+    transform: none; /* Prevent base button translateY jump */
+}
+
+/* 4. Input & Select hover states */
+tbody td > input:hover,
+tbody td > select:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* 5. Crucial Accessibility: Inset focus rings */
+tbody td > input:focus,
+tbody td > select:focus,
+tbody td > button:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: -2px; /* Pulls the outline inside the cell bounds */
+    background-color: var(--color-surface-50);
+    z-index: 2; /* Ensures the focus ring sits above adjacent cells */
+}
+
+/* =========================================
    9. Dark Mode Component Overrides
    ========================================= */
 @media (prefers-color-scheme: dark) {
@@ -525,6 +640,46 @@ summary::-webkit-details-marker {
     details[open] summary {
         border-bottom-color: var(--color-surface-700);
     }
+
+    /* Tables */
+    .table-container {
+        background-color: var(--color-surface-900);
+        border-color: var(--color-surface-700);
+    }
+
+    th, td {
+        border-bottom-color: var(--color-surface-700);
+    }
+
+    th {
+        color: var(--heading-font-color-dark);
+        background-color: rgba(255, 255, 255, 0.05); /* Subtle light tint for dark mode */
+    }
+
+    tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Table Interactive Cells */
+    tbody td > button {
+        color: var(--color-primary-400);
+    }
+
+    tbody td > button:hover {
+        background-color: var(--color-surface-700);
+    }
+
+    tbody td > input:hover,
+    tbody td > select:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    tbody td > input:focus,
+    tbody td > select:focus,
+    tbody td > button:focus-visible {
+        outline-color: var(--color-primary-400);
+        background-color: var(--color-surface-900);
+    }
 }
 
 /* =========================================
@@ -537,4 +692,15 @@ summary::-webkit-details-marker {
 
 .animate-spin {
     animation: spin 1s linear infinite;
+}
+
+/* =========================================
+   14. Mobile / Small Screen Overrides
+   ========================================= */
+@media (max-width: 23.5rem) {
+    header, main {
+        /* Remove left and right padding, keep top and bottom padding */
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
