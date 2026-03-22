@@ -202,10 +202,10 @@
     }
   }
 
-  let dialog: HTMLDialogElement;
+  let helpDialog: HTMLDialogElement;
 </script>
 
-<dialog bind:this={dialog}>
+<dialog bind:this={helpDialog}>
   <h3>{m.shopping_add_items()}</h3>
   <p>{m.shopping_add_items_help()}</p>
   <form method="dialog">
@@ -216,7 +216,7 @@
 <article>
   <div class="header">
     <h4>{m.shopping_add_items()}</h4>
-    <button class="icon-button" onclick={() => dialog.showModal()}>
+    <button class="icon-button" onclick={() => helpDialog.showModal()}>
       <CircleQuestionMark />
       {m.generic_help()}
     </button>
