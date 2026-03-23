@@ -1,24 +1,35 @@
 import { writable } from 'svelte/store';
 
-export type ToastType = 'info' | 'error' | 'accent';
+export type ToastType = 'primary' | 'warning' | 'error';
 
 export interface Toast {
   id: string;
+  title: string;
   message: string;
   type: ToastType;
 }
 
 export const toasts = writable<Toast[]>([]);
 
+type ToastOptions = {
+  title: string;
+  message: string;
+  type?: ToastType;
+  duration?: number;
+};
+
 export function addToast(
-  message: string,
-  type: ToastType = 'info',
-  duration: number = 3000
+  {
+    title,
+    message,
+    type = 'primary',
+    duration = 3000
+  }: ToastOptions
 ): void {
   const id = Math.random().toString(36).substring(2, 9);
 
   // New toasts are added at the start to appear on top
-  toasts.update((all) => [{ id, message, type }, ...all]);
+  toasts.update((all) => [{ id, title, message, type }, ...all]);
 
   if (duration > 0) {
     setTimeout(() => {
