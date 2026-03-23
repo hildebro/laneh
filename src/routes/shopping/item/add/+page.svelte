@@ -5,7 +5,7 @@
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import { toaster } from '$lib/toaster-ref';
+  import { addToast } from '$lib/stores/toast';
   // The actual function is usually on the '.get' property for this library
   const levenshtein = levenshteinPkg.get;
 
@@ -119,10 +119,10 @@
       // Prevent the button from causing a submit.
       e.preventDefault();
       // Let the user know about executed corrections.
-      toaster.warning({
+      addToast({
         title: m.shopping_add_items_correction_title(),
-        description: m.shopping_add_items_correction_description(),
-        duration: 5000
+        message: m.shopping_add_items_correction_description(),
+        duration: 6000
       });
       // Flip the value, so the next submit won't execute corrections again. Note that it's
       // technically more appropriate to update this flag outside the if-clause. Whether something
