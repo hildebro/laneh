@@ -1,9 +1,75 @@
 /* =========================================
-   1. Base Variables
+   1. Semantic Variables & Dark Mode Mapping
    ========================================= */
 :root {
     --max-width: 1000px;
     --sm: 40rem;
+
+    /* Semantic Light Mode Defaults */
+    --bg-app: var(--body-background-color);
+    --bg-surface: var(--color-surface-50);
+    --bg-surface-hover: var(--color-surface-200);
+    --border-main: var(--color-surface-200);
+
+    --text-main: var(--base-font-color);
+    --text-heading: var(--heading-font-color);
+    --text-muted: var(--color-surface-600);
+    --text-anchor: var(--anchor-font-color);
+    --text-outline-focus: var(--base-font-color);
+
+    --btn-primary-bg: var(--color-primary-500);
+    --btn-primary-text: var(--color-primary-contrast-500);
+    --btn-primary-hover: var(--color-primary-600);
+
+    --btn-warning-bg: var(--color-warning-500);
+    --btn-warning-text: var(--color-warning-contrast-500);
+
+    --btn-error-bg: var(--color-error-500);
+    --btn-error-text: var(--color-error-contrast-500);
+
+    --btn-disabled-bg: var(--color-surface-200);
+    --btn-disabled-text: var(--color-surface-400);
+
+    --table-row-hover: rgba(0, 0, 0, 0.02);
+    --table-header-bg: rgba(0, 0, 0, 0.02);
+
+    --dialog-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --dialog-backdrop: rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Semantic Dark Mode Overrides */
+        --bg-app: var(--body-background-color-dark);
+        --bg-surface: var(--color-surface-900);
+        --bg-surface-hover: var(--color-surface-700);
+        --border-main: var(--color-surface-700);
+
+        --text-main: var(--base-font-color-dark);
+        --text-heading: var(--heading-font-color-dark);
+        --text-muted: var(--color-surface-400);
+        --text-anchor: var(--anchor-font-color-dark);
+        --text-outline-focus: var(--base-font-color-dark);
+
+        --btn-primary-bg: var(--color-primary-400);
+        --btn-primary-text: var(--color-primary-contrast-400);
+        --btn-primary-hover: var(--color-primary-300);
+
+        --btn-warning-bg: var(--color-warning-400);
+        --btn-warning-text: var(--color-warning-contrast-400);
+
+        --btn-error-bg: var(--color-error-400);
+        --btn-error-text: var(--color-error-contrast-400);
+
+        --btn-disabled-bg: var(--color-surface-700);
+        --btn-disabled-text: var(--color-surface-400);
+
+        --table-row-hover: rgba(255, 255, 255, 0.05);
+        --table-header-bg: rgba(255, 255, 255, 0.05);
+
+        --dialog-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        --dialog-backdrop: rgba(0, 0, 0, 0.6);
+    }
 }
 
 /* CSS Reset */
@@ -16,12 +82,11 @@
 .app-shell {
     /*noinspection CssNoGenericFontName*/
     font-family: var(--base-font-family);
-    background-color: var(--body-background-color);
-    color: var(--base-font-color);
+    background-color: var(--bg-app);
+    color: var(--text-main);
     line-height: var(--base-line-height);
     font-weight: var(--base-font-weight);
 
-    /* Flexbox magic to keep the footer at the bottom */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -33,35 +98,60 @@
 h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
     font-weight: var(--heading-font-weight);
-    color: var(--heading-font-color);
+    color: var(--text-heading);
 }
 
-h1, h2, h3 { margin-top: 2rem; margin-bottom: 1rem; }
-h4, h5, h6 { margin-bottom: 0.5rem; }
+h1, h2, h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
 
-h1 { font-size: calc(2.5rem * var(--text-scaling)); }
-h2 { font-size: calc(2rem * var(--text-scaling)); }
-h3 { font-size: calc(1.5rem * var(--text-scaling)); }
-h4 { font-size: calc(1.1rem * var(--text-scaling)); }
+h4, h5, h6 {
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: calc(2.5rem * var(--text-scaling));
+}
+
+h2 {
+    font-size: calc(2rem * var(--text-scaling));
+}
+
+h3 {
+    font-size: calc(1.5rem * var(--text-scaling));
+}
+
+h4 {
+    font-size: calc(1.1rem * var(--text-scaling));
+}
 
 p, ul, ol, blockquote {
     margin-bottom: 1rem;
 }
 
 a {
-    color: var(--anchor-font-color);
+    color: var(--text-anchor);
     text-decoration: var(--anchor-text-decoration);
     font-weight: var(--anchor-font-weight);
 
-    &:hover { text-decoration: var(--anchor-text-decoration-hover); }
-    &:active { text-decoration: var(--anchor-text-decoration-active); }
-    &:focus-visible { text-decoration: var(--anchor-text-decoration-focus); }
+    &:hover {
+        text-decoration: var(--anchor-text-decoration-hover);
+    }
+
+    &:active {
+        text-decoration: var(--anchor-text-decoration-active);
+    }
+
+    &:focus-visible {
+        text-decoration: var(--anchor-text-decoration-focus);
+    }
 }
 
 /* =========================================
    3. Layout Containers
    ========================================= */
-header, main  {
+header, main {
     width: 100%;
     max-width: var(--max-width);
     margin: 0 auto;
@@ -69,15 +159,15 @@ header, main  {
 }
 
 header {
-    border-bottom: var(--default-border-width) solid var(--color-surface-200);
+    border-bottom: var(--default-border-width) solid var(--border-main);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 footer {
-    border-top: var(--default-border-width) solid var(--color-surface-200);
-    color: var(--color-surface-600);
+    border-top: var(--default-border-width) solid var(--border-main);
+    color: var(--text-muted);
     text-align: center;
     font-size: 0.9rem;
 }
@@ -95,8 +185,8 @@ main {
 }
 
 main > article {
-    background-color: var(--color-surface-50);
-    border: var(--default-border-width) solid var(--color-surface-200);
+    background-color: var(--bg-surface);
+    border: var(--default-border-width) solid var(--border-main);
     border-radius: var(--radius-container);
     padding: 1.5rem;
 
@@ -119,7 +209,7 @@ main > article > footer {
     gap: 0.75rem;
 
     padding: 1rem 0 0;
-    border-top: var(--default-border-width) solid var(--color-surface-200);
+    border-top: var(--default-border-width) solid var(--border-main);
 }
 
 /* =========================================
@@ -160,8 +250,8 @@ button,
 input[type="submit"],
 a[role="button"] {
     display: inline-block;
-    background-color: var(--color-primary-500);
-    color: var(--color-primary-contrast-500);
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
     border: none;
     border-radius: var(--radius-base);
     padding: 0.5rem 1.2rem;
@@ -171,26 +261,31 @@ a[role="button"] {
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 
-    &:hover { background-color: var(--color-primary-600); }
-    &:active { transform: translateY(1px); }
+    &:hover {
+        background-color: var(--btn-primary-hover);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
 
     &.warning {
-        background-color: var(--color-warning-500);
-        color: var(--color-warning-contrast-500);
+        background-color: var(--btn-warning-bg);
+        color: var(--btn-warning-text);
     }
 
     &.error {
-        background-color: var(--color-error-500);
-        color: var(--color-error-contrast-500);
+        background-color: var(--btn-error-bg);
+        color: var(--btn-error-text);
     }
 
     &:disabled,
-    &:disabled:hover,
     &.warning:disabled,
     &.error:disabled {
-        background-color: var(--color-surface-200);
-        color: var(--color-surface-400);
+        background-color: var(--btn-disabled-bg);
+        color: var(--btn-disabled-text);
         cursor: not-allowed;
+        pointer-events: none;
         transform: none;
     }
 }
@@ -216,31 +311,32 @@ label:has(input[type="checkbox"]) {
     cursor: pointer;
     user-select: none;
 
-    background-color: var(--color-primary-500);
-    color: var(--color-primary-contrast-500);
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
     border-radius: var(--radius-base);
     transition: background-color 0.2s ease;
 
-    &:hover { background-color: var(--color-primary-600); }
+    &:hover {
+        background-color: var(--btn-primary-hover);
+    }
 
     &:has(input[type="checkbox"]:focus-visible) {
-        outline: 2px solid var(--base-font-color);
+        outline: 2px solid var(--text-outline-focus);
         outline-offset: 2px;
     }
 
     &:has(input[type="checkbox"]:disabled) {
-        background-color: var(--color-surface-200);
-        color: var(--color-surface-400);
+        background-color: var(--btn-disabled-bg);
+        color: var(--btn-disabled-text);
         opacity: 0.6;
         cursor: not-allowed;
+        pointer-events: none;
     }
 }
 
 input[type="checkbox"] {
     appearance: none;
-    -webkit-appearance: none;
     margin: 0;
-
     width: 2.5rem;
     height: 1.25rem;
     flex-shrink: 0;
@@ -251,7 +347,9 @@ input[type="checkbox"] {
     cursor: inherit;
     transition: background-color 0.2s ease;
 
-    &:focus-visible { outline: none; }
+    &:focus-visible {
+        outline: none;
+    }
 
     &::after {
         content: '';
@@ -260,17 +358,18 @@ input[type="checkbox"] {
         left: 2px;
         width: calc(1.25rem - 4px);
         height: calc(1.25rem - 4px);
-        background-color: var(--color-surface-50);
+        background-color: var(--bg-surface);
         border-radius: 50%;
         transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), background-color 0.2s ease;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
     &:checked {
-        background-color: var(--color-surface-50);
+        background-color: var(--bg-surface);
+
         &::after {
             transform: translateX(1.25rem);
-            background-color: var(--color-primary-500);
+            background-color: var(--btn-primary-bg);
         }
     }
 }
@@ -279,50 +378,40 @@ input[type="checkbox"] {
    9. Dialogs
    ========================================= */
 dialog {
-    /* Centering and sizing */
     margin: auto;
     width: 90%;
     max-width: var(--sm);
 
-    /* Matching the article card styling */
-    background-color: var(--color-surface-50);
-    color: var(--base-font-color);
-    border: var(--default-border-width) solid var(--color-surface-200);
+    background-color: var(--bg-surface);
+    color: var(--text-main);
+    border: var(--default-border-width) solid var(--border-main);
     border-radius: var(--radius-container);
     padding: 1.5rem;
-
-    /* Subtle shadow for depth */
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--dialog-shadow);
 }
 
-/* Dimmed background behind the dialog */
 dialog::backdrop {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: var(--dialog-backdrop);
     backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
 }
 
-/* Typography adjustments inside dialog */
 dialog h2:first-child,
 dialog h3:first-child {
     margin-top: 0;
     margin-bottom: 1rem;
 }
 
-/* Action bar for dialog buttons (usually wrapped in a form) */
 dialog form[method="dialog"],
 dialog .dialog-actions {
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: var(--default-border-width) solid var(--color-surface-200);
-
+    border-top: var(--default-border-width) solid var(--border-main);
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 0.75rem;
 }
 
-/* Entrance Animations */
 dialog[open] {
     animation: dialog-pop-in 0.2s cubic-bezier(0, 0, 0.2, 1) forwards;
 }
@@ -343,59 +432,56 @@ dialog[open]::backdrop {
 }
 
 @keyframes dialog-backdrop-fade {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /* =========================================
    10. Collapsible Content (Details/Summary)
    ========================================= */
 details {
-    background-color: var(--color-surface-50);
-    border: var(--default-border-width) solid var(--color-surface-200);
+    background-color: var(--bg-surface);
+    border: var(--default-border-width) solid var(--border-main);
     border-radius: var(--radius-container);
     margin-bottom: 1rem;
-    overflow: hidden; /* Ensures child elements don't bleed over the rounded corners */
+    overflow: hidden;
 }
 
 summary {
     padding: 1rem 1.5rem;
     cursor: pointer;
     font-weight: var(--heading-font-weight);
-    color: var(--heading-font-color);
-    background-color: var(--color-surface-50);
+    color: var(--text-heading);
+    background-color: var(--bg-surface);
     transition: background-color 0.2s ease;
     user-select: none;
-
-    /* Flexbox helps align the native marker or custom icons nicely */
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-/* Hover state for the clickable summary */
 summary:hover {
-    background-color: var(--color-surface-200);
+    background-color: var(--bg-surface-hover);
 }
 
-/* Accessibility: Focus state */
 summary:focus-visible {
-    outline: 2px solid var(--base-font-color);
+    outline: 2px solid var(--text-outline-focus);
     outline-offset: -2px;
 }
 
-/* Add padding to the content inside the details element, but not the summary */
 details > :not(summary) {
     padding: 0 1.5rem 1.5rem 1.5rem;
 }
 
-/* Add a separator line and margin when the accordion is open */
 details[open] summary {
-    border-bottom: var(--default-border-width) solid var(--color-surface-200);
+    border-bottom: var(--default-border-width) solid var(--border-main);
     margin-bottom: 1rem;
 }
 
-/* Optional: Fix native marker spacing in Safari/Webkit */
 summary::-webkit-details-marker {
     margin-right: 0.25rem;
 }
@@ -403,14 +489,12 @@ summary::-webkit-details-marker {
 /* =========================================
    11. Tables
    ========================================= */
-
-/* --- Base Table Layout --- */
 .table-container {
     width: 100%;
-    overflow-x: auto; /* Enables horizontal scrolling on small screens */
+    overflow-x: auto;
     margin-bottom: 1.5rem;
-    background-color: var(--color-surface-50);
-    border: var(--default-border-width) solid var(--color-surface-200);
+    background-color: var(--bg-surface);
+    border: var(--default-border-width) solid var(--border-main);
     border-radius: var(--radius-container);
 }
 
@@ -418,262 +502,88 @@ table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    white-space: nowrap; /* Keeps content from squishing on mobile */
+    white-space: nowrap;
 }
 
 th, td {
     padding: 0.5rem;
-    border-bottom: var(--default-border-width) solid var(--color-surface-200);
+    border-bottom: var(--default-border-width) solid var(--border-main);
 }
 
 th {
     font-weight: var(--heading-font-weight);
-    color: var(--heading-font-color);
-    background-color: rgba(0, 0, 0, 0.02); /* Subtle tint */
+    color: var(--text-heading);
+    background-color: var(--table-header-bg);
 }
 
-/* Subtle row hover effect */
 tbody tr {
     transition: background-color 0.2s ease;
 }
 
 tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: var(--table-row-hover);
 }
 
 /* =========================================
    12. Interactive Cells (Inputs & Buttons)
    ========================================= */
-
-/* 1. Reset the cell itself if it contains an input, select, or button */
 tbody td:has(> input, > select, > button) {
     padding: 0;
-    position: relative; /* Helps with focus ring z-indexing */
-
-    /* Optional: Your original code added full borders to input cells.
-       Uncomment the next line if you want all 4 sides bordered instead of just the bottom. */
-     border: var(--default-border-width) solid var(--color-surface-200);
+    position: relative;
 }
 
-/* 2. Stretch elements to fill the entire cell */
 tbody td > input,
 tbody td > select,
 tbody td > button {
-    display: block; /* Ensures reliable height stretching inside cells */
+    display: block;
     width: 100%;
-    height: 100%;
-    min-height: 3rem; /* Good touch target height */
+    min-height: 3rem;
     padding: 0.75rem 0.5rem;
     margin: 0;
-
-    /* Reset borders and radius so they sit flush */
     border: none;
     border-radius: 0;
-
-    /* Inherit typography */
     font-family: inherit;
     font-size: inherit;
     color: inherit;
-
     background-color: transparent;
     transition: background-color 0.2s ease, outline 0.1s ease;
 }
 
-/* 3. Button specific overrides */
 tbody td > button {
-    color: var(--color-primary-500);
+    color: var(--btn-primary-bg);
     text-align: center;
     cursor: pointer;
 }
 
 tbody td > button:hover {
-    background-color: var(--color-surface-200);
-    transform: none; /* Prevent base button translateY jump */
+    background-color: var(--bg-surface-hover);
+    transform: none;
 }
 
-/* 4. Input & Select hover states */
 tbody td > input:hover,
 tbody td > select:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: var(--table-row-hover);
 }
 
-/* 5. Crucial Accessibility: Inset focus rings */
 tbody td > input:focus,
 tbody td > select:focus,
 tbody td > button:focus-visible {
-    outline: 2px solid var(--color-primary-500);
-    outline-offset: -2px; /* Pulls the outline inside the cell bounds */
-    background-color: var(--color-surface-50);
-    z-index: 2; /* Ensures the focus ring sits above adjacent cells */
+    outline: 2px solid var(--btn-primary-bg);
+    outline-offset: -2px;
+    background-color: var(--bg-surface);
+    z-index: 2;
 }
 
 /* =========================================
-   13. Dark Mode Component Overrides
-   ========================================= */
-@media (prefers-color-scheme: dark) {
-    .app-shell {
-        background-color: var(--body-background-color-dark);
-        color: var(--base-font-color-dark);
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-        color: var(--heading-font-color-dark);
-    }
-
-    a {
-        color: var(--anchor-font-color-dark);
-    }
-
-    /* Update borders for dark mode */
-    header,
-    footer,
-    main > article,
-    main > article > footer {
-        border-color: var(--color-surface-700);
-    }
-
-    footer {
-        color: var(--color-surface-400);
-    }
-
-    main > article {
-        background-color: var(--color-surface-900);
-    }
-
-    /* Buttons */
-    button,
-    input[type="submit"],
-    a[role="button"] {
-        background-color: var(--color-primary-400);
-        color: var(--color-primary-contrast-400);
-
-        &:hover { background-color: var(--color-primary-300); }
-
-        &.warning {
-            background-color: var(--color-warning-400);
-            color: var(--color-warning-contrast-400);
-        }
-
-        &.error {
-            background-color: var(--color-error-400);
-            color: var(--color-error-contrast-400);
-        }
-
-        &:disabled, &:disabled:hover, &.warning:disabled, &.error:disabled {
-            background-color: var(--color-surface-700);
-            color: var(--color-surface-400);
-        }
-    }
-
-    /* Toggles */
-    label:has(input[type="checkbox"]) {
-        background-color: var(--color-primary-400);
-        color: var(--color-primary-contrast-400);
-
-        &:hover { background-color: var(--color-primary-300); }
-
-        &:has(input[type="checkbox"]:focus-visible) {
-            outline-color: var(--base-font-color-dark);
-        }
-
-        &:has(input[type="checkbox"]:disabled) {
-            background-color: var(--color-surface-700);
-            color: var(--color-surface-400);
-        }
-    }
-
-    input[type="checkbox"] {
-        &::after { background-color: var(--color-surface-900); }
-
-        &:checked {
-            background-color: var(--color-surface-900);
-            &::after { background-color: var(--color-primary-400); }
-        }
-    }
-
-    dialog {
-        background-color: var(--color-surface-900);
-        color: var(--base-font-color-dark);
-        border-color: var(--color-surface-700);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-    }
-
-    dialog::backdrop {
-        background-color: rgba(0, 0, 0, 0.6);
-    }
-
-    dialog form[method="dialog"],
-    dialog .dialog-actions {
-        border-top-color: var(--color-surface-700);
-    }
-
-    /* Collapsible Content */
-    details {
-        background-color: var(--color-surface-900);
-        border-color: var(--color-surface-700);
-    }
-
-    summary {
-        background-color: var(--color-surface-900);
-        color: var(--heading-font-color-dark);
-    }
-
-    summary:hover {
-        /* In dark mode, surface-700 acts as a good subtle hover */
-        background-color: var(--color-surface-700);
-    }
-
-    details[open] summary {
-        border-bottom-color: var(--color-surface-700);
-    }
-
-    /* Tables */
-    .table-container {
-        background-color: var(--color-surface-900);
-        border-color: var(--color-surface-700);
-    }
-
-    th, td {
-        border-bottom-color: var(--color-surface-700);
-    }
-
-    th {
-        color: var(--heading-font-color-dark);
-        background-color: rgba(255, 255, 255, 0.05); /* Subtle light tint for dark mode */
-    }
-
-    tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Table Interactive Cells */
-    tbody td > button {
-        color: var(--color-primary-400);
-    }
-
-    tbody td > button:hover {
-        background-color: var(--color-surface-700);
-    }
-
-    tbody td > input:hover,
-    tbody td > select:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    tbody td > input:focus,
-    tbody td > select:focus,
-    tbody td > button:focus-visible {
-        outline-color: var(--color-primary-400);
-        background-color: var(--color-surface-900);
-    }
-}
-
-/* =========================================
-   14. Utilities
+   13. Utilities
    ========================================= */
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .animate-spin {
@@ -681,17 +591,15 @@ tbody td > button:focus-visible {
 }
 
 .warning {
-    background-color: var(--color-warning-500);
-    color: var(--color-warning-contrast-500);
+    background-color: var(--btn-warning-bg);
+    color: var(--btn-warning-text);
 }
 
 /* =========================================
-   15. Mobile / Small Screen Overrides
+   14. Mobile / Small Screen Overrides
    ========================================= */
 @media (max-width: 23.5rem) {
     header, main {
-        /* Remove left and right padding, keep top and bottom padding */
-        padding-left: 0;
-        padding-right: 0;
+        padding-inline: 0;
     }
 }
