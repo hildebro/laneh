@@ -232,7 +232,7 @@
 <article>
   <div class="header">
     <h4>{m.shopping_add_items()}</h4>
-    <button class="icon-button" onclick={() => helpDialog.showModal()}>
+    <button class="icon-button secondary" onclick={() => helpDialog.showModal()}>
       <CircleQuestionMark />
       {m.generic_help()}
     </button>
@@ -305,14 +305,16 @@
     {:then suggestions}
       {#if suggestions.length > 0}
         {m.shopping_add_items_suggestions()}
+        <div class="suggestion-box">
+          {#each suggestions as suggestion(suggestion.name)}
+            {#if suggestionNotPresent(suggestion.name)}
+              <button class="tertiary" type="button" onclick={() => addSuggestion(suggestion.name)}>
+                {suggestion.name}
+              </button>
+            {/if}
+          {/each}
+        </div>
       {/if}
-      {#each suggestions as suggestion(suggestion.name)}
-        {#if suggestionNotPresent(suggestion.name)}
-          <button type="button" onclick={() => addSuggestion(suggestion.name)}>
-            {suggestion.name}
-          </button>
-        {/if}
-      {/each}
     {/await}
     {#snippet additionalButtons()}
       {#if correctionRequired}
@@ -343,5 +345,12 @@
 
     .actions-cell {
         display: flex;
+    }
+
+    .suggestion-box {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
     }
 </style>
