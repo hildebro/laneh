@@ -21,11 +21,21 @@
     --btn-primary-text: var(--color-primary-contrast-500);
     --btn-primary-hover: var(--color-primary-600);
 
+    --btn-secondary-bg: var(--color-secondary-500);
+    --btn-secondary-text: var(--color-secondary-contrast-500);
+    --btn-secondary-hover: var(--color-secondary-600);
+
+    --btn-tertiary-bg: var(--color-tertiary-500);
+    --btn-tertiary-text: var(--color-tertiary-contrast-500);
+    --btn-tertiary-hover: var(--color-tertiary-600);
+
     --btn-warning-bg: var(--color-warning-500);
     --btn-warning-text: var(--color-warning-contrast-500);
+    --btn-warning-hover: var(--color-warning-600);
 
     --btn-error-bg: var(--color-error-500);
     --btn-error-text: var(--color-error-contrast-500);
+    --btn-error-hover: var(--color-error-600);
 
     --btn-disabled-bg: var(--color-surface-200);
     --btn-disabled-text: var(--color-surface-400);
@@ -55,11 +65,21 @@
         --btn-primary-text: var(--color-primary-contrast-400);
         --btn-primary-hover: var(--color-primary-300);
 
+        --btn-secondary-bg: var(--color-secondary-400);
+        --btn-secondary-text: var(--color-secondary-contrast-400);
+        --btn-secondary-hover: var(--color-secondary-300);
+
+        --btn-tertiary-bg: var(--color-tertiary-400);
+        --btn-tertiary-text: var(--color-tertiary-contrast-400);
+        --btn-tertiary-hover: var(--color-tertiary-300);
+
         --btn-warning-bg: var(--color-warning-400);
         --btn-warning-text: var(--color-warning-contrast-400);
+        --btn-warning-hover: var(--color-warning-300);
 
         --btn-error-bg: var(--color-error-400);
         --btn-error-text: var(--color-error-contrast-400);
+        --btn-error-hover: var(--color-error-300);
 
         --btn-disabled-bg: var(--color-surface-700);
         --btn-disabled-text: var(--color-surface-400);
@@ -269,21 +289,45 @@ a[role="button"] {
         transform: translateY(1px);
     }
 
+    &.secondary {
+        background-color: var(--btn-secondary-bg);
+        color: var(--btn-secondary-text);
+
+        &:hover {
+            background-color: var(--btn-secondary-hover);
+        }
+    }
+
+    &.tertiary {
+        background-color: var(--btn-tertiary-bg);
+        color: var(--btn-tertiary-text);
+
+        &:hover {
+            background-color: var(--btn-tertiary-hover);
+        }
+    }
+
     &.warning {
         background-color: var(--btn-warning-bg);
         color: var(--btn-warning-text);
+
+        &:hover {
+            background-color: var(--btn-warning-hover);
+        }
     }
 
     &.error {
         background-color: var(--btn-error-bg);
         color: var(--btn-error-text);
+
+        &:hover {
+            background-color: var(--btn-error-hover);
+        }
     }
 
-    &:disabled,
-    &.warning:disabled,
-    &.error:disabled {
-        background-color: var(--btn-disabled-bg);
-        color: var(--btn-disabled-text);
+    &:disabled {
+        background-color: var(--btn-disabled-bg) !important;
+        color: var(--btn-disabled-text) !important;
         cursor: not-allowed;
         pointer-events: none;
         transform: none;
@@ -296,6 +340,7 @@ a[role="button"] {
     align-items: center;
     gap: 0.25rem;
 }
+
 
 /* =========================================
    8. Toggle Switches (Checkboxes)
@@ -588,11 +633,6 @@ tbody td > button:focus-visible {
 
 .animate-spin {
     animation: spin 1s linear infinite;
-}
-
-.warning {
-    background-color: var(--btn-warning-bg);
-    color: var(--btn-warning-text);
 }
 
 /* =========================================
