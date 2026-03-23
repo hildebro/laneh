@@ -6,7 +6,7 @@
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { transPath } from '$lib/path-translations';
-  import { toaster } from '$lib/toaster-ref';
+  import { addToast } from '$lib/stores/toast';
 
   type EnhancedFormProps = {
     children: Snippet;
@@ -53,7 +53,7 @@
         }
       ).join('\n');
 
-      toaster.error({ title: m.form_invalid(), description: formattedIssues, duration: 5000 });
+      addToast({ title: m.form_invalid(), message: formattedIssues, type: 'error' });
     }
 
     if (preUpdatedCallback) {
