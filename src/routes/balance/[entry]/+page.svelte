@@ -35,28 +35,29 @@
 </script>
 
 {#if data.purchaseId}
-  <div class="card preset-filled-error-100-900 p-5 space-y-4 shadow-xl font-semibold mb-2">
-    { m.shopping_purchase_finished() }
-    <br />
-    <a href={resolve('/shopping')} class="btn">{ m.shopping_purchase_finished_skip() }</a>
-  </div>
+  <article class="primary">
+    <p>
+      { m.shopping_purchase_finished() }
+    </p>
+    <footer>
+      <a role="button" href={resolve('/shopping')}>{ m.shopping_purchase_finished_skip() }</a>
+    </footer>
+  </article>
 {/if}
-<div class="card">
-  <div class="h5 mb-4">
-    {data.entry ? m.balance_expense_edit() : m.balance_expense_add()}
-  </div>
+<article>
+  <h2>{data.entry ? m.balance_expense_edit() : m.balance_expense_add()}</h2>
 
   <EnhancedForm method="POST">
-    <div class="flex flex-col gap-3">
+    <div>
       <input type="hidden" name="id" value={data.entry?.id}>
       <input type="hidden" name="purchaseId" value={data.purchaseId}>
       <label>
         { m.generic_name() }
-        <input class="input" type="text" name="name" bind:value={purchaseName} />
+        <input type="text" name="name" bind:value={purchaseName} />
       </label>
       <label>
         { m.balance_expense_user() }
-        <select class="select" name="creditorId" bind:value={purchaseUserId}>
+        <select name="creditorId" bind:value={purchaseUserId}>
           {#each data.users as user (user.id)}
             <option value={user.id}>{user.username}</option>
           {/each}
@@ -64,14 +65,13 @@
       </label>
       <MoneyInput bind:value={purchasePrice} />
       <div>
-        { m.balance_expense_distribution() }
-        <div class="flex flex-row flex-wrap gap-4">
+        <span class="label">{ m.balance_expense_distribution() }</span>
+        <div class="distribution-users">
           {#each distributions as dist (dist.userId)}
-            <label class="w-17">
+            <label>
               {dist.username}
               <input type="hidden" name="userIds" value={dist.userId} />
               <input
-                class="input"
                 type="text"
                 name="percents"
                 bind:value={dist.percent}
@@ -82,4 +82,20 @@
       </div>
     </div>
   </EnhancedForm>
-</div>
+</article>
+
+<style>
+    .distribution-users {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .distribution-users label {
+        flex: 1;
+        min-width: 95px;
+        margin-bottom: 0;
+        font-size: 0.85rem;
+    }
+</style>
