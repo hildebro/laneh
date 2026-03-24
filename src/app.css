@@ -649,3 +649,61 @@ tbody td > button:focus-visible {
         padding-inline: 0;
     }
 }
+
+/* =========================================
+   15. Forms & Inputs
+   ========================================= */
+label, .label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: var(--heading-font-weight);
+    color: var(--text-heading);
+    font-size: 0.95rem;
+}
+
+/* Target standard text-based inputs and dropdowns */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text-main);
+
+    background-color: var(--bg-app);
+    border: var(--default-border-width) solid var(--border-main);
+    border-radius: var(--radius-base);
+
+    transition: border-color 0.2s ease, outline 0.2s ease;
+}
+
+/* Textareas should only resize vertically to avoid breaking layouts */
+textarea {
+    resize: vertical;
+    min-height: 6rem;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--btn-primary-bg);
+    outline-offset: -1px;
+    border-color: var(--btn-primary-bg);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+    background-color: var(--btn-disabled-bg);
+    color: var(--btn-disabled-text);
+    border-color: var(--border-main);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
