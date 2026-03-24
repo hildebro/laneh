@@ -28,40 +28,46 @@
   };
 </script>
 
-<div class="flex flex-col gap-3">
-  <div class="card flex flex-col gap-2">
-    <span class="h5">{m.balance()}</span>
-    {#if data.userDebts.length === 0}
-      { m.balance_none() }
-    {/if}
-    {#each data.userDebts as userDebt (userDebt.creditor.id)}
-      <div class="flex flex-row justify-center">
-        <span>{m.balance_owed({ user: userDebt.creditor.username })}</span>
-        <div>
-          {#each userDebt.debtorData as debtorEntry (debtorEntry.debtor.id)}
-            <div class="px-2 font-bold">
-              {m.balance_owed_debtor({
-                amount: priceFormatter.format(debtorEntry.amount / 100),
-                debtor: debtorEntry.debtor.username
-              })}
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/each}
-  </div>
-  <a class="btn ml-auto" href={resolve('/balance/add')}>{ m.balance_expense_add() }</a>
-  {#each data.entries as entry (entry.id)}
-    <div class="card flex flex-col">
-      <div>
-        {getLabel(entry)}
-        <span class="font-bold">{priceFormatter.format(entry.price / 100)}</span>
-      </div>
-      <span>{entry.user.username}</span>
-      <span class="text-primary-900-100">{dateFormatter.format(entry.date)}</span>
-      <a href={resolve('/balance/[entry]', {entry: entry.id})} class="btn mt-2 ml-auto">
+<div class="action-bar">
+  <a role="button" href={resolve('/balance/add')}>{ m.balance_expense_add() }</a>
+</div>
+
+<article>
+  <h2>{m.balance()}</h2>
+  {#if data.userDebts.length === 0}
+    <p>{ m.balance_none() }</p>
+  {/if}
+  {#each data.userDebts as userDebt (userDebt.creditor.id)}
+    <div>
+      <h4>{m.balance_owed({ user: userDebt.creditor.username })}</h4>
+      <ul>
+        {#each userDebt.debtorData as debtorEntry (debtorEntry.debtor.id)}
+          <li>
+            {m.balance_owed_debtor({
+              amount: priceFormatter.format(debtorEntry.amount / 100),
+              debtor: debtorEntry.debtor.username
+            })}
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/each}
+</article>
+
+{#each data.entries as entry (entry.id)}
+  <article>
+    <div class="action-bar">
+      <a role="button" href={resolve('/balance/[entry]', {entry: entry.id})}>
         {m.generic_edit()}
       </a>
     </div>
-  {/each}
-</div>
+    <div>
+      {getLabel(entry)}
+      <b>{priceFormatter.format(entry.price / 100)}</b>
+    </div>
+    <span>{entry.user.username}</span>
+    <footer>
+      <span>{dateFormatter.format(entry.date)}</span>
+    </footer>
+  </article>
+{/each}
