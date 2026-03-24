@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { Check, Pencil, Undo2 } from 'lucide-svelte';
   import { SvelteDate } from 'svelte/reactivity';
-  import { slide } from 'svelte/transition';
   import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { WeeklyTask, WeeklyTaskWithRelation } from '$lib/server/db/schema';
 
@@ -24,9 +23,9 @@
     if (dueDate.getTime() === today.getTime()) {
       return ''; // Green for due today
     } else if (dueDate.getTime() === yesterday.getTime()) {
-      return 'preset-filled-warning-500'; // Yellow for due yesterday
+      return 'warning'; // Yellow for due yesterday
     } else {
-      return 'preset-filled-error-500'; // Red for tasks due before yesterday
+      return 'error'; // Red for tasks due before yesterday
     }
   }
 
@@ -46,131 +45,106 @@
     }
   }
 
-  let showTaskCompleteModal = $state(false);
   let taskToComplete: WeeklyTaskWithRelation | undefined = $state();
 
   function openModalForTask(task: WeeklyTaskWithRelation) {
-    showTaskCompleteModal = true;
     taskToComplete = task;
+    doneDialog.showModal();
   }
 
   function closeModal() {
-    showTaskCompleteModal = false;
+    doneDialog.close();
   }
+
+  let doneDialog: HTMLDialogElement;
 </script>
 
-<a class="btn mb-2 ml-auto" href={resolve('/schedule/add')}>{ m.schedule_add_task() }</a>
-<div class="card w-full">
-  <section class="space-y-4">
-    <h2 class="h2">{ m.schedule_due_tasks() }</h2>
-    {#if data.dueTasks.length === 0}
-      <p class="mb-2">{ m.schedule_due_tasks_empty() }</p>
-    {:else}
-      <div>
-        {#each data.dueTasks as task (task.id)}
-          <div class="mb-2" transition:slide={{ duration: 300 }}>
-            <div class="card">
-              <h3 class="h3 text-lg font-semibold">{task.name}</h3>
-              <div class="flex justify-end gap-1 mb-2">
-                <a href={resolve('/schedule/[task]', {task: task.id})} class="btn">
-                  <Pencil size={18} />
-                  <span>{ m.generic_edit() }</span>
-                </a>
-                <button class="btn" onclick={() => openModalForTask(task)}>
-                  <Check size={18} />
-                  <span>{ m.schedule_done() }</span>
-                </button>
-              </div>
-              <hr class="my-2 opacity-50" />
-              <div class="text-sm space-y-1">
-                <p>{ m.schedule_assignee() }: {task.nextDueUser?.username}</p>
-                <p class={getDueCardPreset(task)}>
-                  <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.nextDueDate)}
-                </p>
-                {#await data.users}
-                  <span></span>
-                {:then users}
-                  <p>{ m.schedule_completions() }</p>
-                  {#each users as user (user.id)}
-                    <p>
-                      {user.username}: { task.completions.filter(completion => completion.userId === user.id).length }
-                    </p>
-                  {/each}
-                {/await}
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </section>
-
-  <Dialog
-    open={showTaskCompleteModal}
-    onOpenChange={(e) => (showTaskCompleteModal = e.open)}
+<dialog bind:this={doneDialog}>
+  <EnhancedForm
+    action="?/markAsDone"
+    preUpdatedCallback={() => closeModal()}
   >
-    <Portal>
-      <Dialog.Backdrop class="fixed inset-0 z-50 backdrop-blur-xs" />
-      <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center">
-        <Dialog.Content class="card shadow-xl">
-          <Dialog.Description>
-            <EnhancedForm
-              action="?/markAsDone"
-              preUpdatedCallback={() => closeModal()}
-            >
-              <input type="hidden" name="taskId" value={taskToComplete?.id} />
-              <label>
-                { m.schedule_done_who() }
-                <select class="select mb-2" name="userId">
-                  {#await data.users then users}
-                    {#each users as user (user.id)}
-                      <option value={user.id}
-                              selected={user.id === taskToComplete?.nextDueUserId}>{user.username}</option>
-                    {/each}
-                  {/await}
-                </select>
-              </label>
-              {#snippet additionalButtons(submitting)}
-                <button type="button" class="btn preset-filled-surface-800-200" onclick={closeModal}
-                        disabled={submitting}>
-                  <Undo2 size={12} />
-                  { m.generic_cancel() }
-                </button>
-              {/snippet}
-            </EnhancedForm>
-          </Dialog.Description>
-        </Dialog.Content>
-      </Dialog.Positioner>
-    </Portal>
-  </Dialog>
+    <input type="hidden" name="taskId" value={taskToComplete?.id} />
+    <label>
+      { m.schedule_done_who() }
+      <select name="userId">
+        {#await data.users then users}
+          {#each users as user (user.id)}
+            <option value={user.id}
+                    selected={user.id === taskToComplete?.nextDueUserId}>{user.username}</option>
+          {/each}
+        {/await}
+      </select>
+    </label>
+    {#snippet additionalButtons(submitting)}
+      <button type="button" onclick={closeModal}
+              disabled={submitting}>
+        <Undo2 size={12} />
+        { m.generic_cancel() }
+      </button>
+    {/snippet}
+  </EnhancedForm>
+</dialog>
 
-  <section class="space-y-4">
-    <h2 class="h2">{ m.schedule_upcoming_tasks() }</h2>
-    {#if data.upcomingTasks.length === 0}
-      <p>{ m.schedule_upcoming_tasks_empty() }</p>
-    {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {#each data.upcomingTasks as task (task.id)}
-          <div class="mb-2" transition:slide={{ duration: 300 }}>
-            <div class="card">
-              <div class="mb-2">
-                <h3 class="h3 text-lg font-semibold">{task.name}</h3>
-                <div class="flex justify-end gap-1 mb-2">
-                  <a href={resolve('/schedule/[task]', {task: task.id})} class="btn">
-                    <Pencil size={18} />
-                    <span>{ m.generic_edit() }</span>
-                  </a>
-                </div>
-              </div>
-              <hr class="my-2 opacity-50" />
-              <div class="text-sm space-y-1">
-                <p>{ m.schedule_assignee() }: {task.nextDueUser?.username}</p>
-                <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.nextDueDate)}</p>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </section>
+<div class="action-bar">
+  <a role="button" href={resolve('/schedule/add')}>{ m.schedule_add_task() }</a>
 </div>
+<h2 class="headline">{ m.schedule_due_tasks() }</h2>
+{#if data.dueTasks.length === 0}
+  <article>{ m.schedule_due_tasks_empty() }</article>
+{/if}
+{#each data.dueTasks as task (task.id)}
+  <article class={getDueCardPreset(task)}>
+    <div class="action-bar">
+      <a class="icon-button" role="button" href={resolve('/schedule/[task]', {task: task.id})}>
+        <Pencil size={16} />
+        { m.generic_edit() }
+      </a>
+      <button class="icon-button" onclick={() => openModalForTask(task)}>
+        <Check size={16} />
+        { m.schedule_done() }
+      </button>
+    </div>
+    <h3>{task.name}</h3>
+    <hr />
+    <div>
+      <div>{ m.schedule_assignee() }: {task.nextDueUser?.username}</div>
+      <p>
+        <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.nextDueDate)}
+      </p>
+      {#await data.users}
+        <LoadingSpinner />
+      {:then users}
+        <div>{ m.schedule_completions() }</div>
+        <ul>
+          {#each users as user (user.id)}
+            <li>
+              {user.username}: { task.completions.filter(completion => completion.userId === user.id).length }
+            </li>
+          {/each}
+        </ul>
+      {/await}
+    </div>
+  </article>
+{/each}
+
+<h2 class="headline">{ m.schedule_upcoming_tasks() }</h2>
+{#if data.upcomingTasks.length === 0}
+  <article>{ m.schedule_upcoming_tasks_empty() }</article>
+{/if}
+{#each data.upcomingTasks as task (task.id)}
+  <article>
+    <div class="action-bar">
+      <a role="button" href={resolve('/schedule/[task]', {task: task.id})}>
+        <Pencil size={16} />
+        { m.generic_edit() }
+      </a>
+    </div>
+    <h3>{task.name}</h3>
+    <hr />
+    <div>
+      <div>{ m.schedule_assignee() }: {task.nextDueUser?.username}</div>
+      <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.nextDueDate)}</p>
+    </div>
+  </article>
+{/each}
