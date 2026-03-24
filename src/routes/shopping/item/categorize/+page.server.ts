@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
@@ -8,6 +8,8 @@ import {
   findAllShoppingCategories,
   findStagedShoppingList
 } from '$lib/server/db/functions';
+import { processForm } from '$lib/server/formHandler';
+import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const userId = locals.user?.id as string;
@@ -46,18 +48,22 @@ export const load: PageServerLoad = async ({ locals }) => {
   };
 };
 
+const categorizeSchema = z.object({
+  itemIds: z.array(z.string().nonoptional()).nonempty(m.shopping_categorize_select_items_invalid()),
+  categoryId: z.string().nonoptional()
+});
+
 export const actions: Actions = {
-  default: async ({ request  }) => {
-    const formData = await request.formData();
-    const itemIds = formData.getAll('itemIds').map((formValue) => formValue.toString());
-    const categoryId = formData.get('categoryId')?.toString() as string;
-
-    if (!itemIds || itemIds.length === 0) {
-      return fail(400, { message: m.shopping_categorize_select_items_invalid() });
-    }
-
-    // Assign the items. Nothing to do after this, the load function will take over to check, if
-    // commit of the staged list is now possible.
-    await assignCategoryToStagedItems(itemIds, categoryId);
+  default: async (event) => {
+    return processForm(
+      event,
+      categorizeSchema,
+      async (categorize) => {
+        // Assign the items. Nothing to do after this, the load function will take over to check, if
+        // commit of the staged list is now possible.
+        await assignCategoryToStagedItems(categorize.itemIds, categorize.categoryId);
+      },
+      { arrays: ['itemIds'] }
+    );
   }
 };

@@ -1,7 +1,7 @@
 <script lang="ts">
   import CancelAction from '../cancel/CancelAction.svelte';
-  import { enhance } from '$app/forms';
   import * as m from '$lib/paraglide/messages.js';
+  import EnhancedForm from '$lib/EnhancedForm.svelte';
 
   let { data, form } = $props();
 
@@ -12,26 +12,15 @@
   <title>{ m.shopping_categorize() }</title>
 </svelte:head>
 
-<CancelAction />
-<div class="card">
-  <h1 class="text-2xl font-semibold mb-4">{ m.shopping_categorize() }</h1>
+<div class="action-bar">
+  <CancelAction />
+</div>
+<article>
+  <h2>{ m.shopping_categorize() }</h2>
 
-  {#if form?.message}
-    <p class="preset-filled-error-50-950 rounded m-2 text-center">{form.message}</p>
-  {/if}
-
-  <form
-    method="POST"
-    use:enhance={() => {
-        isSubmitting = true;
-        return async ({ update }) => {
-          isSubmitting = false;
-          await update();
-        };
-      }}
-  >
+  <EnhancedForm method="POST" hideSubmitButton>
     { m.shopping_categorize_select_items() }
-    <div class="mt-2 mb-4 flex gap-6 flex-wrap text-lg justify-center">
+    <div class="select-container">
       {#each data.items.filter(item => item.status === 'unmatched' && item.selectedCategoryId === null) as item (item.id)}
         <label>
           <input type="checkbox" name="itemIds" value={item.id} />
@@ -41,12 +30,24 @@
     </div>
 
     { m.shopping_categorize_select_category() }
-    <div class="mt-2 flex gap-6 flex-wrap text-lg justify-center">
+    <div class="select-container">
       {#each data.selectableCategories as category (category.id)}
-        <button type="submit" class="btn" name="categoryId" value={category.id} disabled={isSubmitting}>
+        <button type="submit" name="categoryId" value={category.id} disabled={isSubmitting}>
           {category.name}
         </button>
       {/each}
     </div>
-  </form>
-</div>
+  </EnhancedForm>
+</article>
+
+<!--    mt-2 mb-4 flex gap-6 flex-wrap text-lg justify-center -->
+<style>
+    .select-container {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+    }
+</style>
