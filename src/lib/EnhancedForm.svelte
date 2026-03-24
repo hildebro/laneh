@@ -75,10 +75,14 @@
   {...restProps}
 >
   {@render children()}
-  <div class="mt-4 flex gap-1.5 flex-wrap">
+  <div class="form-actions">
     {@render additionalButtons?.(submitting)}
     {#if !hideSubmitButton}
-      <button class={['btn', submitButtonClasses]} type="submit" disabled={submitting}>
+      <button
+        class="{submitButtonClasses} {submitting ? 'icon-button' : ''}"
+        type="submit"
+        disabled={submitting}
+      >
         {submitButtonText}
         {#if submitting}
           <LoadingSpinner size={6} bright />
@@ -87,3 +91,12 @@
     {/if}
   </div>
 </form>
+
+<style>
+  .form-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+  }
+</style>
