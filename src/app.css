@@ -221,6 +221,12 @@ main > article > h2 {
     font-size: calc(1.25rem * var(--text-scaling));
 }
 
+main > article.primary {
+    background-color: var(--color-primary-100);
+    border-color: var(--color-primary-100);
+    color: var(--color-primary-contrast-300);
+}
+
 main > article > footer {
     margin-top: auto;
     display: flex;
