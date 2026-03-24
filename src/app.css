@@ -227,6 +227,18 @@ main > article.primary {
     color: var(--color-primary-contrast-300);
 }
 
+main > article.warning {
+    background-color: var(--color-warning-100);
+    border-color: var(--color-warning-100);
+    color: var(--color-warning-contrast-300);
+}
+
+main > article.error {
+    background-color: var(--color-error-100);
+    border-color: var(--color-error-100);
+    color: var(--color-error-contrast-300);
+}
+
 main > article > footer {
     margin-top: auto;
     display: flex;
@@ -239,7 +251,7 @@ main > article > footer {
 }
 
 /* =========================================
-   5. Action Bar
+   5. Pre-article areas
    ========================================= */
 .action-bar {
     width: 100%;
@@ -250,6 +262,18 @@ main > article > footer {
     flex-wrap: wrap;
     align-items: center;
     justify-content: end;
+    gap: 0.75rem;
+}
+
+.headline {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: start;
     gap: 0.75rem;
 }
 
