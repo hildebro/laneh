@@ -31,56 +31,67 @@
   }
 </script>
 
-<div class="card max-w-screen-sm">
-  <div class="h5 mb-4">
+<article>
+  <h2>
     {#if data.task}
       { m.settings_tasks_edit() }
     {:else }
       { m.settings_tasks_add() }
     {/if}
-  </div>
+  </h2>
   <EnhancedForm action="?/create">
-    <div class="flex flex-col gap-3">
-      <input type="hidden" name="id" value={data.task?.id}>
-      <label>
-        { m.generic_name() }
-        <input class="input" type="text" name="name" bind:value={name} />
-      </label>
-      <label>
-        { m.schedule_next_assignee() }
-        <select class="select" name="dueUserId" bind:value={dueUserId}>
-          <option value="" selected>{ m.generic_required() }</option>
-          {#await data.users then users}
-            {#each users as user (user.id)}
-              <option value={user.id}>{user.username}</option>
-            {/each}
-          {/await}
-        </select>
-      </label>
-      <label>
-        { m.schedule_weekday() }
-        <select class="select" name="weekday" bind:value={weekday}>
-          <option value="" selected>{ m.generic_required() }</option>
-          {#each data.weekdays as weekdayOption (weekdayOption)}
-            <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
+    <input type="hidden" name="id" value={data.task?.id}>
+    <label>
+      { m.generic_name() }
+      <input type="text" name="name" bind:value={name} />
+    </label>
+    <label>
+      { m.schedule_next_assignee() }
+      <select name="dueUserId" bind:value={dueUserId}>
+        <option value="" selected>{ m.generic_required() }</option>
+        {#await data.users then users}
+          {#each users as user (user.id)}
+            <option value={user.id}>{user.username}</option>
           {/each}
-        </select>
-      </label>
-      <div>
-        { m.schedule_interval() }
-        <div class="flex items-center gap-1">
-          <span>{ m.schedule_interval_every()}</span>
-          <input class="input w-36" type="number" name="interval" bind:value={interval} min="1">
-          <span>{ m.schedule_interval_weeks() }</span>
-        </div>
-      </div>
-      <label>
-        { m.schedule_next_date() }
-        <input class="input" type="date" name="dueDate" bind:value={dueDate} />
-      </label>
-      <p class="opacity-60">
-        { m.schedule_next_date_info() }
-      </p>
+        {/await}
+      </select>
+    </label>
+    <label>
+      { m.schedule_weekday() }
+      <select name="weekday" bind:value={weekday}>
+        <option value="" selected>{ m.generic_required() }</option>
+        {#each data.weekdays as weekdayOption (weekdayOption)}
+          <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
+        {/each}
+      </select>
+    </label>
+    <div class="label">{ m.schedule_interval() }</div>
+    <div class="interval-row">
+      <span>{ m.schedule_interval_every()}</span>
+      <input type="number" name="interval" bind:value={interval} min="1">
+      <span>{ m.schedule_interval_weeks() }</span>
     </div>
+    <label>
+      { m.schedule_next_date() }
+      <input type="date" name="dueDate" bind:value={dueDate} />
+    </label>
+    <p>
+      { m.schedule_next_date_info() }
+    </p>
   </EnhancedForm>
-</div>
+</article>
+
+<style>
+    .interval-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    .interval-row input[type="number"] {
+        width: 5rem;
+        text-align: center;
+    }
+</style>
