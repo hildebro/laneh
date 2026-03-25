@@ -69,11 +69,3 @@
     {/if}
   </div>
 </article>
-
-<style>
-    .action-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-</style>

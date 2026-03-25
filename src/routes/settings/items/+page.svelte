@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Dialog, Portal, Switch } from '@skeletonlabs/skeleton-svelte';
   import { Trash, Undo2 } from 'lucide-svelte';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
@@ -8,84 +7,94 @@
 
   let showInactiveItems = $state(false);
 
-  let deleteModalVisible = $state(false);
-
   let { data } = $props();
 
   let itemIds = $state([]);
+
+  let deleteDialog: HTMLDialogElement;
 </script>
 
 {#await data.categories}
-  <LoadingSpinner />
+  <article>
+    <LoadingSpinner />
+  </article>
 {:then categories}
-  <div class="btn mb-2 ml-auto">
-    <Switch checked={showInactiveItems} onCheckedChange={(e) => (showInactiveItems = e.checked)}>
-      <Switch.Control class="data-[state=checked]:preset-filled-primary-800-200">
-        <Switch.Thumb />
-      </Switch.Control>
-      <Switch.Label>{ m.settings_items_show_inactive() }</Switch.Label>
-      <Switch.HiddenInput />
-    </Switch>
+  <div class="action-bar">
+    <label>
+      <input type="checkbox" checked={showInactiveItems} onchange={() => showInactiveItems = !showInactiveItems} />
+      { m.settings_items_show_inactive() }
+    </label>
   </div>
-  <div class="flex flex-col gap-4 w-full">
-    <CategorizedItemSelect bind:value={itemIds} {categories} unfiltered={showInactiveItems} />
-    <div class="card">
-      <EnhancedForm action="?/setCategory" hideSubmitButton preUpdatedCallback={() => itemIds = []}>
+  <CategorizedItemSelect bind:value={itemIds} {categories} unfiltered={showInactiveItems} />
+  <article>
+    <h2>{ m.settings_items_change_category() }</h2>
+    <EnhancedForm
+      action="?/setCategory"
+      hideSubmitButton
+      submitButtonsLayout="action-row"
+      preUpdatedCallback={() => itemIds = []}
+    >
+      <input type="hidden" name="itemIds" value={itemIds}>
+      {#snippet additionalButtons(submitting)}
+        {#each categories as category (category.id)}
+          <button
+            type="submit"
+            name="categoryId"
+            value={category.id}
+            disabled={submitting}
+          >
+            {category.name}
+          </button>
+        {/each}
+      {/snippet}
+    </EnhancedForm>
+    <hr />
+    <h2>{ m.settings_items_other_actions() }</h2>
+    <div class="action-row">
+      <EnhancedForm
+        action="?/deactivateItems"
+        submitButtonClasses="warning"
+        submitButtonsLayout="none"
+        submitButtonText={m.settings_items_deactivate()}
+        preUpdatedCallback={() => itemIds = []}
+      >
         <input type="hidden" name="itemIds" value={itemIds}>
-        { m.settings_items_change_category() }
-        {#snippet additionalButtons(submitting)}
-          {#each categories as category (category.id)}
-            <button type="submit"
-                    class="btn"
-                    name="categoryId"
-                    value={category.id}
-                    disabled={submitting}
-            >
-              {category.name}
-            </button>
-          {/each}
-        {/snippet}
       </EnhancedForm>
+      <button class="error" onclick={() => deleteDialog.showModal()}>
+        { m.settings_items_delete() }
+      </button>
     </div>
-    <div class="card">
-      { m.settings_items_other_actions() }
-      <div class="flex gap-1.5">
-        <EnhancedForm action="?/deactivateItems" submitButtonText={m.settings_items_deactivate()}>
-          <input type="hidden" name="itemIds" value={itemIds}>
-        </EnhancedForm>
-        <Dialog
-          open={deleteModalVisible}
-          onOpenChange={(e) => (deleteModalVisible = e.open)}
+  </article>
+
+  <dialog bind:this={deleteDialog}>
+    <EnhancedForm
+      action="?/deleteItems"
+      preUpdatedCallback={() => deleteDialog.close()}
+      hideSubmitButton
+    >
+      <input type="hidden" name="itemIds" value={itemIds}>
+      <h2>{m.settings_items_delete()}</h2>
+      <p>{ m.settings_items_delete_info() }</p>
+      {#snippet additionalButtons()}
+        <button
+          type="button"
+          onclick={() => deleteDialog.close()}
         >
-          <Dialog.Trigger class="btn preset-filled-error-800-200 mt-4">{m.settings_items_delete()}</Dialog.Trigger>
-          <Portal>
-            <Dialog.Backdrop class="fixed inset-0 z-50 backdrop-blur-sm" />
-            <Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center">
-              <Dialog.Content class="card preset-filled-error-100-900 p-5 space-y-4 shadow-xl max-w-screen-sm">
-                <Dialog.Description>
-                  <h2 class="h2">{m.settings_items_delete()}</h2>
-                  <p class="opacity-60">{ m.settings_items_delete_info() }</p>
-                  <EnhancedForm action="?/deleteItems" hideSubmitButton
-                                preUpdatedCallback={() => deleteModalVisible = false}>
-                    <input type="hidden" name="itemIds" value={itemIds}>
-                    {#snippet additionalButtons()}
-                      <button type="button" class="btn preset-filled-surface-800-200"
-                              onclick={() => deleteModalVisible = false}>
-                        <Undo2 />
-                        { m.generic_cancel() }
-                      </button>
-                      <button type="submit" class="btn preset-filled-error-800-200">
-                        <Trash />
-                        { m.generic_confirm() }
-                      </button>
-                    {/snippet}
-                  </EnhancedForm>
-                </Dialog.Description>
-              </Dialog.Content>
-            </Dialog.Positioner>
-          </Portal>
-        </Dialog>
-      </div>
-    </div>
-  </div>
+          <Undo2 />
+          { m.generic_cancel() }
+        </button>
+        <button type="submit">
+          <Trash />
+          { m.generic_confirm() }
+        </button>
+      {/snippet}
+    </EnhancedForm>
+  </dialog>
 {/await}
+
+<style>
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>

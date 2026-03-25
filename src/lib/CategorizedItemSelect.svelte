@@ -20,24 +20,24 @@
 
 {#each categories as category (category.id)}
   {#if shouldBeDisplayed(category) }
-    <div class="card w-full">
-      <b>{category.name}</b>
-      <div class="flex flex-col text-base">
+    <article>
+      <h2>{category.name}</h2>
+      <div class="action-row">
         {#each filterActive(category.shoppingItems) as item (item.id)}
-          <label class="flex items-center gap-0.5">
+          <label>
             <input type="checkbox" name="items" value={item.id} bind:group={value} />
             {item.amount} {item.name}
           </label>
         {/each}
         {#if unfiltered}
           {#each filterActive(category.shoppingItems, false) as item (item.id)}
-            <label class="flex items-center gap-0.5">
+            <label class="warning">
               <input type="checkbox" name="items" value={item.id} bind:group={value} />
-              <span class="opacity-50 italic">~{item.name}</span>
+              {item.name}
             </label>
           {/each}
         {/if}
       </div>
-    </div>
+    </article>
   {/if}
 {/each}
