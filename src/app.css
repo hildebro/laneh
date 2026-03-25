@@ -277,6 +277,12 @@ main > article > footer {
     gap: 0.75rem;
 }
 
+.action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 /* =========================================
    6. Lists
    ========================================= */
@@ -447,6 +453,40 @@ input[type="checkbox"] {
             background-color: var(--btn-primary-bg);
         }
     }
+}
+
+label.warning:has(input[type="checkbox"]) {
+    background-color: var(--btn-warning-bg);
+    color: var(--btn-warning-text);
+}
+
+label.warning:has(input[type="checkbox"]):hover {
+    background-color: var(--btn-warning-hover);
+}
+
+label.warning:has(input[type="checkbox"]:focus-visible) {
+    outline: 2px solid var(--btn-warning-bg);
+}
+
+label.warning input[type="checkbox"]:checked::after {
+    background-color: var(--btn-warning-bg);
+}
+
+label.error:has(input[type="checkbox"]) {
+    background-color: var(--btn-error-bg);
+    color: var(--btn-error-text);
+}
+
+label.error:has(input[type="checkbox"]):hover {
+    background-color: var(--btn-error-hover);
+}
+
+label.error:has(input[type="checkbox"]:focus-visible) {
+    outline: 2px solid var(--btn-error-bg);
+}
+
+label.error input[type="checkbox"]:checked::after {
+    background-color: var(--btn-error-bg);
 }
 
 /* =========================================

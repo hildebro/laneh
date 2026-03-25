@@ -18,6 +18,7 @@
     submitButtonText?: string;
     submitButtonClasses?: string;
     hideSubmitButton?: boolean;
+    submitButtonsLayout?: 'form-actions' | 'action-row' | 'none';
   };
 
   let {
@@ -30,6 +31,7 @@
     submitButtonText = m.generic_save(),
     submitButtonClasses = '',
     hideSubmitButton = false,
+    submitButtonsLayout = 'form-actions',
     ...restProps
   }: EnhancedFormProps = $props();
 
@@ -75,7 +77,7 @@
   {...restProps}
 >
   {@render children()}
-  <div class="form-actions">
+  <div class="{submitButtonsLayout}">
     {@render additionalButtons?.(submitting)}
     {#if !hideSubmitButton}
       <button
