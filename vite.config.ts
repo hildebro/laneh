@@ -1,6 +1,5 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { sveltekit } from '@sveltejs/kit/vite';
-import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,7 +15,6 @@ const pkg = JSON.parse(json);
 export default defineConfig({
   plugins: [
     sveltekit(),
-    tailwindcss(),
     paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
   ],
   server: {
