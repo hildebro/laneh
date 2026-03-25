@@ -11,58 +11,69 @@
   let { data } = $props();
 </script>
 
-<div class="flex flex-col gap-4">
-  <div class="flex flex-col gap-4 card">
-    <a class="btn" href={resolve('/settings/users')}>
+<article>
+  <div class="action-row">
+    <a role="button" href={resolve('/settings/users')}>
       {m.settings_users_headline()}
     </a>
-    <a class="btn" href={resolve('/settings/items')}>
+    <a role="button" href={resolve('/settings/items')}>
       {m.settings_items_headline()}
     </a>
-    <a class="btn" href={resolve('/settings/categories')}>
+    <a role="button" href={resolve('/settings/categories')}>
       {m.settings_categories_headline()}
     </a>
   </div>
-  <div class="card">
-    <h2 class="h2">{m.settings_user_data()}</h2>
-    <EnhancedForm action="?/updateUser">
-      <label>
-        {m.generic_name()}
-        <input class="input" type="text" name="username" value={data.user?.username} />
-      </label>
-      <label>
-        {m.settings_user_data_password()}
-        <input class="input" type="password" name="password" id="password" />
-      </label>
-    </EnhancedForm>
+</article>
+
+<article>
+  <h2>{m.settings_user_data()}</h2>
+  <EnhancedForm action="?/updateUser">
+    <label>
+      {m.generic_name()}
+      <input type="text" name="username" value={data.user?.username} />
+    </label>
+    <label>
+      {m.settings_user_data_password()}
+      <input type="password" name="password" id="password" />
+    </label>
+  </EnhancedForm>
+</article>
+<article>
+  <h2>{m.settings_users_language()}</h2>
+  <div class="action-row">
+    {#each locales as locale(locale)}
+      <button onclick={() => setLocale(locale)}>
+        {transLocale(locale)}
+      </button>
+    {/each}
   </div>
-  <div class="card">
-    <h2 class="h2 mb-2">{m.settings_actions()}</h2>
-    <h5 class="h5">{m.settings_users_language()}</h5>
-    <div class="flex flex-row gap-4 mb-4">
-      {#each locales as locale(locale)}
-        <button class="btn text-2xl" onclick={() => setLocale(locale)}>
-          {transLocale(locale)}
+</article>
+<article>
+  <h2>{m.settings_actions()}</h2>
+  <div class="action-row">
+    <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
+      {m.settings_actions_export()}
+    </a>
+    <a role="button" href={resolve('/auth/register')}>
+      {m.settings_users_add()}
+    </a>
+    <form action="?/logout" method="POST" use:enhance>
+      <button type="submit">{m.auth_logout()}</button>
+    </form>
+    {#if Capacitor.isNativePlatform()}
+      <div>
+        <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)}>
+          {m.settings_mobile_return_to_wrapper()}
         </button>
-      {/each}
-    </div>
-    <div class="flex flex-row gap-4">
-      <a class="btn" href={resolve('/api/export')} download="database-dump.tar.gz">
-        {m.settings_actions_export()}
-      </a>
-      <a class="btn" href={resolve('/auth/register')}>
-        {m.settings_users_add()}
-      </a>
-      <form action="?/logout" method="POST" use:enhance>
-        <button type="submit" class="btn">{m.auth_logout()}</button>
-      </form>
-      {#if Capacitor.isNativePlatform()}
-        <div class="native-controls">
-          <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)} class="btn">
-            {m.settings_mobile_return_to_wrapper()}
-          </button>
-        </div>
-      {/if}
-    </div>
+      </div>
+    {/if}
   </div>
-</div>
+</article>
+
+<style>
+    .action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+</style>
