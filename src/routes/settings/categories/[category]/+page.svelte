@@ -7,19 +7,19 @@
   let categoryName = $derived(data.category?.name || '');
 </script>
 
-<div class="card">
-  <div class="h5 mb-4">
+<article>
+  <h2>
     {#if data.category}
       { m.settings_categories_edit() }
     {:else }
       { m.settings_categories_add() }
     {/if}
-  </div>
+  </h2>
   <EnhancedForm method="POST" action="?/create">
     <input type="hidden" name="id" value={data.category?.id}>
     <label>
       { m.generic_name() }
-      <input class="input" type="text" name="name" bind:value={categoryName} />
+      <input type="text" name="name" bind:value={categoryName} />
     </label>
   </EnhancedForm>
 
@@ -27,9 +27,9 @@
     <EnhancedForm
       action="?/delete"
       submitButtonText={m.settings_categories_delete()}
-      submitButtonClasses="preset-filled-error-400-600"
+      submitButtonClasses="error"
     >
       <input type="hidden" name="categoryId" value={data.category?.id}>
     </EnhancedForm>
   {/if}
-</div>
+</article>
