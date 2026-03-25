@@ -1,3 +1,12 @@
+## [1.5.1](https://github.com/hildebro/chorehub/compare/v1.5.0...v1.5.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* leftover reference to old toast ([199e174](https://github.com/hildebro/chorehub/commit/199e174c4a27dba160a942a60e6a726813a24ecd))
+* remove tailwind and skeleton references ([963801e](https://github.com/hildebro/chorehub/commit/963801ebf656dae1c847ae7d783930b52c30fab1))
+* remove unused skeleton toaster ([156077b](https://github.com/hildebro/chorehub/commit/156077bc8cbb244b9222bfbb38a5a2f168b80078))
+
 # [1.5.0](https://github.com/hildebro/chorehub/compare/v1.4.2...v1.5.0) (2026-03-25)
 
 
