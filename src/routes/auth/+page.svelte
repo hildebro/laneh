@@ -7,7 +7,7 @@
   let { data } = $props();
 </script>
 
-<div class="card">
+<article>
   <EnhancedForm submitButtonText={m.auth_login()}>
     <label>
       {m.generic_name()}
@@ -25,4 +25,4 @@
       {/if}
     {/snippet}
   </EnhancedForm>
-</div>
+</article>
