@@ -6,26 +6,25 @@
   let { data } = $props();
 </script>
 
-{#await data.users}
-  <div class="card">
-    <LoadingSpinner />
-  </div>
-{:then users}
-  {#if !data.has_active_user}
-    <p class="card w-full preset-filled-error-50-950 rounded m-2 text-center">
-      { m.settings_users_no_active_user() }
-    </p>
-  {/if}
-  <div class="card mb-2 w-full">
-    <h1 class="text-2xl font-semibold mb-4">{ m.settings_users_default_distribution() }</h1>
+<article>
+  {#await data.users}
+    <div>
+      <LoadingSpinner />
+    </div>
+  {:then users}
+    {#if !data.has_active_user}
+      <p>
+        { m.settings_users_no_active_user() }
+      </p>
+    {/if}
+    <h2>{ m.settings_users_default_distribution() }</h2>
     <EnhancedForm action="?/distribution">
-      <div class="flex flex-row flex-wrap gap-4">
+      <div>
         {#each users as user (user.id)}
-          <label class="w-17">
+          <label>
             {user.username}
             <input type="hidden" name="userIds" value={user.id} />
             <input
-              class="input"
               type="text"
               name="percents"
               bind:value={user.defaultDistribution}
@@ -34,5 +33,5 @@
         {/each}
       </div>
     </EnhancedForm>
-  </div>
-{/await}
+  {/await}
+</article>
