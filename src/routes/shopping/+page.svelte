@@ -25,11 +25,11 @@
 {#if data.hasNoCategories}
   <article>
     { m.error_shopping_no_categories() }
-    <div>
-      <a href={resolve('/settings/categories/add')}>
+    <footer>
+      <a role="button" href={resolve('/settings/categories/add')}>
         { m.settings_categories_add() }
       </a>
-    </div>
+    </footer>
   </article>
 {:else if data.activeCategories.length === 0}
   <article>{ m.error_shopping_no_active_categories() }</article>
