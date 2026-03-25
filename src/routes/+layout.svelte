@@ -2,14 +2,12 @@
   import '../app.css';
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
-  import { Toast } from '@skeletonlabs/skeleton-svelte';
   import { CloudAlert } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import AppHeader from './AppHeader.svelte';
   import { resolve } from '$app/paths';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import { toaster } from '$lib/toaster-ref';
 
   let { children, data } = $props();
 
@@ -41,18 +39,6 @@
 </script>
 
 <ToastContainer />
-
-<Toast.Group {toaster}>
-  {#snippet children(toast)}
-    <Toast {toast}>
-      <Toast.Message>
-        <Toast.Title class="h4">{toast.title}</Toast.Title>
-        <Toast.Description class="whitespace-pre-line p-4">{toast.description}</Toast.Description>
-      </Toast.Message>
-      <Toast.CloseTrigger />
-    </Toast>
-  {/snippet}
-</Toast.Group>
 
 <svelte:head>
   <title>Chorehub</title>

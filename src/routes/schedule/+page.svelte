@@ -9,7 +9,6 @@
 
   let { data } = $props();
 
-  // Function to determine the Skeleton UI card preset based on how overdue a task is
   function getDueCardPreset(task: WeeklyTask): string {
     const today = new SvelteDate();
     today.setHours(0, 0, 0, 0);
