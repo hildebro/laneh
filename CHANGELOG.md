@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/hildebro/chorehub/compare/v1.5.1...v1.5.2) (2026-03-25)
+
+
+### Bug Fixes
+
+* npm vulnerabilities ([d5b06d7](https://github.com/hildebro/chorehub/commit/d5b06d7a7db0d7b409357fce50eb9a1546b552c3))
+
 ## [1.5.1](https://github.com/hildebro/chorehub/compare/v1.5.0...v1.5.1) (2026-03-25)
 
 
