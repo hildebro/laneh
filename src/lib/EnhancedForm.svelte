@@ -56,6 +56,8 @@
       ).join('\n');
 
       addToast({ title: m.form_invalid(), message: formattedIssues, type: 'error' });
+    } else {
+      addToast({ message: m.form_success() });
     }
 
     if (preUpdatedCallback) {

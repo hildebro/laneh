@@ -4,7 +4,7 @@ export type ToastType = 'primary' | 'warning' | 'error';
 
 export interface Toast {
   id: string;
-  title: string;
+  title?: string;
   message: string;
   type: ToastType;
 }
@@ -12,7 +12,7 @@ export interface Toast {
 export const toasts = writable<Toast[]>([]);
 
 type ToastOptions = {
-  title: string;
+  title?: string;
   message: string;
   type?: ToastType;
   duration?: number;
@@ -20,7 +20,7 @@ type ToastOptions = {
 
 export function addToast(
   {
-    title,
+    title = undefined,
     message,
     type = 'primary',
     duration = 3000

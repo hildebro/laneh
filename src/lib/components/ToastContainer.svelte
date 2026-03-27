@@ -17,7 +17,9 @@
       out:fade={{ duration: 200 }}
     >
       <span class="content">
-        <span class="title">{toast.title}</span>
+        {#if toast.title}
+          <span class="title">{toast.title}</span>
+        {/if}
         <span class="message">{toast.message}</span>
       </span>
       <button
@@ -47,7 +49,7 @@
 
     .gui-toast {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 1rem;
 
         background-color: var(--bg-surface);
@@ -71,7 +73,6 @@
         flex-direction: column;
         gap: 0.25rem;
         text-align: left;
-        padding-top: 0.25rem;
     }
 
     .title {

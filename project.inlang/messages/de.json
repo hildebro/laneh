@@ -52,6 +52,7 @@
   "footer_version": "Version {app_version}",
   "form_invalid": "Ungültige Eingabe",
   "form_invalid_nonempty": "Darf nicht leergelassen werden",
+  "form_success": "Aktion erfolgreich!",
   "generic_amount": "Menge",
   "generic_cancel": "Abbrechen",
   "generic_close": "Schließen",
