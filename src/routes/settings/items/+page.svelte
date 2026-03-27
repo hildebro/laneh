@@ -26,6 +26,7 @@
     </label>
   </div>
   <CategorizedItemSelect bind:value={itemIds} {categories} unfiltered={showInactiveItems} />
+  <h2 class="headline">{m.settings_actions()}</h2>
   <article>
     <h2>{ m.settings_items_change_category() }</h2>
     <EnhancedForm
