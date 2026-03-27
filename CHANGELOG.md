@@ -1,3 +1,20 @@
+# [1.6.0](https://github.com/hildebro/chorehub/compare/v1.5.2...v1.6.0) (2026-03-27)
+
+
+### Bug Fixes
+
+* center headlines between articles ([3929d40](https://github.com/hildebro/chorehub/commit/3929d4002a2294372efea70d7bdd76c48b7785ea))
+* clean separation of balance and expenses ([ceb77ab](https://github.com/hildebro/chorehub/commit/ceb77ab36940b3b643df5540a8f1276652191e5d))
+* remove tracked .gitignore from inlang project ([a7c0bfe](https://github.com/hildebro/chorehub/commit/a7c0bfe7f31329827682973c3a09e89aad3b520a))
+* settings category only one per row ([1824c40](https://github.com/hildebro/chorehub/commit/1824c40fd39e2fed020d49a3488a670df2aced51))
+
+
+### Features
+
+* headline for item settings actions ([bbc9e17](https://github.com/hildebro/chorehub/commit/bbc9e1738e7852c0f67c8a6dc6e7296782d18576))
+* restructure settings ([d26e5c0](https://github.com/hildebro/chorehub/commit/d26e5c00543e5a6cc3aa028f21bf6a58cc30649f))
+* success message for forms ([ac2ce1d](https://github.com/hildebro/chorehub/commit/ac2ce1d8033c6e9867382a03f358e67716c71b44))
+
 ## [1.5.2](https://github.com/hildebro/chorehub/compare/v1.5.1...v1.5.2) (2026-03-25)
 
 
