@@ -54,6 +54,7 @@
   {/each}
 </article>
 
+<h2 class="headline">{ m.balance_expenses() }</h2>
 {#each data.entries as entry (entry.id)}
   <article>
     <div class="action-bar">
