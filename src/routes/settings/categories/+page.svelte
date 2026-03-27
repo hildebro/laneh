@@ -50,34 +50,36 @@
   <div class="action-bar">
     <a role="button" href={resolve('/settings/categories/add')}>{ m.settings_categories_add() }</a>
   </div>
-  {#each categories as category, index (category.id)}
-    <article animate:flip={{ duration: 200 }}>
-      <h2>{category.name}</h2>
-      <div class="action-row">
-        <a role="button" href={resolve('/settings/categories/[category]', {category: category.id})}>
-          <Pencil />
-        </a>
-        <form method="POST" action="?/up" use:enhance={handleFormSubmit}>
-          <input type="hidden" name="id" value={category.id} />
-          <button type="submit" disabled={submitting || index === 0}>
-            {#if submitting}
-              <LoadingSpinner size={6} bright />
-            {:else }
-              <ArrowUp />
-            {/if}
-          </button>
-        </form>
-        <form method="POST" action="?/down" use:enhance={handleFormSubmit}>
-          <input type="hidden" name="id" value={category.id} />
-          <button type="submit" disabled={submitting || index === categories.length - 1}>
-            {#if submitting}
-              <LoadingSpinner size={6} bright />
-            {:else }
-              <ArrowDown />
-            {/if}
-          </button>
-        </form>
-      </div>
-    </article>
-  {/each}
+  <div class="single-col-wrapper">
+    {#each categories as category, index (category.id)}
+      <article animate:flip={{ duration: 200 }}>
+        <h2>{category.name}</h2>
+        <div class="action-row">
+          <a role="button" href={resolve('/settings/categories/[category]', {category: category.id})}>
+            <Pencil />
+          </a>
+          <form method="POST" action="?/up" use:enhance={handleFormSubmit}>
+            <input type="hidden" name="id" value={category.id} />
+            <button type="submit" disabled={submitting || index === 0}>
+              {#if submitting}
+                <LoadingSpinner size={6} bright />
+              {:else }
+                <ArrowUp />
+              {/if}
+            </button>
+          </form>
+          <form method="POST" action="?/down" use:enhance={handleFormSubmit}>
+            <input type="hidden" name="id" value={category.id} />
+            <button type="submit" disabled={submitting || index === categories.length - 1}>
+              {#if submitting}
+                <LoadingSpinner size={6} bright />
+              {:else }
+                <ArrowDown />
+              {/if}
+            </button>
+          </form>
+        </div>
+      </article>
+    {/each}
+  </div>
 {/await}

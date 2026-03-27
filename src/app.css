@@ -211,8 +211,17 @@ main > .double-article {
     gap: 1.5rem;
 }
 
+main > .single-col-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
 main > article,
-main > .double-article > article {
+main > .double-article > article,
+main > .single-col-wrapper > article {
     background-color: var(--bg-surface);
     border: var(--default-border-width) solid var(--border-main);
     border-radius: var(--radius-container);
@@ -229,32 +238,46 @@ main > .double-article > article {
     flex: 1;
 }
 
+main > .single-col-wrapper > article {
+    width: 100%;
+    max-width: 23.5rem;
+}
+
 main > article > h2,
-main > .double-article > article > h2 {
+main > .double-article > article > h2,
+main > .single-col-wrapper > article > h2 {
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: calc(1.25rem * var(--text-scaling));
 }
 
-main > article.primary, main > .double-article > article.primary {
+main > article.primary,
+main > .double-article > article.primary,
+main > .single-col-wrapper > article.primary {
     background-color: var(--color-primary-100);
     border-color: var(--color-primary-100);
     color: var(--color-primary-contrast-300);
 }
 
-main > article.warning, main > .double-article > article.warning {
+main > article.warning,
+main > .double-article > article.warning,
+main > .single-col-wrapper > article.warning {
     background-color: var(--color-warning-100);
     border-color: var(--color-warning-100);
     color: var(--color-warning-contrast-300);
 }
 
-main > article.error, main > .double-article > article.error {
+main > article.error,
+main > .double-article > article.error,
+main > .single-col-wrapper > article.error {
     background-color: var(--color-error-100);
     border-color: var(--color-error-100);
     color: var(--color-error-contrast-300);
 }
 
-main > article > footer, main > .double-article > article > footer {
+main > article > footer,
+main > .double-article > article > footer,
+main > .single-col-wrapper > article > footer {
     margin-top: auto;
     display: flex;
     justify-content: flex-end;
