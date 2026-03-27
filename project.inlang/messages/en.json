@@ -52,6 +52,7 @@
   "footer_version": "Version {app_version}",
   "form_invalid": "Invalid input",
   "form_invalid_nonempty": "Cannot be left empty",
+  "form_success": "Success!",
   "generic_amount": "Amount",
   "generic_cancel": "Cancel",
   "generic_close": "Close",
