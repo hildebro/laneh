@@ -11,20 +11,43 @@
   let { data } = $props();
 </script>
 
-<article>
-  <div class="action-row">
-    <a role="button" href={resolve('/settings/users')}>
-      {m.settings_users_headline()}
-    </a>
-    <a role="button" href={resolve('/settings/items')}>
-      {m.settings_items_headline()}
-    </a>
-    <a role="button" href={resolve('/settings/categories')}>
-      {m.settings_categories_headline()}
-    </a>
-  </div>
-</article>
-
+<div class="double-article">
+  <article>
+    <h2>{m.settings_shopping()}</h2>
+    <div class="action-row">
+      <a role="button" href={resolve('/settings/items')}>
+        {m.settings_items_headline()}
+      </a>
+      <a role="button" href={resolve('/settings/categories')}>
+        {m.settings_categories_headline()}
+      </a>
+    </div>
+  </article>
+  <article>
+    <h2>{m.settings_actions()}</h2>
+    <div class="action-row">
+      <a role="button" href={resolve('/settings/users')}>
+        {m.settings_users_distributions()}
+      </a>
+      <a role="button" href={resolve('/auth/register')}>
+        {m.settings_users_add()}
+      </a>
+      <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
+        {m.settings_actions_export()}
+      </a>
+      <form action="?/logout" method="POST" use:enhance>
+        <button type="submit">{m.auth_logout()}</button>
+      </form>
+      {#if Capacitor.isNativePlatform()}
+        <div>
+          <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)}>
+            {m.settings_mobile_return_to_wrapper()}
+          </button>
+        </div>
+      {/if}
+    </div>
+  </article>
+</div>
 <article>
   <h2>{m.settings_user_data()}</h2>
   <EnhancedForm action="?/updateUser">
@@ -48,24 +71,4 @@
     {/each}
   </div>
 </article>
-<article>
-  <h2>{m.settings_actions()}</h2>
-  <div class="action-row">
-    <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
-      {m.settings_actions_export()}
-    </a>
-    <a role="button" href={resolve('/auth/register')}>
-      {m.settings_users_add()}
-    </a>
-    <form action="?/logout" method="POST" use:enhance>
-      <button type="submit">{m.auth_logout()}</button>
-    </form>
-    {#if Capacitor.isNativePlatform()}
-      <div>
-        <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)}>
-          {m.settings_mobile_return_to_wrapper()}
-        </button>
-      </div>
-    {/if}
-  </div>
-</article>
+
