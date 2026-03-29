@@ -34,9 +34,9 @@
 <article>
   <h2>
     {#if data.task}
-      { m.settings_tasks_edit() }
+      { m.schedule_weekly_task_edit() }
     {:else }
-      { m.settings_tasks_add() }
+      { m.schedule_weekly_task_add() }
     {/if}
   </h2>
   <EnhancedForm action="?/create">

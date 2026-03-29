@@ -2,7 +2,7 @@ import { type Actions, error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
-import { addTask, findTask, updateTask } from '$lib/server/db/functions';
+import { addWeeklyTask, findWeeklyTask, updateWeeklyTask } from '$lib/server/db/functions';
 import { weekday } from '$lib/server/db/schema';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ params }) => {
     return { task: null, weekdays: weekday.enumValues };
   }
 
-  const task = await findTask(params.task);
+  const task = await findWeeklyTask(params.task);
   if (!task) {
     throw error(404, m.error_task_not_found());
   }
@@ -34,9 +34,9 @@ export const actions: Actions = {
   create: async (event) => {
     return processForm(event, taskSchema, async (task) => {
       if (task.id) {
-        await updateTask(task.id, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+        await updateWeeklyTask(task.id, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
       } else {
-        await addTask(task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+        await addWeeklyTask(task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
       }
 
       return redirect(302, resolve('/tasks'));
@@ -49,7 +49,7 @@ export const actions: Actions = {
       throw new Error('Action called without task. This should not happen.');
     }
 
-    const task = await findTask(taskId);
+    const task = await findWeeklyTask(taskId);
     if (!task) {
       throw error(404, m.error_task_not_found());
     }

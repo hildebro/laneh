@@ -798,7 +798,7 @@ export const findAllTasks = async (): Promise<WeeklyTaskWithRelation[]> => {
   });
 };
 
-export const findTask = async (taskId: string) => {
+export const findWeeklyTask = async (taskId: string) => {
   const db = getTx();
 
   return db.query.weeklyTask.findFirst({
@@ -806,7 +806,7 @@ export const findTask = async (taskId: string) => {
   }).execute();
 };
 
-export const addTask = async (name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
+export const addWeeklyTask = async (name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
   const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
@@ -821,7 +821,7 @@ export const addTask = async (name: string, weekday: string, interval: number, u
   });
 };
 
-export const updateTask = async (taskId: string, name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
+export const updateWeeklyTask = async (taskId: string, name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
   const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
