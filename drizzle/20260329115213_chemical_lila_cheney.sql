@@ -1,0 +1,1 @@
+ALTER TABLE "task_single" ADD COLUMN "done" boolean DEFAULT false NOT NULL;

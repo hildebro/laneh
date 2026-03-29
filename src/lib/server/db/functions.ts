@@ -837,6 +837,17 @@ export const updateWeeklyTask = async (taskId: string, name: string, weekday: st
     .where(eq(table.weeklyTask.id, taskId));
 };
 
+export const findOpenSingleTasks = async () => {
+  const db = getTx();
+
+  return db.query.singleTask.findMany({
+    where: eq(table.singleTask.done, false),
+    with: {
+      dueUser: {},
+    }
+  });
+};
+
 export const findSingleTask = async (taskId: string) => {
   const db = getTx();
 
