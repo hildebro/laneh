@@ -42,7 +42,6 @@
 <style>
     nav {
         width: 100%;
-        flex: 1;
         display: flex;
         justify-content: center; /* Centers the ul perfectly */
     }
@@ -53,7 +52,7 @@
         margin: 0;
         display: flex;
         justify-content: center;
-        gap: 2.5rem;
+        gap: 1.5rem;
     }
 
     a {
@@ -61,13 +60,13 @@
         flex-direction: column;
         align-items: center;
         gap: 0.4rem;
-        color: var(--color-surface-500);
+        color: var(--text-heading);
         text-decoration: none;
         transition: color 0.2s ease, transform 0.1s ease;
     }
 
     a:hover {
-        color: var(--color-primary-500);
+        color: var(--btn-primary-bg); /* Updated to use semantic variable */
     }
 
     /* Tiny click effect */
@@ -100,8 +99,8 @@
         right: -0.6rem;
         z-index: 10;
 
-        background-color: var(--color-error-500);
-        color: var(--color-error-contrast-500);
+        background-color: var(--btn-error-bg);
+        color: var(--btn-error-text);
         font-size: 0.65rem;
         font-weight: bold;
         line-height: 1;
