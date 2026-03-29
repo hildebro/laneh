@@ -86,6 +86,7 @@
 </dialog>
 
 <div class="action-bar">
+  <a role="button" href={resolve('/tasks/single/add')}>{ m.schedule_single_task_add() }</a>
   <a role="button" href={resolve('/tasks/weekly/add')}>{ m.schedule_weekly_task_add() }</a>
 </div>
 <h2 class="headline">{ m.schedule_due_tasks() }</h2>
