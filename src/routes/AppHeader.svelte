@@ -11,7 +11,7 @@
     { label: m.header_balance(), href: resolve('/balance'), icon: Receipt },
     {
       label: m.header_schedule(),
-      href: resolve('/schedule'),
+      href: resolve('/tasks'),
       icon: CalendarDays,
       badge: dueTaskCount > 0 ? dueTaskCount : null
     },

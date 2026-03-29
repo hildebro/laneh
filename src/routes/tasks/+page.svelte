@@ -86,7 +86,7 @@
 </dialog>
 
 <div class="action-bar">
-  <a role="button" href={resolve('/schedule/add')}>{ m.schedule_add_task() }</a>
+  <a role="button" href={resolve('/tasks/weekly/add')}>{ m.schedule_add_task() }</a>
 </div>
 <h2 class="headline">{ m.schedule_due_tasks() }</h2>
 {#if data.dueTasks.length === 0}
@@ -95,7 +95,7 @@
 {#each data.dueTasks as task (task.id)}
   <article class={getDueCardPreset(task)}>
     <div class="action-bar">
-      <a class="icon-button" role="button" href={resolve('/schedule/[task]', {task: task.id})}>
+      <a class="icon-button" role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
         <Pencil size={16} />
         { m.generic_edit() }
       </a>
@@ -134,7 +134,7 @@
 {#each data.upcomingTasks as task (task.id)}
   <article>
     <div class="action-bar">
-      <a role="button" href={resolve('/schedule/[task]', {task: task.id})}>
+      <a role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
         <Pencil size={16} />
         { m.generic_edit() }
       </a>
