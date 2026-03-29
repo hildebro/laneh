@@ -244,6 +244,6 @@ export const singleTask = pgTable('single_task', {
   createdAt: timestamp().defaultNow().notNull(),
   name: text().notNull(),
   dueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
-  dueDate: date().notNull()
+  dueDate: date()
 });
 export type SingleTask = typeof singleTask.$inferSelect;
