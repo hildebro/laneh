@@ -10,9 +10,12 @@ export const load: PageServerLoad = async () => {
 
   const due: WeeklyTaskWithRelation[] = [];
   const upcoming: WeeklyTaskWithRelation[] = [];
+  const completed: WeeklyTaskWithRelation[] = [];
   const today = new Date();
   // Normalize today to midnight for accurate date comparison
   today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
 
   tasks.forEach((task) => {
     // Parse the nextDueDate string (received from load function) into a Date object.
@@ -23,15 +26,17 @@ export const load: PageServerLoad = async () => {
 
     if (dueDate <= today) {
       due.push(task);
-    } else {
+    } else if (dueDate <= tomorrow || task.completions.length === 0) {
       upcoming.push(task);
+    } else {
+      completed.push(task);
     }
   });
 
   due.sort((a, b) => sortTasks(a, b));
   upcoming.sort((a, b) => sortTasks(a, b));
 
-  return { dueTasks: due, upcomingTasks: upcoming, singleTasks: await findOpenSingleTasks() };
+  return { dueTasks: due, upcomingTasks: upcoming, completedTasks: completed, singleTasks: await findOpenSingleTasks() };
 };
 
 function sortTasks(a: WeeklyTaskWithRelation, b: WeeklyTaskWithRelation) {
