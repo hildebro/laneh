@@ -1,12 +1,12 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { findAllTasks, markTaskAsDone } from '$lib/server/db/functions';
+import { findAllWeeklyTasks, markTaskAsDone } from '$lib/server/db/functions';
 import { type WeeklyTaskWithRelation } from '$lib/server/db/schema';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async () => {
-  const tasks = await findAllTasks();
+  const tasks = await findAllWeeklyTasks();
 
   const due: WeeklyTaskWithRelation[] = [];
   const upcoming: WeeklyTaskWithRelation[] = [];
