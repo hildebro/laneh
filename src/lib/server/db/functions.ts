@@ -787,7 +787,7 @@ export const deleteStagedList = async (userId: string) => {
 };
 
 // ------- TASKS -------
-export const findAllTasks = async (): Promise<WeeklyTaskWithRelation[]> => {
+export const findAllWeeklyTasks = async (): Promise<WeeklyTaskWithRelation[]> => {
   const db = getTx();
 
   return db.query.weeklyTask.findMany({
