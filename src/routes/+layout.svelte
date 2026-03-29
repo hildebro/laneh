@@ -73,10 +73,11 @@
     }
 
     .warning {
-        color: var(--color-warning-500);
+        color: var(--btn-warning-text);
     }
 
     footer {
+        color: var(--text-heading);
         display: flex;
         justify-content: space-between;
         padding: 0.5rem;
