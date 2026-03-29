@@ -244,6 +244,11 @@ export const singleTask = pgTable('task_single', {
   createdAt: timestamp().defaultNow().notNull(),
   name: text().notNull(),
   dueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
-  dueDate: date()
+  dueDate: date(),
+  done: boolean().default(false).notNull(),
 });
 export type SingleTask = typeof singleTask.$inferSelect;
+
+export const singleTasksRelations = relations(singleTask, ({ one }) => ({
+  dueUser: one(user, { fields: [singleTask.dueUserId], references: [user.id] }),
+}));

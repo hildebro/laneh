@@ -1,6 +1,6 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { findAllWeeklyTasks, markTaskAsDone } from '$lib/server/db/functions';
+import { findAllWeeklyTasks, findOpenSingleTasks, markTaskAsDone } from '$lib/server/db/functions';
 import { type WeeklyTaskWithRelation } from '$lib/server/db/schema';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async () => {
   due.sort((a, b) => sortTasks(a, b));
   upcoming.sort((a, b) => sortTasks(a, b));
 
-  return { dueTasks: due, upcomingTasks: upcoming };
+  return { dueTasks: due, upcomingTasks: upcoming, singleTasks: await findOpenSingleTasks() };
 };
 
 function sortTasks(a: WeeklyTaskWithRelation, b: WeeklyTaskWithRelation) {
