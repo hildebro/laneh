@@ -238,3 +238,12 @@ export type TaskCompletion = typeof taskCompletion.$inferSelect;
 export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
   task: one(weeklyTask, { fields: [taskCompletion.taskId], references: [weeklyTask.id] }),
 }));
+
+export const singleTask = pgTable('single_task', {
+  id: text().primaryKey(),
+  createdAt: timestamp().defaultNow().notNull(),
+  name: text().notNull(),
+  dueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
+  dueDate: date().notNull()
+});
+export type SingleTask = typeof singleTask.$inferSelect;
