@@ -9,6 +9,8 @@
     --bg-app: var(--body-background-color);
     --bg-surface: var(--color-surface-50);
     --bg-surface-hover: var(--color-surface-200);
+    --bg-gradient-start: var(--color-primary-50);
+    --bg-gradient-end: var(--color-secondary-50);
     --border-main: var(--color-surface-200);
 
     --text-main: var(--base-font-color);
@@ -53,6 +55,8 @@
         --bg-app: var(--body-background-color-dark);
         --bg-surface: var(--color-surface-900);
         --bg-surface-hover: var(--color-surface-700);
+        --bg-gradient-start: var(--color-primary-900);
+        --bg-gradient-end: var(--color-secondary-900);
         --border-main: var(--color-surface-700);
 
         --text-main: var(--base-font-color-dark);
@@ -103,6 +107,7 @@
     /*noinspection CssNoGenericFontName*/
     font-family: var(--base-font-family);
     background-color: var(--bg-app);
+    background-image: radial-gradient(circle at top left, var(--bg-gradient-start) 19%, var(--bg-gradient-end) 81%);
     color: var(--text-main);
     line-height: var(--base-line-height);
     font-weight: var(--base-font-weight);
