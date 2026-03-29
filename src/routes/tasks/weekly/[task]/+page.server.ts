@@ -1,5 +1,6 @@
 import { type Actions, error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import { addTask, findTask, updateTask } from '$lib/server/db/functions';
 import { weekday } from '$lib/server/db/schema';
@@ -38,7 +39,7 @@ export const actions: Actions = {
         await addTask(task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
       }
 
-      return redirect(302, './');
+      return redirect(302, resolve('/tasks'));
     });
   },
   delete: async ({ request }) => {
@@ -55,6 +56,6 @@ export const actions: Actions = {
 
     // await deleteTask(taskId);
 
-    return redirect(302, './');
+    return redirect(302, resolve('/tasks'));
   }
 };
