@@ -1,3 +1,12 @@
+# [1.7.0](https://github.com/hildebro/chorehub/compare/v1.6.0...v1.7.0) (2026-03-29)
+
+
+### Features
+
+* background gradient ([a7dfd72](https://github.com/hildebro/chorehub/commit/a7dfd724f286ef71be56783580057924ed05a5de))
+* blue tint for surface ([84b01e5](https://github.com/hildebro/chorehub/commit/84b01e5ee6da22e3b2225094b89f3e4079ffb492))
+* improve header and footer colors ([6c634a7](https://github.com/hildebro/chorehub/commit/6c634a708d4f75df0ed9c181d236dee78096b9e0))
+
 # [1.6.0](https://github.com/hildebro/chorehub/compare/v1.5.2...v1.6.0) (2026-03-27)
 
 
