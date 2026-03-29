@@ -239,7 +239,7 @@ export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
   task: one(weeklyTask, { fields: [taskCompletion.taskId], references: [weeklyTask.id] }),
 }));
 
-export const singleTask = pgTable('single_task', {
+export const singleTask = pgTable('task_single', {
   id: text().primaryKey(),
   createdAt: timestamp().defaultNow().notNull(),
   name: text().notNull(),
