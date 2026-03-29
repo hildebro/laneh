@@ -837,6 +837,38 @@ export const updateWeeklyTask = async (taskId: string, name: string, weekday: st
     .where(eq(table.weeklyTask.id, taskId));
 };
 
+export const findSingleTask = async (taskId: string) => {
+  const db = getTx();
+
+  return db.query.singleTask.findFirst({
+    where: eq(table.singleTask.id, taskId)
+  }).execute();
+};
+
+export const addSingleTask = async (name: string, userId: string, dueDate: string | null) => {
+  const db = getTx();
+
+  await db.insert(table.singleTask).values({
+    id: generateUUID(),
+    name: name,
+    dueUserId: userId,
+    dueDate
+  });
+};
+
+export const updateSingleTask = async (taskId: string, name: string,  userId: string, dueDate: string | null) => {
+  const db = getTx();
+
+  await db.update(table.singleTask)
+    .set({
+      name: name,
+      dueUserId: userId,
+      dueDate
+    })
+    .where(eq(table.singleTask.id, taskId));
+};
+
+
 /**
  * Calculates the date of the next occurrence of a specific weekday based on the current time.
  */
