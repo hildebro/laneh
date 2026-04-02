@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes: # Persistent database data.  VERY IMPORTANT!
-      - chorehub_data:/var/lib/postgresql/data
+      - ${DATABASE_LOCATION}:/var/lib/postgresql/data
     networks:
       - chorehub-network
 
@@ -19,7 +19,7 @@ services:
       target: builder
     user: "${UID:-1000}:${GID:-1000}"
     ports:
-      - "5173:5173"
+      - "${APP_PORT}:5173"
     env_file:
       - .env
     environment:
@@ -32,9 +32,6 @@ services:
     networks:
       - chorehub-network
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
-
-volumes:
-  chorehub_data:
 
 networks:
   chorehub-network:
