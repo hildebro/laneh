@@ -16,20 +16,6 @@ services:
       timeout: 5s
       retries: 5
 
-  chorehub-migrator:
-    image: docker.io/hildedev/chorehub:latest
-    env_file:
-      - .env
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      NODE_ENV: production
-    command: npm run db:migrate
-    networks:
-      - chorehub-network
-    depends_on:
-      chorehub-db:
-        condition: service_healthy
-
   chorehub-app:
     image: docker.io/hildedev/chorehub:latest
     restart: always
@@ -41,8 +27,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: production
     depends_on:
-      chorehub-migrator:
-        condition: service_completed_successfully
+      chorehub-db:
+        condition: service_healthy
     networks:
       - chorehub-network
 
