@@ -139,27 +139,6 @@
   </article>
 {/each}
 
-<h2 class="headline">{ m.schedule_upcoming_tasks() }</h2>
-{#if data.upcomingTasks.length === 0}
-  <article>{ m.schedule_upcoming_tasks_empty() }</article>
-{/if}
-{#each data.upcomingTasks as task (task.id)}
-  <article>
-    <div class="action-bar">
-      <a role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
-        <Pencil size={16} />
-        { m.generic_edit() }
-      </a>
-    </div>
-    <h3>{task.name}</h3>
-    <hr />
-    <div>
-      <div>{ m.schedule_assignee() }: {task.dueUser?.username}</div>
-      <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.dueDate)}</p>
-    </div>
-  </article>
-{/each}
-
 {#if data.completedTasks.length > 0}
   <h2 class="headline">{ m.schedule_completed_tasks() }</h2>
   {#each data.completedTasks as task (task.id)}

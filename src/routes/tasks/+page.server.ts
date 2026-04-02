@@ -7,7 +7,6 @@ import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async () => {
   const due: TaskWithRelation[] = [];
-  const upcoming: TaskWithRelation[] = [];
   const completed: TaskWithRelation[] = [];
   const today = new Date();
   // Normalize today to midnight for accurate date comparison
@@ -25,8 +24,6 @@ export const load: PageServerLoad = async () => {
 
     if (dueDate <= today) {
       due.push(task);
-    } else if (dueDate <= tomorrow || task.completions.length === 0) {
-      upcoming.push(task);
     } else {
       completed.push(task);
     }
@@ -41,9 +38,8 @@ export const load: PageServerLoad = async () => {
   });
 
   due.sort((a, b) => sortTasks(a, b));
-  upcoming.sort((a, b) => sortTasks(a, b));
 
-  return { dueTasks: due, upcomingTasks: upcoming, completedTasks: completed };
+  return { dueTasks: due, completedTasks: completed };
 };
 
 function sortTasks(a: TaskWithRelation, b: TaskWithRelation) {
