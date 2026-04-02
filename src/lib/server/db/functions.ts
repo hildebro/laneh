@@ -1,7 +1,7 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import * as argon2 from 'argon2';
 import { randomBytes } from 'crypto';
-import { and, asc, count, desc, eq, gt, gte, inArray, lt, max, min, or, SQL, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, isNull, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import { getTx } from '$lib/context';
@@ -988,11 +988,27 @@ async function findNextDueUserId(taskId: string): Promise<string> {
 export const countDueTasks = async () => {
   const db = getTx();
 
-  return (await db.select({ count: count(table.weeklyTask.id) })
+  const weeklyCount = (await db.select({ count: count(table.weeklyTask.id) })
       .from(table.weeklyTask)
       .where(lte(table.weeklyTask.dueDate, formatDateToYYYYMMDD(new Date())))
       .execute()
   ).at(0)?.count ?? 0;
+
+  const singleCount = (await db.select({ count: count(table.singleTask.id) })
+      .from(table.singleTask)
+      .where(
+        and(
+          eq(table.singleTask.done, false),
+          or(
+            isNull(table.singleTask.dueDate),
+            lte(table.singleTask.dueDate, formatDateToYYYYMMDD(new Date()))
+          )
+        )
+      )
+      .execute()
+  ).at(0)?.count ?? 0;
+
+  return weeklyCount + singleCount;
 };
 
 // ------- GENERIC -------
