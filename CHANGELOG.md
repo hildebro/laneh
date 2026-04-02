@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/hildebro/chorehub/compare/v1.9.0...v1.9.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* image full path ([8fd78ec](https://github.com/hildebro/chorehub/commit/8fd78ec63bb74e5087ae050500d5b82afed47f53))
+
 # [1.9.0](https://github.com/hildebro/chorehub/compare/v1.8.1...v1.9.0) (2026-04-02)
 
 
