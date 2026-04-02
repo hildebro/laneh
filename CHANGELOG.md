@@ -1,3 +1,11 @@
+## [1.8.1](https://github.com/hildebro/chorehub/compare/v1.8.0...v1.8.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* gradient to viewport ([7c219f3](https://github.com/hildebro/chorehub/commit/7c219f3befe514898f1a06b9be66943be7df180b))
+* overscroll into white ([ddca9d3](https://github.com/hildebro/chorehub/commit/ddca9d361b961e60784960a243990caf3ac959f2))
+
 # [1.8.0](https://github.com/hildebro/chorehub/compare/v1.7.0...v1.8.0) (2026-04-02)
 
 
