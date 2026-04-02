@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/hildebro/chorehub/compare/v1.9.2...v1.10.0) (2026-04-02)
+
+
+### Features
+
+* define port and db location via env ([e866315](https://github.com/hildebro/chorehub/commit/e86631506a73476ed7680d4173445b0b0838a73a))
+
 ## [1.9.2](https://github.com/hildebro/chorehub/compare/v1.9.1...v1.9.2) (2026-04-02)
 
 
