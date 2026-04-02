@@ -3,7 +3,6 @@
   import { SvelteDate } from 'svelte/reactivity';
   import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
-  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { TaskWithRelation } from '$lib/server/db/schema';
 
@@ -123,20 +122,6 @@
       <p>
         <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.dueDate)}
       </p>
-      {#if task.completions !== undefined}
-        {#await data.users}
-          <LoadingSpinner />
-        {:then users}
-          <div>{ m.schedule_completions() }</div>
-          <ul>
-            {#each users as user (user.id)}
-              <li>
-                {user.username}: { task.completions?.filter(completion => completion.userId === user.id).length }
-              </li>
-            {/each}
-          </ul>
-        {/await}
-      {/if}
     </div>
   </article>
 {/each}
