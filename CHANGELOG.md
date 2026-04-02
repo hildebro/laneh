@@ -1,3 +1,31 @@
+# [1.8.0](https://github.com/hildebro/chorehub/compare/v1.7.0...v1.8.0) (2026-04-02)
+
+
+### Bug Fixes
+
+* date nullable ([ca18d0c](https://github.com/hildebro/chorehub/commit/ca18d0cf32b2c7040c991488dae8db1d9a53dce6))
+* rename weekly function ([8d89373](https://github.com/hildebro/chorehub/commit/8d89373e0bbc7453948fdc3316a0c04f4ab85e06))
+* table name ([2b83967](https://github.com/hildebro/chorehub/commit/2b839671eea5438f0464d61ef89a0714428925be))
+
+
+### Features
+
+* add `done` flag to single tasks ([486c488](https://github.com/hildebro/chorehub/commit/486c48844d8911cae57dee54a6744db94d0089b0))
+* add single task to database ([b7c9ee6](https://github.com/hildebro/chorehub/commit/b7c9ee6e71c7bb2f9cc15dd66b481b2c471ded9e))
+* allow single task without assignee ([1e2766e](https://github.com/hildebro/chorehub/commit/1e2766eed30d8dbc91b2991e2b66b98efdd16956))
+* completed tasks section ([a5360b7](https://github.com/hildebro/chorehub/commit/a5360b768f7ba96df69d25ed2d529248c79cddfc))
+* completions by user into edit page ([8ee24e1](https://github.com/hildebro/chorehub/commit/8ee24e16893c07a2da62b66826907162862af94b))
+* correct display of single tasks ([b382224](https://github.com/hildebro/chorehub/commit/b3822248fc3536ee171f36c589ae0db625cb320e))
+* create new single tasks ([49fbf53](https://github.com/hildebro/chorehub/commit/49fbf539c12801acba1aca9a44dbec07838dbc52))
+* don't show completions on single tasks ([60d06ae](https://github.com/hildebro/chorehub/commit/60d06ae8ecd8efe7bcda0bd1f94e2726d4b50a98))
+* enable "done" for single tasks ([b71c8a9](https://github.com/hildebro/chorehub/commit/b71c8a98a63bc910b10abfec7949f0a1ab4f9bb3))
+* fix global counter for open tasks ([d1877ae](https://github.com/hildebro/chorehub/commit/d1877aef6be039721d24118e5d6ef06b2a77233c))
+* move weekly task to subpath ([b2269fe](https://github.com/hildebro/chorehub/commit/b2269fe5ee7a98e21fe9627ea4b57042c0b6fbc1))
+* new generic TaskWithRelation ([766d239](https://github.com/hildebro/chorehub/commit/766d239f344951a10df7c4239f3800d9be08397b))
+* remove upcoming category ([8b9268d](https://github.com/hildebro/chorehub/commit/8b9268dd145e3899ac31529fe54ae1e3d6da762c))
+* rename weekly task labels ([486df39](https://github.com/hildebro/chorehub/commit/486df39881f4afd418d677e6590be0c997974f5b))
+* rename weekly task props ([64e3568](https://github.com/hildebro/chorehub/commit/64e35681a41b97f6211f1e1e10b38cb0fe1b4ddd))
+
 # [1.7.0](https://github.com/hildebro/chorehub/compare/v1.6.0...v1.7.0) (2026-03-29)
 
 
