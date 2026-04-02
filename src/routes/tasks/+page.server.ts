@@ -1,13 +1,11 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { findAllWeeklyTasks, findOpenSingleTasks, markTaskAsDone } from '$lib/server/db/functions';
+import { findAllSingleTasks, findAllWeeklyTasks, markTaskAsDone } from '$lib/server/db/functions';
 import { type TaskWithRelation } from '$lib/server/db/schema';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async () => {
-  const tasks = await findAllWeeklyTasks();
-
   const due: TaskWithRelation[] = [];
   const upcoming: TaskWithRelation[] = [];
   const completed: TaskWithRelation[] = [];
@@ -17,7 +15,8 @@ export const load: PageServerLoad = async () => {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  tasks.forEach((task) => {
+  const weeklyTasks = await findAllWeeklyTasks();
+  weeklyTasks.forEach((task) => {
     // Parse the nextDueDate string (received from load function) into a Date object.
     // Appending 'T00:00:00' helps treat the date string as local time's start of day.
     const dueDate = new Date(task.dueDate + 'T00:00:00');
@@ -32,11 +31,19 @@ export const load: PageServerLoad = async () => {
       completed.push(task);
     }
   });
+  const singleTasks = await findAllSingleTasks();
+  singleTasks.forEach((task) => {
+    if (!task.done) {
+      due.push(task);
+    } else {
+      completed.push(task);
+    }
+  });
 
   due.sort((a, b) => sortTasks(a, b));
   upcoming.sort((a, b) => sortTasks(a, b));
 
-  return { dueTasks: due, upcomingTasks: upcoming, completedTasks: completed, singleTasks: await findOpenSingleTasks() };
+  return { dueTasks: due, upcomingTasks: upcoming, completedTasks: completed };
 };
 
 function sortTasks(a: TaskWithRelation, b: TaskWithRelation) {
@@ -45,11 +52,11 @@ function sortTasks(a: TaskWithRelation, b: TaskWithRelation) {
   }
 
   if (!a.dueDate) {
-    return -1;
+    return 1;
   }
 
   if (!b.dueDate) {
-    return 1;
+    return -1;
   }
 
   const timeBasedSort = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();

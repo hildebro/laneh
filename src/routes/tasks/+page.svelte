@@ -10,6 +10,10 @@
   let { data } = $props();
 
   function getDueCardPreset(task: TaskWithRelation): string {
+    if (!task.dueDate) {
+      return '';
+    }
+
     const today = new SvelteDate();
     today.setHours(0, 0, 0, 0);
     const yesterday = new SvelteDate(today);
@@ -19,12 +23,12 @@
     dueDate.setHours(0, 0, 0, 0);
 
     // Assign color based on due date relative to today
-    if (dueDate.getTime() === today.getTime()) {
-      return ''; // Green for due today
-    } else if (dueDate.getTime() === yesterday.getTime()) {
+    if (dueDate.getTime() < yesterday.getTime()) {
+      return 'error'; // Red for tasks due before yesterday
+    } else if (dueDate.getTime() < today.getTime()) {
       return 'warning'; // Yellow for due yesterday
     } else {
-      return 'error'; // Red for tasks due before yesterday
+      return ''; // Green for due today
     }
   }
 
@@ -96,10 +100,17 @@
 {#each data.dueTasks as task (task.id)}
   <article class={getDueCardPreset(task)}>
     <div class="action-bar">
-      <a class="icon-button" role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
-        <Pencil size={16} />
-        { m.generic_edit() }
-      </a>
+      {#if task.completions !== undefined}
+        <a class="icon-button" role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
+          <Pencil size={16} />
+          { m.generic_edit() }
+        </a>
+      {:else}
+        <a class="icon-button" role="button" href={resolve('/tasks/single/[task]', {task: task.id})}>
+          <Pencil size={16} />
+          { m.generic_edit() }
+        </a>
+      {/if}
       <button class="icon-button" onclick={() => openModalForTask(task)}>
         <Check size={16} />
         { m.schedule_done() }
