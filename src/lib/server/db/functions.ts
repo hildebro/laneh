@@ -842,7 +842,7 @@ export const findAllSingleTasks = async () => {
 
   return db.query.singleTask.findMany({
     with: {
-      dueUser: {},
+      dueUser: {}
     }
   });
 };
@@ -866,7 +866,7 @@ export const addSingleTask = async (name: string, userId: string, dueDate: strin
   });
 };
 
-export const updateSingleTask = async (taskId: string, name: string,  userId: string, dueDate: string | null) => {
+export const updateSingleTask = async (taskId: string, name: string, userId: string, dueDate: string | null) => {
   const db = getTx();
 
   await db.update(table.singleTask)
@@ -920,6 +920,16 @@ function getNextDueDate(weekdayName: string, interval: number): Date {
 
 export const markTaskAsDone = async (taskId: string, doneByUserId: string | null = null): Promise<void> => {
   const db = getTx();
+
+  const singleTask = await db.query.singleTask.findFirst({ where: eq(table.singleTask.id, taskId) });
+  if (singleTask) {
+    await db.update(table.singleTask).set({
+      done: true,
+      dueUserId: doneByUserId
+    }).where(eq(table.singleTask.id, taskId)).execute();
+
+    return;
+  }
 
   const task = await db.query.weeklyTask.findFirst({ where: eq(table.weeklyTask.id, taskId) }) as WeeklyTask;
   const completionUserId = doneByUserId ?? task.dueUserId as string;
