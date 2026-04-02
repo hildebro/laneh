@@ -15,7 +15,7 @@
     const yesterday = new SvelteDate(today);
     yesterday.setDate(today.getDate() - 1); // Get yesterday's date
 
-    const dueDate = new SvelteDate(task.nextDueDate + 'T00:00:00');
+    const dueDate = new SvelteDate(task.dueDate + 'T00:00:00');
     dueDate.setHours(0, 0, 0, 0);
 
     // Assign color based on due date relative to today
@@ -70,7 +70,7 @@
         {#await data.users then users}
           {#each users as user (user.id)}
             <option value={user.id}
-                    selected={user.id === taskToComplete?.nextDueUserId}>{user.username}</option>
+                    selected={user.id === taskToComplete?.dueUserId}>{user.username}</option>
           {/each}
         {/await}
       </select>
@@ -108,9 +108,9 @@
     <h3>{task.name}</h3>
     <hr />
     <div>
-      <div>{ m.schedule_assignee() }: {task.nextDueUser?.username}</div>
+      <div>{ m.schedule_assignee() }: {task.dueUser?.username}</div>
       <p>
-        <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.nextDueDate)}
+        <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.dueDate)}
       </p>
       {#await data.users}
         <LoadingSpinner />
@@ -143,8 +143,8 @@
     <h3>{task.name}</h3>
     <hr />
     <div>
-      <div>{ m.schedule_assignee() }: {task.nextDueUser?.username}</div>
-      <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.nextDueDate)}</p>
+      <div>{ m.schedule_assignee() }: {task.dueUser?.username}</div>
+      <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.dueDate)}</p>
     </div>
   </article>
 {/each}
@@ -162,8 +162,8 @@
       <h3>{task.name}</h3>
       <hr />
       <div>
-        <div>{ m.schedule_assignee() }: {task.nextDueUser?.username}</div>
-        <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.nextDueDate)}</p>
+        <div>{ m.schedule_assignee() }: {task.dueUser?.username}</div>
+        <p><strong>{ m.schedule_upcoming_at() }:</strong> {formatDate(task.dueDate)}</p>
       </div>
     </article>
   {/each}

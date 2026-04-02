@@ -212,31 +212,31 @@ export const weeklyTask = pgTable('task_weekly', {
   name: text().notNull(),
   dueWeekday: weekday().notNull(),
   interval: integer().notNull().default(1),
-  nextDueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
-  nextDueDate: date().notNull()
+  dueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
+  dueDate: date().notNull()
 });
 export type WeeklyTask = typeof weeklyTask.$inferSelect;
 
 export type WeeklyTaskWithRelation = InferSelectModel<typeof weeklyTask> & {
-  nextDueUser: InferSelectModel<typeof user> | null;
-  completions: InferSelectModel<typeof taskCompletion>[];
+  dueUser: InferSelectModel<typeof user> | null;
+  completions: InferSelectModel<typeof weeklyTaskCompletion>[];
 };
 
-export const tasksRelations = relations(weeklyTask, ({ one, many }) => ({
-  nextDueUser: one(user, { fields: [weeklyTask.nextDueUserId], references: [user.id] }),
-  completions: many(taskCompletion)
+export const weeklyTasksRelations = relations(weeklyTask, ({ one, many }) => ({
+  dueUser: one(user, { fields: [weeklyTask.dueUserId], references: [user.id] }),
+  completions: many(weeklyTaskCompletion)
 }));
 
-export const taskCompletion = pgTable('task_completion', {
+export const weeklyTaskCompletion = pgTable('task_weekly_completion', {
   id: text().primaryKey(),
   taskId: text().notNull().references(() => weeklyTask.id, { onDelete: 'cascade' }),
   userId: text().references(() => user.id, { onDelete: 'cascade' }).notNull(),
   date: date().notNull()
 });
-export type TaskCompletion = typeof taskCompletion.$inferSelect;
+export type TaskCompletion = typeof weeklyTaskCompletion.$inferSelect;
 
-export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
-  task: one(weeklyTask, { fields: [taskCompletion.taskId], references: [weeklyTask.id] }),
+export const weeklyTaskCompletionRelations = relations(weeklyTaskCompletion, ({ one }) => ({
+  task: one(weeklyTask, { fields: [weeklyTaskCompletion.taskId], references: [weeklyTask.id] }),
 }));
 
 export const singleTask = pgTable('task_single', {

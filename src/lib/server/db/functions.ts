@@ -792,7 +792,7 @@ export const findAllWeeklyTasks = async (): Promise<WeeklyTaskWithRelation[]> =>
 
   return db.query.weeklyTask.findMany({
     with: {
-      nextDueUser: {},
+      dueUser: {},
       completions: {}
     }
   });
@@ -816,8 +816,8 @@ export const addWeeklyTask = async (name: string, weekday: string, interval: num
     name: name,
     dueWeekday: weekday as Weekday,
     interval,
-    nextDueUserId: userId,
-    nextDueDate
+    dueUserId: userId,
+    dueDate: nextDueDate
   });
 };
 
@@ -831,8 +831,8 @@ export const updateWeeklyTask = async (taskId: string, name: string, weekday: st
       name: name,
       dueWeekday: weekday as Weekday,
       interval,
-      nextDueUserId: userId,
-      nextDueDate
+      dueUserId: userId,
+      dueDate: nextDueDate
     })
     .where(eq(table.weeklyTask.id, taskId));
 };
@@ -923,20 +923,20 @@ export const markTaskAsDone = async (taskId: string, doneByUserId: string | null
   const db = getTx();
 
   const task = await db.query.weeklyTask.findFirst({ where: eq(table.weeklyTask.id, taskId) }) as WeeklyTask;
-  const completionUserId = doneByUserId ?? task.nextDueUserId as string;
+  const completionUserId = doneByUserId ?? task.dueUserId as string;
 
-  await db.insert(table.taskCompletion).values({
+  await db.insert(table.weeklyTaskCompletion).values({
     id: generateUUID(),
     taskId,
     userId: completionUserId,
     date: formatDateToYYYYMMDD(new Date())
   });
 
-  const nextDueDate = formatDateToYYYYMMDD(getNextDueDate(task.dueWeekday, task.interval));
-  const nextDueUserId = await findNextDueUserId(taskId);
+  const dueDate = formatDateToYYYYMMDD(getNextDueDate(task.dueWeekday, task.interval));
+  const dueUserId = await findNextDueUserId(taskId);
 
   await db.update(table.weeklyTask)
-    .set({ nextDueDate, nextDueUserId })
+    .set({ dueDate, dueUserId })
     .where(eq(table.weeklyTask.id, taskId))
     .execute();
 };
@@ -954,21 +954,21 @@ async function findNextDueUserId(taskId: string): Promise<string> {
   const completionsPerUser = await db
     .select({
       id: table.user.id,
-      completionCount: count(table.taskCompletion.id)
+      completionCount: count(table.weeklyTaskCompletion.id)
         .mapWith(Number)
         .as('completionCount'),
-      earliestCompletionDate: min(table.taskCompletion.date).as('earliestCompletionDate')
+      earliestCompletionDate: min(table.weeklyTaskCompletion.date).as('earliestCompletionDate')
     })
     .from(table.user)
     .leftJoin(
-      table.taskCompletion,
+      table.weeklyTaskCompletion,
       and(
-        eq(table.user.id, table.taskCompletion.userId),
-        eq(table.taskCompletion.taskId, taskId)
+        eq(table.user.id, table.weeklyTaskCompletion.userId),
+        eq(table.weeklyTaskCompletion.taskId, taskId)
       )
     )
     .groupBy(table.user.id)
-    .orderBy(asc(count(table.taskCompletion.id)), asc(min(table.taskCompletion.date)));
+    .orderBy(asc(count(table.weeklyTaskCompletion.id)), asc(min(table.weeklyTaskCompletion.date)));
 
   return completionsPerUser[0].id;
 }
@@ -978,7 +978,7 @@ export const countDueTasks = async () => {
 
   return (await db.select({ count: count(table.weeklyTask.id) })
       .from(table.weeklyTask)
-      .where(lte(table.weeklyTask.nextDueDate, formatDateToYYYYMMDD(new Date())))
+      .where(lte(table.weeklyTask.dueDate, formatDateToYYYYMMDD(new Date())))
       .execute()
   ).at(0)?.count ?? 0;
 };
