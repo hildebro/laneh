@@ -1,3 +1,16 @@
+# [1.9.0](https://github.com/hildebro/chorehub/compare/v1.8.1...v1.9.0) (2026-04-02)
+
+
+### Bug Fixes
+
+* bin scripts ([0888e69](https://github.com/hildebro/chorehub/commit/0888e69a45b0c19070f92bf8188a60c05b5fbd70))
+
+
+### Features
+
+* change dev docker ([9a956e0](https://github.com/hildebro/chorehub/commit/9a956e03870668702b3aa5af8bf39796d4a8c8a4))
+* change prod docker compose to use docker hub ([85685eb](https://github.com/hildebro/chorehub/commit/85685ebfe4fe6b4e55e4f871d64947612a46e3f2))
+
 ## [1.8.1](https://github.com/hildebro/chorehub/compare/v1.8.0...v1.8.1) (2026-04-02)
 
 
