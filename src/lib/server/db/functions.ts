@@ -1,10 +1,10 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import * as argon2 from 'argon2';
 import { randomBytes } from 'crypto';
 import { and, asc, count, desc, eq, gt, gte, inArray, isNull, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import { getTx } from '$lib/context';
+import { hashPassword, verifyPassword } from '$lib/server/db/crypto';
 import * as table from '$lib/server/db/schema';
 import {
   type Session,
@@ -39,16 +39,8 @@ export const addUser = async (username: string, password: string): Promise<strin
   const db = getTx();
 
   const userId = generateUUID();
-  const hashingOptions = {
-    type: argon2.argon2id,
-    memoryCost: 65536, // 64 MB (passed in kilobytes)
-    timeCost: 3,       // Number of iterations
-    parallelism: 1    // Number of threads to use
-  };
 
-  const hashedPassword = await argon2.hash(password, hashingOptions);
-
-  await db.insert(table.user).values({ id: userId, username, password: hashedPassword }).execute();
+  await db.insert(table.user).values({ id: userId, username, password: await hashPassword(password) }).execute();
 
   return userId;
 };
@@ -56,17 +48,9 @@ export const addUser = async (username: string, password: string): Promise<strin
 export const updateUser = async (userId: string, username: string, password: string | undefined): Promise<void> => {
   const db = getTx();
 
-  const hashingOptions = {
-    type: argon2.argon2id,
-    memoryCost: 65536, // 64 MB (passed in kilobytes)
-    timeCost: 3, // Number of iterations
-    parallelism: 1 // Number of threads to use
-  };
-
   let update: { username: string, password?: string } = { username };
   if (password) {
-    const hashedPassword = await argon2.hash(password, hashingOptions);
-    update = { ...update, password: hashedPassword };
+    update = { ...update, password: await hashPassword(password) };
   }
 
   await db.update(table.user).set(update).where(eq(table.user.id, userId)).execute();
@@ -92,7 +76,7 @@ export const findAndVerifyUser = async (username: string, password: string): Pro
     return undefined;
   }
 
-  if (await argon2.verify(user.password, password)) {
+  if (await verifyPassword(password, user.password)) {
     return user;
   }
 
