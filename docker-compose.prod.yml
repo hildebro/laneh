@@ -1,5 +1,5 @@
 services:
-  db:
+  chorehub-db:
     image: postgres:17.4-bookworm
     restart: always
     environment:
@@ -7,17 +7,17 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - chorehub_data:/var/lib/postgresql/data
     networks:
-      - app-network
+      - chorehub-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  migrator:
-    build: .
+  chorehub-migrator:
+    image: hildedev/chorehub:latest
     env_file:
       - .env
     environment:
@@ -25,13 +25,13 @@ services:
       NODE_ENV: production
     command: npm run db:migrate
     networks:
-      - app-network
+      - chorehub-network
     depends_on:
-      db:
+      chorehub-db:
         condition: service_healthy
 
-  app:
-    build: .
+  chorehub-app:
+    image: hildedev/chorehub:latest
     restart: always
     ports:
       - "127.0.0.1:3000:3000"
@@ -41,14 +41,14 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: production
     depends_on:
-      migrator:
+      chorehub-migrator:
         condition: service_completed_successfully
     networks:
-      - app-network
+      - chorehub-network
 
 volumes:
-  postgres_data:
+  chorehub_data:
 
 networks:
-  app-network:
+  chorehub-network:
     driver: bridge
