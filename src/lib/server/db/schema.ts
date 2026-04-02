@@ -252,3 +252,12 @@ export type SingleTask = typeof singleTask.$inferSelect;
 export const singleTasksRelations = relations(singleTask, ({ one }) => ({
   dueUser: one(user, { fields: [singleTask.dueUserId], references: [user.id] }),
 }));
+
+export type TaskWithRelation = {
+  id: string;
+  name: string;
+  dueUser: InferSelectModel<typeof user> | null;
+  dueDate: string | null;
+  done?: boolean;
+  completions?: InferSelectModel<typeof weeklyTaskCompletion>[];
+};

@@ -1,16 +1,16 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { findAllWeeklyTasks, findOpenSingleTasks, markTaskAsDone } from '$lib/server/db/functions';
-import { type WeeklyTaskWithRelation } from '$lib/server/db/schema';
+import { type TaskWithRelation } from '$lib/server/db/schema';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
 export const load: PageServerLoad = async () => {
   const tasks = await findAllWeeklyTasks();
 
-  const due: WeeklyTaskWithRelation[] = [];
-  const upcoming: WeeklyTaskWithRelation[] = [];
-  const completed: WeeklyTaskWithRelation[] = [];
+  const due: TaskWithRelation[] = [];
+  const upcoming: TaskWithRelation[] = [];
+  const completed: TaskWithRelation[] = [];
   const today = new Date();
   // Normalize today to midnight for accurate date comparison
   today.setHours(0, 0, 0, 0);
@@ -39,7 +39,19 @@ export const load: PageServerLoad = async () => {
   return { dueTasks: due, upcomingTasks: upcoming, completedTasks: completed, singleTasks: await findOpenSingleTasks() };
 };
 
-function sortTasks(a: WeeklyTaskWithRelation, b: WeeklyTaskWithRelation) {
+function sortTasks(a: TaskWithRelation, b: TaskWithRelation) {
+  if (!a.dueDate && !b.dueDate) {
+    return a.name.localeCompare(b.name);
+  }
+
+  if (!a.dueDate) {
+    return -1;
+  }
+
+  if (!b.dueDate) {
+    return 1;
+  }
+
   const timeBasedSort = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   if (timeBasedSort !== 0) {
     return timeBasedSort;
