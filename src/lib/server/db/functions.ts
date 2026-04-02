@@ -802,7 +802,10 @@ export const findWeeklyTask = async (taskId: string) => {
   const db = getTx();
 
   return db.query.weeklyTask.findFirst({
-    where: eq(table.weeklyTask.id, taskId)
+    where: eq(table.weeklyTask.id, taskId),
+    with: {
+      completions: {}
+    }
   }).execute();
 };
 

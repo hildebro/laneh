@@ -1,5 +1,6 @@
 <script lang="ts">
   import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { Weekday } from '$lib/server/db/schema';
 
@@ -78,6 +79,20 @@
     <p>
       { m.schedule_next_date_info() }
     </p>
+    {#if data.task?.completions}
+      {#await data.users}
+        <LoadingSpinner />
+      {:then users}
+        <div>{ m.schedule_completions() }</div>
+        <ul>
+          {#each users as user (user.id)}
+            <li>
+              {user.username}: { data.task.completions?.filter(completion => completion.userId === user.id).length }
+            </li>
+          {/each}
+        </ul>
+      {/await}
+    {/if}
   </EnhancedForm>
 </article>
 
