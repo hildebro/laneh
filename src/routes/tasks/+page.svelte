@@ -119,22 +119,24 @@
     <h3>{task.name}</h3>
     <hr />
     <div>
-      <div>{ m.schedule_assignee() }: {task.dueUser?.username}</div>
+      <div>{ m.schedule_assignee() }: {task.dueUser?.username ?? 'N/A'}</div>
       <p>
         <strong>{ m.schedule_due_since() }:</strong> {formatDate(task.dueDate)}
       </p>
-      {#await data.users}
-        <LoadingSpinner />
-      {:then users}
-        <div>{ m.schedule_completions() }</div>
-        <ul>
-          {#each users as user (user.id)}
-            <li>
-              {user.username}: { task.completions?.filter(completion => completion.userId === user.id).length }
-            </li>
-          {/each}
-        </ul>
-      {/await}
+      {#if task.completions !== undefined}
+        {#await data.users}
+          <LoadingSpinner />
+        {:then users}
+          <div>{ m.schedule_completions() }</div>
+          <ul>
+            {#each users as user (user.id)}
+              <li>
+                {user.username}: { task.completions?.filter(completion => completion.userId === user.id).length }
+              </li>
+            {/each}
+          </ul>
+        {/await}
+      {/if}
     </div>
   </article>
 {/each}
