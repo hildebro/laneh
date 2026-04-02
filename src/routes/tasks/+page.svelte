@@ -5,11 +5,11 @@
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import type { WeeklyTask, WeeklyTaskWithRelation } from '$lib/server/db/schema';
+  import type { TaskWithRelation } from '$lib/server/db/schema';
 
   let { data } = $props();
 
-  function getDueCardPreset(task: WeeklyTask): string {
+  function getDueCardPreset(task: TaskWithRelation): string {
     const today = new SvelteDate();
     today.setHours(0, 0, 0, 0);
     const yesterday = new SvelteDate(today);
@@ -44,9 +44,9 @@
     }
   }
 
-  let taskToComplete: WeeklyTaskWithRelation | undefined = $state();
+  let taskToComplete: TaskWithRelation | undefined = $state();
 
-  function openModalForTask(task: WeeklyTaskWithRelation) {
+  function openModalForTask(task: TaskWithRelation) {
     taskToComplete = task;
     doneDialog.showModal();
   }
@@ -70,7 +70,7 @@
         {#await data.users then users}
           {#each users as user (user.id)}
             <option value={user.id}
-                    selected={user.id === taskToComplete?.dueUserId}>{user.username}</option>
+                    selected={user.id === taskToComplete?.dueUser?.id}>{user.username}</option>
           {/each}
         {/await}
       </select>
@@ -119,7 +119,7 @@
         <ul>
           {#each users as user (user.id)}
             <li>
-              {user.username}: { task.completions.filter(completion => completion.userId === user.id).length }
+              {user.username}: { task.completions?.filter(completion => completion.userId === user.id).length }
             </li>
           {/each}
         </ul>
