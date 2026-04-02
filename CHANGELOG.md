@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/hildebro/chorehub/compare/v1.9.1...v1.9.2) (2026-04-02)
+
+
+### Bug Fixes
+
+* remove migrator ([7c7a525](https://github.com/hildebro/chorehub/commit/7c7a525b5af285e09a9199fc7e42b7f9d8dd9dc1))
+
 ## [1.9.1](https://github.com/hildebro/chorehub/compare/v1.9.0...v1.9.1) (2026-04-02)
 
 
