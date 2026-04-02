@@ -108,6 +108,7 @@
     font-family: var(--base-font-family);
     background-color: var(--bg-app);
     background-image: radial-gradient(circle at top left, var(--bg-gradient-start) 19%, var(--bg-gradient-end) 81%);
+    background-attachment: fixed;
     color: var(--text-main);
     line-height: var(--base-line-height);
     font-weight: var(--base-font-weight);
