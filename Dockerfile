@@ -29,4 +29,4 @@ COPY --from=builder /app/drizzle ./drizzle
 EXPOSE 3000
 
 # Start the application. Use `node` and the entry point of your built app.
-CMD ["node", "build"]
+CMD ["sh", "-c", "npm run db:migrate && node build"]
