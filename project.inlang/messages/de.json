@@ -91,8 +91,6 @@
   "schedule_single_task_due_date": "Fälligkeitsdatum",
   "schedule_single_task_edit": "Einzelaufgabe bearbeiten",
   "schedule_upcoming_at": "Fällig am",
-  "schedule_upcoming_tasks": "Anstehende Aufgaben",
-  "schedule_upcoming_tasks_empty": "Keine anstehenden Aufgaben.",
   "schedule_weekday": "Wochentag",
   "schedule_weekday_nonoptional": "Bitte wähle einen Wochentag aus",
   "schedule_weekday_fri": "Freitag",
