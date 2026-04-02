@@ -20,7 +20,7 @@ export const load: PageServerLoad = async () => {
   tasks.forEach((task) => {
     // Parse the nextDueDate string (received from load function) into a Date object.
     // Appending 'T00:00:00' helps treat the date string as local time's start of day.
-    const dueDate = new Date(task.nextDueDate + 'T00:00:00');
+    const dueDate = new Date(task.dueDate + 'T00:00:00');
     // Normalize due date to midnight
     dueDate.setHours(0, 0, 0, 0);
 
@@ -40,7 +40,7 @@ export const load: PageServerLoad = async () => {
 };
 
 function sortTasks(a: WeeklyTaskWithRelation, b: WeeklyTaskWithRelation) {
-  const timeBasedSort = new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime();
+  const timeBasedSort = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   if (timeBasedSort !== 0) {
     return timeBasedSort;
   }

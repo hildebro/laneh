@@ -8,8 +8,8 @@
   let name = $derived(data.task?.name);
   let weekday = $derived(data.task?.dueWeekday);
   let interval = $derived(data.task?.interval);
-  let dueDate = $derived(data.task?.nextDueDate);
-  let dueUserId = $derived(data.task?.nextDueUserId);
+  let dueDate = $derived(data.task?.dueDate);
+  let dueUserId = $derived(data.task?.dueUserId);
 
   function translateWeekday(weekday: Weekday) {
     switch (weekday) {
