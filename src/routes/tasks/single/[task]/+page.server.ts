@@ -22,8 +22,8 @@ export const load: PageServerLoad = async ({ params }) => {
 const taskSchema = z.object({
   id: z.string().trim().nullish(),
   name: z.string().trim().nonempty(),
-  dueUserId: z.string().trim().nonempty(),
-  dueDate: z.string().pipe(z.transform(val => val === '' ? null : val))
+  dueUserId: z.string().trim().pipe(z.transform(val => val === '' ? null : val)),
+  dueDate: z.string().trim().pipe(z.transform(val => val === '' ? null : val))
 });
 
 export const actions: Actions = {

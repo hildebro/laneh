@@ -855,7 +855,7 @@ export const findSingleTask = async (taskId: string) => {
   }).execute();
 };
 
-export const addSingleTask = async (name: string, userId: string, dueDate: string | null) => {
+export const addSingleTask = async (name: string, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
   await db.insert(table.singleTask).values({
@@ -866,7 +866,7 @@ export const addSingleTask = async (name: string, userId: string, dueDate: strin
   });
 };
 
-export const updateSingleTask = async (taskId: string, name: string, userId: string, dueDate: string | null) => {
+export const updateSingleTask = async (taskId: string, name: string, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
   await db.update(table.singleTask)

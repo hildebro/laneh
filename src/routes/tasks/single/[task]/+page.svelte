@@ -6,7 +6,7 @@
 
   let name = $derived(data.task?.name);
   let dueDate = $derived(data.task?.dueDate);
-  let dueUserId = $derived(data.task?.dueUserId);
+  let dueUserId = $derived(data.task?.dueUserId ?? '');
 </script>
 
 <article>
@@ -26,7 +26,7 @@
     <label>
       { m.schedule_single_task_assignee() }
       <select name="dueUserId" bind:value={dueUserId}>
-        <option value="" selected>{ m.generic_required() }</option>
+        <option value="" selected></option>
         {#await data.users then users}
           {#each users as user (user.id)}
             <option value={user.id}>{user.username}</option>
