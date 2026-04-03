@@ -1,3 +1,10 @@
+## [1.11.3](https://github.com/hildebro/chorehub/compare/v1.11.2...v1.11.3) (2026-04-03)
+
+
+### Bug Fixes
+
+* docker hub repo name ([68b8acd](https://github.com/hildebro/chorehub/commit/68b8acd1ddb03459aad5a70f24c5df0d79f5d70d))
+
 ## [1.11.2](https://github.com/hildebro/chorehub/compare/v1.11.1...v1.11.2) (2026-04-03)
 
 
