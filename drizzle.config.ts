@@ -1,12 +1,12 @@
 import { defineConfig } from 'drizzle-kit';
 
-if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
-
 export default defineConfig({
   schema: './src/lib/server/db/schema.ts',
 
   dbCredentials: {
-    url: process.env.DATABASE_URL
+    // Provide a fallback empty string to satisfy TypeScript during the build stage.
+    // Drizzle Kit will use the actual process.env.DATABASE_URL at runtime.
+    url: process.env.DATABASE_URL || '',
   },
 
   migrations: {
@@ -18,6 +18,5 @@ export default defineConfig({
   verbose: true,
   strict: true,
   dialect: 'postgresql',
-
   casing: 'snake_case'
 });
