@@ -1,3 +1,15 @@
+# [1.11.0](https://github.com/hildebro/chorehub/compare/v1.10.0...v1.11.0) (2026-04-03)
+
+
+### Bug Fixes
+
+* update env examples ([6e86b0d](https://github.com/hildebro/chorehub/commit/6e86b0dda292b5ee5ea3208837bf724a9e29a72b))
+
+
+### Features
+
+* automated docker release ([2fd15e1](https://github.com/hildebro/chorehub/commit/2fd15e1f0232c0d49a96b42fa8f8c60867bf2c29))
+
 # [1.10.0](https://github.com/hildebro/chorehub/compare/v1.9.2...v1.10.0) (2026-04-02)
 
 
