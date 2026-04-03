@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/hildebro/chorehub/compare/v1.11.0...v1.11.1) (2026-04-03)
+
+
+### Bug Fixes
+
+* remove DATABASE_URL check for build stage ([74f9af8](https://github.com/hildebro/chorehub/commit/74f9af880b843b91297abd77495f131186a6bdbd))
+
 # [1.11.0](https://github.com/hildebro/chorehub/compare/v1.10.0...v1.11.0) (2026-04-03)
 
 
