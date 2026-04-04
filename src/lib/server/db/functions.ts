@@ -1,6 +1,6 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { randomBytes } from 'crypto';
-import { and, asc, count, desc, eq, gt, gte, inArray, isNull, lt, max, min, or, SQL, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, isNotNull, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import { getTx } from '$lib/context';
@@ -983,10 +983,8 @@ export const countDueTasks = async () => {
       .where(
         and(
           eq(table.singleTask.done, false),
-          or(
-            isNull(table.singleTask.dueDate),
-            lte(table.singleTask.dueDate, formatDateToYYYYMMDD(new Date()))
-          )
+          isNotNull(table.singleTask.dueDate),
+          lte(table.singleTask.dueDate, formatDateToYYYYMMDD(new Date()))
         )
       )
       .execute()
