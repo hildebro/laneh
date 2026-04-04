@@ -16,9 +16,6 @@ const categorySchema = z.object({
 
 export const actions: Actions = {
   up: async (event) => {
-    await new Promise((r) => {
-      setTimeout(r, 2000)
-    });
     return processForm(event, categorySchema, async (category) => {
       await moveCategoryOrderUp(category.id);
     });
@@ -27,6 +24,5 @@ export const actions: Actions = {
     return processForm(event, categorySchema, async (category) => {
       await moveCategoryOrderDown(category.id);
     });
-
   }
 };
