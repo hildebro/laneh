@@ -1,3 +1,18 @@
+# [1.12.0](https://github.com/hildebro/chorehub/compare/v1.11.3...v1.12.0) (2026-04-04)
+
+
+### Bug Fixes
+
+* hard to read anchor font color in dark mode ([24ca49a](https://github.com/hildebro/chorehub/commit/24ca49a2561306f7c7af29cf4762264ee0c901ee))
+* margin for h2 as non-first items ([4533901](https://github.com/hildebro/chorehub/commit/453390143bed72f18e15d37ccba895e31668e860))
+* only count due single tasks in header ([94d80fe](https://github.com/hildebro/chorehub/commit/94d80fefad622c6d8c8ebac5d91d1ca42463152f))
+* remove debugging delay from category swap ([0ce2935](https://github.com/hildebro/chorehub/commit/0ce29358b31bdaee8a3cde107b080ed744a204ae))
+
+
+### Features
+
+* dark mode switch in settings ([a9268eb](https://github.com/hildebro/chorehub/commit/a9268eb9b6f0b1ec32ebb66f03e5cc8e2fd03732))
+
 ## [1.11.3](https://github.com/hildebro/chorehub/compare/v1.11.2...v1.11.3) (2026-04-03)
 
 
