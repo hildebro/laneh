@@ -12,6 +12,22 @@
 
   <link id="theme-css" rel="stylesheet" href="%sveltekit.assets%/themes/default.css" />
 
+  <script>
+    (function() {
+      try {
+        let savedScheme = localStorage.getItem('color-scheme');
+        if (!savedScheme) {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          savedScheme = prefersDark ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-color-scheme', savedScheme);
+      } catch (e) {
+        // Fallback if localStorage is disabled/unavailable
+        document.documentElement.setAttribute('data-color-scheme', 'light');
+      }
+    })();
+  </script>
+
   %sveltekit.head%
 </head>
 <body data-sveltekit-preload-data="hover">
