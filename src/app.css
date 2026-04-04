@@ -49,51 +49,49 @@
     --dialog-backdrop: rgba(0, 0, 0, 0.4);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Semantic Dark Mode Overrides */
-        --bg-app: var(--body-background-color-dark);
-        --bg-surface: var(--color-surface-900);
-        --bg-surface-hover: var(--color-surface-700);
-        --bg-gradient-start: var(--color-primary-900);
-        --bg-gradient-end: var(--color-secondary-900);
-        --border-main: var(--color-surface-700);
+:root[data-color-scheme="dark"] {
+    /* Semantic Dark Mode Overrides */
+    --bg-app: var(--body-background-color-dark);
+    --bg-surface: var(--color-surface-900);
+    --bg-surface-hover: var(--color-surface-700);
+    --bg-gradient-start: var(--color-primary-900);
+    --bg-gradient-end: var(--color-secondary-900);
+    --border-main: var(--color-surface-700);
 
-        --text-main: var(--base-font-color-dark);
-        --text-heading: var(--heading-font-color-dark);
-        --text-muted: var(--color-surface-400);
-        --text-anchor: var(--anchor-font-color-dark);
-        --text-outline-focus: var(--base-font-color-dark);
+    --text-main: var(--base-font-color-dark);
+    --text-heading: var(--heading-font-color-dark);
+    --text-muted: var(--color-surface-400);
+    --text-anchor: var(--anchor-font-color-dark);
+    --text-outline-focus: var(--base-font-color-dark);
 
-        --btn-primary-bg: var(--color-primary-400);
-        --btn-primary-text: var(--color-primary-contrast-400);
-        --btn-primary-hover: var(--color-primary-300);
+    --btn-primary-bg: var(--color-primary-400);
+    --btn-primary-text: var(--color-primary-contrast-400);
+    --btn-primary-hover: var(--color-primary-300);
 
-        --btn-secondary-bg: var(--color-secondary-400);
-        --btn-secondary-text: var(--color-secondary-contrast-400);
-        --btn-secondary-hover: var(--color-secondary-300);
+    --btn-secondary-bg: var(--color-secondary-400);
+    --btn-secondary-text: var(--color-secondary-contrast-400);
+    --btn-secondary-hover: var(--color-secondary-300);
 
-        --btn-tertiary-bg: var(--color-tertiary-400);
-        --btn-tertiary-text: var(--color-tertiary-contrast-400);
-        --btn-tertiary-hover: var(--color-tertiary-300);
+    --btn-tertiary-bg: var(--color-tertiary-400);
+    --btn-tertiary-text: var(--color-tertiary-contrast-400);
+    --btn-tertiary-hover: var(--color-tertiary-300);
 
-        --btn-warning-bg: var(--color-warning-400);
-        --btn-warning-text: var(--color-warning-contrast-400);
-        --btn-warning-hover: var(--color-warning-300);
+    --btn-warning-bg: var(--color-warning-400);
+    --btn-warning-text: var(--color-warning-contrast-400);
+    --btn-warning-hover: var(--color-warning-300);
 
-        --btn-error-bg: var(--color-error-400);
-        --btn-error-text: var(--color-error-contrast-400);
-        --btn-error-hover: var(--color-error-300);
+    --btn-error-bg: var(--color-error-400);
+    --btn-error-text: var(--color-error-contrast-400);
+    --btn-error-hover: var(--color-error-300);
 
-        --btn-disabled-bg: var(--color-surface-700);
-        --btn-disabled-text: var(--color-surface-400);
+    --btn-disabled-bg: var(--color-surface-700);
+    --btn-disabled-text: var(--color-surface-400);
 
-        --table-row-hover: rgba(255, 255, 255, 0.05);
-        --table-header-bg: rgba(255, 255, 255, 0.05);
+    --table-row-hover: rgba(255, 255, 255, 0.05);
+    --table-header-bg: rgba(255, 255, 255, 0.05);
 
-        --dialog-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        --dialog-backdrop: rgba(0, 0, 0, 0.6);
-    }
+    --dialog-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    --dialog-backdrop: rgba(0, 0, 0, 0.6);
 }
 
 /* CSS Reset */
