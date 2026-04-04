@@ -254,9 +254,14 @@ main > .single-col-wrapper > article {
 main > article > h2,
 main > .double-article > article > h2,
 main > .single-col-wrapper > article > h2 {
-    margin-top: 0;
     margin-bottom: 1rem;
     font-size: calc(1.25rem * var(--text-scaling));
+}
+
+main > article > h2:first-child,
+main > .double-article > article > h2:first-child,
+main > .single-col-wrapper > article > h2:first-child {
+    margin-top: 0;
 }
 
 main > article.primary,
