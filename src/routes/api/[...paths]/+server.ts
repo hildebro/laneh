@@ -1,0 +1,24 @@
+// src/routes/api/[...paths]/+server.ts
+import type { RequestHandler } from '@sveltejs/kit';
+import app from '$lib/server/api/index';
+
+const handleRequest: RequestHandler = ({ request }) => {
+  const url = new URL(request.url);
+  
+  // Strip SvelteKit's dynamic base path (e.g., /chorehub) 
+  // so Hono correctly matches its .basePath('/api')
+  const apiIndex = url.pathname.indexOf('/api');
+  if (apiIndex !== -1) {
+    url.pathname = url.pathname.substring(apiIndex);
+  }
+
+  return app.fetch(new Request(url, request));
+};
+
+// Export for all HTTP methods
+export const GET = handleRequest;
+export const POST = handleRequest;
+export const PUT = handleRequest;
+export const DELETE = handleRequest;
+export const PATCH = handleRequest;
+export const fallback = handleRequest;
