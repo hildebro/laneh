@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { hc } from 'hono/client';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getBaseUrl } from '$lib/config';
   import * as m from '$lib/paraglide/messages.js';
+  import type { AppType } from '$lib/server/api';
 
   let { data } = $props();
 
@@ -15,13 +17,12 @@
     event.preventDefault();
     const baseUrl = getBaseUrl();
 
-    const response = await fetch(baseUrl + resolve('/api/tasks/single/[task]', { task: id ?? 'add' }), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-        // 'Authorization': `Bearer ${token}` // You will likely need this
-      },
-      body: JSON.stringify({ id, name, dueDate, dueUserId })
+    const client = hc<AppType>(baseUrl + resolve('/'));
+
+    // Include .api in the chain
+    const response = await client.api.tasks.single[':task'].$post({
+      param: { task: id ?? 'add' },
+      json: { id, name, dueDate, dueUserId }
     });
 
     if (response.ok) {
