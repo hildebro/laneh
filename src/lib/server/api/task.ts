@@ -1,6 +1,13 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { addSingleTask, findSingleTask, updateSingleTask } from '$lib/server/db/functions';
+import {
+  addSingleTask,
+  findAllSingleTasks,
+  findAllWeeklyTasks,
+  findSingleTask,
+  updateSingleTask
+} from '$lib/server/db/functions';
+import { groupTasks } from '$lib/utils/taskHelper';
 import { z } from '$lib/zod';
 
 const taskSchema = z.object({
@@ -11,6 +18,15 @@ const taskSchema = z.object({
 });
 
 const tasksRouter = new Hono()
+  .get('/', async (c) => {
+
+    const weeklyTasks = await findAllWeeklyTasks();
+    const singleTasks = await findAllSingleTasks();
+
+    const [due, completed] = groupTasks(weeklyTasks, singleTasks);
+
+    return c.json({ dueTasks: due, completedTasks: completed });
+  })
   .get('/single/:task', async (c) => {
     const taskParam = c.req.param('task');
     if (taskParam === 'add') return c.json({ task: null });
