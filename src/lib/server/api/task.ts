@@ -25,7 +25,13 @@ const tasksRouter = new Hono()
   .post(
     '/single/:task',
     zValidator('json', taskSchema, (result, c) => {
-      if (!result.success) return c.json({ error: 'Invalid data', issues: result.error.issues }, 422);
+      // Intercept the messy ZodError and format it cleanly
+      if (!result.success) {
+        return c.json({
+          success: false,
+          error: { issues: result.error.issues }
+        }, 400); // 400 Bad Request is the standard here
+      }
     }),
     async (c) => {
       const task = c.req.valid('json');
