@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
@@ -22,7 +23,7 @@
 <article>
   <h2>{ id ? m.schedule_single_task_edit() : m.schedule_single_task_add() }</h2>
 
-  <ApiForm submitAction={saveTask} redirectTo="/tasks">
+  <ApiForm submitAction={saveTask} redirectTo={resolve('/tasks')}>
     <label>
       { m.generic_name() }
       <input type="text" bind:value={name} required />
