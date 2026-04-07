@@ -12,6 +12,7 @@ import {
   text,
   timestamp
 } from 'drizzle-orm/pg-core';
+import { Weekday } from '$lib/utils/taskHelper';
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
@@ -202,9 +203,7 @@ export const balanceEntryDistributionRelations = relations(balanceEntryDistribut
   }),
 }));
 
-export const weekday = pgEnum('weekday', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-
-export type Weekday = typeof weekday.enumValues[number];
+export const weekday = pgEnum('weekday', Weekday);
 
 export const weeklyTask = pgTable('task_weekly', {
   id: text().primaryKey(),

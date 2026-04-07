@@ -1,26 +1,39 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import * as m from '$lib/paraglide/messages.js';
 import {
   addSingleTask,
+  addWeeklyTask,
   findAllSingleTasks,
   findAllWeeklyTasks,
   findSingleTask,
+  findWeeklyTask,
   markTaskAsDone,
-  updateSingleTask
+  updateSingleTask,
+  updateWeeklyTask
 } from '$lib/server/db/functions';
-import { groupTasks } from '$lib/utils/taskHelper';
+import { groupTasks, Weekday } from '$lib/utils/taskHelper';
 import { z } from '$lib/zod';
 
-const taskSchema = z.object({
+const taskDoneSchema = z.object({
+  taskId: z.string().trim().nonempty(),
+  userId: z.string().trim().nonempty()
+});
+
+const singleTaskSchema = z.object({
   id: z.string().trim().nullish(),
   name: z.string().trim().nonempty(),
   dueUserId: z.string().trim().pipe(z.transform(val => val === '' ? null : val)),
   dueDate: z.string().trim().pipe(z.transform(val => val === '' ? null : val))
 });
 
-const taskDoneSchema = z.object({
-  taskId: z.string().trim().nonempty(),
-  userId: z.string().trim().nonempty()
+const weeklyTaskSchema = z.object({
+  id: z.string().trim().nullish(),
+  name: z.string().trim().nonempty(),
+  dueUserId: z.string().trim().nonoptional(),
+  dueDate: z.string().trim().pipe(z.transform((val) => (val === '' ? null : val))),
+  weekday: z.enum(Weekday, { error: () => m.schedule_weekday_nonoptional() }),
+  interval: z.coerce.number().min(1).nonoptional()
 });
 
 const tasksRouter = new Hono()
@@ -58,7 +71,7 @@ const tasksRouter = new Hono()
   })
   .post(
     '/single/:task',
-    zValidator('json', taskSchema),
+    zValidator('json', singleTaskSchema),
     async (c) => {
       const task = c.req.valid('json');
       try {
@@ -66,6 +79,32 @@ const tasksRouter = new Hono()
           await updateSingleTask(task.id, task.name, task.dueUserId, task.dueDate);
         } else {
           await addSingleTask(task.name, task.dueUserId, task.dueDate);
+        }
+        return c.json({ success: true });
+      } catch {
+        return c.json({ error: 'Database error' }, 500);
+      }
+    }
+  )
+  .get('/weekly/:task', async (c) => {
+    const taskParam = c.req.param('task');
+    if (taskParam === 'add') return c.json({ task: null });
+
+    const task = await findWeeklyTask(taskParam);
+    if (!task) return c.json({ error: 'Task not found' }, 404);
+
+    return c.json({ task });
+  })
+  .post(
+    '/weekly',
+    zValidator('json', weeklyTaskSchema),
+    async (c) => {
+      const task = c.req.valid('json');
+      try {
+        if (task.id) {
+          await updateWeeklyTask(task.id, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+        } else {
+          await addWeeklyTask(task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
         }
         return c.json({ success: true });
       } catch {

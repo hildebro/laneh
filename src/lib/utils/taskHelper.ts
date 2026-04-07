@@ -1,5 +1,15 @@
 import type { TaskWithRelation, WeeklyTaskWithRelation } from '$lib/server/db/schema';
 
+export enum Weekday {
+  Monday = 'mon',
+  Tuesday = 'tue',
+  Wednesday = 'wed',
+  Thursday = 'thu',
+  Friday = 'fri',
+  Saturday = 'sat',
+  Sunday = 'sun'
+}
+
 export function groupTasks(weeklyTasks: WeeklyTaskWithRelation[], singleTasks: TaskWithRelation[]) {
   const due: TaskWithRelation[] = [];
   const completed: TaskWithRelation[] = [];

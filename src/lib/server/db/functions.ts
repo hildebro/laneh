@@ -15,10 +15,10 @@ import {
   shoppingItem,
   stagedShoppingPurchaseItem,
   type User,
-  type Weekday,
   type WeeklyTask,
   type WeeklyTaskWithRelation
 } from '$lib/server/db/schema';
+import type { Weekday } from '$lib/utils/taskHelper';
 
 // ------- USER -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
@@ -793,7 +793,7 @@ export const findWeeklyTask = async (taskId: string) => {
   }).execute();
 };
 
-export const addWeeklyTask = async (name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
+export const addWeeklyTask = async (name: string, weekday: Weekday, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
   const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
@@ -801,14 +801,14 @@ export const addWeeklyTask = async (name: string, weekday: string, interval: num
   await db.insert(table.weeklyTask).values({
     id: generateUUID(),
     name: name,
-    dueWeekday: weekday as Weekday,
+    dueWeekday: weekday,
     interval,
     dueUserId: userId,
     dueDate: nextDueDate
   });
 };
 
-export const updateWeeklyTask = async (taskId: string, name: string, weekday: string, interval: number, userId: string, dueDate: string | null) => {
+export const updateWeeklyTask = async (taskId: string, name: string, weekday: Weekday, interval: number, userId: string, dueDate: string | null) => {
   const db = getTx();
 
   const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
@@ -869,7 +869,7 @@ export const updateSingleTask = async (taskId: string, name: string, userId: str
 /**
  * Calculates the date of the next occurrence of a specific weekday based on the current time.
  */
-function getNextDueDate(weekdayName: string, interval: number): Date {
+function getNextDueDate(weekdayName: Weekday, interval: number): Date {
   const weekdayMap: { [key: string]: number } = {
     'sun': 0,
     'mon': 1,
