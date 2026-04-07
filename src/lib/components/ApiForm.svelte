@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { z } from 'zod';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import type { ResolvedPathname } from '$app/types';
   import * as m from '$lib/paraglide/messages.js';
   import { transPath } from '$lib/path-translations';
@@ -9,11 +9,13 @@
 
   let {
     submitAction,
-    redirectTo,
+    onSuccess = undefined,
+    additionalButtons = undefined,
     children
   }: {
     submitAction: () => Promise<Response>;
-    redirectTo: ResolvedPathname;
+    onSuccess?: ResolvedPathname | (() => void) | undefined;
+    additionalButtons?: Snippet,
     children: Snippet;
   } = $props();
 
@@ -28,9 +30,15 @@
 
       if (response.ok) {
         addToast({ message: m.form_success() });
-        // `redirectTo` is typed as ResolvedPathname, so it's fine to navigate without resolve.
-        // eslint-disable-next-line svelte/no-navigation-without-resolve
-        await goto(redirectTo);
+
+        if (typeof onSuccess === 'function') {
+          onSuccess();
+          await invalidateAll();
+        } else if (typeof onSuccess === 'string') {
+          // `redirectTo` is typed as ResolvedPathname, so it's fine to navigate without resolve.
+          // eslint-disable-next-line svelte/no-navigation-without-resolve
+          await goto(onSuccess);
+        }
 
         return;
       }
@@ -61,6 +69,9 @@
 <form onsubmit={handleSubmit}>
   {@render children()}
 
+  {#if additionalButtons}
+    {@render additionalButtons()}
+  {/if}
   <button type="submit" disabled={isSubmitting}>
     {isSubmitting ? m.generic_loading() : m.generic_save()}
   </button>
