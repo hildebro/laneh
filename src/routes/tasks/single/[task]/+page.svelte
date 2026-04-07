@@ -23,7 +23,7 @@
 <article>
   <h2>{ id ? m.schedule_single_task_edit() : m.schedule_single_task_add() }</h2>
 
-  <ApiForm submitAction={saveTask} redirectTo={resolve('/tasks')}>
+  <ApiForm submitAction={saveTask} onSuccess={resolve('/tasks')}>
     <label>
       { m.generic_name() }
       <input type="text" bind:value={name} required />
