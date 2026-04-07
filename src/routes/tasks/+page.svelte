@@ -81,11 +81,9 @@
     <label>
       { m.schedule_done_who() }
       <select name="userId" bind:value={markAsDoneUserId}>
-        {#await data.users then users}
-          {#each users as user (user.id)}
-            <option value={user.id}>{user.username}</option>
-          {/each}
-        {/await}
+        {#each data.users as user (user.id)}
+          <option value={user.id}>{user.username}</option>
+        {/each}
       </select>
     </label>
   </ApiForm>
