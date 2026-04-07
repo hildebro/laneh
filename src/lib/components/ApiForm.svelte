@@ -30,23 +30,33 @@
         addToast({ message: m.form_success() });
         goto(resolve(redirectTo));
       } else {
-        // Parse the error payload
         const result = await response.json().catch(() => ({}));
+        let issues: z.core.$ZodIssue[] | null = null;
 
-        // Hono's default Zod validator format returns { success: false, error: { issues: [...] } }
-        const isHonoZodError = result.success === false && result.error?.issues;
+        // Check for Hono's default unhooked ZodError (where issues are stringified in the message)
+        if (result.success === false && result.error?.name === 'ZodError' && typeof result.error.message === 'string') {
+          try {
+            issues = JSON.parse(result.error.message);
+          } catch (e) {
+            console.error('Failed to parse ZodError string:', e);
+          }
+        } 
+        // Fallback just in case you ever pass actual arrays (e.g. { error: { issues: [...] } })
+        else if (result.success === false && Array.isArray(result.error?.issues)) {
+          issues = result.error.issues;
+        }
 
-        if (isHonoZodError) {
-          const formattedIssues = result.error.issues.map((issue: z.core.$ZodIssue) => {
+        if (issues && Array.isArray(issues) && issues.length > 0) {
+          const formattedIssues = issues.map((issue) => {
             const path = transPath(issue.path.join('.'));
             return `${path}: ${issue.message}`;
           }).join('\n');
 
           addToast({ title: m.form_invalid(), message: formattedIssues, type: 'error' });
         } else {
-          // Generic API error (e.g., 500 internal server error or a non-validation 400)
-          const errorMsg = result.message || 'Failed to save data. Please try again.';
-          addToast({ title: 'Error', message: errorMsg, type: 'error' });
+          // Generic API error (e.g., 500 internal server error)
+          const errorMsg = result.message || result.error || 'Failed to save data. Please try again.';
+          addToast({ title: 'Error', message: typeof errorMsg === 'string' ? errorMsg : 'Unknown error', type: 'error' });
           console.error('API Error:', result);
         }
       }
