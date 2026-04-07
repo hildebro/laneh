@@ -5,6 +5,7 @@ import {
   findAllSingleTasks,
   findAllWeeklyTasks,
   findSingleTask,
+  markTaskAsDone,
   updateSingleTask
 } from '$lib/server/db/functions';
 import { groupTasks } from '$lib/utils/taskHelper';
@@ -17,6 +18,11 @@ const taskSchema = z.object({
   dueDate: z.string().trim().pipe(z.transform(val => val === '' ? null : val))
 });
 
+const taskDoneSchema = z.object({
+  taskId: z.string().trim().nonempty(),
+  userId: z.string().trim().nonempty()
+});
+
 const tasksRouter = new Hono()
   .get('/', async (c) => {
 
@@ -27,6 +33,20 @@ const tasksRouter = new Hono()
 
     return c.json({ dueTasks: due, completedTasks: completed });
   })
+  .post(
+    '/done',
+    zValidator('json', taskDoneSchema),
+    async (c) => {
+      const taskCompletion = c.req.valid('json');
+      try {
+        await markTaskAsDone(taskCompletion.taskId, taskCompletion.userId);
+
+        return c.json({ success: true });
+      } catch {
+        return c.json({ error: 'Database error' }, 500);
+      }
+    }
+  )
   .get('/single/:task', async (c) => {
     const taskParam = c.req.param('task');
     if (taskParam === 'add') return c.json({ task: null });
