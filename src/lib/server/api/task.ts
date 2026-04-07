@@ -1,4 +1,3 @@
-// src/lib/server/api/tasks.ts
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { addSingleTask, findSingleTask, updateSingleTask } from '$lib/server/db/functions';
@@ -11,7 +10,6 @@ const taskSchema = z.object({
   dueDate: z.string().trim().pipe(z.transform(val => val === '' ? null : val))
 });
 
-// Create a standard Hono instance for this domain
 const tasksRouter = new Hono()
   .get('/single/:task', async (c) => {
     const taskParam = c.req.param('task');
@@ -34,7 +32,7 @@ const tasksRouter = new Hono()
           await addSingleTask(task.name, task.dueUserId, task.dueDate);
         }
         return c.json({ success: true });
-      } catch (error) {
+      } catch {
         return c.json({ error: 'Database error' }, 500);
       }
     }

@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte';
   import type { z } from 'zod';
   import { goto } from '$app/navigation';
-  import { resolve } from '$app/paths';
+  import type { ResolvedPathname } from '$app/types';
   import * as m from '$lib/paraglide/messages.js';
   import { transPath } from '$lib/path-translations';
   import { addToast } from '$lib/stores/toast';
@@ -13,7 +13,7 @@
     children
   }: {
     submitAction: () => Promise<Response>;
-    redirectTo: string;
+    redirectTo: ResolvedPathname;
     children: Snippet;
   } = $props();
 
@@ -28,41 +28,30 @@
 
       if (response.ok) {
         addToast({ message: m.form_success() });
-        goto(resolve(redirectTo));
-      } else {
-        const result = await response.json().catch(() => ({}));
-        let issues: z.core.$ZodIssue[] | null = null;
+        // `redirectTo` is typed as ResolvedPathname, so it's fine to navigate without resolve.
+        // eslint-disable-next-line svelte/no-navigation-without-resolve
+        await goto(redirectTo);
 
-        // Check for Hono's default unhooked ZodError (where issues are stringified in the message)
-        if (result.success === false && result.error?.name === 'ZodError' && typeof result.error.message === 'string') {
-          try {
-            issues = JSON.parse(result.error.message);
-          } catch (e) {
-            console.error('Failed to parse ZodError string:', e);
-          }
-        } 
-        // Fallback just in case you ever pass actual arrays (e.g. { error: { issues: [...] } })
-        else if (result.success === false && Array.isArray(result.error?.issues)) {
-          issues = result.error.issues;
-        }
-
-        if (issues && Array.isArray(issues) && issues.length > 0) {
-          const formattedIssues = issues.map((issue) => {
-            const path = transPath(issue.path.join('.'));
-            return `${path}: ${issue.message}`;
-          }).join('\n');
-
-          addToast({ title: m.form_invalid(), message: formattedIssues, type: 'error' });
-        } else {
-          // Generic API error (e.g., 500 internal server error)
-          const errorMsg = result.message || result.error || 'Failed to save data. Please try again.';
-          addToast({ title: 'Error', message: typeof errorMsg === 'string' ? errorMsg : 'Unknown error', type: 'error' });
-          console.error('API Error:', result);
-        }
+        return;
       }
-    } catch (err) {
-      addToast({ title: 'Error', message: 'An unexpected error occurred.', type: 'error' });
-      console.error('Network or parsing error:', err);
+
+      const result = await response.json().catch(() => ({}));
+      const issues: z.core.$ZodIssue[] | null = JSON.parse(result?.error?.message);
+
+      if (issues && Array.isArray(issues) && issues.length > 0) {
+        const formattedIssues = issues.map((issue) => {
+          const path = transPath(issue.path.join('.'));
+          return `${path}: ${issue.message}`;
+        }).join('\n');
+
+        addToast({ title: m.form_invalid(), message: formattedIssues, type: 'error' });
+      } else {
+        const errorMsg = result.message || result.error || m.form_error_generic();
+
+        addToast({ title: m.form_error(), message: errorMsg, type: 'error' });
+      }
+    } catch {
+      addToast({ title: m.form_error(), message: m.form_error_generic(), type: 'error' });
     } finally {
       isSubmitting = false;
     }
@@ -73,6 +62,6 @@
   {@render children()}
 
   <button type="submit" disabled={isSubmitting}>
-    {isSubmitting ? 'Saving...' : 'Save'}
+    {isSubmitting ? m.generic_loading() : m.generic_save()}
   </button>
 </form>

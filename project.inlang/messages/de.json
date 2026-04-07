@@ -50,6 +50,8 @@
   "error_user_not_found": "Benutzer:in nicht gefunden",
   "footer_user": "Eingeloggt als {name}",
   "footer_version": "Version {app_version}",
+  "form_error": "Fehler",
+  "form_error_generic": "Die Daten konnten nicht gespeichert werden. Bitte versuche es erneut.",
   "form_invalid": "Ungültige Eingabe",
   "form_invalid_nonempty": "Darf nicht leergelassen werden",
   "form_success": "Aktion erfolgreich!",
