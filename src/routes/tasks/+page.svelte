@@ -2,7 +2,8 @@
   import { Check, Pencil, Undo2 } from 'lucide-svelte';
   import { SvelteDate } from 'svelte/reactivity';
   import { resolve } from '$app/paths';
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { TaskWithRelation } from '$lib/server/db/schema';
 
@@ -47,10 +48,9 @@
     }
   }
 
-  let taskToComplete: TaskWithRelation | undefined = $state();
-
   function openModalForTask(task: TaskWithRelation) {
-    taskToComplete = task;
+    markAsDoneTaskId = task.id;
+    markAsDoneUserId = task.dueUser?.id || '';
     doneDialog.showModal();
   }
 
@@ -59,33 +59,42 @@
   }
 
   let doneDialog: HTMLDialogElement;
+
+  let markAsDoneTaskId = $state('');
+  let markAsDoneUserId = $state('');
+
+  async function markAsDone() {
+    const client = getApiClient();
+    return client.api.tasks.done.$post({
+      json: { taskId: markAsDoneTaskId, userId: markAsDoneUserId },
+    });
+  }
 </script>
 
 <dialog bind:this={doneDialog}>
-  <EnhancedForm
-    action="?/markAsDone"
-    preUpdatedCallback={() => closeModal()}
+  <ApiForm
+    submitAction={markAsDone}
+    onSuccess={closeModal}
+    {additionalButtons}
   >
-    <input type="hidden" name="taskId" value={taskToComplete?.id} />
+    <input type="hidden" name="taskId" value={markAsDoneTaskId} />
     <label>
       { m.schedule_done_who() }
-      <select name="userId">
+      <select name="userId" bind:value={markAsDoneUserId}>
         {#await data.users then users}
           {#each users as user (user.id)}
-            <option value={user.id}
-                    selected={user.id === taskToComplete?.dueUser?.id}>{user.username}</option>
+            <option value={user.id}>{user.username}</option>
           {/each}
         {/await}
       </select>
     </label>
-    {#snippet additionalButtons(submitting)}
-      <button type="button" onclick={closeModal}
-              disabled={submitting}>
-        <Undo2 size={12} />
-        { m.generic_cancel() }
-      </button>
-    {/snippet}
-  </EnhancedForm>
+  </ApiForm>
+  {#snippet additionalButtons()}
+    <button type="button" onclick={closeModal}>
+      <Undo2 size={12} />
+      { m.generic_cancel() }
+    </button>
+  {/snippet}
 </dialog>
 
 <div class="action-bar">
