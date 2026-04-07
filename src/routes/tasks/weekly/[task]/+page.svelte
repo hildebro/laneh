@@ -1,32 +1,42 @@
 <script lang="ts">
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import { resolve } from '$app/paths';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import type { Weekday } from '$lib/server/db/schema';
+  import { Weekday } from '$lib/utils/taskHelper';
 
   let { data } = $props();
 
-  let name = $derived(data.task?.name);
-  let weekday = $derived(data.task?.dueWeekday);
-  let interval = $derived(data.task?.interval);
-  let dueDate = $derived(data.task?.dueDate);
-  let dueUserId = $derived(data.task?.dueUserId);
+  let id = $derived(data.task?.id);
+  let name = $derived(data.task?.name ?? '');
+  let weekday = $derived(data.task?.dueWeekday ?? '');
+  let interval = $derived(data.task?.interval ?? '');
+  let dueDate = $derived(data.task?.dueDate ?? '');
+  let dueUserId = $derived(data.task?.dueUserId ?? '');
+
+  async function saveTask() {
+    const client = getApiClient();
+    return client.api.tasks.weekly.$post({
+      json: { id, name, dueDate, dueUserId, weekday: weekday as Weekday, interval }
+    });
+  }
 
   function translateWeekday(weekday: Weekday) {
     switch (weekday) {
-      case 'mon':
+      case Weekday.Monday:
         return m.schedule_weekday_mon();
-      case 'tue':
+      case Weekday.Tuesday:
         return m.schedule_weekday_tue();
-      case 'wed':
+      case Weekday.Wednesday:
         return m.schedule_weekday_wed();
-      case 'thu':
+      case Weekday.Thursday:
         return m.schedule_weekday_thu();
-      case 'fri':
+      case Weekday.Friday:
         return m.schedule_weekday_fri();
-      case 'sat':
+      case Weekday.Saturday:
         return m.schedule_weekday_sat();
-      case 'sun':
+      case Weekday.Sunday:
         return m.schedule_weekday_sun();
     }
   }
@@ -40,8 +50,8 @@
       { m.schedule_weekly_task_add() }
     {/if}
   </h2>
-  <EnhancedForm action="?/create">
-    <input type="hidden" name="id" value={data.task?.id}>
+  <ApiForm submitAction={saveTask} onSuccess={resolve('/tasks')}>
+    <input type="hidden" name="id" value={id}>
     <label>
       { m.generic_name() }
       <input type="text" name="name" bind:value={name} />
@@ -61,7 +71,7 @@
       { m.schedule_weekday() }
       <select name="weekday" bind:value={weekday}>
         <option value="" selected>{ m.generic_required() }</option>
-        {#each data.weekdays as weekdayOption (weekdayOption)}
+        {#each Object.values(Weekday) as weekdayOption (weekdayOption)}
           <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
         {/each}
       </select>
@@ -93,7 +103,7 @@
         </ul>
       {/await}
     {/if}
-  </EnhancedForm>
+  </ApiForm>
 </article>
 
 <style>
