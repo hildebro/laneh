@@ -66,7 +66,7 @@
   async function markAsDone() {
     const client = getApiClient();
     return client.api.tasks.done.$post({
-      json: { taskId: markAsDoneTaskId, userId: markAsDoneUserId },
+      json: { taskId: markAsDoneTaskId, userId: markAsDoneUserId }
     });
   }
 </script>
@@ -140,10 +140,17 @@
   {#each data.completedTasks as task (task.id)}
     <article>
       <div class="action-bar">
-        <a role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
-          <Pencil size={16} />
-          { m.generic_edit() }
-        </a>
+        {#if task.completions !== undefined}
+          <a class="icon-button" role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
+            <Pencil size={16} />
+            { m.generic_edit() }
+          </a>
+        {:else}
+          <a class="icon-button" role="button" href={resolve('/tasks/single/[task]', {task: task.id})}>
+            <Pencil size={16} />
+            { m.generic_edit() }
+          </a>
+        {/if}
       </div>
       <h3>{task.name}</h3>
       <hr />
