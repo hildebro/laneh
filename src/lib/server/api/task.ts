@@ -4,6 +4,7 @@ import * as m from '$lib/paraglide/messages.js';
 import {
   addSingleTask,
   addWeeklyTask,
+  countDueTasks,
   findAllSingleTasks,
   findAllWeeklyTasks,
   findSingleTask,
@@ -45,6 +46,9 @@ const tasksRouter = new Hono()
     const [due, completed] = groupTasks(weeklyTasks, singleTasks);
 
     return c.json({ dueTasks: due, completedTasks: completed });
+  })
+  .get('/dueTaskCount', async (c) => {
+    return c.json(await countDueTasks())
   })
   .post(
     '/done',

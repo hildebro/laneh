@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import shoppingRouter from '$lib/server/api/shopping';
 import tasksRouter from '$lib/server/api/task';
 import usersRouter from '$lib/server/api/user';
 
@@ -8,7 +9,9 @@ const app = new Hono().basePath('/api');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const routes = app
   .route('/tasks', tasksRouter)
-  .route('/users', usersRouter);
+  .route('/users', usersRouter)
+  .route('/shopping', shoppingRouter)
+;
 
 export type AppType = typeof routes;
 
