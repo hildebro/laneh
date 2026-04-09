@@ -462,7 +462,7 @@ export const fetchLastPurchaseDate = async () => {
   return (await db.select({ date: max(table.shoppingPurchase.date) })
       .from(table.shoppingPurchase)
       .execute()
-  ).at(0)?.date ?? null;
+  ).at(0)?.date?.toISOString() ?? null;
 };
 
 export const findAllPurchases = async () => {

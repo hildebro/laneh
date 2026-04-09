@@ -17,7 +17,7 @@
         year: 'numeric',
         month: 'short',
         day: 'numeric'
-      }).format(data.last_purchase_date)
+      }).format(new Date(data.last_purchase_date))
   );
 </script>
 
@@ -41,16 +41,16 @@
   <h2>{ m.header_schedule() }</h2>
   <p>{ m.dashboard_schedule_count({ count: data.due_task_count }) }</p>
   <footer>
-    <a role="button" href={resolve('/schedule')}>{ m.dashboard_schedule_go_to() }</a>
+    <a role="button" href={resolve('/tasks')}>{ m.dashboard_schedule_go_to() }</a>
   </footer>
 </article>
 
 <article>
   <h2>{ m.balance() }</h2>
-  {#if data.userDebts.length === 0}
+  {#if data.user_debts.length === 0}
     <p>{ m.balance_none() }</p>
   {:else }
-    {#each data.userDebts as userDebt (userDebt.creditor.id)}
+    {#each data.user_debts as userDebt (userDebt.creditor.id)}
       <div>
         <h4>{m.balance_owed({ user: userDebt.creditor.username })}</h4>
         <ul>
@@ -67,6 +67,6 @@
     {/each}
   {/if}
   <footer>
-    <a role="button" href={resolve('/schedule')}>{ m.dashboard_balance_go_to() }</a>
+    <a role="button" href={resolve('/balance')}>{ m.dashboard_balance_go_to() }</a>
   </footer>
 </article>
