@@ -68,7 +68,7 @@
     </div>
     <span>{entry.user.username}</span>
     <footer>
-      <span>{dateFormatter.format(entry.date)}</span>
+      <span>{dateFormatter.format(new Date(entry.date))}</span>
     </footer>
   </article>
 {/each}
