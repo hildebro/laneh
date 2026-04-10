@@ -1,13 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { resolve } from '$app/paths';
-import { countDueTasks, findAllUsers } from '$lib/server/db/functions';
+import { findAllUsers } from '$lib/server/db/functions';
 
 export const load: LayoutServerLoad = async (event) => {
   if (event.locals.user) {
     return {
       user: event.locals.user,
-      dueTaskCount: await countDueTasks(),
       returnUrl: event.cookies.get('returnUrl')
     };
   }

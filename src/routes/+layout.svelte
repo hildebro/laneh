@@ -46,7 +46,7 @@
 
 <div class="app-shell">
   <header>
-    <AppHeader dueTaskCount={data.dueTaskCount} />
+    <AppHeader dueTaskCount={data.due_task_count} />
   </header>
   <main>
     {@render children()}
