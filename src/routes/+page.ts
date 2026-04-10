@@ -8,7 +8,6 @@ export const load: PageLoad = async ({ fetch }) => {
   return {
     shopping_item_count: await handleCrudLoad(client.api.shopping.activeCount.$get()),
     last_purchase_date: await handleCrudLoad(client.api.shopping.lastPurchaseDate.$get()),
-    due_task_count: await handleCrudLoad(client.api.tasks.dueTaskCount.$get()),
     user_debts: await handleCrudLoad(client.api.users.debts.$get())
   };
 };

@@ -5,7 +5,8 @@ import { handleCrudLoad } from '$lib/utils/crudHelper';
 export const load: LayoutLoad = async ({ fetch }) => {
   const client = getApiClient(fetch);
 
-  return await handleCrudLoad(
-    client.api.users.$get()
-  );
+  return {
+    users: await handleCrudLoad(client.api.users.$get()),
+    due_task_count: await handleCrudLoad(client.api.tasks.dueTaskCount.$get()),
+  }
 };
