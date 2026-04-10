@@ -11,7 +11,7 @@ type BaseResponse = {
 	json(): Promise<unknown>;
 };
 
-export async function handleCrudLoad<T extends BaseResponse>(
+export async function handleApiLoad<T extends BaseResponse>(
 	apiPromise: Promise<T>
 ): Promise<Exclude<InferJson<T>, { error: unknown }>> {
 	const res = await apiPromise;
