@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import MoneyInput from '$lib/MoneyInput.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -28,10 +29,19 @@
     });
   };
 
-  let purchaseName = $derived(data.entry?.name || '');
-  let purchaseUserId = $derived(data.entry?.userId || data.user?.id);
+  let id = $derived(data.entry?.id || '');
+  let name = $derived(data.entry?.name || '');
+  let creditorId = $derived(data.entry?.userId || data.user?.id);
   let purchasePrice = $derived(data.entry?.price || '0');
   let distributions = $derived(getInitialDistributions());
+  let purchaseId = $derived(data.purchaseId || null);
+
+  async function saveEntry() {
+    const client = getApiClient();
+    return client.api.balance.$post({
+      json: { id, name, creditorId, price: purchasePrice, distributions, purchaseId }
+    });
+  }
 </script>
 
 {#if data.purchaseId}
@@ -47,17 +57,17 @@
 <article>
   <h2>{data.entry ? m.balance_expense_edit() : m.balance_expense_add()}</h2>
 
-  <EnhancedForm method="POST">
+  <ApiForm submitAction={saveEntry} onSuccess={resolve('/balance')}>
     <div>
       <input type="hidden" name="id" value={data.entry?.id}>
       <input type="hidden" name="purchaseId" value={data.purchaseId}>
       <label>
         { m.generic_name() }
-        <input type="text" name="name" bind:value={purchaseName} />
+        <input type="text" name="name" bind:value={name} />
       </label>
       <label>
         { m.balance_expense_user() }
-        <select name="creditorId" bind:value={purchaseUserId}>
+        <select name="creditorId" bind:value={creditorId}>
           {#each data.users as user (user.id)}
             <option value={user.id}>{user.username}</option>
           {/each}
@@ -81,7 +91,7 @@
         </div>
       </div>
     </div>
-  </EnhancedForm>
+  </ApiForm>
 </article>
 
 <style>
