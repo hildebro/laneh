@@ -3,9 +3,11 @@ import { getApiClient } from '$lib/apiClient';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 
 export const load: PageLoad = async ({ params, fetch }) => {
-	const client = getApiClient(fetch);
+  if (params.task === 'add') return { task: null };
 
-	return await handleApiLoad(
-		client.api.tasks.single[':task'].$get({ param: { task: params.task } })
-	);
+  const client = getApiClient(fetch);
+
+  return {
+    task: await handleApiLoad(client.api.tasks.single[':task'].$get({ param: { task: params.task } }))
+  };
 };
