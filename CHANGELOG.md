@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/hildebro/chorehub/compare/v1.12.0...v1.12.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* unable to refresh with pull ([941401c](https://github.com/hildebro/chorehub/commit/941401c4132041e3e7a0797146b29d1af86944d9))
+
 # [1.12.0](https://github.com/hildebro/chorehub/compare/v1.11.3...v1.12.0) (2026-04-04)
 
 
