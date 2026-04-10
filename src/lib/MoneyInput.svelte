@@ -3,15 +3,13 @@
 
   let { value = $bindable() } = $props();
 
-  let valueInCents = $state(value);
-
   const formatter = new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2
   });
 
-  let formattedValue = $derived(formatter.format(valueInCents / 100));
+  let formattedValue = $derived(formatter.format(value / 100));
 
   function handleKeyDown(e: KeyboardEvent) {
     const key = e.key;
@@ -24,36 +22,28 @@
     // Stop default typing
     e.preventDefault();
 
-    // Digits
     if (/^[0-9]$/.test(key)) {
-      if (valueInCents < 10000000000) { // Safety limit
-        valueInCents = (valueInCents * 10) + parseInt(key);
+      if (value < 1000000000) { // Safety limit
+        value = (value * 10) + parseInt(key);
       }
     }
 
     // Backspace
     if (key === 'Backspace') {
-      valueInCents = Math.floor(valueInCents / 10);
+      value = Math.floor(value / 10);
     }
   }
 </script>
 
 <div class="flex flex-col w-full mx-auto">
-  <label>
-    { m.balance_price() }
+  <label class="label">
+    <span class="label-text">{ m.balance_price() }</span>
     <input
       type="text"
       inputmode="numeric"
       value={formattedValue}
       onkeydown={handleKeyDown}
-      class="input"
       placeholder="0,00 €"
     />
   </label>
-
-  <input
-    type="hidden"
-    name="price"
-    value={valueInCents}
-  />
 </div>
