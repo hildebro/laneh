@@ -66,15 +66,13 @@ const tasksRouter = new Hono()
   )
   .get('/single/:task', async (c) => {
     const taskParam = c.req.param('task');
-    if (taskParam === 'add') return c.json({ task: null });
-
     const task = await findSingleTask(taskParam);
     if (!task) return c.json({ error: 'Task not found' }, 404);
 
-    return c.json({ task });
+    return c.json(task);
   })
   .post(
-    '/single/:task',
+    '/single',
     zValidator('json', singleTaskSchema),
     async (c) => {
       const task = c.req.valid('json');
@@ -92,12 +90,10 @@ const tasksRouter = new Hono()
   )
   .get('/weekly/:task', async (c) => {
     const taskParam = c.req.param('task');
-    if (taskParam === 'add') return c.json({ task: null });
-
     const task = await findWeeklyTask(taskParam);
     if (!task) return c.json({ error: 'Task not found' }, 404);
 
-    return c.json({ task });
+    return c.json(task);
   })
   .post(
     '/weekly',

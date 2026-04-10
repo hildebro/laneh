@@ -13,8 +13,7 @@
 
   async function saveTask() {
     const client = getApiClient();
-    return client.api.tasks.single[':task'].$post({
-      param: { task: id ?? 'add' },
+    return client.api.tasks.single.$post({
       json: { id, name, dueDate, dueUserId }
     });
   }
