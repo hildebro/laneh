@@ -8,6 +8,6 @@ export const load: PageLoad = async ({ fetch }) => {
   return {
     shopping_item_count: await handleApiLoad(client.api.shopping.activeCount.$get()),
     last_purchase_date: await handleApiLoad(client.api.shopping.lastPurchaseDate.$get()),
-    user_debts: await handleApiLoad(client.api.users.debts.$get())
+    user_debts: await handleApiLoad(client.api.balance.debts.$get())
   };
 };
