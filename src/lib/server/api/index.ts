@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import balanceRouter from '$lib/server/api/balance';
+import publicRouter from '$lib/server/api/public';
 import shoppingRouter from '$lib/server/api/shopping';
 import tasksRouter from '$lib/server/api/task';
 import usersRouter from '$lib/server/api/user';
@@ -13,6 +14,7 @@ const routes = app
   .route('/users', usersRouter)
   .route('/shopping', shoppingRouter)
   .route('/balance', balanceRouter)
+  .route('/public', publicRouter)
 ;
 
 export type AppType = typeof routes;

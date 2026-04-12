@@ -3,6 +3,7 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let username = $state('');
@@ -13,6 +14,8 @@
     return client.api.users.login.$post({ json: { username, password } });
   }
 </script>
+
+<ToastContainer />
 
 <svelte:head>
   <title>Chorehub</title>

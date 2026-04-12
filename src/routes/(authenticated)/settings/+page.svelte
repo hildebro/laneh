@@ -43,7 +43,7 @@
       <a role="button" href={resolve('/settings/users')}>
         {m.settings_users_distributions()}
       </a>
-      <a role="button" href={resolve('/auth/register')}>
+      <a role="button" href={resolve('/settings/register')}>
         {m.settings_users_add()}
       </a>
       <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
@@ -60,7 +60,7 @@
   <EnhancedForm action="?/updateUser">
     <label>
       {m.generic_name()}
-      <input type="text" name="username" value={data.user?.username} />
+      <input type="text" name="username" value={data.logged_in_user.username} />
     </label>
     <label>
       {m.settings_user_data_password()}
