@@ -3,7 +3,7 @@ import { sql } from 'drizzle-orm';
 import { Readable } from 'node:stream';
 import zlib from 'node:zlib';
 import tar from 'tar-stream';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from '../../../../../.svelte-kit/types/src/routes';
 import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import { setSessionCookie } from '$lib/server/auth';

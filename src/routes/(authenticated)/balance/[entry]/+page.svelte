@@ -31,7 +31,7 @@
 
   let id = $derived(data.entry?.id || '');
   let name = $derived(data.entry?.name || '');
-  let creditorId = $derived(data.entry?.userId || data.user?.id);
+  let creditorId = $derived(data.entry?.userId || data.logged_in_user?.id);
   let purchasePrice = $derived(data.entry?.price || '0');
   let distributions = $derived(getInitialDistributions());
   let purchaseId = $derived(data.purchaseId || null);
