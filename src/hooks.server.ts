@@ -1,33 +1,11 @@
-import { type Handle, redirect } from '@sveltejs/kit';
+import { type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
 import { transactionContext } from '$lib/context';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { needsRefresh, setSessionCookie } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { createSession, findSession, findUser } from '$lib/server/db/functions';
-
-/**
- * If a return url is provided via params, we save it as a cookie and then drop that param.
- */
-const handleReturnUrl: Handle = async ({ event, resolve }) => {
-  const returnUrl = event.url.searchParams.get('returnUrl');
-  if (!returnUrl) {
-    return resolve(event);
-  }
-
-  event.cookies.set('returnUrl', returnUrl, {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: !dev
-  });
-
-  const cleanUrl = new URL(event.url);
-  cleanUrl.searchParams.delete('returnUrl');
-  return redirect(302, cleanUrl.toString());
-};
 
 /**
  * Ensures every request has a db transaction.
@@ -89,4 +67,4 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     });
   });
 
-export const handle: Handle = sequence(handleReturnUrl, handleDatabase, handleUser, handleParaglide);
+export const handle: Handle = sequence(handleDatabase, handleUser, handleParaglide);

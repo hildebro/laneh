@@ -7,7 +7,6 @@ export const load: LayoutServerLoad = async (event) => {
   if (event.locals.user) {
     return {
       user: event.locals.user,
-      returnUrl: event.cookies.get('returnUrl')
     };
   }
 
@@ -16,7 +15,7 @@ export const load: LayoutServerLoad = async (event) => {
     if (event.route.id !== '/auth/register') {
       return redirect(302, resolve('/auth/register'));
     } else {
-      return { returnUrl: event.cookies.get('returnUrl') };
+      return {};
     }
   }
 
@@ -24,5 +23,5 @@ export const load: LayoutServerLoad = async (event) => {
     return redirect(302, resolve('/auth'));
   }
 
-  return { returnUrl: event.cookies.get('returnUrl') };
+  return {};
 };
