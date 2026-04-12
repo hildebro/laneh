@@ -107,12 +107,12 @@
   <article class={getDueCardPreset(task)}>
     <div class="action-bar">
       {#if task.completions !== undefined}
-        <a class="icon-button" role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
+        <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/weekly/[task]', {task: task.id})}>
           <Pencil size={16} />
           { m.generic_edit() }
         </a>
       {:else}
-        <a class="icon-button" role="button" href={resolve('/tasks/single/[task]', {task: task.id})}>
+        <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/single/[task]', {task: task.id})}>
           <Pencil size={16} />
           { m.generic_edit() }
         </a>
@@ -139,12 +139,12 @@
     <article>
       <div class="action-bar">
         {#if task.completions !== undefined}
-          <a class="icon-button" role="button" href={resolve('/tasks/weekly/[task]', {task: task.id})}>
+          <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/weekly/[task]', {task: task.id})}>
             <Pencil size={16} />
             { m.generic_edit() }
           </a>
         {:else}
-          <a class="icon-button" role="button" href={resolve('/tasks/single/[task]', {task: task.id})}>
+          <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/single/[task]', {task: task.id})}>
             <Pencil size={16} />
             { m.generic_edit() }
           </a>
