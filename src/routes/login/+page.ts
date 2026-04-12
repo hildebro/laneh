@@ -7,6 +7,11 @@ import { handleApiLoad } from '$lib/utils/apiHelper';
 export const load: PageLoad = async ({ fetch }) => {
 	const client = getApiClient(fetch);
 
+  const needsInitiation = await handleApiLoad(client.api.public.needsInitiation.$get());
+  if (needsInitiation) {
+    return redirect(302, resolve('/initiate'));
+  }
+
 	const loggedInUser =  await handleApiLoad(client.api.users.loggedInUser.$get());
   if (loggedInUser) {
     return redirect(302, resolve('/'));
