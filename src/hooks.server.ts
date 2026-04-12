@@ -1,11 +1,8 @@
 import { type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { SESSION_COOKIE } from '$lib';
 import { transactionContext } from '$lib/context';
 import { paraglideMiddleware } from '$lib/paraglide/server';
-import { needsRefresh, setSessionCookie } from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import { createSession, findSession, findUser } from '$lib/server/db/functions';
 
 /**
  * Ensures every request has a db transaction.
@@ -28,33 +25,6 @@ const handleDatabase: Handle = async ({ event, resolve }) => {
 };
 
 /**
- * Loads the user into locals based on session cookie.
- */
-const handleUser: Handle = async ({ event, resolve }) => {
-  const sessionToken = event.cookies.get(SESSION_COOKIE);
-  if (!sessionToken) {
-    event.locals.user = undefined;
-
-    return resolve(event);
-  }
-
-  const session = await findSession(sessionToken);
-  if (!session) {
-    event.locals.user = undefined;
-
-    return resolve(event);
-  }
-
-  event.locals.user = await findUser(session.userId);
-  if (needsRefresh(session.expiresAt)) {
-    const newSession = await createSession(session.userId);
-    setSessionCookie(event.cookies, newSession);
-  }
-
-  return resolve(event);
-};
-
-/**
  * Translates the app.
  */
 const handleParaglide: Handle = ({ event, resolve }) =>
@@ -67,4 +37,4 @@ const handleParaglide: Handle = ({ event, resolve }) =>
     });
   });
 
-export const handle: Handle = sequence(handleDatabase, handleUser, handleParaglide);
+export const handle: Handle = sequence(handleDatabase, handleParaglide);
