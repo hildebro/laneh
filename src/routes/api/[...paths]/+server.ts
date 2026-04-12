@@ -1,5 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import app from '$lib/server/api/index';
+import app from '$lib/server/api';
 
 const handleRequest: RequestHandler = ({ request }) => {
   const url = new URL(request.url);

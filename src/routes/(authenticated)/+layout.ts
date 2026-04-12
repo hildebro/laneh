@@ -4,16 +4,12 @@ import { resolve } from '$app/paths';
 import { getApiClient } from '$lib/apiClient';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 
-export const load: LayoutLoad = async ({ fetch, route }) => {
+export const load: LayoutLoad = async ({ fetch }) => {
   const client = getApiClient(fetch);
 
   const loggedInUser = await handleApiLoad(client.api.users.loggedInUser.$get());
   if (!loggedInUser) {
-    if (route.id !== '/auth') {
-      return redirect(302, resolve('/auth'));
-    } else {
-      return {};
-    }
+    return redirect(302, resolve('/login'));
   }
 
   return {

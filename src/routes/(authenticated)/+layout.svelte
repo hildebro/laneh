@@ -1,5 +1,5 @@
 <script lang="ts">
-  import '../app.css';
+  import '../../app.css';
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
   import { CloudAlert } from 'lucide-svelte';
