@@ -11,7 +11,7 @@
 
   async function submitAction() {
     const client = getApiClient();
-    return client.api.users.login.$post({ json: { username, password } });
+    return client.api.public.login.$post({ json: { username, password } });
   }
 </script>
 
