@@ -8,7 +8,12 @@ import {
   findBalanceEntry,
   updateBalanceEntry
 } from '$lib/server/db/functions';
+import type { BalanceEntry } from '$lib/server/db/schema';
 import { z } from '$lib/zod';
+
+export type ApiBalanceEntry = Omit<BalanceEntry, 'date'> & {
+  date: string;
+};
 
 const expenseSchema = z
   .object({
