@@ -58,9 +58,9 @@
         <CloudAlert size={20} class="icon" />
       {/if}
     </div>
-    {#if data.user}
+    {#if data.logged_in_user}
       <div>
-        { m.footer_user({ name: data.user.username }) }
+        { m.footer_user({ name: data.logged_in_user.username }) }
       </div>
     {/if}
   </footer>
