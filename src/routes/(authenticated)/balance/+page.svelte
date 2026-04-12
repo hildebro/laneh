@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
-  import type { BalanceEntry } from '$lib/server/db/schema';
+  import type { ApiBalanceEntry } from '$lib/server/api/balance';
 
   let { data } = $props();
 
@@ -19,7 +19,7 @@
     minimumFractionDigits: 2
   });
 
-  const getLabel = (balanceEntry: BalanceEntry) => {
+  const getLabel = (balanceEntry: ApiBalanceEntry) => {
     if (balanceEntry.name) {
       return balanceEntry.name;
     }
@@ -58,7 +58,7 @@
 {#each data.entries as entry (entry.id)}
   <article>
     <div class="action-bar">
-      <a role="button" href={resolve('/balance/[entry]', {entry: entry.id})}>
+      <a role="button" href={resolve('/(authenticated)/balance/[entry]', {entry: entry.id})}>
         {m.generic_edit()}
       </a>
     </div>
