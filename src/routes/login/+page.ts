@@ -12,7 +12,7 @@ export const load: PageLoad = async ({ fetch }) => {
     return redirect(302, resolve('/initiate'));
   }
 
-	const loggedInUser =  await handleApiLoad(client.api.users.loggedInUser.$get());
+	const loggedInUser =  await handleApiLoad(client.api.public.loggedInUser.$get());
   if (loggedInUser) {
     return redirect(302, resolve('/'));
   }

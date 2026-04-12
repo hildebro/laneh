@@ -7,7 +7,7 @@ import { handleApiLoad } from '$lib/utils/apiHelper';
 export const load: LayoutLoad = async ({ fetch }) => {
   const client = getApiClient(fetch);
 
-  const loggedInUser = await handleApiLoad(client.api.users.loggedInUser.$get());
+  const loggedInUser = await handleApiLoad(client.api.public.loggedInUser.$get());
   if (!loggedInUser) {
     return redirect(302, resolve('/login'));
   }
