@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { Capacitor } from '@capacitor/core';
   import { Moon, Sun } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { enhance } from '$app/forms';
   import { resolve } from '$app/paths';
   import EnhancedForm from '$lib/EnhancedForm.svelte';
   import { transLocale } from '$lib/locale-translations.js';
-  import { disconnectFromWrapper } from '$lib/mobile-shell';
   import * as m from '$lib/paraglide/messages.js';
   import { locales, setLocale } from '$lib/paraglide/runtime.js';
 
@@ -54,13 +52,6 @@
       <form action="?/logout" method="POST" use:enhance>
         <button type="submit">{m.auth_logout()}</button>
       </form>
-      {#if Capacitor.isNativePlatform()}
-        <div>
-          <button type="button" onclick={() => disconnectFromWrapper(data.returnUrl)}>
-            {m.settings_mobile_return_to_wrapper()}
-          </button>
-        </div>
-      {/if}
     </div>
   </article>
 </div>
