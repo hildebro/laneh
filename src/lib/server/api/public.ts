@@ -7,9 +7,9 @@ import zlib from 'node:zlib';
 import tar from 'tar-stream';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
+import { getTx } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
 import { getLoggedInUser } from '$lib/server/auth';
-import { db } from '$lib/server/db';
 import { addUser, createSession, findAllUsers, findAndVerifyUser } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
 
@@ -91,18 +91,16 @@ const publicRouter = new Hono()
       Readable.from(buffer).pipe(zlib.createGunzip()).pipe(extract);
     });
 
-    // Execute all queries in a single transaction
-    await db.transaction(async (tx) => {
-      // Temporarily disable foreign key constraints and triggers for the import
-      await tx.execute(sql`SET session_replication_role = replica;`);
+    const db = getTx();
+    // Temporarily disable foreign key constraints and triggers for the import
+    await db.execute(sql`SET session_replication_role = replica;`);
 
-      for (const query of queries) {
-        await tx.execute(sql.raw(query));
-      }
+    for (const query of queries) {
+      await db.execute(sql.raw(query));
+    }
 
-      // Re-enable constraints
-      await tx.execute(sql`SET session_replication_role = origin;`);
-    });
+    // Re-enable constraints
+    await db.execute(sql`SET session_replication_role = origin;`);
 
     return c.json({ success: true });
   })
