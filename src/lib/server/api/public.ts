@@ -51,7 +51,15 @@ const publicRouter = new Hono()
 
     const matchingUser = await findAndVerifyUser(user.username, user.password);
     if (!matchingUser) {
-      return c.json({ username: m.auth_login_invalid() });
+      const error = new z.ZodError([
+        {
+          code: 'custom',
+          path: ['username'],
+          message: m.auth_login_invalid()
+        }
+      ]);
+
+      return c.json({ success: false, error }, 400);
     }
 
     const session = await createSession(matchingUser.id);
