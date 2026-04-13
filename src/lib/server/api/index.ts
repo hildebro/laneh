@@ -1,12 +1,25 @@
 import { Hono } from 'hono';
+import { transactionContext } from '$lib/context';
 import balanceRouter from '$lib/server/api/balance';
 import publicRouter from '$lib/server/api/public';
 import shoppingRouter from '$lib/server/api/shopping';
 import tasksRouter from '$lib/server/api/task';
 import usersRouter from '$lib/server/api/user';
 import { getLoggedInUser } from '$lib/server/auth';
+import { db } from '$lib/server/db';
 
 const app = new Hono().basePath('/api');
+
+// Database Transaction
+app.use('*', async (c, next) => {
+  // Start the Drizzle transaction using the main db client
+  await db.transaction(async (tx) => {
+    // Run the downstream Hono routes within the ALS context
+    await transactionContext.run(tx, async () => {
+      await next();
+    });
+  });
+});
 
 // Authentication
 app.use('*', async (c, next) => {
