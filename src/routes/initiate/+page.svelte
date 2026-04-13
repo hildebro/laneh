@@ -4,7 +4,6 @@
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let username = $state('');
@@ -15,6 +14,16 @@
     return client.api.public.initiate.$post({ json: { username, password } });
   }
 
+  let files: FileList | undefined = $state();
+
+  async function importDatabase() {
+    const dumpFile = files && files.length > 0
+      ? files[0]
+      : new File([], '');
+
+    const client = getApiClient();
+    return client.api.public.importDatabase.$post({ form: { dumpFile } });
+  }
 </script>
 
 <ToastContainer />
@@ -42,10 +51,10 @@
       </ApiForm>
     </article>
     <article>
-      <EnhancedForm
-        action="?/import"
+      <ApiForm
+        submitAction={importDatabase}
+        onSuccess={resolve('/login')}
         submitButtonText={m.settings_actions_import()}
-        enctype="multipart/form-data"
       >
         <label class="label">
           <span>{m.settings_actions_import_file_label()}</span>
@@ -53,9 +62,10 @@
             type="file"
             name="dumpFile"
             accept="application/gzip, .tar.gz, .gz"
+            bind:files={files}
           />
         </label>
-      </EnhancedForm>
+      </ApiForm>
     </article>
   </main>
 </div>
