@@ -1,23 +1,16 @@
 import { zValidator } from '@hono/zod-validator';
 import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { getCookie, setCookie } from 'hono/cookie';
+import { setCookie } from 'hono/cookie';
 import { Readable } from 'node:stream';
 import zlib from 'node:zlib';
 import tar from 'tar-stream';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
 import * as m from '$lib/paraglide/messages.js';
-import { needsRefresh } from '$lib/server/auth';
+import { getLoggedInUser } from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import {
-  addUser,
-  createSession,
-  findAllUsers,
-  findAndVerifyUser,
-  findSession,
-  findUser
-} from '$lib/server/db/functions';
+import { addUser, createSession, findAllUsers, findAndVerifyUser } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
 
 const userSchema = z.object({
@@ -141,32 +134,9 @@ const publicRouter = new Hono()
     return c.json({ success: true });
   })
   .get('/loggedInUser', async (c) => {
-    const sessionToken = getCookie(c, SESSION_COOKIE);
-
-    if (!sessionToken) {
-      return c.json(null);
-    }
-
-    const session = await findSession(sessionToken);
-    if (!session) {
-      return c.json(null);
-    }
-
-    const user = await findUser(session.userId);
+    const user = await getLoggedInUser(c);
     if (!user) {
       return c.json(null);
-    }
-
-    if (needsRefresh(session.expiresAt)) {
-      const newSession = await createSession(session.userId);
-
-      setCookie(c, SESSION_COOKIE, newSession.id, {
-        path: '/',
-        httpOnly: true,
-        secure: !dev,
-        sameSite: 'Lax',
-        expires: newSession.expiresAt
-      });
     }
 
     return c.json({
