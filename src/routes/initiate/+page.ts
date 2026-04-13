@@ -7,9 +7,9 @@ import { handleApiLoad } from '$lib/utils/apiHelper';
 export const load: PageLoad = async ({ fetch }) => {
 	const client = getApiClient(fetch);
 
-	const users =  await handleApiLoad(client.api.users.$get());
+	const needsInitiation =  await handleApiLoad(client.api.public.needsInitiation.$get());
   // Navigate away, if initiation is already initiated.
-  if (users.length > 0) {
+  if (!needsInitiation) {
     return redirect(302, resolve('/'));
   }
 
