@@ -1,10 +1,15 @@
 import { zValidator } from '@hono/zod-validator';
+import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
+import { Readable } from 'node:stream';
+import zlib from 'node:zlib';
+import tar from 'tar-stream';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
 import * as m from '$lib/paraglide/messages.js';
 import { needsRefresh } from '$lib/server/auth';
+import { db } from '$lib/server/db';
 import {
   addUser,
   createSession,
@@ -18,6 +23,10 @@ import { z } from '$lib/zod';
 const userSchema = z.object({
   username: z.string().trim().nonempty(),
   password: z.string().nonempty()
+});
+
+const importSchema = z.object({
+  dumpFile: z.file().mime(['application/gzip']).nonoptional()
 });
 
 const publicRouter = new Hono()
@@ -42,6 +51,64 @@ const publicRouter = new Hono()
       secure: !dev,
       sameSite: 'Lax',
       expires: session.expiresAt
+    });
+
+    return c.json({ success: true });
+  })
+  .post('/importDatabase', zValidator('form', importSchema), async (c) => {
+    const users = await findAllUsers();
+    if (users.length > 0) {
+      return c.json({ success: false }, 405);
+    }
+
+    const importFile = c.req.valid('form');
+
+    // Convert the uploaded file to a Node Buffer
+    const arrayBuffer = await importFile.dumpFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const queries: string[] = [];
+
+    await new Promise<void>((resolve, reject) => {
+      const extract = tar.extract();
+
+      extract.on('entry', (header, stream, next) => {
+        // Only process .sql files
+        if (!header.name.endsWith('.sql')) {
+          stream.on('end', () => next());
+          stream.resume();
+
+          return;
+        }
+
+        let sqlContent = '';
+        stream.on('data', (chunk) => {
+          sqlContent += chunk;
+        });
+        stream.on('end', () => {
+          if (sqlContent.trim()) queries.push(sqlContent);
+          next();
+        });
+      });
+
+      extract.on('finish', () => resolve());
+      extract.on('error', (err) => reject(err));
+
+      // Pipe the buffer through gunzip and into the tar extractor
+      Readable.from(buffer).pipe(zlib.createGunzip()).pipe(extract);
+    });
+
+    // Execute all queries in a single transaction
+    await db.transaction(async (tx) => {
+      // Temporarily disable foreign key constraints and triggers for the import
+      await tx.execute(sql`SET session_replication_role = replica;`);
+
+      for (const query of queries) {
+        await tx.execute(sql.raw(query));
+      }
+
+      // Re-enable constraints
+      await tx.execute(sql`SET session_replication_role = origin;`);
     });
 
     return c.json({ success: true });
