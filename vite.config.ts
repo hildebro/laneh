@@ -15,7 +15,11 @@ const pkg = JSON.parse(json);
 export default defineConfig({
   plugins: [
     sveltekit(),
-    paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/lib/paraglide',
+      strategy: ['localStorage', 'preferredLanguage', 'baseLocale']
+    })
   ],
   server: {
     fs: {
