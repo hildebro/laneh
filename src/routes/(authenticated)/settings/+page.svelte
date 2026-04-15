@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Moon, Sun } from 'lucide-svelte';
   import { onMount } from 'svelte';
-  import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
@@ -25,6 +24,11 @@
   async function onSuccess() {
     password = undefined;
     await invalidateAll();
+  }
+
+  async function logout() {
+    const client = getApiClient();
+    return client.api.users.logout.$post();
   }
 
   let isDark = $state(false);
@@ -66,9 +70,9 @@
       <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
         {m.settings_actions_export()}
       </a>
-      <form action="?/logout" method="POST" use:enhance>
-        <button type="submit">{m.auth_logout()}</button>
-      </form>
+      <ApiForm submitAction={logout} submitButtonText={m.auth_logout()} onSuccess={resolve('/login')}>
+        <span></span>
+      </ApiForm>
     </div>
   </article>
 </div>

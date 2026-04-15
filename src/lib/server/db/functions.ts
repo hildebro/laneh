@@ -130,6 +130,12 @@ export const findSession = async (sessionToken: string): Promise<Session | undef
   return result.at(0);
 };
 
+export const deleteSession = async (sessionToken: string) => {
+  const db = getTx();
+
+  await db.delete(table.session).where(eq(table.session.id, sessionToken)).execute();
+}
+
 // ------- SHOPPING CATEGORY -------
 export const findShoppingCategory = async (categoryId: string) => {
   const db = getTx();
