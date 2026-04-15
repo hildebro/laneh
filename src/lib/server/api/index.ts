@@ -4,11 +4,12 @@ import balanceRouter from '$lib/server/api/balance';
 import publicRouter from '$lib/server/api/public';
 import shoppingRouter from '$lib/server/api/shopping';
 import tasksRouter from '$lib/server/api/task';
+import type { AppEnv } from '$lib/server/api/types';
 import usersRouter from '$lib/server/api/user';
 import { getLoggedInUser } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 
-const app = new Hono().basePath('/api');
+const app = new Hono<AppEnv>().basePath('/api');
 
 // Database Transaction
 app.use('*', async (c, next) => {
@@ -31,6 +32,8 @@ app.use('*', async (c, next) => {
   if (!user) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
+
+  c.set('loggedInUser', user);
 
   await next();
 });
