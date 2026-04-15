@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import type { AppEnv } from '$lib/server/api/types';
+import { logout } from '$lib/server/auth';
 import { findAllUsers, updateUser } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
 
@@ -19,6 +20,11 @@ const usersRouter = new Hono<AppEnv>()
     const user = c.get('loggedInUser');
 
     await updateUser(user.id, updateData.username, updateData.password);
+
+    return c.json({ success: true });
+  })
+  .post('/logout', async (c) => {
+    await logout(c);
 
     return c.json({ success: true });
   })

@@ -1,9 +1,8 @@
-import type { Cookies } from '@sveltejs/kit';
 import type { Context } from 'hono';
-import { getCookie, setCookie } from 'hono/cookie';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
-import { createSession, findSession, findUser } from '$lib/server/db/functions';
+import { createSession, deleteSession, findSession, findUser } from '$lib/server/db/functions';
 
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 const THREE_DAYS_IN_MS = 3 * ONE_DAY_IN_MS;
@@ -50,11 +49,18 @@ export function needsRefresh(expiresAt: Date): boolean {
   return timeRemaining < THREE_DAYS_IN_MS && timeRemaining > 0;
 }
 
-export function deleteSessionCookie(cookies: Cookies) {
-  cookies.delete(SESSION_COOKIE, {
+export async function logout(c: Context) {
+  const sessionToken = getCookie(c, SESSION_COOKIE);
+  if (!sessionToken) {
+    // Nothing to do, if no session exists.
+    return;
+  }
+
+  await deleteSession(sessionToken);
+  deleteCookie(c, SESSION_COOKIE, {
     path: '/',
     httpOnly: true,
-    sameSite: 'lax',
-    secure: !dev
+    secure: !dev,
+    sameSite: 'lax'
   });
 }
