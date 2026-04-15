@@ -1,16 +1,8 @@
 import { type Actions } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
 import * as m from '$lib/paraglide/messages';
-import { findAllUsers, updateDefaultDistribution } from '$lib/server/db/functions';
+import { updateDefaultDistribution } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
-
-export const load: PageServerLoad = async ({ locals }) => {
-  return {
-    users: findAllUsers(),
-    has_active_user: locals.user !== undefined
-  };
-};
 
 const distributionSchema = z
   .object({
