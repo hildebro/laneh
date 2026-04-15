@@ -2,13 +2,30 @@
   import { Moon, Sun } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { enhance } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import { transLocale } from '$lib/locale-translations.js';
   import * as m from '$lib/paraglide/messages.js';
   import { locales, setLocale } from '$lib/paraglide/runtime.js';
 
   let { data } = $props();
+
+  let username = $derived(data.logged_in_user.username);
+  let password = $state(undefined);
+
+  async function updateUser() {
+    const client = getApiClient();
+    return client.api.users.update.$post({
+      json: { username, password }
+    });
+  }
+
+  async function onSuccess() {
+    password = undefined;
+    await invalidateAll();
+  }
 
   let isDark = $state(false);
 
@@ -57,16 +74,16 @@
 </div>
 <article>
   <h2>{m.settings_user_data()}</h2>
-  <EnhancedForm action="?/updateUser">
+  <ApiForm submitAction={updateUser} {onSuccess}>
     <label>
       {m.generic_name()}
-      <input type="text" name="username" value={data.logged_in_user.username} />
+      <input type="text" name="username" bind:value={username} />
     </label>
     <label>
       {m.settings_user_data_password()}
-      <input type="password" name="password" id="password" />
+      <input type="password" name="password" id="password" bind:value={password} />
     </label>
-  </EnhancedForm>
+  </ApiForm>
 </article>
 <article>
   <h2>{m.settings_users_language()}</h2>
