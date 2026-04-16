@@ -6,7 +6,9 @@ import {
   deactivateShoppingItems,
   deleteShoppingItems,
   fetchLastPurchaseDate,
-  findAllShoppingCategories
+  findAllShoppingCategories,
+  moveCategoryOrderDown,
+  moveCategoryOrderUp
 } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
 
@@ -18,6 +20,10 @@ const setCategorySchema = z.object({
 const itemActionSchema = z.object({
   itemIds: z.array(z.string()).nonempty()
 });
+
+const categoryActionSchema = z.object({
+  categoryId: z.string().nonempty(),
+})
 
 const shoppingRouter = new Hono()
   .get('/activeCount', async (c) => {
@@ -47,6 +53,20 @@ const shoppingRouter = new Hono()
     const action = c.req.valid('json');
 
     await deleteShoppingItems(action.itemIds);
+
+    return c.json({ success: true});
+  })
+  .post('/moveCategoryUp', zValidator('json', categoryActionSchema), async (c) => {
+    const action = c.req.valid('json');
+
+    await moveCategoryOrderUp(action.categoryId);
+
+    return c.json({ success: true});
+  })
+  .post('/moveCategoryDown', zValidator('json', categoryActionSchema), async (c) => {
+    const action = c.req.valid('json');
+
+    await moveCategoryOrderDown(action.categoryId);
 
     return c.json({ success: true});
   })
