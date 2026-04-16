@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
@@ -13,14 +14,6 @@
     }))
   );
 
-  // 2. Sync the state when data updates (e.g., after invalidateAll runs)
-  $effect(() => {
-    distributionPayload = data.users.map((user) => ({
-      userId: user.id,
-      percent: user.defaultDistribution
-    }));
-  });
-
   async function submitAction() {
     const client = getApiClient();
 
@@ -31,7 +24,11 @@
   }
 
   async function onSuccess() {
+    // Since the underlying data used for the form comes from a layout.ts further up, we need to
+    // invalidateAll here before redirecting. Otherwise, when the user navigates to this page again,
+    // they would still see the old data.
     await invalidateAll();
+    await goto(resolve('/settings'))
   }
 </script>
 
