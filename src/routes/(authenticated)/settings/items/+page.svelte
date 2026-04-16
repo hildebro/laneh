@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { Trash, Undo2 } from 'lucide-svelte';
+  import { Undo2 } from 'lucide-svelte';
   import { invalidateAll } from '$app/navigation';
   import { getApiClient } from '$lib/apiClient';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
   import ApiForm from '$lib/components/ApiForm.svelte';
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let showInactiveItems = $state(false);
@@ -20,12 +19,22 @@
 
   async function deactivateItems() {
     const client = getApiClient();
-    return client.api.shopping.deactivate.$post({ json: {itemIds} });
+    return client.api.shopping.deactivateItems.$post({ json: { itemIds } });
+  }
+
+  async function deleteItems() {
+    const client = getApiClient();
+    return client.api.shopping.deleteItems.$post({ json: { itemIds } });
   }
 
   async function onSuccess() {
     itemIds = [];
     await invalidateAll();
+  }
+
+  async function onDeleteSuccess() {
+    await onSuccess();
+    deleteDialog.close();
   }
 
   let deleteDialog: HTMLDialogElement;
@@ -70,12 +79,11 @@
 </article>
 
 <dialog bind:this={deleteDialog}>
-  <EnhancedForm
-    action="?/deleteItems"
-    preUpdatedCallback={() => deleteDialog.close()}
-    hideSubmitButton
+  <ApiForm
+    submitAction={deleteItems}
+    onSuccess={onDeleteSuccess}
+    submitButtonText={m.generic_confirm()}
   >
-    <input type="hidden" name="itemIds" value={itemIds}>
     <h2>{m.settings_items_delete()}</h2>
     <p>{ m.settings_items_delete_info() }</p>
     {#snippet additionalButtons()}
@@ -86,12 +94,8 @@
         <Undo2 />
         { m.generic_cancel() }
       </button>
-      <button type="submit">
-        <Trash />
-        { m.generic_confirm() }
-      </button>
     {/snippet}
-  </EnhancedForm>
+  </ApiForm>
 </dialog>
 
 <style>
