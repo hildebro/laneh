@@ -24,9 +24,7 @@
   }
 
   async function onSuccess() {
-    // Since the underlying data used for the form comes from a layout.ts further up, we need to
-    // invalidateAll here before redirecting. Otherwise, when the user navigates to this page again,
-    // they would still see the old data.
+    // Updating user data requires `invalidateAll` to bubble the change up to layout files.
     await invalidateAll();
     await goto(resolve('/settings'))
   }
