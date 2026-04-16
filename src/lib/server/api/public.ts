@@ -15,7 +15,7 @@ import { z } from '$lib/zod';
 
 const userSchema = z.object({
   username: z.string().trim().nonempty(),
-  password: z.string().nonempty()
+  password: z.string().min(6).max(64)
 });
 
 const importSchema = z.object({
