@@ -12,12 +12,14 @@
     onSuccess = undefined,
     additionalButtons = undefined,
     submitButtonText = m.generic_save(),
+    submitButtonClasses = '',
     children
   }: {
     submitAction: () => Promise<Response>;
     onSuccess?: ResolvedPathname | (() => void) | undefined;
     additionalButtons?: Snippet,
     submitButtonText?: string;
+    submitButtonClasses?: string,
     children: Snippet;
   } = $props();
 
@@ -74,7 +76,7 @@
   {#if additionalButtons}
     {@render additionalButtons()}
   {/if}
-  <button type="submit" disabled={isSubmitting}>
+  <button class={submitButtonClasses} type="submit" disabled={isSubmitting}>
     {isSubmitting ? m.generic_loading() : submitButtonText}
   </button>
 </form>

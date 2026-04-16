@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import {
   assignCategoryToShoppingItems,
   countActiveShoppingItems,
+  deactivateShoppingItems,
   fetchLastPurchaseDate,
   findAllShoppingCategories
 } from '$lib/server/db/functions';
@@ -11,6 +12,10 @@ import { z } from '$lib/zod';
 const setCategorySchema = z.object({
   categoryId: z.string().nonempty(),
   itemIds: z.array(z.string()).nonempty(),
+});
+
+const itemActionSchema = z.object({
+  itemIds: z.array(z.string()).nonempty()
 });
 
 const shoppingRouter = new Hono()
@@ -29,6 +34,13 @@ const shoppingRouter = new Hono()
     await assignCategoryToShoppingItems(setCategory.itemIds, setCategory.categoryId);
 
     return c.json({ success: true });
+  })
+  .post('/deactivate', zValidator('json', itemActionSchema), async (c) => {
+    const action = c.req.valid('json');
+
+    await deactivateShoppingItems(action.itemIds);
+
+    return c.json({ success: true});
   })
 ;
 
