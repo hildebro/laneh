@@ -1,4 +1,4 @@
-import { deactivateShoppingItems, deleteShoppingItems } from '$lib/server/db/functions';
+import { deleteShoppingItems } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
 
@@ -13,11 +13,6 @@ const itemUpdateSchema = z.object({
 });
 
 export const actions = {
-  deactivateItems: async (event) => {
-    return processForm(event, itemUpdateSchema, async (itemUpdate) => {
-      await deactivateShoppingItems(itemUpdate.itemIds);
-    });
-  },
   deleteItems: async (event) => {
     return processForm(event, itemUpdateSchema, async (itemUpdate) => {
       await deleteShoppingItems(itemUpdate.itemIds);

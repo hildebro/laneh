@@ -18,6 +18,11 @@
     return client.api.shopping.setItemCategory.$post({ json: { categoryId, itemIds } });
   }
 
+  async function deactivateItems() {
+    const client = getApiClient();
+    return client.api.shopping.deactivate.$post({ json: {itemIds} });
+  }
+
   async function onSuccess() {
     itemIds = [];
     await invalidateAll();
@@ -50,15 +55,14 @@
   <hr />
   <h2>{ m.settings_items_other_actions() }</h2>
   <div class="action-row">
-    <EnhancedForm
-      action="?/deactivateItems"
+    <ApiForm
+      submitAction={deactivateItems}
       submitButtonClasses="warning"
-      submitButtonsLayout="none"
       submitButtonText={m.settings_items_deactivate()}
-      preUpdatedCallback={() => itemIds = []}
+      {onSuccess}
     >
       <input type="hidden" name="itemIds" value={itemIds}>
-    </EnhancedForm>
+    </ApiForm>
     <button class="error" onclick={() => deleteDialog.showModal()}>
       { m.settings_items_delete() }
     </button>
