@@ -4,6 +4,7 @@ import {
   assignCategoryToShoppingItems,
   countActiveShoppingItems,
   deactivateShoppingItems,
+  deleteShoppingItems,
   fetchLastPurchaseDate,
   findAllShoppingCategories
 } from '$lib/server/db/functions';
@@ -35,10 +36,17 @@ const shoppingRouter = new Hono()
 
     return c.json({ success: true });
   })
-  .post('/deactivate', zValidator('json', itemActionSchema), async (c) => {
+  .post('/deactivateItems', zValidator('json', itemActionSchema), async (c) => {
     const action = c.req.valid('json');
 
     await deactivateShoppingItems(action.itemIds);
+
+    return c.json({ success: true});
+  })
+  .post('/deleteItems', zValidator('json', itemActionSchema), async (c) => {
+    const action = c.req.valid('json');
+
+    await deleteShoppingItems(action.itemIds);
 
     return c.json({ success: true});
   })
