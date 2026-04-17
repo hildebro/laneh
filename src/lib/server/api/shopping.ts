@@ -9,6 +9,7 @@ import {
   deleteCategory,
   deleteShoppingItems,
   fetchLastPurchaseDate,
+  findActiveItemsByCategory,
   findAllShoppingCategories,
   findShoppingCategory,
   moveCategoryOrderDown,
@@ -41,6 +42,11 @@ const shoppingRouter = new Hono()
   })
   .get('/lastPurchaseDate', async (c) => {
     return c.json(await fetchLastPurchaseDate());
+  })
+  .get('/hasNoCategories', async (c) => {
+    const categories = await findAllShoppingCategories();
+
+    return c.json(categories.length === 0);
   })
   .post('/category', zValidator('json', categorySchema), async (c) => {
     const category = c.req.valid('json');
@@ -87,6 +93,9 @@ const shoppingRouter = new Hono()
   })
   .get('/categoriesWithItems', async (c) => {
     return c.json(await findAllShoppingCategories());
+  })
+  .get('/categoriesWithActiveItems', async (c) => {
+    return c.json(await findActiveItemsByCategory());
   })
   .post('/setItemCategory', zValidator('json', setCategorySchema), async (c) => {
     const setCategory = c.req.valid('json');
