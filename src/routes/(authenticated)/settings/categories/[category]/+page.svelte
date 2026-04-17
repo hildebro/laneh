@@ -1,10 +1,28 @@
 <script lang="ts">
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
+  import { resolve } from '$app/paths';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
-  let categoryName = $derived(data.category?.name || '');
+  let id = $derived(data.category?.id);
+  let name = $derived(data.category?.name || '');
+
+  async function saveCategory() {
+    const client = getApiClient();
+    return client.api.shopping.category.$post({
+      json: { id: id ?? null, name }
+    });
+  }
+
+  async function deleteCategory() {
+    const client = getApiClient();
+    return client.api.shopping.category[':id'].$delete({
+      param: { id: id as string }
+    });
+  }
+
 </script>
 
 <article>
@@ -15,21 +33,23 @@
       { m.settings_categories_add() }
     {/if}
   </h2>
-  <EnhancedForm method="POST" action="?/create">
-    <input type="hidden" name="id" value={data.category?.id}>
-    <label>
-      { m.generic_name() }
-      <input type="text" name="name" bind:value={categoryName} />
-    </label>
-  </EnhancedForm>
+  <div class="action-row">
+    <ApiForm submitAction={saveCategory} onSuccess={resolve('/settings/categories')}>
+      <label>
+        { m.generic_name() }
+        <input type="text" name="name" bind:value={name} />
+      </label>
+    </ApiForm>
 
-  {#if data.category}
-    <EnhancedForm
-      action="?/delete"
-      submitButtonText={m.settings_categories_delete()}
-      submitButtonClasses="error"
-    >
-      <input type="hidden" name="categoryId" value={data.category?.id}>
-    </EnhancedForm>
-  {/if}
+    {#if data.category}
+      <ApiForm
+        submitAction={deleteCategory}
+        submitButtonText={m.settings_categories_delete()}
+        submitButtonClasses="error"
+        onSuccess={resolve('/settings/categories')}
+      >
+        <input type="hidden" name="categoryId" value={data.category?.id}>
+      </ApiForm>
+    {/if}
+  </div>
 </article>
