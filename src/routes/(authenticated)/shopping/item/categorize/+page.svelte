@@ -1,11 +1,30 @@
 <script lang="ts">
   import CancelAction from '../cancel/CancelAction.svelte';
+  import { goto, invalidateAll } from '$app/navigation';
+  import { resolve } from '$app/paths';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
 
-  let { data, form } = $props();
+  let { data } = $props();
 
-  let isSubmitting = $state(false);
+  let itemIds = $state([]);
+
+  async function submitAction(categoryId: string) {
+    const client = getApiClient();
+    return client.api.shopping.categorizeItems.$post({
+      json: { itemIds, categoryId }
+    });
+  }
+
+  async function onSuccess(response: Response) {
+    const json = await response.json();
+    if (json?.finished) {
+      await goto(resolve('/shopping'));
+    }
+
+    await invalidateAll();
+  }
 </script>
 
 <svelte:head>
@@ -18,29 +37,30 @@
 <article>
   <h2>{ m.shopping_categorize() }</h2>
 
-  <EnhancedForm method="POST" hideSubmitButton>
-    { m.shopping_categorize_select_items() }
-    <div class="select-container">
-      {#each data.items.filter(item => item.status === 'unmatched' && item.selectedCategoryId === null) as item (item.id)}
-        <label>
-          <input type="checkbox" name="itemIds" value={item.id} />
-          {item.name}
-        </label>
-      {/each}
-    </div>
+  { m.shopping_categorize_select_items() }
+  <div class="select-container">
+    {#each data.items.filter(item => item.status === 'unmatched' && item.selectedCategoryId === null) as item (item.id)}
+      <label>
+        <input type="checkbox" name="itemIds" value={item.id} bind:group={itemIds} />
+        {item.name}
+      </label>
+    {/each}
+  </div>
 
-    { m.shopping_categorize_select_category() }
-    <div class="select-container">
-      {#each data.selectableCategories as category (category.id)}
-        <button type="submit" name="categoryId" value={category.id} disabled={isSubmitting}>
-          {category.name}
-        </button>
-      {/each}
-    </div>
-  </EnhancedForm>
+  { m.shopping_categorize_select_category() }
+  <div class="select-container">
+    {#each data.selectableCategories as category (category.id)}
+      <ApiForm
+        submitAction={() => submitAction(category.id)}
+        submitButtonText={category.name}
+        {onSuccess}
+      >
+        <span></span>
+      </ApiForm>
+    {/each}
+  </div>
 </article>
 
-<!--    mt-2 mb-4 flex gap-6 flex-wrap text-lg justify-center -->
 <style>
     .select-container {
         margin-top: 1rem;

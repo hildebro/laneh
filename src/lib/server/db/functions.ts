@@ -1,6 +1,23 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { randomBytes } from 'crypto';
-import { and, asc, count, desc, eq, gt, gte, inArray, isNotNull, lt, max, min, or, SQL, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  max,
+  min,
+  or,
+  SQL,
+  sql
+} from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import { getTx } from '$lib/context';
@@ -747,14 +764,41 @@ export const addNewStagedItem = async (listId: string, name: string, amount: str
   });
 };
 
-export const assignCategoryToStagedItems = async (itemIds: string[], categoryId: string) => {
+export const assignCategoryToStagedItems = async (userId: string, itemIds: string[], categoryId: string) => {
   const db = getTx();
 
   await db.update(table.stagedShoppingItem)
     .set({
       selectedCategoryId: categoryId
     })
-    .where(inArray(table.stagedShoppingItem.id, itemIds)).execute();
+    .from(table.stagedShoppingList)
+    .where(
+      and(
+        eq(table.stagedShoppingItem.listId, table.stagedShoppingList.id),
+        eq(table.stagedShoppingList.userId, userId),
+        inArray(table.stagedShoppingItem.id, itemIds)
+      )
+    ).execute();
+};
+
+export const categorizationFinished = async (userId: string) => {
+  const db = getTx();
+
+  const result = await db
+    .select({ uncategorizedItemCount: count(table.stagedShoppingItem.id) })
+    .from(table.stagedShoppingItem)
+    .innerJoin(table.stagedShoppingList, eq(table.stagedShoppingItem.listId, table.stagedShoppingList.id))
+    .where(
+      and(
+        eq(table.stagedShoppingItem.status, 'unmatched'),
+        isNull(table.stagedShoppingItem.selectedCategoryId),
+        eq(table.stagedShoppingList.userId, userId)
+      )
+    ).execute();
+
+  const uncategorizedItemCount = result.at(0)?.uncategorizedItemCount ?? 0;
+
+  return uncategorizedItemCount === 0;
 };
 
 export const commitStagedItems = async (userId: string) => {
