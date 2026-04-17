@@ -1,5 +1,4 @@
 import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
 import { resolve } from '$app/paths';
 import * as m from '$lib/paraglide/messages.js';
 import {
@@ -7,24 +6,10 @@ import {
   addPerfectStagedItem,
   addStagedShoppingList,
   commitStagedItems,
-  findAllShoppingItems,
-  findShoppingItem,
-  findStagedShoppingList,
-  getItemAddSuggestions
+  findShoppingItem
 } from '$lib/server/db/functions';
 import { processForm } from '$lib/server/formHandler';
 import { z } from '$lib/zod';
-
-export const load: PageServerLoad = async ({ locals }) => {
-  const userId = locals.user?.id as string;
-
-  const existingList = await findStagedShoppingList(userId);
-  if (existingList) {
-    return redirect(302, resolve('/shopping/item/categorize'));
-  }
-
-  return { allItems: await findAllShoppingItems(), suggestions: getItemAddSuggestions() };
-};
 
 const addingItemsSchema = z
   .object({
