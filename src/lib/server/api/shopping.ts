@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import * as m from '$lib/paraglide/messages.js';
+import type { AppEnv } from '$lib/server/api/types';
 import {
   addShoppingCategory,
   assignCategoryToShoppingItems,
@@ -11,7 +12,10 @@ import {
   fetchLastPurchaseDate,
   findActiveItemsByCategory,
   findAllShoppingCategories,
+  findAllShoppingItems,
   findShoppingCategory,
+  findStagedShoppingList,
+  getItemAddSuggestions,
   moveCategoryOrderDown,
   moveCategoryOrderUp,
   updateShoppingCategory
@@ -36,7 +40,7 @@ const categorySchema = z.object({
   name: z.string().nonempty(),
 })
 
-const shoppingRouter = new Hono()
+const shoppingRouter = new Hono<AppEnv>()
   .get('/activeCount', async (c) => {
     return c.json(await countActiveShoppingItems());
   })
@@ -96,6 +100,17 @@ const shoppingRouter = new Hono()
   })
   .get('/categoriesWithActiveItems', async (c) => {
     return c.json(await findActiveItemsByCategory());
+  })
+  .get('/items', async (c) => {
+    return c.json(await findAllShoppingItems());
+  })
+  .get('/itemSuggestions', async (c) => {
+    return c.json(await getItemAddSuggestions());
+  })
+  .get('/stagedItems', async (c) => {
+    const user = c.get('loggedInUser');
+
+    return c.json(await findStagedShoppingList(user.id) ?? null);
   })
   .post('/setItemCategory', zValidator('json', setCategorySchema), async (c) => {
     const setCategory = c.req.valid('json');
