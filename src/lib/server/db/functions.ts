@@ -134,7 +134,7 @@ export const deleteSession = async (sessionToken: string) => {
   const db = getTx();
 
   await db.delete(table.session).where(eq(table.session.id, sessionToken)).execute();
-}
+};
 
 // ------- SHOPPING CATEGORY -------
 export const findShoppingCategory = async (categoryId: string) => {
@@ -695,17 +695,27 @@ export const findStagedShoppingList = async (userId: string) => {
   }).execute();
 };
 
-export const addStagedShoppingList = async (userId: string): Promise<string> => {
+export const addStagedShoppingList = async (userId: string, items: {
+  amount: string,
+  name: string
+}[]) => {
   const db = getTx();
 
-  const id = generateUUID();
+  const listId = generateUUID();
   await db.insert(table.stagedShoppingList).values({
-    id: id,
+    id: listId,
     userId: userId,
     status: 'validating'
   });
 
-  return id;
+  for (const item of items) {
+    const matchedItem = await findShoppingItem(item.name);
+    if (matchedItem) {
+      await addPerfectStagedItem(listId, matchedItem, item.amount);
+    } else {
+      await addNewStagedItem(listId, item.name, item.amount);
+    }
+  }
 };
 
 export const addPerfectStagedItem = async (listId: string, matchedItem: ShoppingItem, amount: string | undefined): Promise<void> => {

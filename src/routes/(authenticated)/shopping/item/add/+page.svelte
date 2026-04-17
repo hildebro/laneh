@@ -2,8 +2,9 @@
   import levenshteinPkg from 'fast-levenshtein';
   import { CircleAlert, CirclePlus, CircleQuestionMark, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
-  import EnhancedForm from '$lib/EnhancedForm.svelte';
-  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+  import { resolve } from '$app/paths';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
   // The actual function is usually on the '.get' property for this library
@@ -110,6 +111,11 @@
   }
 
   function applyCorrections(e: MouseEvent) {
+    if (!correctionRequired) {
+      // With this return, the corrections will be skipped and the normal submit action will come next.
+      return;
+    }
+
     let anyItemCorrected = false;
     for (const index in items) {
       anyItemCorrected = handleCorrection(parseInt(index)) || anyItemCorrected;
@@ -132,6 +138,13 @@
       // forced to keep it here.
       correctionRequired = false;
     }
+  }
+
+  async function submitAction() {
+    const client = getApiClient();
+    return client.api.shopping.items.$post({
+      json: items
+    });
   }
 
   /**
@@ -237,7 +250,7 @@
       {m.generic_help()}
     </button>
   </div>
-  <EnhancedForm hideSubmitButton={correctionRequired}>
+  <ApiForm {submitAction} submitButtonHidden onSuccess={resolve('/shopping/item/categorize')}>
     <table class="items-table">
       <thead>
       <tr>
@@ -300,28 +313,22 @@
       </tbody>
     </table>
 
-    {#await data.suggestions}
-      <LoadingSpinner />
-    {:then suggestions}
-      {#if suggestions.length > 0}
-        {m.shopping_add_items_suggestions()}
-        <div class="suggestion-box">
-          {#each suggestions as suggestion(suggestion.name)}
-            {#if suggestionNotPresent(suggestion.name)}
-              <button class="tertiary" type="button" onclick={() => addSuggestion(suggestion.name)}>
-                {suggestion.name}
-              </button>
-            {/if}
-          {/each}
-        </div>
-      {/if}
-    {/await}
+    {#if data.suggestions.length > 0}
+      {m.shopping_add_items_suggestions()}
+      <div class="suggestion-box">
+        {#each data.suggestions as suggestion(suggestion.name)}
+          {#if suggestionNotPresent(suggestion.name)}
+            <button class="tertiary" type="button" onclick={() => addSuggestion(suggestion.name)}>
+              {suggestion.name}
+            </button>
+          {/if}
+        {/each}
+      </div>
+    {/if}
     {#snippet additionalButtons()}
-      {#if correctionRequired}
-        <button type="submit" onclick={applyCorrections}>{ m.generic_save() }</button>
-      {/if}
+      <button type="submit" onclick={applyCorrections}>{ m.generic_save() }</button>
     {/snippet}
-  </EnhancedForm>
+  </ApiForm>
 </article>
 
 <style>
