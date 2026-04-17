@@ -6,6 +6,8 @@ import {
   addShoppingCategory,
   addStagedShoppingList,
   assignCategoryToShoppingItems,
+  assignCategoryToStagedItems,
+  categorizationFinished,
   commitStagedItems,
   countActiveShoppingItems,
   deactivateShoppingItems,
@@ -59,6 +61,11 @@ const itemsSchema = z.array(z.object({
       path: ['names']
     }
   );
+
+const categorizeItemSchema = z.object({
+  itemIds: z.array(z.string().nonoptional()).nonempty(m.shopping_categorize_select_items_invalid()),
+  categoryId: z.string().nonoptional()
+});
 
 const shoppingRouter = new Hono<AppEnv>()
   .get('/activeCount', async (c) => {
@@ -135,6 +142,20 @@ const shoppingRouter = new Hono<AppEnv>()
     }
 
     return c.json({ success: true });
+  })
+  .post('/categorizeItems', zValidator('json', categorizeItemSchema), async (c) => {
+    const data = c.req.valid('json');
+
+    const loggedInUser = c.get('loggedInUser');
+
+    await assignCategoryToStagedItems(loggedInUser.id, data.itemIds, data.categoryId);
+
+    const finished = await categorizationFinished(loggedInUser.id);
+    if (finished) {
+      await commitStagedItems(loggedInUser.id)
+    }
+
+    return c.json({ success: true, finished });
   })
   .get('/itemSuggestions', async (c) => {
     return c.json(await getItemAddSuggestions());
