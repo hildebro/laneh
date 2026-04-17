@@ -708,14 +708,18 @@ export const addStagedShoppingList = async (userId: string, items: {
     status: 'validating'
   });
 
+  let needsCategorization = false;
   for (const item of items) {
     const matchedItem = await findShoppingItem(item.name);
     if (matchedItem) {
       await addPerfectStagedItem(listId, matchedItem, item.amount);
     } else {
       await addNewStagedItem(listId, item.name, item.amount);
+      needsCategorization = true;
     }
   }
+
+  return needsCategorization;
 };
 
 export const addPerfectStagedItem = async (listId: string, matchedItem: ShoppingItem, amount: string | undefined): Promise<void> => {

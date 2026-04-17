@@ -2,11 +2,13 @@
   import levenshteinPkg from 'fast-levenshtein';
   import { CircleAlert, CirclePlus, CircleQuestionMark, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
+  import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
+  import { handleApiLoad } from '$lib/utils/apiHelper';
   // The actual function is usually on the '.get' property for this library
   const levenshtein = levenshteinPkg.get;
 
@@ -147,6 +149,16 @@
     });
   }
 
+  async function onSuccess() {
+    const client = getApiClient();
+    const stagedList = await handleApiLoad(client.api.shopping.stagedItems.$get());
+    if (!stagedList) {
+      await goto(resolve('/shopping'));
+    } else {
+      await goto(resolve('/shopping/item/categorize'));
+    }
+  }
+
   /**
    * Returns true, if the item has been corrected.
    */
@@ -250,7 +262,7 @@
       {m.generic_help()}
     </button>
   </div>
-  <ApiForm {submitAction} submitButtonHidden onSuccess={resolve('/shopping/item/categorize')}>
+  <ApiForm {submitAction} submitButtonHidden {onSuccess}>
     <table class="items-table">
       <thead>
       <tr>

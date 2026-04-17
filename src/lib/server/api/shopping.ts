@@ -6,6 +6,7 @@ import {
   addShoppingCategory,
   addStagedShoppingList,
   assignCategoryToShoppingItems,
+  commitStagedItems,
   countActiveShoppingItems,
   deactivateShoppingItems,
   deleteCategory,
@@ -128,7 +129,10 @@ const shoppingRouter = new Hono<AppEnv>()
 
     const loggedInUser = c.get('loggedInUser');
 
-    await addStagedShoppingList(loggedInUser.id, items);
+    const needsCategorization = await addStagedShoppingList(loggedInUser.id, items);
+    if (!needsCategorization) {
+      await commitStagedItems(loggedInUser.id);
+    }
 
     return c.json({ success: true });
   })
