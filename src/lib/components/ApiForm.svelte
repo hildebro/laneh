@@ -13,6 +13,7 @@
     additionalButtons = undefined,
     submitButtonText = m.generic_save(),
     submitButtonClasses = '',
+    submitButtonHidden = false,
     children
   }: {
     submitAction: () => Promise<Response>;
@@ -20,6 +21,7 @@
     additionalButtons?: Snippet,
     submitButtonText?: string;
     submitButtonClasses?: string,
+    submitButtonHidden?: boolean,
     children: Snippet;
   } = $props();
 
@@ -76,7 +78,9 @@
   {#if additionalButtons}
     {@render additionalButtons()}
   {/if}
-  <button class={submitButtonClasses} type="submit" disabled={isSubmitting}>
-    {isSubmitting ? m.generic_loading() : submitButtonText}
-  </button>
+  {#if !submitButtonHidden}
+    <button class={submitButtonClasses} type="submit" disabled={isSubmitting}>
+      {isSubmitting ? m.generic_loading() : submitButtonText}
+    </button>
+  {/if}
 </form>

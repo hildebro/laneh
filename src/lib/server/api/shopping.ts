@@ -4,6 +4,7 @@ import * as m from '$lib/paraglide/messages.js';
 import type { AppEnv } from '$lib/server/api/types';
 import {
   addShoppingCategory,
+  addStagedShoppingList,
   assignCategoryToShoppingItems,
   countActiveShoppingItems,
   deactivateShoppingItems,
@@ -24,7 +25,7 @@ import { z } from '$lib/zod';
 
 const setCategorySchema = z.object({
   categoryId: z.string().nonempty(),
-  itemIds: z.array(z.string()).nonempty(),
+  itemIds: z.array(z.string()).nonempty()
 });
 
 const itemActionSchema = z.object({
@@ -32,13 +33,31 @@ const itemActionSchema = z.object({
 });
 
 const categoryActionSchema = z.object({
-  categoryId: z.string().nonempty(),
-})
+  categoryId: z.string().nonempty()
+});
 
 const categorySchema = z.object({
   id: z.union([z.string().nonempty(), z.null()]),
-  name: z.string().nonempty(),
-})
+  name: z.string().nonempty()
+});
+
+const itemsSchema = z.array(z.object({
+  amount: z.string(),
+  name: z.string()
+}))
+  .transform((data) => {
+    return data
+      .filter(item => item.name.trim().length > 0);
+  })
+  .refine(
+    (data) => {
+      return data.length > 0;
+    },
+    {
+      message: m.generic_empty(),
+      path: ['names']
+    }
+  );
 
 const shoppingRouter = new Hono<AppEnv>()
   .get('/activeCount', async (c) => {
@@ -58,7 +77,7 @@ const shoppingRouter = new Hono<AppEnv>()
     if (!category.id) {
       await addShoppingCategory(category.name);
     } else {
-      await updateShoppingCategory(category.id, category.name)
+      await updateShoppingCategory(category.id, category.name);
     }
 
     return c.json(category);
@@ -67,7 +86,7 @@ const shoppingRouter = new Hono<AppEnv>()
     const categoryId = c.req.param('id');
     const category = await findShoppingCategory(categoryId);
     if (!category) {
-      return c.json({ error: m.error_category_not_found()}, 404);
+      return c.json({ error: m.error_category_not_found() }, 404);
     }
 
     if (category.shoppingItems.length > 0) {
@@ -104,6 +123,15 @@ const shoppingRouter = new Hono<AppEnv>()
   .get('/items', async (c) => {
     return c.json(await findAllShoppingItems());
   })
+  .post('/items', zValidator('json', itemsSchema), async (c) => {
+    const items = c.req.valid('json');
+
+    const loggedInUser = c.get('loggedInUser');
+
+    await addStagedShoppingList(loggedInUser.id, items);
+
+    return c.json({ success: true });
+  })
   .get('/itemSuggestions', async (c) => {
     return c.json(await getItemAddSuggestions());
   })
@@ -124,28 +152,28 @@ const shoppingRouter = new Hono<AppEnv>()
 
     await deactivateShoppingItems(action.itemIds);
 
-    return c.json({ success: true});
+    return c.json({ success: true });
   })
   .post('/deleteItems', zValidator('json', itemActionSchema), async (c) => {
     const action = c.req.valid('json');
 
     await deleteShoppingItems(action.itemIds);
 
-    return c.json({ success: true});
+    return c.json({ success: true });
   })
   .post('/moveCategoryUp', zValidator('json', categoryActionSchema), async (c) => {
     const action = c.req.valid('json');
 
     await moveCategoryOrderUp(action.categoryId);
 
-    return c.json({ success: true});
+    return c.json({ success: true });
   })
   .post('/moveCategoryDown', zValidator('json', categoryActionSchema), async (c) => {
     const action = c.req.valid('json');
 
     await moveCategoryOrderDown(action.categoryId);
 
-    return c.json({ success: true});
+    return c.json({ success: true });
   })
 ;
 
