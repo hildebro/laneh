@@ -7,11 +7,11 @@
   let filterByAge = $state(true);
   let filterByUnmatched = $state(false);
 
-  const isOlderThan7Days = (date: Date) => {
+  const isOlderThan7Days = (date: string) => {
     const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
     const today = new Date();
 
-    return (today.getTime() - date.getTime()) > sevenDaysInMs;
+    return (today.getTime() - new Date(date).getTime()) > sevenDaysInMs;
   };
 
   const filterPurchases = () => {
@@ -58,7 +58,7 @@
     <span>
       { m.shopping_purchase_list_entry({ user: purchase.user.username, count: purchase.shoppingItems.length }) }
     </span>
-    <span>{dateFormatter.format(purchase.date)}</span>
+    <span>{dateFormatter.format(new Date(purchase.date))}</span>
     <footer>
       {#if purchase.balanceEntry}
         {priceFormatter.format(purchase.balanceEntry.price / 100)}
