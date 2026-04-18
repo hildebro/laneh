@@ -1,3 +1,73 @@
+# [2.0.0](https://github.com/hildebro/chorehub/compare/v1.12.1...v2.0.0) (2026-04-18)
+
+
+### Bug Fixes
+
+* commit staged items in the same request, if possible ([1d73fd6](https://github.com/hildebro/chorehub/commit/1d73fd6e4cf43801ff9867851811dadeebbcc5c8))
+* display validations ([f606c76](https://github.com/hildebro/chorehub/commit/f606c76aedb1998f9d0ca5986567e65b52fdd7f6))
+* edit single tasks not working on completed list ([2b5b435](https://github.com/hildebro/chorehub/commit/2b5b435131e05c4d5315c82f88b3ba45bc09d7a6))
+* initiate page calling protected route ([2212625](https://github.com/hildebro/chorehub/commit/2212625a1a4ef025ddd8da2d8fca5854ae497c1c))
+* money input working with API approach ([39b176c](https://github.com/hildebro/chorehub/commit/39b176c44945bf27340917fd66f7c056fca3a096))
+* move loggedInUser and login to public ([0769466](https://github.com/hildebro/chorehub/commit/07694668ce5b8f26f23d362ccd1d56e93dc59587))
+* new resolve call for authenticated group ([cb8b21e](https://github.com/hildebro/chorehub/commit/cb8b21e5afa89b38073872ecaefe38baa2352040))
+* proper zod error for invalid credentials ([fbeb621](https://github.com/hildebro/chorehub/commit/fbeb621477e155f962f7935648602787b2613f49))
+* remove effect for distribution page ([c99c46a](https://github.com/hildebro/chorehub/commit/c99c46a13248b66fc9caafb785562f3a0a5ba509))
+* types in balance view ([7bf2f89](https://github.com/hildebro/chorehub/commit/7bf2f89e047718d7e2e13fe7b1d516b7d9f71301))
+
+
+### chore
+
+* remove return url handling ([f980df3](https://github.com/hildebro/chorehub/commit/f980df3bf3adb4e4dc6cff26c749d2c3337872c5))
+
+
+### Features
+
+* add (authenticated) group ([b095a2c](https://github.com/hildebro/chorehub/commit/b095a2c5b981a71b1dbac6ba378d5f5e773d2d78))
+* add authentication to non-public routes ([f2d5109](https://github.com/hildebro/chorehub/commit/f2d510972cd5558ba14bb6fc70e4430374ba505b))
+* add logged-in user to hono env ([ceacf4a](https://github.com/hildebro/chorehub/commit/ceacf4a2fe48959ca8d8aa45cd44cd6372f1e142))
+* additionalButtons and onSuccess for ApiForm ([0421e39](https://github.com/hildebro/chorehub/commit/0421e3914442e64f62f31ac1201ecb59fda6dc8d))
+* disable ssr globally ([23f1b38](https://github.com/hildebro/chorehub/commit/23f1b382f8b198cfb52bda2d78446cfc75f3533c))
+* include hono ([f2000c9](https://github.com/hildebro/chorehub/commit/f2000c973fb731f467b6bcc02631373f3b924170))
+* migrate / + href fixes ([287dbf0](https://github.com/hildebro/chorehub/commit/287dbf04ea519ea77f78bc7426860fb51f44df1c))
+* migrate /balance ([9e1a190](https://github.com/hildebro/chorehub/commit/9e1a190becb7b62206f67ab57a11f139dd527eba))
+* migrate /balance/[entry] ([05ab643](https://github.com/hildebro/chorehub/commit/05ab643a654df360d3c2253c2ffc0189838b7427))
+* migrate /item/add load ([8621511](https://github.com/hildebro/chorehub/commit/86215110fc049f6baa8ba973d7d9ddf60d3df02a))
+* migrate /item/add post ([77d17e5](https://github.com/hildebro/chorehub/commit/77d17e5c7288bd1dffe24537e2a4673e33eac74a))
+* migrate /login ([56151a6](https://github.com/hildebro/chorehub/commit/56151a6d5ea41a0d6aec579df7de158dc3a75d19))
+* migrate /shopping ([fe91b2e](https://github.com/hildebro/chorehub/commit/fe91b2e01479666ec11f6aa937651548be5936ef))
+* migrate /tasks user fetching ([f74d41c](https://github.com/hildebro/chorehub/commit/f74d41cb3112225c1a955b4c51f05d1173471d95))
+* migrate cancel ([042bc94](https://github.com/hildebro/chorehub/commit/042bc944559b9b95b69ce7f614aa61fb67100891))
+* migrate category crud ([88fa520](https://github.com/hildebro/chorehub/commit/88fa520b0e3167f06d03282d6d17a4ab5b2e5019))
+* migrate category up/down ([7fe1dc6](https://github.com/hildebro/chorehub/commit/7fe1dc64b3feedcd72646d04bcac777bb3e88567))
+* migrate common stuff to root layout ([226dea4](https://github.com/hildebro/chorehub/commit/226dea41cf12413345842ff435886aa155483d70))
+* migrate deactivate items ([21f596c](https://github.com/hildebro/chorehub/commit/21f596c7f0fd945a8404b370774c1152f5a6a6a8))
+* migrate distributions ([9d5850e](https://github.com/hildebro/chorehub/commit/9d5850ef919d4d7f265d679a03025061d4340d2b))
+* migrate handleUser hook ([3023c8b](https://github.com/hildebro/chorehub/commit/3023c8b572e3cc44e35da44e872a4f89ab161462))
+* migrate import db ([daea7ae](https://github.com/hildebro/chorehub/commit/daea7ae1d4e891d7e9f4d1d7c1bc87ba1ae7408b))
+* migrate item categorize ([7fc5ec5](https://github.com/hildebro/chorehub/commit/7fc5ec50192f0eedd70862bdbbfb345ce69c6caa))
+* migrate item delete ([687e561](https://github.com/hildebro/chorehub/commit/687e561aba7553d2be3cafc74e423a18c36af204))
+* migrate logout ([3eb5b0f](https://github.com/hildebro/chorehub/commit/3eb5b0fd83a70972220189ff7005d2abf5c4de1f))
+* migrate purchase list ([4b70cb7](https://github.com/hildebro/chorehub/commit/4b70cb7082cace1607c1c3b177b0e214114ca0f2))
+* migrate register ([c0f82c7](https://github.com/hildebro/chorehub/commit/c0f82c7af116e6cb1aa0d709bcb6d0442313864a))
+* migrate setCategory ([091f50e](https://github.com/hildebro/chorehub/commit/091f50e675df2862d402c026a95ca29fe3b3d5a9))
+* migrate shopping load ([0373a8e](https://github.com/hildebro/chorehub/commit/0373a8e062db84d36d1ba858beb04d2d294fd2e0))
+* migrate task done action ([e4abc00](https://github.com/hildebro/chorehub/commit/e4abc00d7aafa1dc5a2113b2d9b1d97953765fba))
+* migrate updateUser ([28761de](https://github.com/hildebro/chorehub/commit/28761deae3e81368e52e39459babd40a31380a68))
+* migrate weekly tasks ([b676003](https://github.com/hildebro/chorehub/commit/b676003fae694aebec89475c99675f4f065646af))
+* move database transaction to hono ([de09397](https://github.com/hildebro/chorehub/commit/de093974a8ac96e64321d524a5c7482045464e6f))
+* move due tasks into layout.ts ([7893a66](https://github.com/hildebro/chorehub/commit/7893a6628648bfd1fa2621712fe6f35220e7386d))
+* purchase (un)staging ([acb48f7](https://github.com/hildebro/chorehub/commit/acb48f7cc4d1f615ad912e60e73908989cc200c3))
+* purchase commit ([f80edb2](https://github.com/hildebro/chorehub/commit/f80edb20c92d85a5b0749a1ba6b5f027ac4f79c7))
+* split initiation into public route, away from register ([316b36a](https://github.com/hildebro/chorehub/commit/316b36a19cae9d9b4da67f4362558ca28b417111))
+* switch /tasks load to api ([5cad06c](https://github.com/hildebro/chorehub/commit/5cad06c3b222257d8a16e69281dac6c9f0972956))
+* switch paraglide to localStorage ([b6c75d8](https://github.com/hildebro/chorehub/commit/b6c75d8f03e3d77fc1faebc601628a1d4bbbd0df))
+* switch to api setup for task ([cf7a15f](https://github.com/hildebro/chorehub/commit/cf7a15fd3afd8f801301e77038ce06d2d4d3c9cc))
+
+
+### BREAKING CHANGES
+
+* mobile shell has no more exit
+
 ## [1.12.1](https://github.com/hildebro/chorehub/compare/v1.12.0...v1.12.1) (2026-04-10)
 
 
