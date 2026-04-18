@@ -23,6 +23,8 @@ import {
   getItemAddSuggestions,
   moveCategoryOrderDown,
   moveCategoryOrderUp,
+  stagePurchaseItem,
+  unstagePurchaseItem,
   updateShoppingCategory
 } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
@@ -67,6 +69,10 @@ const categorizeItemSchema = z.object({
   itemIds: z.array(z.string().nonoptional()).nonempty(m.shopping_categorize_select_items_invalid()),
   categoryId: z.string().nonoptional()
 });
+
+const stagingItemSchema = z.object({
+  itemId: z.string().nonempty()
+})
 
 const shoppingRouter = new Hono<AppEnv>()
   .get('/activeCount', async (c) => {
@@ -244,6 +250,22 @@ const shoppingRouter = new Hono<AppEnv>()
       stagedItemsForUser,
       stagedItemsForOtherUsers
     });
+  })
+  .post('/stagePurchaseItem', zValidator('json', stagingItemSchema), async (c) => {
+    const data = c.req.valid('json');
+    const loggedInUser = c.get('loggedInUser');
+
+    await stagePurchaseItem(data.itemId, loggedInUser.id);
+
+    return c.json({ success: true });
+  })
+  .post('/unstagePurchaseItem', zValidator('json', stagingItemSchema), async (c) => {
+    const data = c.req.valid('json');
+    const loggedInUser = c.get('loggedInUser');
+
+    await unstagePurchaseItem(data.itemId, loggedInUser.id);
+
+    return c.json({ success: true });
   })
 ;
 

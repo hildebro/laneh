@@ -6,6 +6,7 @@
   import { crossfade } from 'svelte/transition';
   import { enhance } from '$app/forms';
   import { beforeNavigate, invalidateAll } from '$app/navigation';
+  import { getApiClient } from '$lib/apiClient';
   import * as m from '$lib/paraglide/messages.js';
 
   const [send, receive] = crossfade({
@@ -40,23 +41,31 @@
 
   const stageItem = async (itemId: string) => {
     const target = isUnchecked(itemId)
-      ? '?/stage'
-      : '?/unstage';
+      ? 'stage'
+      : 'unstage';
 
     itemStates[itemId] = 'loading';
 
     await sendStagingRequest(itemId, target);
   };
 
-  const sendStagingRequest = async (itemId: string, target: string) => {
+  const sendStagingRequest = async (itemId: string, target: 'stage' | 'unstage') => {
     const formData = new FormData();
     formData.append('itemId', itemId);
 
     try {
-      const response = await fetch(target, {
-        method: 'POST',
-        body: formData
-      });
+      const client = getApiClient();
+
+      let response;
+      if (target === 'stage') {
+        response = await client.api.shopping.stagePurchaseItem.$post({
+          json: { itemId }
+        });
+      } else {
+        response = await client.api.shopping.unstagePurchaseItem.$post({
+          json: { itemId }
+        });
+      }
 
       if (response.ok) {
         await invalidateAll();
