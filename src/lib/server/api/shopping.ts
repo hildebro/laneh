@@ -10,6 +10,7 @@ import {
   categorizationFinished,
   commitStagedItems,
   countActiveShoppingItems,
+  createShoppingPurchase,
   deactivateShoppingItems,
   deleteCategory,
   deleteShoppingItems,
@@ -159,7 +160,7 @@ const shoppingRouter = new Hono<AppEnv>()
 
     const finished = await categorizationFinished(loggedInUser.id);
     if (finished) {
-      await commitStagedItems(loggedInUser.id)
+      await commitStagedItems(loggedInUser.id);
     }
 
     return c.json({ success: true, finished });
@@ -177,7 +178,7 @@ const shoppingRouter = new Hono<AppEnv>()
   .get('/stagedItems', async (c) => {
     const user = c.get('loggedInUser');
 
-    return c.json(await findStagedShoppingList(user.id) ?? null);
+    return c.json((await findStagedShoppingList(user.id)) ?? null);
   })
   .post('/setItemCategory', zValidator('json', setCategorySchema), async (c) => {
     const setCategory = c.req.valid('json');
@@ -266,6 +267,13 @@ const shoppingRouter = new Hono<AppEnv>()
     await unstagePurchaseItem(data.itemId, loggedInUser.id);
 
     return c.json({ success: true });
+  })
+  .post('/commitPurchase', async (c) => {
+    const loggedInUser = c.get('loggedInUser');
+
+    const purchaseId = await createShoppingPurchase(loggedInUser.id) ?? null;
+
+    return c.json({ success: true, purchaseId });
   })
 ;
 
