@@ -4,9 +4,10 @@
   import { flip } from 'svelte/animate';
   import { quintOut } from 'svelte/easing';
   import { crossfade } from 'svelte/transition';
-  import { enhance } from '$app/forms';
-  import { beforeNavigate, invalidateAll } from '$app/navigation';
+  import { beforeNavigate, goto, invalidateAll } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   const [send, receive] = crossfade({
@@ -109,12 +110,26 @@
       }
     }
   });
+
+  async function submitAction() {
+    const client = getApiClient();
+    return client.api.shopping.commitPurchase.$post();
+  }
+
+  async function onSuccess(response: Response) {
+    const json = await response.json();
+    if (json?.purchaseId) {
+      await goto(resolve(`/balance/add?purchaseId=${json.purchaseId}`));
+    } else {
+      await goto(resolve('/shopping'))
+    }
+  }
 </script>
 
 <div class="action-bar">
-  <form method="POST" action="?/commit" use:enhance>
-    <button type="submit">{m.shopping_finish_purchase()}</button>
-  </form>
+  <ApiForm {submitAction} submitButtonText={m.shopping_finish_purchase()} {onSuccess}>
+    <span></span>
+  </ApiForm>
 </div>
 {#each data.unstagedItemsByCategory as category (category.id)}
   <article>
