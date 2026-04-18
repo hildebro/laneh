@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { resolve } from '$app/paths';
-import { createShoppingPurchase, stagePurchaseItem, unstagePurchaseItem } from '$lib/server/db/functions';
+import { createShoppingPurchase } from '$lib/server/db/functions';
 import type { User } from '$lib/server/db/schema';
 
 export const actions = {
@@ -14,18 +14,4 @@ export const actions = {
 
     return redirect(302, resolve(`/balance/add?purchaseId=${purchaseId}`));
   },
-  stage: async ({ request, locals }) => {
-    const formData = await request.formData();
-    const itemId = formData.get('itemId')?.toString() as string;
-    const user = locals.user as User;
-
-    await stagePurchaseItem(itemId, user.id);
-  },
-  unstage: async ({ request, locals }) => {
-    const formData = await request.formData();
-    const itemId = formData.get('itemId')?.toString() as string;
-    const user = locals.user as User;
-
-    await unstagePurchaseItem(itemId, user.id);
-  }
 };
