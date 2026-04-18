@@ -17,6 +17,7 @@ import {
   deleteStagedList,
   fetchLastPurchaseDate,
   findActiveItemsByCategory,
+  findAllPurchases,
   findAllShoppingCategories,
   findAllShoppingItems,
   findShoppingCategory,
@@ -214,6 +215,9 @@ const shoppingRouter = new Hono<AppEnv>()
     await moveCategoryOrderDown(action.categoryId);
 
     return c.json({ success: true });
+  })
+  .get('/purchases', async (c) => {
+    return c.json(await findAllPurchases())
   })
   .get('/activePurchase', async (c) => {
     const loggedInUser = c.get('loggedInUser');
