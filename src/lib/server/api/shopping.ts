@@ -208,6 +208,43 @@ const shoppingRouter = new Hono<AppEnv>()
 
     return c.json({ success: true });
   })
+  .get('/activePurchase', async (c) => {
+    const loggedInUser = c.get('loggedInUser');
+
+    const categories = await findActiveItemsByCategory();
+
+    const unstagedItemsByCategory = [];
+    const stagedItemsForUser = [];
+    const stagedItemsForOtherUsers = [];
+
+    for (const category of categories) {
+      const currentCategoryUnstaged = [];
+
+      for (const item of category.shoppingItems) {
+        if (!item.stagedPurchase) {
+          currentCategoryUnstaged.push(item);
+        } else if (item.stagedPurchase.userId === loggedInUser.id) {
+          stagedItemsForUser.push(item);
+        } else {
+          stagedItemsForOtherUsers.push(item);
+        }
+      }
+
+      if (currentCategoryUnstaged.length > 0) {
+        unstagedItemsByCategory.push({
+          id: category.id,
+          name: category.name,
+          shoppingItems: currentCategoryUnstaged
+        });
+      }
+    }
+
+    return c.json({
+      unstagedItemsByCategory,
+      stagedItemsForUser,
+      stagedItemsForOtherUsers
+    });
+  })
 ;
 
 export default shoppingRouter;
