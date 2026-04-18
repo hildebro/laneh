@@ -13,6 +13,7 @@ import {
   deactivateShoppingItems,
   deleteCategory,
   deleteShoppingItems,
+  deleteStagedList,
   fetchLastPurchaseDate,
   findActiveItemsByCategory,
   findAllShoppingCategories,
@@ -156,6 +157,13 @@ const shoppingRouter = new Hono<AppEnv>()
     }
 
     return c.json({ success: true, finished });
+  })
+  .post('/cancelStagedItems', async (c) => {
+    const loggedInUser = c.get('loggedInUser');
+
+    await deleteStagedList(loggedInUser.id);
+
+    return c.json({ success: true });
   })
   .get('/itemSuggestions', async (c) => {
     return c.json(await getItemAddSuggestions());

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CancelAction from '../cancel/CancelAction.svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
@@ -25,6 +24,11 @@
 
     await invalidateAll();
   }
+
+  async function cancelAction() {
+    const client = getApiClient();
+    return client.api.shopping.cancelStagedItems.$post();
+  }
 </script>
 
 <svelte:head>
@@ -32,7 +36,13 @@
 </svelte:head>
 
 <div class="action-bar">
-  <CancelAction />
+  <ApiForm
+    submitAction={cancelAction}
+    submitButtonText={m.shopping_cancel_staging()}
+    onSuccess={resolve('/shopping')}
+  >
+    <span></span>
+  </ApiForm>
 </div>
 <article>
   <h2>{ m.shopping_categorize() }</h2>
