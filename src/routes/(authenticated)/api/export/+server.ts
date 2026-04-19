@@ -114,7 +114,7 @@ export async function GET() {
   return new Response(webStream, {
     headers: {
       'Content-Type': 'application/gzip',
-      'Content-Disposition': `attachment; filename="chorehub-${__APP_VERSION__}-db-${timestamp}.tar.gz"`
+      'Content-Disposition': `attachment; filename="laneh-${__APP_VERSION__}-db-${timestamp}.tar.gz"`
     }
   });
 }

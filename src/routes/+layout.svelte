@@ -24,7 +24,7 @@
 <ToastContainer />
 
 <svelte:head>
-  <title>Chorehub</title>
+  <title>Laneh</title>
 </svelte:head>
 
 <div class="app-shell">

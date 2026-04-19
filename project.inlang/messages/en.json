@@ -140,7 +140,7 @@
   "shopping_add_items": "Add items",
   "shopping_add_items_correction_description": "Some items were detected as misspelled and corrected. Use the exclamation button to check/revert the correction.",
   "shopping_add_items_correction_title": "Names corrected",
-  "shopping_add_items_help": "Write the item names that you want to add. Write one name per row. You can add more rows with the 'Plus' button.\n\nThe 'Tab' or 'Enter' keys can be used to navigate from amount to name or to navigate into the next row. If no next row exists, a new one will be created automatically.\n\nThe amount column is optional. It can be filled with any string like '2kg' or '5 cans'.\n\nIf any name is similar to an item you've added in the past, Chorehub will autocorrect it for you before you save. This correction can be reverted, if you want.",
+  "shopping_add_items_help": "Write the item names that you want to add. Write one name per row. You can add more rows with the 'Plus' button.\n\nThe 'Tab' or 'Enter' keys can be used to navigate from amount to name or to navigate into the next row. If no next row exists, a new one will be created automatically.\n\nThe amount column is optional. It can be filled with any string like '2kg' or '5 cans'.\n\nIf any name is similar to an item you've added in the past, they will be autocorrected before you save. This correction can be reverted, if you want.",
   "shopping_add_items_label": "Items to add:",
   "shopping_add_items_original_value": "You typed: {value}",
   "shopping_add_items_original_value_revert": "Revert correction",
@@ -160,8 +160,5 @@
   "shopping_purchase_list_entry": "{user} bought {count} item(s)",
   "shopping_purchase_staged_by_others": "Checked off by other users",
   "shopping_purchase_staged_by_you": "Checked off by you",
-  "shopping_start_purchase": "Start purchase",
-  "shopping_validate_all_items": "For reference, these are the items you wrote down in the last step:",
-  "shopping_validate_explanation": "You've entered names that are very similar to existing items. Chorehub will automatically 'fix' that for you by using the existing items. If you don't want this, please untick the corresponding checkboxes.",
-  "shopping_validate_headline": "Validate items"
+  "shopping_start_purchase": "Start purchase"
 }

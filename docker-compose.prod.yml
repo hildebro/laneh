@@ -1,5 +1,5 @@
 services:
-  chorehub-db:
+  laneh-db:
     image: docker.io/postgres:17.4-bookworm
     restart: always
     environment:
@@ -9,15 +9,15 @@ services:
     volumes:
       - ${DATABASE_LOCATION}:/var/lib/postgresql/data
     networks:
-      - chorehub-network
+      - laneh-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  chorehub-app:
-    image: docker.io/hildedev/chorehub:latest
+  laneh-app:
+    image: docker.io/hildedev/laneh:latest
     restart: always
     ports:
       - 127.0.0.1:${APP_PORT}:3000
@@ -27,11 +27,11 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: production
     depends_on:
-      chorehub-db:
+      laneh-db:
         condition: service_healthy
     networks:
-      - chorehub-network
+      - laneh-network
 
 networks:
-  chorehub-network:
+  laneh-network:
     driver: bridge

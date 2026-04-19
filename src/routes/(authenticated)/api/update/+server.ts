@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 
 export async function GET() {
   try {
-    const res = await fetch('https://api.github.com/repos/hildebro/chorehub/releases/latest');
+    const res = await fetch('https://api.github.com/repos/hildebro/laneh/releases/latest');
 
     if (!res.ok) {
       return json({ error: 'Failed to fetch release' }, { status: 500 });
