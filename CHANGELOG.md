@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/hildebro/laneh/compare/v2.0.0...v2.1.0) (2026-04-19)
+
+
+### Features
+
+* rename to laneh ([0f161ee](https://github.com/hildebro/laneh/commit/0f161ee2291dd0d9272146eb145a9a4c955e1ab5))
+
 # [2.0.0](https://github.com/hildebro/chorehub/compare/v1.12.1...v2.0.0) (2026-04-18)
 
 
