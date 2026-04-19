@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { Capacitor } from '@capacitor/core';
   import { Moon, Sun } from 'lucide-svelte';
   import { onMount } from 'svelte';
-  import { invalidateAll } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
@@ -29,6 +30,11 @@
   async function logout() {
     const client = getApiClient();
     return client.api.users.logout.$post();
+  }
+
+  function exitInstance() {
+    localStorage.removeItem('serverUrl');
+    goto(resolve('/server-picker'));
   }
 
   let isDark = $state(false);
@@ -73,6 +79,9 @@
       <ApiForm submitAction={logout} submitButtonText={m.auth_logout()} onSuccess={resolve('/login')}>
         <span></span>
       </ApiForm>
+      {#if Capacitor.isNativePlatform()}
+        <button onclick={exitInstance}>{m.settings_mobile_return_to_wrapper()}</button>
+      {/if}
     </div>
   </article>
 </div>
