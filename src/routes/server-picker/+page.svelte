@@ -2,13 +2,15 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
 
-  let inputUrl = '';
+  let inputUrl = $state('');
 
-  function saveUrl() {
+  function saveUrl(event: Event) {
+    event.preventDefault();
+
     if (inputUrl) {
       localStorage.setItem('serverUrl', inputUrl);
       // Optional: Test the API connection here before redirecting
-      goto(resolve('/')); // Go back to the main app
+      goto(resolve('/'));
     }
   }
 </script>
@@ -17,7 +19,7 @@
   <h1>Enter Server URL</h1>
   <p>Please enter the URL of your self-hosted instance:</p>
 
-  <form on:submit|preventDefault={saveUrl}>
+  <form onsubmit={saveUrl}>
     <input
       type="url"
       bind:value={inputUrl}
