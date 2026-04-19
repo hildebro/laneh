@@ -1,31 +1,47 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
+  import { getApiClient } from '$lib/apiClient';
+  import * as m from '$lib/paraglide/messages.js';
+  import { addToast } from '$lib/stores/toast';
+  import { handleApiLoad } from '$lib/utils/apiHelper';
 
   let inputUrl = $state('');
 
-  function saveUrl(event: Event) {
-    event.preventDefault();
+  async function saveUrl() {
+    if (!inputUrl) {
+      addToast({ message: m.server_picker_input_invalid(), type: 'warning' });
+    }
 
-    if (inputUrl) {
-      localStorage.setItem('serverUrl', inputUrl);
-      // Optional: Test the API connection here before redirecting
-      goto(resolve('/'));
+    localStorage.setItem('serverUrl', inputUrl);
+    const client = getApiClient();
+
+    try {
+      const result = await handleApiLoad(client.api.public.marco.$get());
+
+      if (result === 'polo') {
+        await goto(resolve('/'));
+      } else {
+        localStorage.removeItem('serverUrl');
+        addToast({ message: m.server_picker_error() });
+      }
+    } catch {
+      localStorage.removeItem('serverUrl');
+      addToast({ message: m.server_picker_error() });
     }
   }
 </script>
 
 <main>
-  <h1>Enter Server URL</h1>
-  <p>Please enter the URL of your self-hosted instance:</p>
+  <article>
+    <h2>{m.server_picker_header()}</h2>
+    <p>{m.server_picker_text()}</p>
 
-  <form onsubmit={saveUrl}>
     <input
       type="url"
       bind:value={inputUrl}
       placeholder="https://your-server.com"
-      required
     />
-    <button type="submit">Connect</button>
-  </form>
+    <button type="button" onclick={saveUrl}>{m.server_picker_connect()}</button>
+  </article>
 </main>

@@ -142,6 +142,9 @@ const publicRouter = new Hono()
       username: user.username
     });
   })
+  .get('/marco', async (c) => {
+    return c.json('polo');
+  })
 ;
 
 export default publicRouter;
