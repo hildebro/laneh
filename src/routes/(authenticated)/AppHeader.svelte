@@ -44,6 +44,8 @@
         width: 100%;
         display: flex;
         justify-content: center; /* Centers the ul perfectly */
+
+        padding-top: env(safe-area-inset-top, 1rem);
     }
 
     ul {
