@@ -66,5 +66,5 @@ jobs:
           context: .
           push: true
           tags: |
-            hildedev/chorehub:latest
-            hildedev/chorehub:${{ steps.check_tag.outputs.tag }}
+            hildedev/laneh:latest
+            hildedev/laneh:${{ steps.check_tag.outputs.tag }}

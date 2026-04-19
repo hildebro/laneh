@@ -1,5 +1,5 @@
 services:
-  chorehub-db:
+  laneh-db:
     image: postgres:17.4-bookworm
     restart: always
     ports:
@@ -11,9 +11,9 @@ services:
     volumes: # Persistent database data.  VERY IMPORTANT!
       - ${DATABASE_LOCATION}:/var/lib/postgresql/data
     networks:
-      - chorehub-network
+      - laneh-network
 
-  chorehub-app:
+  laneh-app:
     build:
       context: .
       target: builder
@@ -28,11 +28,11 @@ services:
     volumes:
       - ./:/app
     depends_on:
-      - chorehub-db
+      - laneh-db
     networks:
-      - chorehub-network
+      - laneh-network
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
 networks:
-  chorehub-network:
+  laneh-network:
     driver: bridge

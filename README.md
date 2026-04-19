@@ -1,4 +1,4 @@
-# Chorehub
+# Laneh
 
 ## Preconditions
 
@@ -19,22 +19,20 @@ that file also has a database migrator included. So you don't have to run the `d
 container.
 
 If you want to automatically start the container whenever your server starts, I suggest using this systemd unit. Make
-sure to replace `/path/to/chorehub` and `myusername` with the correct values for your setup.
+sure to replace `/path/to/laneh` and `myusername` with the correct values for your setup.
 
 ```unit file (systemd)
 [Unit]
-Description=Chorehub Docker Compose
+Description=Laneh Docker Compose
 After=docker.service network.target
 Requires=docker.service
 
 [Service]
 Type=simple
-WorkingDirectory=/path/to/chorehub
+WorkingDirectory=/path/to/laneh
 User=myusername
 Group=myusername
-# Uncomment this line, if you want to automatically update whenever the unit restarts.
-#ExecStartPre=/usr/bin/git pull
-ExecStart=/usr/bin/docker-compose -f docker-compose.prod.yml up --build
+ExecStart=/usr/bin/docker-compose up
 ExecStop=/usr/bin/docker-compose down
 Restart=on-failure
 RestartSec=5s
