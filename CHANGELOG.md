@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/hildebro/laneh/compare/v2.3.0...v2.3.1) (2026-04-20)
+
+
+### Bug Fixes
+
+* node and static build, based on env ([ed8e70f](https://github.com/hildebro/laneh/commit/ed8e70f7e0f551102df0ab0a6836993ed0418917))
+
 # [2.3.0](https://github.com/hildebro/laneh/compare/v2.2.0...v2.3.0) (2026-04-20)
 
 
