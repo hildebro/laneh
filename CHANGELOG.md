@@ -1,3 +1,23 @@
+# [2.3.0](https://github.com/hildebro/laneh/compare/v2.2.0...v2.3.0) (2026-04-20)
+
+
+### Bug Fixes
+
+* correct icon.ico target ([8790120](https://github.com/hildebro/laneh/commit/8790120c726a8e875985f4b9e85615af4bc0d13d))
+* hard-coded server url for capacitor ([ab65c5f](https://github.com/hildebro/laneh/commit/ab65c5feb52fc1c3cb27c2784b912013bda55a0b))
+* header padding ([60c9b68](https://github.com/hildebro/laneh/commit/60c9b680aef7a9027a12035e9f6921753ca6342a))
+* status bar clearing for public pages ([40d179b](https://github.com/hildebro/laneh/commit/40d179b79cf336a4732fdc184dde86e4608fdbb1))
+
+
+### Features
+
+* add android build ([4ea7584](https://github.com/hildebro/laneh/commit/4ea758498823ad2a948096ed2fe4c2a930657b4d))
+* exit button for server instance ([e6b64e7](https://github.com/hildebro/laneh/commit/e6b64e76d2d817eb4e73af4c02abe02532057768))
+* handle non valid input in server-picker ([60dcd03](https://github.com/hildebro/laneh/commit/60dcd039873f3721f56b58ba70af0731f7966826))
+* more detailed error message on server picker ([f0f4a23](https://github.com/hildebro/laneh/commit/f0f4a239252ecdf1bf8ef56262a5f0fa4e1fa1ae))
+* prepare for app version ([dba1083](https://github.com/hildebro/laneh/commit/dba10837dd35906da1c04487c27b4d69dca59d6c))
+* timeout for api helper ([a0c59f9](https://github.com/hildebro/laneh/commit/a0c59f958b0fa44fedd20c684e45172258a263a2))
+
 # [2.2.0](https://github.com/hildebro/laneh/compare/v2.1.0...v2.2.0) (2026-04-20)
 
 
