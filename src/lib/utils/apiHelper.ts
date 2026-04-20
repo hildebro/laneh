@@ -1,3 +1,5 @@
+import { error } from '@sveltejs/kit';
+
 // Utility type to pluck the generic T out of any .json() Promise
 type InferJson<T> = T extends { json(): Promise<infer U> } ? U : never;
 
