@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/hildebro/laneh/compare/v2.3.1...v2.3.2) (2026-04-20)
+
+
+### Bug Fixes
+
+* missing import ([feac07e](https://github.com/hildebro/laneh/commit/feac07e244fa7259a8a2b97fa3603a9a6c74fdb2))
+
 ## [2.3.1](https://github.com/hildebro/laneh/compare/v2.3.0...v2.3.1) (2026-04-20)
 
 
