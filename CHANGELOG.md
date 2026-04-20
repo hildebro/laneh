@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/hildebro/laneh/compare/v2.1.0...v2.2.0) (2026-04-20)
+
+
+### Features
+
+* remove base path ([457d791](https://github.com/hildebro/laneh/commit/457d791d4b320c8168c0d1ccebda56f0d8ee3858))
+
 # [2.1.0](https://github.com/hildebro/laneh/compare/v2.0.0...v2.1.0) (2026-04-19)
 
 
