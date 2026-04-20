@@ -23,11 +23,11 @@
         await goto(resolve('/'));
       } else {
         localStorage.removeItem('serverUrl');
-        addToast({ message: m.server_picker_error() });
+        addToast({ title: m.server_picker_error(), message: result });
       }
-    } catch {
+    } catch (error) {
       localStorage.removeItem('serverUrl');
-      addToast({ message: m.server_picker_error() });
+      addToast({ title: m.server_picker_error(), message: error as string });
     }
   }
 </script>
