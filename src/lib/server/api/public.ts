@@ -129,7 +129,7 @@ const publicRouter = new Hono()
       expires: session.expiresAt
     });
 
-    return c.json({ success: true });
+    return c.json(session.id);
   })
   .get('/loggedInUser', async (c) => {
     const user = await getLoggedInUser(c);

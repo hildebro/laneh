@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { cors} from 'hono/cors';
 import { transactionContext } from '$lib/context';
 import balanceRouter from '$lib/server/api/balance';
 import publicRouter from '$lib/server/api/public';
@@ -10,6 +11,14 @@ import { getLoggedInUser } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 
 const app = new Hono<AppEnv>().basePath('/api');
+
+// Cors settings for capacitor
+app.use('*', cors({
+  origin: ['capacitor://localhost', 'http://localhost'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  exposeHeaders: ['x-refreshed-token'],
+}));
 
 // Database Transaction
 app.use('*', async (c, next) => {

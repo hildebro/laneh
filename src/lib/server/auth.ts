@@ -7,32 +7,40 @@ import { createSession, deleteSession, findSession, findUser } from '$lib/server
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 const THREE_DAYS_IN_MS = 3 * ONE_DAY_IN_MS;
 
-export async function getLoggedInUser(c: Context) {
-  const sessionToken = getCookie(c, SESSION_COOKIE);
-  if (!sessionToken) {
-    return null;
+function getAuthData(c: Context): [string | undefined, boolean] {
+  const authHeader = c.req.header('Authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return [authHeader.split(' ')[1], true];
   }
+
+  return [getCookie(c, SESSION_COOKIE), false];
+}
+
+export async function getLoggedInUser(c: Context) {
+  const [sessionToken, isMobile] = getAuthData(c);
+
+  if (!sessionToken) return null;
 
   const session = await findSession(sessionToken);
-  if (!session) {
-    return null;
-  }
+  if (!session) return null;
 
   const user = await findUser(session.userId);
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   if (needsRefresh(session.expiresAt)) {
     const newSession = await createSession(session.userId);
 
-    setCookie(c, SESSION_COOKIE, newSession.id, {
-      path: '/',
-      httpOnly: true,
-      secure: !dev,
-      sameSite: 'Lax',
-      expires: newSession.expiresAt
-    });
+    if (isMobile) {
+      c.header('x-refreshed-token', newSession.id);
+    } else {
+      setCookie(c, SESSION_COOKIE, newSession.id, {
+        path: '/',
+        httpOnly: true,
+        secure: !dev,
+        sameSite: 'Lax',
+        expires: newSession.expiresAt
+      });
+    }
   }
 
   return user;
