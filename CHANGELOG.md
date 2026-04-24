@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/hildebro/laneh/compare/v2.3.2...v2.4.0) (2026-04-24)
+
+
+### Features
+
+* token handling for android ([09ffdfb](https://github.com/hildebro/laneh/commit/09ffdfba299998e56f671b6af7b244e110923b7a))
+
 ## [2.3.2](https://github.com/hildebro/laneh/compare/v2.3.1...v2.3.2) (2026-04-20)
 
 
