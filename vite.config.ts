@@ -30,6 +30,13 @@ export default defineConfig({
           : path.join(process.env.HOME || '~', '.cache/yarn/berry/cache/'),
         path.resolve(__dirname, './.yarn/.cache')
       ]
+    },
+    cors: {
+      // Ensure all possible Capacitor origins are allowed by Vite
+      origin: ['capacitor://localhost', 'http://localhost', 'https://localhost'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      exposedHeaders: ['x-refreshed-token']
     }
   },
   define: {
