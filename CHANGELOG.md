@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/hildebro/laneh/compare/v2.4.0...v2.4.1) (2026-04-26)
+
+
+### Bug Fixes
+
+* android mixed content and cors issues ([9683b8b](https://github.com/hildebro/laneh/commit/9683b8bbf024f581c90396a1ef787c3667efab0e))
+
 # [2.4.0](https://github.com/hildebro/laneh/compare/v2.3.2...v2.4.0) (2026-04-24)
 
 
