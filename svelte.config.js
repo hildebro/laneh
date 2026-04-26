@@ -17,7 +17,15 @@ const config = {
         precompress: false,
         strict: true
       })
-      : adapterNode()
+      : adapterNode(),
+    csrf: {
+      checkOrigin: true,
+      trustedOrigins: [
+        'capacitor://localhost',
+        'http://localhost',
+        'https://localhost',
+      ]
+    }
   }
 };
 
