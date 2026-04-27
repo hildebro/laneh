@@ -1,3 +1,15 @@
+# [2.5.0](https://github.com/hildebro/laneh/compare/v2.4.1...v2.5.0) (2026-04-27)
+
+
+### Bug Fixes
+
+* no additional overscroll ([4e7894e](https://github.com/hildebro/laneh/commit/4e7894ee874e21f2e91c0dcb6bd32926003bd1b7))
+
+
+### Features
+
+* refresher for app ([ca08e2b](https://github.com/hildebro/laneh/commit/ca08e2bd56a262d2e1cf14e99c4fc5bd5cf27083))
+
 ## [2.4.1](https://github.com/hildebro/laneh/compare/v2.4.0...v2.4.1) (2026-04-26)
 
 
