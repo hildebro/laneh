@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/hildebro/laneh/compare/v2.5.1...v2.5.2) (2026-04-28)
+
+
+### Bug Fixes
+
+* requests without data failing due to content type ([36d2796](https://github.com/hildebro/laneh/commit/36d2796dc2bef687273b13bd6224babbff51581b))
+
 ## [2.5.1](https://github.com/hildebro/laneh/compare/v2.5.0...v2.5.1) (2026-04-28)
 
 
