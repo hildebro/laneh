@@ -50,12 +50,12 @@ const categorySchema = z.object({
 });
 
 const itemsSchema = z.array(z.object({
-  amount: z.string(),
-  name: z.string()
+  amount: z.string().trim(),
+  name: z.string().trim()
 }))
   .transform((data) => {
     return data
-      .filter(item => item.name.trim().length > 0);
+      .filter(item => item.name.length > 0);
   })
   .refine(
     (data) => {
