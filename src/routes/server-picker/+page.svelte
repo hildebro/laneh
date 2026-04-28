@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
+  import { setDemoMode } from '$lib/demo';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
   import { handleApiLoad } from '$lib/utils/apiHelper';
@@ -30,6 +31,12 @@
       addToast({ title: m.server_picker_error(), message: error as string });
     }
   }
+
+  async function demoMode() {
+    localStorage.setItem('serverUrl', 'demo');
+    await setDemoMode(true);
+    await goto(resolve('/'));
+  }
 </script>
 
 <main>
@@ -43,5 +50,6 @@
       placeholder="https://your-server.com"
     />
     <button type="button" onclick={saveUrl}>{m.server_picker_connect()}</button>
+    <button type="button" onclick={demoMode}>{m.demo_mode()}</button>
   </article>
 </main>

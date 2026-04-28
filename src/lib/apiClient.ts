@@ -3,6 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 import { hc } from 'hono/client';
 import { resolve } from '$app/paths';
 import { getBaseUrl } from '$lib/config';
+import { handleDemoMode, isDemoMode } from '$lib/demo';
 import type { AppType } from '$lib/server/api';
 
 export function getApiClient(customFetch?: typeof fetch) {
@@ -11,6 +12,10 @@ export function getApiClient(customFetch?: typeof fetch) {
 
   // Create our interceptor
   const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    if (await isDemoMode()) {
+      return handleDemoMode(input, init);
+    }
+
     // 1. Clone the init object and headers so we don't mutate the original
     const requestInit = { ...init };
     const headers = new Headers(requestInit.headers);

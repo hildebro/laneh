@@ -42,6 +42,7 @@
     }
   ],
   "dashboard_shopping_last_purchase": "Letzter Einkauf am {date}",
+  "demo_mode": "Demo Modus ausprobieren",
   "error_category_not_found": "Kategorie nicht gefunden",
   "error_balance_entry_not_found": "Eintrag nicht gefunden",
   "error_shopping_no_active_categories": "Es liegen momentan keine aktiven Artikel vor.",
