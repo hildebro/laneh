@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/hildebro/laneh/compare/v2.5.0...v2.5.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* item names with spaces are not trimmed correctly ([8753ef8](https://github.com/hildebro/laneh/commit/8753ef8aed92d7302422354da9d1b87f66ccd2db))
+
 # [2.5.0](https://github.com/hildebro/laneh/compare/v2.4.1...v2.5.0) (2026-04-27)
 
 
