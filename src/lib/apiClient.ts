@@ -14,6 +14,8 @@ export function getApiClient(customFetch?: typeof fetch) {
     // 1. Clone the init object and headers so we don't mutate the original
     const requestInit = { ...init };
     const headers = new Headers(requestInit.headers);
+    // Need to always transmit JSON type to prevent CORS problems.
+    headers.set('Content-Type', 'application/json');
 
     // 2. Inject Auth Token for Mobile, or ensure Cookies for Web
     if (Capacitor.isNativePlatform()) {
