@@ -1,3 +1,10 @@
+## [2.6.1](https://github.com/hildebro/laneh/compare/v2.6.0...v2.6.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* pull to refresh moving content around ([c66c46e](https://github.com/hildebro/laneh/commit/c66c46e169c62619d114940917a155fb3f570904))
+
 # [2.6.0](https://github.com/hildebro/laneh/compare/v2.5.2...v2.6.0) (2026-04-30)
 
 
