@@ -18,18 +18,35 @@ export async function isDemoMode() {
 export function handleDemoMode(input: RequestInfo | URL, init?: RequestInit) {
   const method = (init?.method || 'GET').toUpperCase();
   if (method !== 'GET') {
+    const errorPayload = {
+      success: false,
+      error: {
+        name: 'ZodError',
+        message: JSON.stringify([
+          {
+            code: 'custom',
+            path: ['system'],
+            message: 'Demo mode is read-only.'
+          }
+        ])
+      }
+    };
+
     return new Response(
-      JSON.stringify({ message: 'Demo mode is read-only.' }),
+      JSON.stringify(errorPayload),
       {
-        status: 403,
+        status: 400,
         headers: { 'Content-Type': 'application/json' }
       }
     );
   }
 
-  const mockPayload = getMockData(input.toString());
-  console.log(input.toString());
-  console.log(mockPayload);
+  const urlString = input instanceof Request ? input.url : input.toString();
+
+  const parsedUrl = new URL(urlString, 'http://localhost');
+  const pathname = parsedUrl.pathname;
+
+  const mockPayload = getMockData(pathname);
 
   return new Response(
     JSON.stringify(mockPayload),
