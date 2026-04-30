@@ -49,7 +49,9 @@
       bind:value={inputUrl}
       placeholder="https://your-server.com"
     />
-    <button type="button" onclick={saveUrl}>{m.server_picker_connect()}</button>
-    <button type="button" onclick={demoMode}>{m.demo_mode()}</button>
+    <div class="action-row">
+      <button type="button" onclick={saveUrl}>{m.server_picker_connect()}</button>
+      <button type="button" onclick={demoMode}>{m.demo_mode()}</button>
+    </div>
   </article>
 </main>
