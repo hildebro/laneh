@@ -39,7 +39,11 @@
     if (diff > 20) {
       pulling = true;
       rotateDeg = diff * 1;
-      translateY = diff * resistance;
+
+      // Calculate the pull, but never let it exceed 60px
+      const calculatedPull = diff * resistance;
+      translateY = Math.min(calculatedPull, 60);
+
       shouldRefresh = rotateDeg > 180;
 
       // Prevent standard browser pull-to-refresh/overscroll
@@ -92,22 +96,28 @@
   <AppHeader dueTaskCount={data.due_task_count} />
 </header>
 
-{#if pulling || isRefreshing}
-  <div class="pull-indicator">
-    <LoaderCircle
-      size={28}
-      style="transform: rotate({rotateDeg}deg); transition: {isRefreshing ? 'none' : 'transform 0.1s linear'}"
-      class={isRefreshing ? 'animate-spin' : ''}
-    />
-  </div>
-{/if}
-
 <main
   ontouchstart={touchStart}
   ontouchmove={touchMove}
   ontouchend={touchEnd}
-  style="transform: translateY({translateY}px); transition: {pulling ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'};"
 >
+  {#if pulling || isRefreshing}
+    <div class="pull-wrapper">
+      <div
+        class="pull-indicator"
+        style="transform: translateY({translateY}px); transition: {pulling ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'};"
+      >
+        <div class="loader-bg">
+          <LoaderCircle
+            size={24}
+            style="transform: rotate({rotateDeg}deg); transition: {isRefreshing ? 'none' : 'transform 0.1s linear'}"
+            class={isRefreshing ? 'animate-spin' : ''}
+          />
+        </div>
+      </div>
+    </div>
+  {/if}
+
   {@render children()}
 </main>
 
@@ -131,16 +141,37 @@
     }
 
     /* Pull to refresh styles */
+    .pull-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 150px;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 50;
+    }
+
     .pull-indicator {
-        position: fixed;
-        top: 6rem; /* Adjust this to match the height of your <header> */
+        position: absolute;
+        top: -55px;
         left: 0;
         right: 0;
         display: flex;
         justify-content: center;
-        z-index: 0; /* Keeps it behind <main> so it reveals underneath */
-        color: var(--text-muted); /* Leverages your existing semantic variables */
-        pointer-events: none;
+    }
+
+    .loader-bg {
+        background-color: var(--bg-surface);
+        color: var(--btn-primary-bg);
+        border: var(--default-border-width) solid var(--border-main);
+        border-radius: 50%;
+        width: 2.75rem;
+        height: 2.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     footer {
