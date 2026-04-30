@@ -1,3 +1,17 @@
+# [2.6.0](https://github.com/hildebro/laneh/compare/v2.5.2...v2.6.0) (2026-04-30)
+
+
+### Bug Fixes
+
+* demo button spacing ([56a01c3](https://github.com/hildebro/laneh/commit/56a01c33e4bb0452c2b968b28c3fbb519a4403fc))
+* path handling and POST handling ([28ca826](https://github.com/hildebro/laneh/commit/28ca82609704d463ffa923e1edd314f70e3c9fa0))
+
+
+### Features
+
+* add demo mode ([1a68849](https://github.com/hildebro/laneh/commit/1a68849291008ce6101d2f3e646ff264431b0d9d))
+* mocks for all GET endpoints ([1541f0a](https://github.com/hildebro/laneh/commit/1541f0a19bc9dc71574d5dc6acd9539000c4d48d))
+
 ## [2.5.2](https://github.com/hildebro/laneh/compare/v2.5.1...v2.5.2) (2026-04-28)
 
 
