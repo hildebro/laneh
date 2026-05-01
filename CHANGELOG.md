@@ -1,3 +1,10 @@
+## [2.7.2](https://github.com/hildebro/laneh/compare/v2.7.1...v2.7.2) (2026-05-01)
+
+
+### Bug Fixes
+
+* missing build step in actions ([58ba1e1](https://github.com/hildebro/laneh/commit/58ba1e1bc32cc18d8827ffb06f29fc1550d946c8))
+
 ## [2.7.1](https://github.com/hildebro/laneh/compare/v2.7.0...v2.7.1) (2026-05-01)
 
 
