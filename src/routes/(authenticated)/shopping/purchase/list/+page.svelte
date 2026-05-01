@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
+  import { priceFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
 
@@ -34,12 +35,6 @@
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric'
-  });
-
-  const priceFormatter = new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2
   });
 </script>
 
