@@ -1,3 +1,10 @@
+## [2.7.4](https://github.com/hildebro/laneh/compare/v2.7.3...v2.7.4) (2026-05-01)
+
+
+### Bug Fixes
+
+* remove hardcoded version number ([01aac4a](https://github.com/hildebro/laneh/commit/01aac4aeb3240b53c733d55eb1ea4a84f9a14c86))
+
 ## [2.7.3](https://github.com/hildebro/laneh/compare/v2.7.2...v2.7.3) (2026-05-01)
 
 
