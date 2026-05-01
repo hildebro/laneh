@@ -76,6 +76,10 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
 
+      - name: Build Web Assets
+        if: steps.check_tag.outputs.tag != ''
+        run: CAPACITOR_BUILD=true npm run build
+
       - name: Sync Capacitor Android
         if: steps.check_tag.outputs.tag != ''
         run: npx cap sync android
