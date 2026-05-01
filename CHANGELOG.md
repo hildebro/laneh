@@ -1,3 +1,10 @@
+## [2.7.3](https://github.com/hildebro/laneh/compare/v2.7.2...v2.7.3) (2026-05-01)
+
+
+### Bug Fixes
+
+* remove redundant code for price formatter ([4d48a05](https://github.com/hildebro/laneh/commit/4d48a0544d9b2819d1d16260e59d5190fbaeb4d5))
+
 ## [2.7.2](https://github.com/hildebro/laneh/compare/v2.7.1...v2.7.2) (2026-05-01)
 
 
