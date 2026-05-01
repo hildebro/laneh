@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/hildebro/laneh/compare/v2.6.1...v2.7.0) (2026-05-01)
+
+
+### Features
+
+* automated android release ([f68c93d](https://github.com/hildebro/laneh/commit/f68c93d7b3aedfb68204f1d4943a21cabc2f306b))
+
 ## [2.6.1](https://github.com/hildebro/laneh/compare/v2.6.0...v2.6.1) (2026-04-30)
 
 
