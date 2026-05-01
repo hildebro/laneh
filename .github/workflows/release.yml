@@ -68,3 +68,44 @@ jobs:
           tags: |
             hildedev/laneh:latest
             hildedev/laneh:${{ steps.check_tag.outputs.tag }}
+
+      - name: Setup Java
+        if: steps.check_tag.outputs.tag != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Sync Capacitor Android
+        if: steps.check_tag.outputs.tag != ''
+        run: npx cap sync android
+
+      - name: Build Android App Bundle
+        if: steps.check_tag.outputs.tag != ''
+        working-directory: ./android
+        run: |
+          chmod +x gradlew
+          ./gradlew bundleRelease \
+            -PversionName=${{ steps.check_tag.outputs.tag }} \
+            -PversionCode=${{ github.run_number }}
+
+      - name: Sign App Bundle
+        if: steps.check_tag.outputs.tag != ''
+        id: sign_app
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: android/app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.PLAYSTORE_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.PLAYSTORE_KEYSTORE_ALIAS }}
+          keyStorePassword: ${{ secrets.PLAYSTORE_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.PLAYSTORE_KEY_PASSWORD }}
+
+      - name: Upload to Google Play Internal Testing
+        if: steps.check_tag.outputs.tag != ''
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_SERVICE_ACCOUNT_JSON }}
+          packageName: dev.laneh.app
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
