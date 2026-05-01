@@ -1,3 +1,10 @@
+## [2.7.6](https://github.com/hildebro/laneh/compare/v2.7.5...v2.7.6) (2026-05-01)
+
+
+### Bug Fixes
+
+* change back to "completed" status ([8922c2a](https://github.com/hildebro/laneh/commit/8922c2a33692577b928f2f88f245064ab6e5a4a1))
+
 ## [2.7.5](https://github.com/hildebro/laneh/compare/v2.7.4...v2.7.5) (2026-05-01)
 
 
