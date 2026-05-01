@@ -1,15 +1,10 @@
 <script lang="ts">
   import * as m from '$lib/paraglide/messages.js';
+  import { priceFormatter } from '$lib/utils/formatter';
 
   let { value = $bindable() } = $props();
 
-  const formatter = new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2
-  });
-
-  let formattedValue = $derived(formatter.format(value / 100));
+  let formattedValue = $derived(priceFormatter.format(value / 100));
 
   function handleKeyDown(e: KeyboardEvent) {
     const key = e.key;
