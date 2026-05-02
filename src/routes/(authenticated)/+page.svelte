@@ -1,18 +1,14 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
-  import { priceFormatter } from '$lib/utils/formatter';
+  import { priceFormatter, shortDateFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
 
   let lastPurchaseDate = $derived(
     !data.last_purchase_date
       ? null
-      : new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      }).format(new Date(data.last_purchase_date))
+      : shortDateFormatter.format(new Date(data.last_purchase_date))
   );
 </script>
 
