@@ -30,6 +30,7 @@
 
 <main>
   <article>
+    <h2>{m.login_headline()}</h2>
     <ApiForm {submitAction} {onSuccess} submitButtonText={m.auth_login()}>
       <label>
         {m.generic_name()}
@@ -42,3 +43,9 @@
     </ApiForm>
   </article>
 </main>
+
+<style>
+    main {
+        align-content: center;
+    }
+</style>
