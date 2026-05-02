@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
-  import { priceFormatter } from '$lib/utils/formatter';
+  import { dateFormatter, priceFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
 
@@ -28,14 +28,6 @@
   };
 
   let filteredPurchases = $derived(filterPurchases());
-
-  const dateFormatter = new Intl.DateTimeFormat('de-DE', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric'
-  });
 </script>
 
 <div class="action-bar">

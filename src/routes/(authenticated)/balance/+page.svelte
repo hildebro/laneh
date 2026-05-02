@@ -2,17 +2,9 @@
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
   import type { ApiBalanceEntry } from '$lib/server/api/balance';
-  import { priceFormatter } from '$lib/utils/formatter';
+  import { dateFormatter, priceFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
-
-  const dateFormatter = new Intl.DateTimeFormat('de-DE', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric'
-  });
 
   const getLabel = (balanceEntry: ApiBalanceEntry) => {
     if (balanceEntry.name) {

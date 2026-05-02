@@ -6,6 +6,7 @@
   import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { TaskWithRelation } from '$lib/server/db/schema';
+  import { shortDateFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
 
@@ -36,12 +37,7 @@
   function formatDate(dateString: string | null): string {
     if (!dateString) return 'N/A'; // Handle null or undefined dates
     try {
-      // Use Intl.DateTimeFormat for locale-aware date formatting
-      return new Intl.DateTimeFormat('en-US', { // Adjust locale ('en-GB', 'de-DE', etc.) as needed
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      }).format(new Date(dateString + 'T00:00:00')); // Treat as local date
+      return shortDateFormatter.format(new Date(dateString + 'T00:00:00')); // Treat as local date
     } catch (e) {
       console.error('Error formatting date:', dateString, e);
       return 'Invalid Date'; // Fallback for parsing errors
