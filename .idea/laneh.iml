@@ -11,6 +11,9 @@
       <excludeFolder url="file://$MODULE_DIR$/mobile-shell/android/app/src/main/assets/public" />
       <excludeFolder url="file://$MODULE_DIR$/mobile-shell/project.inlang/cache" />
       <excludeFolder url="file://$MODULE_DIR$/android/app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/android/app/src/main/assets/public" />
+      <excludeFolder url="file://$MODULE_DIR$/android/build" />
+      <excludeFolder url="file://$MODULE_DIR$/android/capacitor-cordova-android-plugins" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
