@@ -41,8 +41,6 @@
 <style>
     nav {
         width: 100%;
-        display: flex;
-        justify-content: center; /* Centers the ul perfectly */
     }
 
     ul {
@@ -50,7 +48,7 @@
         padding: 0;
         margin: 0;
         display: flex;
-        justify-content: center;
+        justify-content: space-evenly;
         gap: 1.5rem;
     }
 
