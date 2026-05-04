@@ -179,25 +179,11 @@ a {
 /* =========================================
    3. Layout Containers
    ========================================= */
-header, main {
+main {
     width: 100%;
     max-width: var(--max-width);
     margin: 0 auto;
     padding: 1rem;
-}
-
-header {
-    border-bottom: var(--default-border-width) solid var(--border-main);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-footer {
-    border-top: var(--default-border-width) solid var(--border-main);
-    color: var(--text-muted);
-    text-align: center;
-    font-size: 0.9rem;
 }
 
 /* =========================================
@@ -299,6 +285,9 @@ main > .single-col-wrapper > article > footer {
     gap: 0.75rem;
     padding: 1rem 0 0;
     border-top: var(--default-border-width) solid var(--border-main);
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.9rem;
 }
 
 /* =========================================
@@ -422,7 +411,6 @@ a[role="button"] {
     align-items: center;
     gap: 0.25rem;
 }
-
 
 /* =========================================
    8. Toggle Switches (Checkboxes)
@@ -755,7 +743,7 @@ tbody td > button:focus-visible {
    14. Mobile / Small Screen Overrides
    ========================================= */
 @media (max-width: 23.5rem) {
-    header, main {
+    main {
         padding-inline: 0;
     }
 }
