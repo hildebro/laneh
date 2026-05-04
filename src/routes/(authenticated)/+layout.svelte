@@ -1,14 +1,10 @@
 <script lang="ts">
-  import { CloudAlert, LoaderCircle } from 'lucide-svelte';
-  import { onMount } from 'svelte';
+  import { LoaderCircle } from 'lucide-svelte';
+  import HeaderDropdown from './HeaderDropdown.svelte';
   import Navigation from './Navigation.svelte';
   import { invalidateAll } from '$app/navigation';
-  import { resolve } from '$app/paths';
-  import * as m from '$lib/paraglide/messages.js';
 
   let { children, data } = $props();
-
-  let updateAvailable = $state(false);
 
   // --- Pull to Refresh State ---
   const resistance = 0.3;
@@ -77,33 +73,14 @@
       shouldRefresh = false;
     }
   };
-
-  onMount(async () => {
-    try {
-      const res = await fetch(resolve('/api/update'));
-      const updateData = await res.json();
-      if (updateData.hasUpdate) {
-        updateAvailable = true;
-      }
-    } catch {
-      console.error('Failed to check for updates');
-    }
-  });
 </script>
 
 <header>
   <div class="header-inner">
-    <div class:warning={updateAvailable}>
-      {m.footer_version({ app_version: __APP_VERSION__ })}
-      {#if updateAvailable}
-        <CloudAlert size={20} class="icon" />
-      {/if}
+    <div>
+      Laneh
     </div>
-    {#if data.logged_in_user}
-      <div>
-        { m.footer_user({ name: data.logged_in_user.username }) }
-      </div>
-    {/if}
+    <HeaderDropdown logged_in_user={data.logged_in_user} />
   </div>
 </header>
 
@@ -139,86 +116,82 @@
 </footer>
 
 <style>
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background-color: var(--bg-app);
-    border-bottom: var(--default-border-width) solid var(--border-main);
-  }
-
-  .header-inner {
-    width: 100%;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 1rem;
-    color: var(--text-heading);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .header-inner div {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .warning {
-    color: var(--btn-warning-text);
-  }
-
-  footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 100;
-    background-color: var(--bg-app);
-    border-top: var(--default-border-width) solid var(--border-main);
-  }
-
-  .footer-inner {
-    width: 100%;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0.5rem 1rem;
-  }
-
-  .pull-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 150px;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 50;
-  }
-
-  .pull-indicator {
-    position: absolute;
-    top: -55px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-  }
-
-  .loader-bg {
-    background-color: var(--bg-surface);
-    color: var(--btn-primary-bg);
-    border: var(--default-border-width) solid var(--border-main);
-    border-radius: 50%;
-    width: 2.75rem;
-    height: 2.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  @media (max-width: 23.5rem) {
-    .header-inner, .footer-inner {
-      padding-inline: 0.5rem;
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--bg-app);
+        border-bottom: var(--default-border-width) solid var(--border-main);
     }
-  }
+
+    .header-inner {
+        width: 100%;
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 0.7rem;
+        color: var(--text-heading);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-inner div {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 100;
+        background-color: var(--bg-app);
+        border-top: var(--default-border-width) solid var(--border-main);
+    }
+
+    .footer-inner {
+        width: 100%;
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 0.5rem 1rem;
+    }
+
+    .pull-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 150px;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 50;
+    }
+
+    .pull-indicator {
+        position: absolute;
+        top: -55px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .loader-bg {
+        background-color: var(--bg-surface);
+        color: var(--btn-primary-bg);
+        border: var(--default-border-width) solid var(--border-main);
+        border-radius: 50%;
+        width: 2.75rem;
+        height: 2.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 23.5rem) {
+        .header-inner, .footer-inner {
+            padding-inline: 0.5rem;
+        }
+    }
 </style>

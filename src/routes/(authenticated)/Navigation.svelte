@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CalendarDays, House, Receipt, Settings, ShoppingCart } from 'lucide-svelte';
+  import { CalendarDays, House, Receipt, ShoppingCart } from 'lucide-svelte';
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -14,8 +14,7 @@
       href: resolve('/tasks'),
       icon: CalendarDays,
       badge: dueTaskCount > 0 ? dueTaskCount : null
-    },
-    { label: m.header_settings(), href: resolve('/settings'), icon: Settings }
+    }
   ]);
 </script>
 
