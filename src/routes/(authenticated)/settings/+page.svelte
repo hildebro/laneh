@@ -27,10 +27,6 @@
     await invalidateAll();
   }
 
-  async function logout() {
-    const client = getApiClient();
-    return client.api.users.logout.$post();
-  }
 
   function exitInstance() {
     localStorage.removeItem('serverUrl');
@@ -76,9 +72,6 @@
       <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
         {m.settings_actions_export()}
       </a>
-      <ApiForm submitAction={logout} submitButtonText={m.auth_logout()} onSuccess={resolve('/login')}>
-        <span></span>
-      </ApiForm>
       {#if Capacitor.isNativePlatform()}
         <button onclick={exitInstance}>{m.settings_mobile_return_to_wrapper()}</button>
       {/if}

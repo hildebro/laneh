@@ -2,6 +2,8 @@
   import { CircleUser, CloudAlert } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { resolve } from '$app/paths';
+  import { getApiClient } from '$lib/apiClient';
+  import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let { logged_in_user } = $props();
@@ -15,11 +17,12 @@
     isOpen = !isOpen;
   };
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-  };
+  async function logout() {
+    const client = getApiClient();
+    return client.api.users.logout.$post();
+  }
 
-  // Close the dropdown if the user clicks outside of the component
+  // Close the dropdown if the user clicks outside the component
   const handleOutsideClick = (event: MouseEvent) => {
     if (isOpen && wrapper && !wrapper.contains(event.target as Node)) {
       isOpen = false;
@@ -65,9 +68,11 @@
           { m.header_settings() }
         </a>
 
-        <button class="dropdown-item" onclick={() => { handleLogout(); isOpen = false; }}>
-          { m.auth_logout() }
-        </button>
+        <ApiForm submitAction={logout} submitButtonHidden onSuccess={resolve('/login')}>
+          <button type="submit" class="dropdown-item" style="width: 100%">
+            {m.auth_logout()}
+          </button>
+        </ApiForm>
       </div>
     </div>
   {/if}
