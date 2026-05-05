@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Capacitor } from '@capacitor/core';
   import { CloudAlert, Menu } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { goto, invalidateAll } from '$app/navigation';
@@ -21,6 +22,12 @@
   async function logout() {
     const client = getApiClient();
     return client.api.users.logout.$post();
+  }
+
+  function exitInstance() {
+    localStorage.removeItem('serverUrl');
+    goto(resolve('/server-picker'));
+    isOpen = false;
   }
 
   // Close the dropdown if the user clicks outside the component
@@ -86,6 +93,10 @@
               {m.auth_logout()}
             </button>
           </ApiForm>
+        {/if}
+
+        {#if Capacitor.isNativePlatform() && localStorage.getItem('serverUrl')}
+          <button class="dropdown-item" onclick={exitInstance}>{m.settings_mobile_return_to_wrapper()}</button>
         {/if}
       </div>
     </div>

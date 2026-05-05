@@ -13,6 +13,8 @@ export const load: LayoutLoad = async ({ fetch, parent }) => {
   const client = getApiClient(fetch);
 
   return {
+    // Passing the user again, so the type is no longer possibly null.
+    logged_in_user,
     users: await handleApiLoad(client.api.users.$get()),
     due_task_count: await handleApiLoad(client.api.tasks.dueTaskCount.$get())
   };

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Capacitor } from '@capacitor/core';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
@@ -21,11 +20,6 @@
   async function onSuccess() {
     password = undefined;
     await invalidateAll();
-  }
-
-  function exitInstance() {
-    localStorage.removeItem('serverUrl');
-    goto(resolve('/server-picker'));
   }
 </script>
 
@@ -53,9 +47,6 @@
       <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
         {m.settings_actions_export()}
       </a>
-      {#if Capacitor.isNativePlatform()}
-        <button onclick={exitInstance}>{m.settings_mobile_return_to_wrapper()}</button>
-      {/if}
     </div>
   </article>
 </div>
