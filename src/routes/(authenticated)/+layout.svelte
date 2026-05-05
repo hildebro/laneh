@@ -4,6 +4,7 @@
   import UserDropdown from './UserDropdown.svelte';
   import { invalidateAll } from '$app/navigation';
   import * as m from '$lib/paraglide/messages.js';
+  import LanguageDropdown from './LanguageDropdown.svelte';
 
   let { children, data } = $props();
 
@@ -81,7 +82,10 @@
     <div>
       { m.header_head() }
     </div>
-    <UserDropdown logged_in_user={data.logged_in_user} />
+    <div style="display: flex; align-items: start;">
+      <LanguageDropdown />
+      <UserDropdown logged_in_user={data.logged_in_user} />
+    </div>
   </div>
 </header>
 
