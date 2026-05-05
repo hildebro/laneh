@@ -3,6 +3,7 @@
   import HeaderDropdown from './HeaderDropdown.svelte';
   import Navigation from './Navigation.svelte';
   import { invalidateAll } from '$app/navigation';
+  import * as m from '$lib/paraglide/messages.js';
 
   let { children, data } = $props();
 
@@ -78,7 +79,7 @@
 <header>
   <div class="header-inner">
     <div>
-      Laneh
+      { m.header_head() }
     </div>
     <HeaderDropdown logged_in_user={data.logged_in_user} />
   </div>
