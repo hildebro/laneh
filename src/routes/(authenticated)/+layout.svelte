@@ -128,7 +128,7 @@
         width: 100%;
         max-width: var(--max-width);
         margin: 0 auto;
-        padding: 0.7rem;
+        padding: 0.3rem;
         color: var(--text-heading);
         display: flex;
         justify-content: space-between;
