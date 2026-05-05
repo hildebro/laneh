@@ -76,15 +76,17 @@
       </div>
 
       <div class="dropdown-actions">
-        <a href={resolve('/settings')} class="dropdown-item" onclick={() => isOpen = false}>
-          { m.header_settings() }
-        </a>
+        {#if logged_in_user}
+          <a href={resolve('/settings')} class="dropdown-item" onclick={() => isOpen = false}>
+            { m.header_settings() }
+          </a>
 
-        <ApiForm submitAction={logout} submitButtonHidden {onSuccess}>
-          <button type="submit" class="dropdown-item" style="width: 100%">
-            {m.auth_logout()}
-          </button>
-        </ApiForm>
+          <ApiForm submitAction={logout} submitButtonHidden {onSuccess}>
+            <button type="submit" class="dropdown-item" style="width: 100%">
+              {m.auth_logout()}
+            </button>
+          </ApiForm>
+        {/if}
       </div>
     </div>
   {/if}
