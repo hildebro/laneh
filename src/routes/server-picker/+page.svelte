@@ -33,8 +33,7 @@
   }
 
   async function demoMode() {
-    localStorage.setItem('serverUrl', 'demo');
-    await setDemoMode(true);
+    await setDemoMode();
     await goto(resolve('/'));
   }
 </script>
