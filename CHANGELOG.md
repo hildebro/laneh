@@ -1,3 +1,29 @@
+# [2.8.0](https://github.com/hildebro/laneh/compare/v2.7.6...v2.8.0) (2026-05-05)
+
+
+### Bug Fixes
+
+* back to draft releases for internal testing ([eae5809](https://github.com/hildebro/laneh/commit/eae5809c0e29d83dffa293f96134ac86195f055a))
+* hide settings and logout outside of auth area ([1d35d2c](https://github.com/hildebro/laneh/commit/1d35d2c75734d60c482422322bdf152622019834))
+* local-based formatters ([3c29462](https://github.com/hildebro/laneh/commit/3c29462d022c49151c4db50dabf29e6ebebfd6e3))
+* logout button in header ([15b8988](https://github.com/hildebro/laneh/commit/15b898847741273f3da8a43fe4c0edb380e3c78d))
+* remove username when logging out ([66ec035](https://github.com/hildebro/laneh/commit/66ec035b4986e53f2c024fe9cf4f094a942fdf0b))
+* slight header spacing ([9687203](https://github.com/hildebro/laneh/commit/9687203a821cdfb483fff650d773a8ab997c0e09))
+* user handling for android ([eb1c51c](https://github.com/hildebro/laneh/commit/eb1c51c1c89ab1cd4a752bd80ea5e614a1c2019a))
+
+
+### Features
+
+* exchange header and footer, always keep in view ([6c89686](https://github.com/hildebro/laneh/commit/6c8968635d8c1705c499d76b3bf111332d3a22f1))
+* improve nav spacing ([ae4ce1f](https://github.com/hildebro/laneh/commit/ae4ce1f9164f981c0f12071cb4f98d676bcc7707))
+* improved styling for login ([e329e06](https://github.com/hildebro/laneh/commit/e329e06324695ff44d1e90fb52aadd427fe9bfc8))
+* language to header ([8e1e564](https://github.com/hildebro/laneh/commit/8e1e564c6998285e3a0abe3829c5860db6667c8c))
+* move exit instance to menu ([ac2bfeb](https://github.com/hildebro/laneh/commit/ac2bfeb99253ddebd63f333da8ce9aac08c48493))
+* move header to root layout ([0dce58f](https://github.com/hildebro/laneh/commit/0dce58fb3e9d53f272b23f2d1ec3906f97e8afb3))
+* new header dropdown ([564d98d](https://github.com/hildebro/laneh/commit/564d98ddbb36788bc04b8019af5b95517a44c434))
+* theme to header ([0b0bc44](https://github.com/hildebro/laneh/commit/0b0bc444b406f5e15b1a52e45c4b0f7c44888e28))
+* username into menu ([01431ed](https://github.com/hildebro/laneh/commit/01431ed3bc0393cc9427d2662ef09430d645931e))
+
 ## [2.7.6](https://github.com/hildebro/laneh/compare/v2.7.5...v2.7.6) (2026-05-01)
 
 
