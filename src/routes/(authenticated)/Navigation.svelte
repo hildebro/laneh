@@ -6,11 +6,11 @@
   let { dueTaskCount } = $props();
 
   const links = $derived([
-    { label: m.header_dashboard(), href: resolve('/'), icon: House },
-    { label: m.header_shopping(), href: resolve('/shopping'), icon: ShoppingCart },
-    { label: m.header_balance(), href: resolve('/balance'), icon: Receipt },
+    { label: m.navigation_dashboard(), href: resolve('/'), icon: House },
+    { label: m.navigation_shopping(), href: resolve('/shopping'), icon: ShoppingCart },
+    { label: m.navigation_balance(), href: resolve('/balance'), icon: Receipt },
     {
-      label: m.header_schedule(),
+      label: m.navigation_schedule(),
       href: resolve('/tasks'),
       icon: CalendarDays,
       badge: dueTaskCount > 0 ? dueTaskCount : null

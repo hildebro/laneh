@@ -13,7 +13,7 @@
 </script>
 
 <article>
-  <h2>{ m.header_shopping() }</h2>
+  <h2>{ m.navigation_shopping() }</h2>
   <p>
     { m.dashboard_shopping_count({ count: data.shopping_item_count }) }
   </p>
@@ -29,7 +29,7 @@
 </article>
 
 <article>
-  <h2>{ m.header_schedule() }</h2>
+  <h2>{ m.navigation_schedule() }</h2>
   <p>{ m.dashboard_schedule_count({ count: data.due_task_count }) }</p>
   <footer>
     <a role="button" href={resolve('/tasks')}>{ m.dashboard_schedule_go_to() }</a>
