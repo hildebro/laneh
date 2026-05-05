@@ -1,7 +1,7 @@
 <script lang="ts">
   import { LoaderCircle } from 'lucide-svelte';
-  import HeaderDropdown from './HeaderDropdown.svelte';
   import Navigation from './Navigation.svelte';
+  import UserDropdown from './UserDropdown.svelte';
   import { invalidateAll } from '$app/navigation';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -81,7 +81,7 @@
     <div>
       { m.header_head() }
     </div>
-    <HeaderDropdown logged_in_user={data.logged_in_user} />
+    <UserDropdown logged_in_user={data.logged_in_user} />
   </div>
 </header>
 
