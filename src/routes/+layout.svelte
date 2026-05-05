@@ -4,8 +4,8 @@
   import { StatusBar } from '@capacitor/status-bar';
   import { Moon, Sun } from 'lucide-svelte';
   import { onMount } from 'svelte';
-  import LanguageDropdown from './(authenticated)/LanguageDropdown.svelte';
-  import UserDropdown from './(authenticated)/UserDropdown.svelte';
+  import LanguageDropdown from './LanguageDropdown.svelte';
+  import UserDropdown from './UserDropdown.svelte';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
