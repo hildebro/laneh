@@ -1,13 +1,11 @@
 import { Capacitor } from '@capacitor/core';
 import { redirect } from '@sveltejs/kit';
 import { resolve } from '$app/paths';
-import { getApiClient } from '$lib/apiClient';
-import { handleApiLoad } from '$lib/utils/apiHelper';
 
 export const ssr = false;
 export const prerender = false;
 
-export const load = async ({ fetch, url }) => {
+export const load = async ({ url }) => {
   if (Capacitor.isNativePlatform()) {
     const serverUrl = localStorage.getItem('serverUrl');
 
@@ -16,8 +14,6 @@ export const load = async ({ fetch, url }) => {
     }
   }
 
-  const client = getApiClient(fetch);
-  const logged_in_user = await handleApiLoad(client.api.public.loggedInUser.$get());
-
-  return { logged_in_user };
+  // This will be overridden in the (authenticated) area with the actual user.
+  return { logged_in_user: null };
 };

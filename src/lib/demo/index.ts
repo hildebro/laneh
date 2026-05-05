@@ -1,18 +1,14 @@
 import { Capacitor } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
 import { getMockData } from '$lib/demo/mockFactory';
 
-export async function setDemoMode(demoMode: boolean) {
+export async function setDemoMode() {
   if (Capacitor.isNativePlatform()) {
-    await Preferences.set({
-      key: 'demoMode',
-      value: `${demoMode}`
-    });
+    localStorage.setItem('serverUrl', 'demo');
   }
 }
 
 export async function isDemoMode() {
-  return Capacitor.isNativePlatform() && (await Preferences.get({ key: 'demoMode' })).value === 'true';
+  return Capacitor.isNativePlatform() && localStorage.getItem('serverUrl') === 'demo';
 }
 
 export function handleDemoMode(input: RequestInfo | URL, init?: RequestInit) {
