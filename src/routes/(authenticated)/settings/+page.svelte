@@ -1,7 +1,5 @@
 <script lang="ts">
   import { Capacitor } from '@capacitor/core';
-  import { Moon, Sun } from 'lucide-svelte';
-  import { onMount } from 'svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
@@ -28,20 +26,6 @@
   function exitInstance() {
     localStorage.removeItem('serverUrl');
     goto(resolve('/server-picker'));
-  }
-
-  let isDark = $state(false);
-
-  onMount(() => {
-    isDark = document.documentElement.getAttribute('data-color-scheme') === 'dark';
-  });
-
-  function toggleTheme() {
-    isDark = !isDark;
-    const newScheme = isDark ? 'dark' : 'light';
-
-    document.documentElement.setAttribute('data-color-scheme', newScheme);
-    localStorage.setItem('color-scheme', newScheme);
   }
 </script>
 
@@ -88,16 +72,5 @@
     </label>
   </ApiForm>
 </article>
-<article>
-  <h2>{m.settings_users_theme()}</h2>
-  <div class="action-row">
-    <button onclick={() => toggleTheme()}>
-      {#if isDark}
-        <Moon />
-      {:else}
-        <Sun />
-      {/if}
-    </button>
-  </div>
-</article>
+
 
