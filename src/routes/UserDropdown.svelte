@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CircleUser, CloudAlert } from 'lucide-svelte';
+  import { CloudAlert, Menu } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -31,7 +31,7 @@
   };
 
   async function onSuccess() {
-    await invalidateAll()
+    await invalidateAll();
     await goto(resolve('/login'));
     isOpen = false;
   }
@@ -54,20 +54,25 @@
 <div class="user-menu-wrapper" bind:this={wrapper}>
   <button class="trigger" onclick={toggleMenu} aria-expanded={isOpen}>
     <span style="display: flex; flex-direction: column; align-items: center; line-height: 0.7rem; font-size: 0.7rem;">
-      <CircleUser size={24} />
-      {#if logged_in_user}
-        <span style="margin-top: 0.2rem;">{ logged_in_user.username }</span>
-      {/if}
+      <Menu size={24} />
+      <span style="margin-top: 0.2rem;">{ m.header_menu() }</span>
     </span>
   </button>
 
   {#if isOpen}
     <div class="dropdown">
       <div class="dropdown-header" class:warning={updateAvailable}>
-        {#if updateAvailable}
-          <CloudAlert size={20} class="icon" />
-        {/if}
-        {m.footer_version({ app_version: __APP_VERSION__ })}
+        <div>
+          {#if logged_in_user}
+            { m.header_user({ name: logged_in_user.username }) }
+          {/if}
+        </div>
+        <div>
+          {#if updateAvailable}
+            <CloudAlert size={20} class="icon" />
+          {/if}
+          {m.footer_version({ app_version: __APP_VERSION__ })}
+        </div>
       </div>
 
       <div class="dropdown-actions">
