@@ -6,9 +6,7 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
-  import { transLocale } from '$lib/locale-translations.js';
   import * as m from '$lib/paraglide/messages.js';
-  import { locales, setLocale } from '$lib/paraglide/runtime.js';
 
   let { data } = $props();
 
@@ -26,7 +24,6 @@
     password = undefined;
     await invalidateAll();
   }
-
 
   function exitInstance() {
     localStorage.removeItem('serverUrl');
@@ -92,14 +89,6 @@
   </ApiForm>
 </article>
 <article>
-  <h2>{m.settings_users_language()}</h2>
-  <div class="action-row">
-    {#each locales as locale(locale)}
-      <button onclick={() => setLocale(locale)}>
-        {transLocale(locale)}
-      </button>
-    {/each}
-  </div>
   <h2>{m.settings_users_theme()}</h2>
   <div class="action-row">
     <button onclick={() => toggleTheme()}>
