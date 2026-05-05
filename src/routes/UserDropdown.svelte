@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CircleUser, CloudAlert } from 'lucide-svelte';
   import { onMount } from 'svelte';
+  import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
@@ -28,6 +29,12 @@
       isOpen = false;
     }
   };
+
+  async function onSuccess() {
+    await invalidateAll()
+    await goto(resolve('/login'));
+    isOpen = false;
+  }
 
   onMount(async () => {
     try {
@@ -68,7 +75,7 @@
           { m.header_settings() }
         </a>
 
-        <ApiForm submitAction={logout} submitButtonHidden onSuccess={resolve('/login')}>
+        <ApiForm submitAction={logout} submitButtonHidden {onSuccess}>
           <button type="submit" class="dropdown-item" style="width: 100%">
             {m.auth_logout()}
           </button>
