@@ -58,15 +58,15 @@
 
 <svelte:window onclick={handleOutsideClick} />
 
-<div class="user-menu-wrapper" bind:this={wrapper}>
+<div class="header-dropdown-wrapper" bind:this={wrapper}>
   <button class="header-action" onclick={toggleMenu} aria-expanded={isOpen}>
     <Menu size={24} />
     <span>{ m.header_menu() }</span>
   </button>
 
   {#if isOpen}
-    <div class="dropdown">
-      <div class="dropdown-header" class:warning={updateAvailable}>
+    <div class="header-dropdown">
+      <div class="header-dropdown-info" class:warning={updateAvailable}>
         <div>
           {#if logged_in_user}
             { m.header_user({ name: logged_in_user.username }) }
@@ -80,21 +80,21 @@
         </div>
       </div>
 
-      <div class="dropdown-actions">
+      <div class="header-dropdown-actions">
         {#if logged_in_user}
-          <a href={resolve('/settings')} class="dropdown-item" onclick={() => isOpen = false}>
+          <a href={resolve('/settings')} class="header-dropdown-item" onclick={() => isOpen = false}>
             { m.header_settings() }
           </a>
 
           <ApiForm submitAction={logout} submitButtonHidden {onSuccess}>
-            <button type="submit" class="dropdown-item" style="width: 100%">
+            <button type="submit" class="header-dropdown-item" style="width: 100%">
               {m.auth_logout()}
             </button>
           </ApiForm>
         {/if}
 
         {#if Capacitor.isNativePlatform() && localStorage.getItem('serverUrl')}
-          <button class="dropdown-item" onclick={exitInstance}>{m.settings_mobile_return_to_wrapper()}</button>
+          <button class="header-dropdown-item" onclick={exitInstance}>{m.settings_mobile_return_to_wrapper()}</button>
         {/if}
       </div>
     </div>
@@ -104,89 +104,5 @@
 <style>
     .warning {
         color: var(--btn-warning-text);
-    }
-
-    .user-menu-wrapper {
-        position: relative;
-        display: inline-block;
-    }
-
-    .trigger {
-        background: transparent;
-        border: none;
-        color: var(--text-heading);
-        cursor: pointer;
-        padding: 0.25rem;
-        transition: color 0.2s ease, transform 0.1s ease;
-        font-family: inherit;
-    }
-
-    .trigger:hover {
-        color: var(--btn-primary-bg);
-    }
-
-    .trigger:active {
-        transform: scale(0.95);
-    }
-
-    .dropdown {
-        position: absolute;
-        top: calc(100% + 0.5rem);
-        right: 0;
-        min-width: 12rem;
-
-        background-color: var(--bg-surface);
-        border: var(--default-border-width) solid var(--border-main);
-        border-radius: var(--radius-container);
-        box-shadow: var(--dialog-shadow);
-
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        z-index: 200;
-    }
-
-    .dropdown-header {
-        padding: 0.75rem 1rem;
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        border-bottom: var(--default-border-width) solid var(--border-main);
-        text-align: right;
-        background-color: var(--table-header-bg); /* Reusing a subtle background variable */
-    }
-
-    .dropdown-actions {
-        display: flex;
-        flex-direction: column;
-        padding: 0.5rem 0;
-    }
-
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.6rem 1rem;
-
-        color: var(--text-heading);
-        background-color: transparent;
-        border: none;
-        font-size: 0.95rem;
-        font-family: inherit;
-        text-decoration: none;
-        text-align: left;
-        cursor: pointer;
-
-        transition: background-color 0.2s ease, color 0.2s ease;
-    }
-
-    .dropdown-item:hover {
-        background-color: var(--bg-surface-hover);
-        color: var(--btn-primary-bg);
-    }
-
-    /* Reset button specific styles that might clash from app.css */
-    button.dropdown-item {
-        border-radius: 0;
-        line-height: normal;
     }
 </style>
