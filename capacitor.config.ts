@@ -17,6 +17,7 @@ const config: CapacitorConfig = {
 
 if (process.env.CAP_LIVE_RELOAD === 'true') {
   config.server = {
+    ...config.server,
     url: process.env.CAP_SERVER_URL
   };
 }
