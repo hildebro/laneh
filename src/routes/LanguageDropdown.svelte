@@ -22,11 +22,9 @@
 <svelte:window onclick={handleOutsideClick} />
 
 <div class="user-menu-wrapper" bind:this={wrapper}>
-  <button class="trigger" onclick={toggleMenu} aria-expanded={isOpen}>
-    <span style="display: flex; flex-direction: column; align-items: center; line-height: 0.7rem; font-size: 0.7rem;">
-      <Globe size={24} />
-      <span style="margin-top: 0.2rem;">{ m.header_language() }</span>
-    </span>
+  <button class="header-action" onclick={toggleMenu} aria-expanded={isOpen}>
+    <Globe size={24} />
+    <span>{ m.header_language() }</span>
   </button>
 
   {#if isOpen}
@@ -46,24 +44,6 @@
     .user-menu-wrapper {
         position: relative;
         display: inline-block;
-    }
-
-    .trigger {
-        background: transparent;
-        border: none;
-        color: var(--text-heading);
-        cursor: pointer;
-        padding: 0.25rem;
-        transition: color 0.2s ease, transform 0.1s ease;
-        font-family: inherit;
-    }
-
-    .trigger:hover {
-        color: var(--btn-primary-bg);
-    }
-
-    .trigger:active {
-        transform: scale(0.95);
     }
 
     .dropdown {

@@ -2,9 +2,9 @@
   import '../app.css';
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
-  import { Moon, Sun } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import LanguageDropdown from './LanguageDropdown.svelte';
+  import ThemeAction from './ThemeAction.svelte';
   import UserDropdown from './UserDropdown.svelte';
   import { page } from '$app/state';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
@@ -12,19 +12,7 @@
 
   let { children } = $props();
 
-  let isDark = $state(false);
-
-  function toggleTheme() {
-    isDark = !isDark;
-    const newScheme = isDark ? 'dark' : 'light';
-
-    document.documentElement.setAttribute('data-color-scheme', newScheme);
-    localStorage.setItem('color-scheme', newScheme);
-  }
-
   onMount(async () => {
-    isDark = document.documentElement.getAttribute('data-color-scheme') === 'dark';
-
     if (Capacitor.isNativePlatform()) {
       // Option A: Make the status bar transparent (Content goes BEHIND it)
       // You MUST use Method 1 (CSS padding) with this for it to look good.
@@ -50,18 +38,8 @@
       <div>
         { m.header_head() }
       </div>
-      <div style="display: flex; align-items: start">
-        <button class="trigger" onclick={toggleTheme}>
-        <span
-          style="display: flex; flex-direction: column; align-items: center; line-height: 0.7rem; font-size: 0.7rem;">
-            {#if isDark}
-              <Moon size={24} />
-            {:else}
-              <Sun size={24} />
-            {/if}
-          <span style="margin-top: 0.2rem;">{ m.header_theme() }</span>
-        </span>
-        </button>
+      <div class="header-action-container">
+        <ThemeAction/>
         <LanguageDropdown />
         <UserDropdown logged_in_user={page.data.logged_in_user} />
       </div>
@@ -96,6 +74,11 @@
         align-items: center;
     }
 
+    .header-action-container {
+        display: flex;
+        align-items: start;
+    }
+
     .header-inner div {
         display: flex;
         align-items: center;
@@ -106,23 +89,5 @@
         .header-inner {
             padding-inline: 0.5rem;
         }
-    }
-
-    .trigger {
-        background: transparent;
-        border: none;
-        color: var(--text-heading);
-        cursor: pointer;
-        padding: 0.25rem;
-        transition: color 0.2s ease, transform 0.1s ease;
-        font-family: inherit;
-    }
-
-    .trigger:hover {
-        color: var(--btn-primary-bg);
-    }
-
-    .trigger:active {
-        transform: scale(0.95);
     }
 </style>
