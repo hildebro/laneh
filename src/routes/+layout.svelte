@@ -17,11 +17,6 @@
       // Option A: Make the status bar transparent (Content goes BEHIND it)
       // You MUST use Method 1 (CSS padding) with this for it to look good.
       await StatusBar.setOverlaysWebView({ overlay: true });
-
-      // Since your header is "bg-surface-50-950" (likely dark in dark mode, light in light mode),
-      // you might want to dynamically set this, or just stick to Style.Default which adapts.
-      // If your header is always dark-ish, force Light icons:
-      // await StatusBar.setStyle({ style: Style.Dark });
     }
   });
 </script>
