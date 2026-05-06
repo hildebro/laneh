@@ -54,3 +54,9 @@
     </div>
   </article>
 </main>
+
+<style>
+    main {
+        align-content: center;
+    }
+</style>
