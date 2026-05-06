@@ -112,6 +112,7 @@
         z-index: 100;
         background-color: var(--bg-app);
         border-top: var(--default-border-width) solid var(--border-main);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     .footer-inner {

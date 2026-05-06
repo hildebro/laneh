@@ -73,8 +73,6 @@
     /* This ensures the background color extends BEHIND the status bar, but content starts BELOW it. */
     .app-shell {
         min-height: 100vh;
-
-        padding-top: env(safe-area-inset-top, 1rem);
     }
 
     header {
@@ -83,6 +81,7 @@
         z-index: 100;
         background-color: var(--bg-app);
         border-bottom: var(--default-border-width) solid var(--border-main);
+        padding-top: env(safe-area-inset-top, 1rem);
     }
 
     .header-inner {
