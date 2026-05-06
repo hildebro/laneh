@@ -4,8 +4,8 @@
   import { StatusBar } from '@capacitor/status-bar';
   import { onMount } from 'svelte';
   import LanguageAction from './LanguageAction.svelte';
+  import MenuAction from './MenuAction.svelte';
   import ThemeAction from './ThemeAction.svelte';
-  import UserDropdown from './UserDropdown.svelte';
   import { page } from '$app/state';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
@@ -41,7 +41,7 @@
       <div class="header-action-container">
         <ThemeAction/>
         <LanguageAction />
-        <UserDropdown logged_in_user={page.data.logged_in_user} />
+        <MenuAction logged_in_user={page.data.logged_in_user} />
       </div>
     </div>
   </header>
