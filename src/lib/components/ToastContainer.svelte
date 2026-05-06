@@ -37,12 +37,12 @@
         position: fixed;
         z-index: 999;
         top: 0;
-        right: 0;
+        left: 0;
         padding: 1.5rem;
 
         display: grid;
-        justify-content: end;
-        justify-items: end;
+        justify-content: start;
+        justify-items: start;
         gap: 0.75rem;
         pointer-events: none;
     }
