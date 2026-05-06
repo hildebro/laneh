@@ -6,10 +6,11 @@
   import { onMount } from 'svelte';
   import LanguageDropdown from './LanguageDropdown.svelte';
   import UserDropdown from './UserDropdown.svelte';
+  import { page } from '$app/state';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
-  let { children, data } = $props();
+  let { children } = $props();
 
   let isDark = $state(false);
 
@@ -62,7 +63,7 @@
         </span>
         </button>
         <LanguageDropdown />
-        <UserDropdown logged_in_user={data?.logged_in_user} />
+        <UserDropdown logged_in_user={page.data.logged_in_user} />
       </div>
     </div>
   </header>
