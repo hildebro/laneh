@@ -1,3 +1,14 @@
+## [2.8.1](https://github.com/hildebro/laneh/compare/v2.8.0...v2.8.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* capacitor header/footer spacing ([710b070](https://github.com/hildebro/laneh/commit/710b070f86897d4c767bd9b96071deb84d257b7c))
+* menu not working for auth area ([3857212](https://github.com/hildebro/laneh/commit/385721218b4040aa9d5c19b9a30ad15cd4375705))
+* phone status bar color ([d318a83](https://github.com/hildebro/laneh/commit/d318a83d221d2912a38c025aa38b667b8fd606ed))
+* server piker article placement ([7f0920c](https://github.com/hildebro/laneh/commit/7f0920c0620f998e148a10735eb54c357c7e9f4e))
+* toasts topleft instead of topright ([ddeaec2](https://github.com/hildebro/laneh/commit/ddeaec21f1b9687f4b6401376825aef221e240c4))
+
 # [2.8.0](https://github.com/hildebro/laneh/compare/v2.7.6...v2.8.0) (2026-05-05)
 
 
