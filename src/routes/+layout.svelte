@@ -3,7 +3,7 @@
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
   import { onMount } from 'svelte';
-  import LanguageDropdown from './LanguageDropdown.svelte';
+  import LanguageAction from './LanguageAction.svelte';
   import ThemeAction from './ThemeAction.svelte';
   import UserDropdown from './UserDropdown.svelte';
   import { page } from '$app/state';
@@ -40,7 +40,7 @@
       </div>
       <div class="header-action-container">
         <ThemeAction/>
-        <LanguageDropdown />
+        <LanguageAction />
         <UserDropdown logged_in_user={page.data.logged_in_user} />
       </div>
     </div>
