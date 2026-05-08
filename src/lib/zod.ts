@@ -6,6 +6,8 @@ z.config({
   customError: (iss) => {
     if (iss.code === 'too_small' && iss.minimum === 1) {
       return m.form_invalid_nonempty();
+    } else if (iss.code === 'too_small' && iss.minimum > 1) {
+      return m.form_invalid_minimum({ minimum: iss.minimum });
     }
   }
 });
