@@ -1,11 +1,10 @@
 import { z } from 'zod/v4';
-import { languageContext } from '$lib/context';
+import { getLocale } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
-import { baseLocale } from '$lib/paraglide/runtime.js';
 
 z.config({
   customError: (iss) => {
-    const locale = languageContext.getStore() || baseLocale;
+    const locale = getLocale();
 
     if (iss.code === 'too_small' && iss.minimum === 1) {
       return m.form_invalid_nonempty({}, { locale });
