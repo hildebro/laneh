@@ -1,13 +1,16 @@
-// Custom zod instance with improved preconfigured messages
 import { z } from 'zod/v4';
+import { languageContext } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
+import { baseLocale } from '$lib/paraglide/runtime.js';
 
 z.config({
   customError: (iss) => {
+    const locale = languageContext.getStore() || baseLocale;
+
     if (iss.code === 'too_small' && iss.minimum === 1) {
-      return m.form_invalid_nonempty();
+      return m.form_invalid_nonempty({}, { locale });
     } else if (iss.code === 'too_small' && iss.minimum > 1) {
-      return m.form_invalid_minimum({ minimum: iss.minimum });
+      return m.form_invalid_minimum({ minimum: iss.minimum }, { locale });
     }
   }
 });
