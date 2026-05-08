@@ -40,44 +40,43 @@
 </div>
 
 <style>
-    .form-item {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 0;
-    }
+  .form-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.25rem;
+  }
 
-    /* Target the input when there is an error */
-    .input.error-border {
-        border-color: var(--btn-error-bg);
-    }
+  .input.error-border {
+    border-color: var(--btn-error-bg);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 
-    .input.error-border:focus-visible {
-        outline-color: var(--btn-error-bg);
-    }
+  .input.error-border:focus-visible {
+    outline-color: var(--btn-error-bg);
+  }
 
-    .error-spacer {
-        /* Set a minimum height equivalent to line-height + margin to hold the space */
-        min-height: 1.5rem;
-        margin-top: 0.25rem;
-        padding-left: 0.2rem;
-    }
+  .error-spacer {
+    min-height: 1.85rem;
+  }
 
-    .error-text {
-        display: block;
-        font-size: 0.85rem;
-        color: var(--btn-error-bg);
-        line-height: 1.2;
-        animation: fade-in 0.2s ease-out;
-    }
+  .error-text {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
 
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-            transform: translateY(-2px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    background-color: var(--btn-error-bg);
+    color: var(--btn-error-text);
+    padding: 0.35rem 0.5rem;
+
+    border-radius: 0 0 var(--radius-base, 0.25rem) var(--radius-base, 0.25rem);
+
+    line-height: 1.2;
+    animation: fade-in 0.2s ease-out;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
