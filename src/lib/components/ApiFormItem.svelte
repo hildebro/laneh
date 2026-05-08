@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getContext, type Snippet } from 'svelte';
+  import MoneyInput from '$lib/MoneyInput.svelte';
 
   let {
     label,
@@ -12,7 +13,7 @@
     label: string;
     name: string;
     value: unknown;
-    type?: 'text' | 'password' | 'number' | 'select';
+    type?: 'text' | 'password' | 'number' | 'select' | 'money';
     error?: string;
     children?: Snippet;
   } = $props();
@@ -38,6 +39,13 @@
         {@render children()}
       {/if}
     </select>
+  {:else if type === 'money'}
+    <MoneyInput
+      {name}
+      id={name}
+      bind:value={value as number}
+      hasError={!!displayError}
+    />
   {:else}
     <input
       class="input"
@@ -62,13 +70,13 @@
         margin-bottom: 0.25rem;
     }
 
-    .input.error-border {
+    .form-item :global(.input.error-border) {
         border-color: var(--btn-error-bg);
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
     }
 
-    .input.error-border:focus-visible {
+    .form-item :global(.input.error-border:focus-visible) {
         outline-color: var(--btn-error-bg);
     }
 

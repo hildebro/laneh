@@ -1,8 +1,17 @@
 <script lang="ts">
-  import * as m from '$lib/paraglide/messages.js';
   import { priceFormatter } from '$lib/utils/formatter';
 
-  let { value = $bindable() } = $props();
+  let {
+    value = $bindable(),
+    name,
+    id,
+    hasError = false
+  }: {
+    value: number;
+    name: string;
+    id: string;
+    hasError?: boolean;
+  } = $props();
 
   let formattedValue = $derived(priceFormatter.format(value / 100));
 
@@ -30,15 +39,14 @@
   }
 </script>
 
-<div class="flex flex-col w-full mx-auto">
-  <label class="label">
-    <span class="label-text">{ m.balance_price() }</span>
-    <input
-      type="text"
-      inputmode="numeric"
-      value={formattedValue}
-      onkeydown={handleKeyDown}
-      placeholder="0,00 €"
-    />
-  </label>
-</div>
+<input
+  class="input"
+  class:error-border={hasError}
+  type="text"
+  inputmode="numeric"
+  {name}
+  {id}
+  value={formattedValue}
+  onkeydown={handleKeyDown}
+  placeholder="0,00 €"
+/>
