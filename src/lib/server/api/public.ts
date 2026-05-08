@@ -7,7 +7,7 @@ import zlib from 'node:zlib';
 import tar from 'tar-stream';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
-import { getTx } from '$lib/context';
+import { getLocale, getTx } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
 import { getLoggedInUser } from '$lib/server/auth';
 import { addUser, createSession, findAllUsers, findAndVerifyUser } from '$lib/server/db/functions';
@@ -113,7 +113,7 @@ const publicRouter = new Hono()
         {
           code: 'custom',
           path: ['username'],
-          message: m.auth_login_invalid()
+          message: m.auth_login_invalid({}, { locale: getLocale() })
         }
       ]);
 
