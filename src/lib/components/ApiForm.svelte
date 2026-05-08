@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { setContext } from 'svelte';
   import type { Snippet } from 'svelte';
   import type { z } from 'zod';
   import { goto, invalidateAll } from '$app/navigation';
@@ -27,9 +28,14 @@
 
   let isSubmitting = $state(false);
 
+  let formState = $state({ errors: {} as Record<string, string> });
+
+  setContext('api-form-context', formState);
+
   async function handleSubmit(event: Event) {
     event.preventDefault();
     isSubmitting = true;
+    formState.errors = {};
 
     try {
       const response = await submitAction();
@@ -50,15 +56,17 @@
       }
 
       const result = await response.json().catch(() => ({}));
-      const issues: z.core.$ZodIssue[] | null = JSON.parse(result?.error?.message);
+      const issues: z.core.$ZodIssue[] | null = result?.error?.message ? JSON.parse(result.error.message) : null;
 
       if (issues && Array.isArray(issues) && issues.length > 0) {
-        const formattedIssues = issues.map((issue) => {
-          const path = transPath(issue.path.join('.'));
-          return `${path}: ${issue.message}`;
-        }).join('\n');
+        const newErrors: Record<string, string> = {};
 
-        addToast({ title: m.form_invalid(), message: formattedIssues, type: 'error' });
+        issues.map((issue) => {
+          const fieldPath = issue.path.join('.');
+          newErrors[fieldPath] = issue.message;
+        });
+
+        formState.errors = newErrors;
       } else {
         const errorMsg = result.message || result.error || m.form_error_generic();
 

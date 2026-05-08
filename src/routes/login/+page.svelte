@@ -44,13 +44,6 @@
         type="password"
         bind:value={password}
       />
-
     </ApiForm>
   </article>
 </main>
-
-<style>
-    main {
-        align-content: center;
-    }
-</style>
