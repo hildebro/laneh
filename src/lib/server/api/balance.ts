@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import { getLocale } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
 import {
   addBalanceEntry,
@@ -22,18 +23,19 @@ const expenseSchema = z
     name: z.string().min(1),
     creditorId: z.string().min(1),
     price: z.coerce.number().min(0.01),
-    distributions: z.array(z.object({ userId: z.string().nonempty(), percent: z.coerce.number().positive() })),
+    distributions: z.array(z.object({ userId: z.string().nonempty(), percent: z.coerce.number().min(0) }))
   })
-  .refine(
-    (data) => {
-      const total = data.distributions.reduce((sum, d) => sum + d.percent, 0);
-      return Math.abs(total - 100) < 0.1;
-    },
-    {
-      message: m.balance_expense_distribution_invalid_sum(),
-      path: ['distributions']
+  .superRefine((data, ctx) => {
+    const total = data.distributions.reduce((sum, d) => sum + d.percent, 0);
+
+    if (Math.abs(total - 100) >= 0.1) {
+      ctx.addIssue({
+        code: 'custom',
+        message: m.balance_expense_distribution_invalid_sum({}, { locale: getLocale() }),
+        path: ['distributions']
+      });
     }
-  );
+  });
 
 const balanceRouter = new Hono()
   .get('/', async (c) => {
