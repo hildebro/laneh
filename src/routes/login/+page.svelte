@@ -5,6 +5,7 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let username = $state('');
@@ -32,14 +33,18 @@
   <article>
     <h2>{m.login_headline()}</h2>
     <ApiForm {submitAction} {onSuccess} submitButtonText={m.auth_login()}>
-      <label>
-        {m.generic_name()}
-        <input class="input" type="text" name="username" bind:value={username} />
-      </label>
-      <label>
-        {m.auth_register_password()}
-        <input class="input" type="password" name="password" id="password" bind:value={password} />
-      </label>
+      <ApiFormItem
+        label={m.generic_name()}
+        name="username"
+        bind:value={username}
+      />
+      <ApiFormItem
+        label={m.auth_register_password()}
+        name="password"
+        type="password"
+        bind:value={password}
+      />
+
     </ApiForm>
   </article>
 </main>
