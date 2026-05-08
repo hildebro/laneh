@@ -47,3 +47,9 @@
     </ApiForm>
   </article>
 </main>
+
+<style>
+    main {
+        align-content: center;
+    }
+</style>
