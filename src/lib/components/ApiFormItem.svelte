@@ -1,18 +1,20 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, type Snippet } from 'svelte';
 
   let {
     label,
     name,
     value = $bindable(),
     type = 'text',
-    error = ''
+    error = '',
+    children
   }: {
     label: string;
     name: string;
-    value: string;
-    type?: 'text' | 'password' | 'email' | 'number';
+    value: unknown;
+    type?: 'text' | 'password' | 'number' | 'select';
     error?: string;
+    children?: Snippet;
   } = $props();
 
   // Retrieve the shared state from ApiForm (fallback to empty object if used outside ApiForm)
@@ -23,15 +25,29 @@
 
 <div class="form-item">
   <label for={name}>{label}</label>
-  <input
-    class="input"
-    class:error-border={!!displayError}
-    {type}
-    {name}
-    id={name}
-    bind:value
-  />
-
+  {#if type === 'select'}
+    <select
+      class="input"
+      class:error-border={!!displayError}
+      {name}
+      id={name}
+      bind:value
+    >
+      <!-- Conditional to make the type-check happy. Even though select without children should not happen. -->
+      {#if children}
+        {@render children()}
+      {/if}
+    </select>
+  {:else}
+    <input
+      class="input"
+      class:error-border={!!displayError}
+      {type}
+      {name}
+      id={name}
+      bind:value
+    />
+  {/if}
   <div class="error-spacer">
     {#if displayError}
       <span class="error-text">{displayError}</span>
@@ -40,43 +56,49 @@
 </div>
 
 <style>
-  .form-item {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0.25rem;
-  }
+    .form-item {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.25rem;
+    }
 
-  .input.error-border {
-    border-color: var(--btn-error-bg);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
+    .input.error-border {
+        border-color: var(--btn-error-bg);
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
 
-  .input.error-border:focus-visible {
-    outline-color: var(--btn-error-bg);
-  }
+    .input.error-border:focus-visible {
+        outline-color: var(--btn-error-bg);
+    }
 
-  .error-spacer {
-    min-height: 1.85rem;
-  }
+    .error-spacer {
+        min-height: 1.85rem;
+    }
 
-  .error-text {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
+    .error-text {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
 
-    background-color: var(--btn-error-bg);
-    color: var(--btn-error-text);
-    padding: 0.35rem 0.5rem;
+        background-color: var(--btn-error-bg);
+        color: var(--btn-error-text);
+        padding: 0.35rem 0.5rem;
 
-    border-radius: 0 0 var(--radius-base, 0.25rem) var(--radius-base, 0.25rem);
+        border-radius: 0 0 var(--radius-base, 0.25rem) var(--radius-base, 0.25rem);
 
-    line-height: 1.2;
-    animation: fade-in 0.2s ease-out;
-  }
+        line-height: 1.2;
+        animation: fade-in 0.2s ease-out;
+    }
 
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(-2px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(-2px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
