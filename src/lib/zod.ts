@@ -6,10 +6,12 @@ z.config({
   customError: (iss) => {
     const locale = getLocale();
 
-    if (iss.code === 'too_small' && iss.minimum === 1) {
+    if (iss.origin === 'string' && iss.code === 'too_small' && iss.minimum === 1) {
       return m.form_invalid_nonempty({}, { locale });
-    } else if (iss.code === 'too_small' && iss.minimum > 1) {
+    } else if (iss.origin === 'string' && iss.code === 'too_small') {
       return m.form_invalid_minimum({ minimum: iss.minimum }, { locale });
+    } else if (iss.origin === 'number' && iss.code === 'too_small') {
+      return m.form_invalid_number_too_small({ minimum: iss.minimum }, { locale });
     }
   }
 });
