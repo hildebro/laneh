@@ -55,6 +55,7 @@
   "form_invalid": "Invalid input",
   "form_invalid_minimum": "At least {minimum} characters required",
   "form_invalid_nonempty": "Cannot be left empty",
+  "form_invalid_number_too_small": "Value must be at least {minimum}",
   "form_success": "Success!",
   "generic_amount": "Amount",
   "generic_cancel": "Cancel",
