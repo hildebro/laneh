@@ -19,8 +19,8 @@ const expenseSchema = z
   .object({
     id: z.string().nullable(),
     purchaseId: z.transform((val) => (val !== '' ? val : null)).pipe(z.string().nullable()),
-    name: z.string().min(1, 'Name is required'),
-    creditorId: z.string().min(1, 'Creditor is required'),
+    name: z.string().min(1),
+    creditorId: z.string().min(1),
     price: z.coerce.number().min(0.01),
     distributions: z.array(z.object({ userId: z.string().nonempty(), percent: z.coerce.number().positive() })),
   })
