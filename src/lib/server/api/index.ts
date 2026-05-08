@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
-import { cors} from 'hono/cors';
-import { transactionContext } from '$lib/context';
+import { cors } from 'hono/cors';
+import { languageContext, transactionContext } from '$lib/context';
+import { baseLocale, toLocale } from '$lib/paraglide/runtime.js';
 import balanceRouter from '$lib/server/api/balance';
 import publicRouter from '$lib/server/api/public';
 import shoppingRouter from '$lib/server/api/shopping';
@@ -17,8 +18,19 @@ app.use('*', cors({
   origin: ['capacitor://localhost', 'http://localhost', 'https://localhost'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
-  exposeHeaders: ['x-refreshed-token'],
+  exposeHeaders: ['x-refreshed-token']
 }));
+
+// Language (for Zod messages)
+app.use('*', async (c, next) => {
+  const langHeader = c.req.header('Accept-Language');
+
+  const lang = toLocale(langHeader) || baseLocale;
+
+  await languageContext.run(lang, async () => {
+    await next();
+  });
+});
 
 // Database Transaction
 app.use('*', async (c, next) => {
