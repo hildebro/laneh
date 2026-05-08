@@ -11,7 +11,7 @@
   "balance_expenses": "Expenses",
   "balance_expense_add": "Add expense",
   "balance_expense_distribution": "Distribution (%)",
-  "balance_expense_distribution_invalid_sum": "Distribution amounts must add up to exactly 100%",
+  "balance_expense_distribution_invalid_sum": "Sum of amounts must be exactly 100%",
   "balance_expense_edit": "Edit expense",
   "balance_expense_user": "Buyer",
   "balance_no_name_label": "Shopping",

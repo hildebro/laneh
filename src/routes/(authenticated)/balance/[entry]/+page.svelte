@@ -2,6 +2,7 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -46,9 +47,7 @@
 
 {#if data.purchaseId}
   <article class="primary">
-    <p>
-      { m.shopping_purchase_finished() }
-    </p>
+    <p>{ m.shopping_purchase_finished() }</p>
     <footer>
       <a role="button" href={resolve('/shopping')}>{ m.shopping_purchase_finished_skip() }</a>
     </footer>
@@ -58,8 +57,8 @@
   <h2>{data.entry ? m.balance_expense_edit() : m.balance_expense_add()}</h2>
 
   <ApiForm submitAction={saveEntry} onSuccess={resolve('/balance')}>
-    <input type="hidden" name="id" value={data.entry?.id}>
-    <input type="hidden" name="purchaseId" value={data.purchaseId}>
+    <input type="hidden" name="id" value={id}>
+    <input type="hidden" name="purchaseId" value={purchaseId}>
     <ApiFormItem
       label={m.generic_name()}
       name="name"
@@ -81,37 +80,19 @@
       type="money"
       bind:value={purchasePrice}
     />
-    <div>
-      <span class="label">{ m.balance_expense_distribution() }</span>
-      <div class="distribution-users">
-        {#each distributions as dist (dist.userId)}
-          <label>
-            {dist.username}
-            <input type="hidden" name="userIds" value={dist.userId} />
-            <input
-              type="text"
-              name="percents"
-              bind:value={dist.percent}
-            />
-          </label>
-        {/each}
-      </div>
-    </div>
+    <ApiFormGroup
+      label={m.balance_expense_distribution()}
+      name="distributions"
+      layout="row"
+    >
+      {#each distributions as dist, i (dist.userId)}
+        <ApiFormItem
+          label={dist.username}
+          name={`distributions.${i}.percent`}
+          type="number"
+          bind:value={dist.percent}
+        />
+      {/each}
+    </ApiFormGroup>
   </ApiForm>
 </article>
-
-<style>
-    .distribution-users {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .distribution-users label {
-        flex: 1;
-        min-width: 95px;
-        margin-bottom: 0;
-        font-size: 0.85rem;
-    }
-</style>
