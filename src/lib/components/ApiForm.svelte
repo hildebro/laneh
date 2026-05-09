@@ -5,7 +5,6 @@
   import { goto, invalidateAll } from '$app/navigation';
   import type { ResolvedPathname } from '$app/types';
   import * as m from '$lib/paraglide/messages.js';
-  import { transPath } from '$lib/path-translations';
   import { addToast } from '$lib/stores/toast';
 
   let {
