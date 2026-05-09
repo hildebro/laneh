@@ -29,6 +29,8 @@
 
   let formState = $state({ errors: {} as Record<string, string> });
 
+  let formWideError = $derived(formState.errors['form']);
+
   setContext('api-form-context', formState);
 
   async function handleSubmit(event: Event) {
@@ -80,6 +82,10 @@
 </script>
 
 <form onsubmit={handleSubmit}>
+  {#if formWideError}
+    <span class="error-text">{formWideError}</span>
+  {/if}
+
   {@render children()}
 
   {#if additionalButtons}
@@ -91,3 +97,21 @@
     </button>
   {/if}
 </form>
+
+<style>
+    .error-text {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+
+        background-color: var(--btn-error-bg);
+        color: var(--btn-error-text);
+        padding: 0.35rem 0.5rem;
+        margin-bottom: 0.25rem;
+
+        border-radius: var(--radius-base, 0.25rem);
+
+        line-height: 1.2;
+        animation: fade-in 0.2s ease-out;
+    }
+</style>
