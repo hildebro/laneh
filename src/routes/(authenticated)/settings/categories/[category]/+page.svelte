@@ -2,6 +2,7 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
@@ -35,10 +36,11 @@
   </h2>
   <div class="action-row">
     <ApiForm submitAction={saveCategory} onSuccess={resolve('/settings/categories')}>
-      <label>
-        { m.generic_name() }
-        <input type="text" name="name" bind:value={name} />
-      </label>
+      <ApiFormItem
+        label={m.generic_name()}
+        name="name"
+        bind:value={name}
+      />
     </ApiForm>
 
     {#if data.category}
