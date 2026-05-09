@@ -1,5 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import { getLocale } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
 import type { AppEnv } from '$lib/server/api/types';
 import {
@@ -110,8 +111,8 @@ const shoppingRouter = new Hono<AppEnv>()
       const error = new z.ZodError([
         {
           code: 'custom',
-          path: ['name'],
-          message: m.settings_categories_delete_invalid()
+          path: ['form'],
+          message: m.settings_categories_delete_invalid({}, {locale: getLocale()})
         }
       ]);
 
