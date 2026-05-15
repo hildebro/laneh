@@ -64,7 +64,14 @@
 
         issues.map((issue) => {
           const fieldPath = issue.path.join('.');
-          newErrors[fieldPath] = issue.message;
+          const key = issue.message as keyof typeof m;
+
+          if (key in m && typeof m[key] === 'function') {
+            const translate = m[key] as () => string;
+            newErrors[fieldPath] = translate();
+          } else {
+            newErrors[fieldPath] = issue.message;
+          }
         });
 
         formState.errors = newErrors;
