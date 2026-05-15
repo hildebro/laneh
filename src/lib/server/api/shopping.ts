@@ -34,11 +34,11 @@ import { z } from '$lib/zod';
 
 const setCategorySchema = z.object({
   categoryId: z.string().nonempty(),
-  itemIds: z.array(z.string()).nonempty()
+  itemIds: z.array(z.string()).nonempty("settings_items_action_empty")
 });
 
 const itemActionSchema = z.object({
-  itemIds: z.array(z.string()).nonempty()
+  itemIds: z.array(z.string()).nonempty("settings_items_action_empty")
 });
 
 const categoryActionSchema = z.object({

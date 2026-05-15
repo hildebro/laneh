@@ -4,7 +4,9 @@
   import { getApiClient } from '$lib/apiClient';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import ApiFormItem from '$lib/components/ApiFormItem.svelte';
 
   let showInactiveItems = $state(false);
 
@@ -12,9 +14,13 @@
 
   let itemIds = $state<string[]>([]);
 
-  async function setCategory(categoryId: string) {
+  let pendingCategoryId = $state<string>('');
+
+  async function setCategory() {
     const client = getApiClient();
-    return client.api.shopping.setItemCategory.$post({ json: { categoryId, itemIds } });
+    return client.api.shopping.setItemCategory.$post({
+      json: { categoryId: pendingCategoryId, itemIds }
+    });
   }
 
   async function deactivateItems() {
@@ -49,18 +55,24 @@
 <CategorizedItemSelect bind:value={itemIds} categories={data.categories} unfiltered={showInactiveItems} />
 <h2 class="headline">{m.settings_actions()}</h2>
 <article>
-  <h2>{ m.settings_items_change_category() }</h2>
-  <div class="action-row">
-    {#each data.categories as category (category.id)}
-      <ApiForm
-        submitAction={async () => {return await setCategory(category.id)}}
-        submitButtonText={category.name}
-        {onSuccess}
-      >
-        <input type="hidden" name="itemIds" value={itemIds}>
-      </ApiForm>
-    {/each}
-  </div>
+  <ApiForm
+    submitAction={setCategory}
+    {onSuccess}
+    submitButtonHidden={true}
+  >
+    <ApiFormGroup name="itemIds" label={m.settings_items_change_category()}>
+      <div class="action-row">
+        {#each data.categories as category (category.id)}
+          <button
+            type="submit"
+            onclick={() => pendingCategoryId = category.id}
+          >
+            {category.name}
+          </button>
+        {/each}
+      </div>
+    </ApiFormGroup>
+  </ApiForm>
   <hr />
   <h2>{ m.settings_items_other_actions() }</h2>
   <div class="action-row">
@@ -70,7 +82,12 @@
       submitButtonText={m.settings_items_deactivate()}
       {onSuccess}
     >
-      <input type="hidden" name="itemIds" value={itemIds}>
+      <ApiFormItem
+        label=""
+        name="itemIds"
+        value={itemIds}
+        type="hidden"
+      />
     </ApiForm>
     <button class="error" onclick={() => deleteDialog.showModal()}>
       { m.settings_items_delete() }
@@ -86,6 +103,12 @@
   >
     <h2>{m.settings_items_delete()}</h2>
     <p>{ m.settings_items_delete_info() }</p>
+    <ApiFormItem
+      label=""
+      name="itemIds"
+      value={itemIds}
+      type="hidden"
+    />
     {#snippet additionalButtons()}
       <button
         type="button"
