@@ -7,8 +7,7 @@ import zlib from 'node:zlib';
 import tar from 'tar-stream';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
-import { getLocale, getTx } from '$lib/context';
-import * as m from '$lib/paraglide/messages.js';
+import { getTx } from '$lib/context';
 import { getLoggedInUser } from '$lib/server/auth';
 import { addUser, createSession, findAllUsers, findAndVerifyUser } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
@@ -112,8 +111,8 @@ const publicRouter = new Hono()
       const error = new z.ZodError([
         {
           code: 'custom',
-          path: ['username'],
-          message: m.auth_login_invalid({}, { locale: getLocale() })
+          path: ['form'],
+          message: 'auth_login_invalid'
         }
       ]);
 

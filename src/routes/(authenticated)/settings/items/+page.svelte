@@ -5,8 +5,8 @@
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
-  import * as m from '$lib/paraglide/messages.js';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
+  import * as m from '$lib/paraglide/messages.js';
 
   let showInactiveItems = $state(false);
 

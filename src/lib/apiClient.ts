@@ -4,7 +4,6 @@ import { hc } from 'hono/client';
 import { resolve } from '$app/paths';
 import { getBaseUrl } from '$lib/config';
 import { handleDemoMode, isDemoMode } from '$lib/demo';
-import { getLocale } from '$lib/paraglide/runtime.js';
 import type { AppType } from '$lib/server/api';
 
 export function getApiClient(customFetch?: typeof fetch) {
@@ -33,8 +32,6 @@ export function getApiClient(customFetch?: typeof fetch) {
       // Ensure web requests send the httpOnly cookie if making cross-origin requests
       requestInit.credentials = 'include';
     }
-
-    headers.set('Accept-Language', getLocale());
 
     requestInit.headers = headers;
 

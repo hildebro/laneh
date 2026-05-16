@@ -3,15 +3,6 @@ import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import type * as schema from './server/db/schema';
-import { baseLocale, type Locale } from '$lib/paraglide/runtime.js';
-
-export const languageContext = new AsyncLocalStorage<Locale>();
-
-export function getLocale(): Locale {
-  // It's technically possible to call this from outside a running language context. So a fallback
-  // must be defined for type-safety.
-  return languageContext.getStore() ?? baseLocale;
-}
 
 // Define the type for the value stored in the context (our transactional client)
 type TransactionalDbClient = PgTransaction<PostgresJsQueryResultHKT, typeof schema, ExtractTablesWithRelations<typeof schema>>;

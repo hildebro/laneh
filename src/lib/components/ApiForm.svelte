@@ -6,6 +6,7 @@
   import type { ResolvedPathname } from '$app/types';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
+  import { translateZodIssue } from '$lib/utils/zod';
 
   let {
     submitAction,
@@ -64,14 +65,7 @@
 
         issues.map((issue) => {
           const fieldPath = issue.path.join('.');
-          const key = issue.message as keyof typeof m;
-
-          if (key in m && typeof m[key] === 'function') {
-            const translate = m[key] as () => string;
-            newErrors[fieldPath] = translate();
-          } else {
-            newErrors[fieldPath] = issue.message;
-          }
+          newErrors[fieldPath] = translateZodIssue(issue);
         });
 
         formState.errors = newErrors;
