@@ -1,6 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { getLocale } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
 import type { AppEnv } from '$lib/server/api/types';
 import {
@@ -34,7 +33,7 @@ import { z } from '$lib/zod';
 
 const setCategorySchema = z.object({
   categoryId: z.string().nonempty(),
-  itemIds: z.array(z.string()).nonempty("settings_items_action_empty")
+  itemIds: z.array(z.string()).nonempty()
 });
 
 const itemActionSchema = z.object({
@@ -112,7 +111,7 @@ const shoppingRouter = new Hono<AppEnv>()
         {
           code: 'custom',
           path: ['form'],
-          message: m.settings_categories_delete_invalid({}, {locale: getLocale()})
+          message: 'settings_categories_delete_invalid'
         }
       ]);
 
