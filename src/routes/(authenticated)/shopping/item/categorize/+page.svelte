@@ -3,16 +3,19 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
   let itemIds = $state([]);
 
-  async function submitAction(categoryId: string) {
+  let pendingCategoryId = $state<string>('');
+
+  async function submitAction() {
     const client = getApiClient();
     return client.api.shopping.categorizeItems.$post({
-      json: { itemIds, categoryId }
+      json: { itemIds, categoryId: pendingCategoryId }
     });
   }
 
@@ -57,18 +60,24 @@
     {/each}
   </div>
 
-  { m.shopping_categorize_select_category() }
-  <div class="select-container">
-    {#each data.selectableCategories as category (category.id)}
-      <ApiForm
-        submitAction={() => submitAction(category.id)}
-        submitButtonText={category.name}
-        {onSuccess}
-      >
-        <span></span>
-      </ApiForm>
-    {/each}
-  </div>
+  <ApiForm
+    {submitAction}
+    {onSuccess}
+    submitButtonHidden={true}
+  >
+    <ApiFormGroup name="itemIds" label={m.shopping_categorize_select_category()}>
+      <div class="action-row">
+        {#each data.selectableCategories as category (category.id)}
+          <button
+            type="submit"
+            onclick={() => pendingCategoryId = category.id}
+          >
+            {category.name}
+          </button>
+        {/each}
+      </div>
+    </ApiFormGroup>
+  </ApiForm>
 </article>
 
 <style>
