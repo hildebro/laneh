@@ -244,10 +244,10 @@
 
 <dialog bind:this={correctionDialog}>
   <p>
-    { m.shopping_add_items_original_value({ value: items[correctionItemIndex]?.overwrittenName ?? '' }) }
+    { m.shopping_add_items_original_value({ value: items[correctionItemIndex!]?.overwrittenName ?? '' }) }
   </p>
   <form method="dialog">
-    <button onclick={() => handleRestore(correctionItemIndex)}>
+    <button onclick={() => handleRestore(correctionItemIndex!)}>
       { m.shopping_add_items_original_value_revert() }
     </button>
     <button>{m.generic_close()}</button>
