@@ -37,7 +37,7 @@ const setCategorySchema = z.object({
 });
 
 const itemActionSchema = z.object({
-  itemIds: z.array(z.string()).nonempty("settings_items_action_empty")
+  itemIds: z.array(z.string()).nonempty()
 });
 
 const categoryActionSchema = z.object({
