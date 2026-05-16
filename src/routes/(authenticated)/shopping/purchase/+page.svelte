@@ -15,17 +15,10 @@
 
     // fallback is used if the item is just appearing/disappearing
     // without moving to another list (e.g. initial load)
-    fallback(node, params) {
-      const style = getComputedStyle(node);
-      const transform = style.transform === 'none' ? '' : style.transform;
-
+    fallback() {
       return {
         duration: 800,
-        easing: quintOut,
-        css: (t) => `
-          transform: ${transform} scale(${t});
-          opacity: ${t}
-        `
+        easing: quintOut
       };
     }
   });
@@ -90,11 +83,9 @@
   };
 
   onMount(() => {
-    const handleBeforeUnload = (e) => {
+    const handleBeforeUnload = (e: Event) => {
       if (isDirty) {
         e.preventDefault();
-        // Standard browsers requirereturnValue to be set
-        e.returnValue = '';
       }
     };
 
@@ -121,7 +112,7 @@
     if (json?.purchaseId) {
       await goto(resolve(`/balance/add?purchaseId=${json.purchaseId}`));
     } else {
-      await goto(resolve('/shopping'))
+      await goto(resolve('/shopping'));
     }
   }
 </script>
