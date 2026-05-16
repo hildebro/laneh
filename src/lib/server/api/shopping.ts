@@ -62,8 +62,8 @@ const itemsSchema = z.array(z.object({
       return data.length > 0;
     },
     {
-      message: m.generic_empty(),
-      path: ['names']
+      message: 'shopping_add_items_empty',
+      path: ['form']
     }
   );
 
