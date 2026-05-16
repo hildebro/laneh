@@ -3,13 +3,16 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
+  import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let { data } = $props();
 
-  let distributionPayload = $derived(
+  let distributions = $state(
     data.users.map((user) => ({
       userId: user.id,
+      username: user.username,
       percent: user.defaultDistribution
     }))
   );
@@ -19,7 +22,7 @@
 
     // 3. Pass the $state array into your Hono client's json payload
     return client.api.users.distributions.$post({
-      json: distributionPayload
+      json: distributions
     });
   }
 
@@ -31,21 +34,19 @@
 </script>
 
 <article>
-  <h2>{m.settings_users_default_distribution()}</h2>
   <ApiForm {submitAction} {onSuccess}>
-    <div>
-      {#each data.users as user, index (user.id)}
-        <label>
-          {user.username}
-          <input type="hidden" name="userIds" value={user.id} />
-
-          <input
-            type="text"
-            name="percents"
-            bind:value={distributionPayload[index].percent}
-          />
-        </label>
+    <ApiFormGroup
+      label={m.settings_users_default_distribution()}
+      name="distributions"
+    >
+      {#each distributions as dist, index (dist.userId)}
+        <ApiFormItem
+          label={dist.username}
+          name={`${index}.percent`}
+          type="number"
+          bind:value={dist.percent}
+        />
       {/each}
-    </div>
+    </ApiFormGroup>
   </ApiForm>
 </article>
