@@ -34,7 +34,7 @@ const distributionSchema = z.array(
       return Math.abs(total - 100) < 0.1;
     },
     {
-      message: m.balance_expense_distribution_invalid_sum(),
+      message: 'balance_expense_distribution_invalid_sum',
       path: ['distributions']
     }
   );
