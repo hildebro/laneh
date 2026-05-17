@@ -18,6 +18,12 @@ export function translateZodIssue(issue: z.core.$ZodIssue) {
       }
 
       break;
+    case 'invalid_value':
+      if (issue.values.some(value => value === 'application/gzip')) {
+        return m.settings_actions_import_file_missing();
+      }
+
+      break;
     case 'custom':
       return handleCustomCode(issue.message, issue.params);
   }

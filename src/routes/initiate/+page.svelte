@@ -50,15 +50,13 @@
       onSuccess={resolve('/login')}
       submitButtonText={m.settings_actions_import()}
     >
-      <label class="label">
-        <span>{m.settings_actions_import_file_label()}</span>
-        <input
-          type="file"
-          name="dumpFile"
-          accept="application/gzip, .tar.gz, .gz"
-          bind:files={files}
-        />
-      </label>
+      <ApiFormItem
+        type="file"
+        name="dumpFile"
+        label={m.settings_actions_import_file_label()}
+        accept="application/gzip, .tar.gz, .gz"
+        bind:files={files}
+      />
     </ApiForm>
   </article>
 </main>

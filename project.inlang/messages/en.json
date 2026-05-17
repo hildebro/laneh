@@ -120,6 +120,7 @@
   "settings_actions_export": "Export database",
   "settings_actions_import": "Import database",
   "settings_actions_import_file_label": "Select database to import",
+  "settings_actions_import_file_missing": "A file is required",
   "settings_categories_add": "Add category",
   "settings_categories_delete": "Delete category",
   "settings_categories_delete_invalid": "Cannot delete a category that has items (including deactivated ones)",
