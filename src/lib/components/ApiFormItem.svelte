@@ -6,14 +6,18 @@
     label,
     name,
     value = $bindable(),
+    files = $bindable(),
+    accept,
     type = 'text',
     error = '',
     children
   }: {
     label: string;
     name: string;
-    value: unknown;
-    type?: 'text' | 'password' | 'number' | 'select' | 'money' | 'hidden' | 'date';
+    value?: unknown;
+    files?: FileList | null;
+    accept?: string;
+    type?: 'text' | 'password' | 'number' | 'select' | 'money' | 'hidden' | 'date' | 'file';
     error?: string;
     children?: Snippet;
   } = $props();
@@ -45,6 +49,16 @@
       id={name}
       bind:value={value as number}
       hasError={!!displayError}
+    />
+  {:else if type === 'file'}
+    <input
+      class="input"
+      class:error-border={!!displayError}
+      type="file"
+      {name}
+      id={name}
+      {accept}
+      bind:files
     />
   {:else}
     <input

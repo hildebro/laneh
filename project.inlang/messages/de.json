@@ -120,6 +120,7 @@
   "settings_actions_export": "Datenbank exportieren",
   "settings_actions_import": "Datenbank importieren",
   "settings_actions_import_file_label": "Datenbank zum Importieren wählen",
+  "settings_actions_import_file_missing": "Eine Datei wird benötigt",
   "settings_categories_add": "Kategorie hinzufügen",
   "settings_categories_delete": "Kategorie löschen",
   "settings_categories_delete_invalid": "Kategorien mit Artikeln (inklusive deaktivierter) können nicht gelöscht werden",
