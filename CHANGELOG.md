@@ -1,3 +1,43 @@
+# [2.9.0](https://github.com/hildebro/laneh/compare/v2.8.1...v2.9.0) (2026-05-17)
+
+
+### Bug Fixes
+
+* centralized login ([1dafdfe](https://github.com/hildebro/laneh/commit/1dafdfe0cbc0cbdc522c730f28fff3303b5498ff))
+* don't swallow generic form errors ([6db910c](https://github.com/hildebro/laneh/commit/6db910c695f29ccfa446de9e2aa0bf8a7bd15f76))
+* form not working ([7c5533a](https://github.com/hildebro/laneh/commit/7c5533ae7268d9a6c91484c9b7e410decebdc153))
+* locale in login errors ([a0ff339](https://github.com/hildebro/laneh/commit/a0ff339113218c3df2868e622feecf15d44109bb))
+* more accurate global zod messages ([dcab980](https://github.com/hildebro/laneh/commit/dcab980bf7f9c9823add71459be11077b4474f74))
+* supress ide warning ([6134827](https://github.com/hildebro/laneh/commit/61348270f1629825dd87581b77aacd790aa991f0))
+* translation coming from backend ([ca59657](https://github.com/hildebro/laneh/commit/ca59657b5df8732d5dff7db48dcae4fca792943c))
+* translations for zod errors ([c1f76a2](https://github.com/hildebro/laneh/commit/c1f76a2f95ff5fd05a4502160f1251ff5d476d3a))
+
+
+### Features
+
+* add ApiFormItem.svelte ([3ccff72](https://github.com/hildebro/laneh/commit/3ccff720afd4f9298d2510318c322b2096d1fc28))
+* add select type to ApiFormItem.svelte ([972ef82](https://github.com/hildebro/laneh/commit/972ef82dc76ab2b50b1c04c8cdd58ba37b74c5fb))
+* enable ApiForm to receive message key as validation error ([7db15c8](https://github.com/hildebro/laneh/commit/7db15c8fe119ef4d2984e795491aae7517579aee))
+* frontend-only translations ([a6b73b5](https://github.com/hildebro/laneh/commit/a6b73b56445fe0140fb0095af8b83768a8872e66))
+* full migration of balance/[entry] ([44ffa68](https://github.com/hildebro/laneh/commit/44ffa686493a914b569472a349a9d1f20dc0896c))
+* fully migrate /initiate ([415bf2f](https://github.com/hildebro/laneh/commit/415bf2f353b5d41815c4b6fd4103f4828e63bd7a))
+* fully migrate /tasks/single/add ([5a2f26b](https://github.com/hildebro/laneh/commit/5a2f26be127d91a96a386ba1fd749c09d70a6697))
+* handling form-wide errors ([645748b](https://github.com/hildebro/laneh/commit/645748bf485d791cd3e3579aa5b7841ca252480e))
+* improve "at least x characters" zod message ([d9839c5](https://github.com/hildebro/laneh/commit/d9839c57e1cf7cec9a8c1f27caf76c0703f3ac78))
+* migrate /settings/* ([65d0193](https://github.com/hildebro/laneh/commit/65d01933e9f7626b9c4b403c137ab563b02ad696))
+* migrate /settings/categories/[category] ([ed12e3d](https://github.com/hildebro/laneh/commit/ed12e3de72f6bfd5330d27139d7c36a2a8f1ec3e))
+* migrate /settings/items ([ead2650](https://github.com/hildebro/laneh/commit/ead265021fcef3396a92bf471cacc1ec50873f25))
+* migrate /shopping/add ([56eb1f4](https://github.com/hildebro/laneh/commit/56eb1f4f853e955f1cde1e742ea4879a93280edf))
+* migrate /shopping/categorize ([1fe6f35](https://github.com/hildebro/laneh/commit/1fe6f35219463f3f90de490a2eeb2c6c7ff3f869))
+* migrate /tasks ([15362a2](https://github.com/hildebro/laneh/commit/15362a2e31c591ddfb08ebe3e4c1369a3152be39))
+* migrate /tasks/weekly/add ([9e0bb33](https://github.com/hildebro/laneh/commit/9e0bb33f58af5f110786005f499a094a7a26aead))
+* money type changed for ApiFormItem integration ([bc08889](https://github.com/hildebro/laneh/commit/bc088898cb1ac6c9114258ba595875c2df22fa6a))
+* nicer styling for validation messages ([8177d55](https://github.com/hildebro/laneh/commit/8177d559631acba6e0e12b3416ba802f98d89d0d))
+* partial migrate /initiate ([247ccbd](https://github.com/hildebro/laneh/commit/247ccbd73ea242755633b55cbe216c77c8aabbf5))
+* partial migrate /tasks/single/add ([c257be2](https://github.com/hildebro/laneh/commit/c257be2d402eba0f39ca734ddb552f2faf7e8d9e))
+* partial migration of balance/[entry] ([9b3a19e](https://github.com/hildebro/laneh/commit/9b3a19e07919894fc2be728624f77afe63b3c20d))
+* replace toast validation with inlined text ([aeb448e](https://github.com/hildebro/laneh/commit/aeb448ed9dca511635c2f51e98e808e1107cc458))
+
 ## [2.8.1](https://github.com/hildebro/laneh/compare/v2.8.0...v2.8.1) (2026-05-06)
 
 
