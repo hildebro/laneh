@@ -13,7 +13,7 @@
     label: string;
     name: string;
     value: unknown;
-    type?: 'text' | 'password' | 'number' | 'select' | 'money' | 'hidden';
+    type?: 'text' | 'password' | 'number' | 'select' | 'money' | 'hidden' | 'date';
     error?: string;
     children?: Snippet;
   } = $props();
