@@ -74,8 +74,9 @@
 
         addToast({ title: m.form_error(), message: errorMsg, type: 'error' });
       }
-    } catch {
+    } catch(e) {
       addToast({ title: m.form_error(), message: m.form_error_generic(), type: 'error' });
+      throw e;
     } finally {
       isSubmitting = false;
     }
