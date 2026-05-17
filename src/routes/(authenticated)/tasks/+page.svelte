@@ -4,6 +4,7 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import type { TaskWithRelation } from '$lib/server/db/schema';
   import { shortDateFormatter } from '$lib/utils/formatter';
@@ -74,14 +75,17 @@
     {additionalButtons}
   >
     <input type="hidden" name="taskId" value={markAsDoneTaskId} />
-    <label>
-      { m.schedule_done_who() }
-      <select name="userId" bind:value={markAsDoneUserId}>
-        {#each data.users as user (user.id)}
-          <option value={user.id}>{user.username}</option>
-        {/each}
-      </select>
-    </label>
+    <ApiFormItem
+      label={m.schedule_done_who()}
+      name="userId"
+      type="select"
+      bind:value={markAsDoneUserId}
+    >
+      <option value="" selected>{ m.generic_required() }</option>
+      {#each data.users as user (user.id)}
+        <option value={user.id}>{user.username}</option>
+      {/each}
+    </ApiFormItem>
   </ApiForm>
   {#snippet additionalButtons()}
     <button type="button" onclick={closeModal}>
