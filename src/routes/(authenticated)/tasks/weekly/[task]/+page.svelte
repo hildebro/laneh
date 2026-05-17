@@ -2,7 +2,7 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
-  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+  import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { Weekday } from '$lib/utils/taskHelper';
 
@@ -52,56 +52,61 @@
   </h2>
   <ApiForm submitAction={saveTask} onSuccess={resolve('/tasks')}>
     <input type="hidden" name="id" value={id}>
-    <label>
-      { m.generic_name() }
-      <input type="text" name="name" bind:value={name} />
-    </label>
-    <label>
-      { m.schedule_next_assignee() }
-      <select name="dueUserId" bind:value={dueUserId}>
-        <option value="" selected>{ m.generic_required() }</option>
-        {#await data.users then users}
-          {#each users as user (user.id)}
-            <option value={user.id}>{user.username}</option>
-          {/each}
-        {/await}
-      </select>
-    </label>
-    <label>
-      { m.schedule_weekday() }
-      <select name="weekday" bind:value={weekday}>
-        <option value="" selected>{ m.generic_required() }</option>
-        {#each Object.values(Weekday) as weekdayOption (weekdayOption)}
-          <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
-        {/each}
-      </select>
-    </label>
+    <ApiFormItem
+      label={m.generic_name()}
+      name="name"
+      bind:value={name}
+    />
+    <ApiFormItem
+      label={m.schedule_next_assignee()}
+      name="assignee"
+      type="select"
+      bind:value={dueUserId}
+    >
+      <option value="" selected>{ m.generic_required() }</option>
+      {#each data.users as user (user.id)}
+        <option value={user.id}>{user.username}</option>
+      {/each}
+    </ApiFormItem>
+    <ApiFormItem
+      label={m.schedule_weekday()}
+      name="weekday"
+      type="select"
+      bind:value={weekday}
+    >
+      <option value="" selected>{ m.generic_required() }</option>
+      {#each Object.values(Weekday) as weekdayOption (weekdayOption)}
+        <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
+      {/each}
+    </ApiFormItem>
     <div class="label">{ m.schedule_interval() }</div>
     <div class="interval-row">
       <span>{ m.schedule_interval_every()}</span>
-      <input type="number" name="interval" bind:value={interval} min="1">
+      <ApiFormItem
+        label=""
+        name="interval"
+        bind:value={interval}
+      />
       <span>{ m.schedule_interval_weeks() }</span>
     </div>
-    <label>
-      { m.schedule_next_date() }
-      <input type="date" name="dueDate" bind:value={dueDate} />
-    </label>
+    <ApiFormItem
+      label={ m.schedule_next_date() }
+      name="date"
+      type="date"
+      bind:value={dueDate}
+    />
     <p>
       { m.schedule_next_date_info() }
     </p>
     {#if data.task?.completions}
-      {#await data.users}
-        <LoadingSpinner />
-      {:then users}
-        <div>{ m.schedule_completions() }</div>
-        <ul>
-          {#each users as user (user.id)}
-            <li>
-              {user.username}: { data.task.completions?.filter(completion => completion.userId === user.id).length }
-            </li>
-          {/each}
-        </ul>
-      {/await}
+      <div>{ m.schedule_completions() }</div>
+      <ul>
+        {#each data.users as user (user.id)}
+          <li>
+            {user.username}: { data.task.completions?.filter(completion => completion.userId === user.id).length }
+          </li>
+        {/each}
+      </ul>
     {/if}
   </ApiForm>
 </article>
@@ -113,10 +118,5 @@
         align-items: center;
         gap: 0.75rem;
         margin-top: 0.25rem;
-    }
-
-    .interval-row input[type="number"] {
-        width: 5rem;
-        text-align: center;
     }
 </style>
