@@ -234,49 +234,49 @@ export const task = pgTable('task', {
 // TYPESCRIPT: STRICT DISCRIMINATED UNIONS
 // ============================================================================
 
-// type BaseTaskSelect = typeof task.$inferSelect;
-// type BaseTaskInsert = typeof task.$inferInsert;
+type BaseTaskSelect = typeof task.$inferSelect;
+type BaseTaskInsert = typeof task.$inferInsert;
 
 // Utility to extract the exact Weekday type inferred by Drizzle
-// type WeekdayType = NonNullable<BaseTaskSelect['dueWeekday']>;
+type WeekdayType = NonNullable<BaseTaskSelect['dueWeekday']>;
 
-// // --- SELECT TYPES ---
-// export type SingleTask = BaseTaskSelect & {
-//   type: 'single';
-//   dueWeekday: null; // Enforced null
-//   interval: null;   // Enforced null
-//   // dueDate is allowed to be string | null per your original singleTask
-// };
-//
-// export type RepeatingTask = BaseTaskSelect & {
-//   type: 'repeating';
-//   dueDate: string;         // Enforced not null
-//   dueWeekday: WeekdayType; // Enforced not null
-//   interval: number;        // Enforced not null
-// };
-//
-// // Use this type anywhere you query tasks!
-// export type Task = SingleTask | RepeatingTask;
-//
-// // --- INSERT TYPES ---
-// export type SingleTaskInsert = BaseTaskInsert & {
-//   type: 'single';
-//   dueWeekday?: null;
-//   interval?: null;
-// };
-//
-// export type RepeatingTaskInsert = BaseTaskInsert & {
-//   type: 'repeating';
-//   dueDate: string;
-//   dueWeekday: WeekdayType;
-//   interval: number; // No default at DB level anymore, so we require it on insert
-// };
-//
-// export type TaskInsert = SingleTaskInsert | RepeatingTaskInsert;
-//
-// // ============================================================================
-// // COMPLETIONS & RELATIONS
-// // ============================================================================
+// --- SELECT TYPES ---
+export type SingleTask = BaseTaskSelect & {
+  type: 'single';
+  dueWeekday: null; // Enforced null
+  interval: null;   // Enforced null
+  // dueDate is allowed to be string | null per your original singleTask
+};
+
+export type RepeatingTask = BaseTaskSelect & {
+  type: 'repeating';
+  dueDate: string;         // Enforced not null
+  dueWeekday: WeekdayType; // Enforced not null
+  interval: number;        // Enforced not null
+};
+
+// Use this type anywhere you query tasks!
+export type Task = SingleTask | RepeatingTask;
+
+// --- INSERT TYPES ---
+export type SingleTaskInsert = BaseTaskInsert & {
+  type: 'single';
+  dueWeekday?: null;
+  interval?: null;
+};
+
+export type RepeatingTaskInsert = BaseTaskInsert & {
+  type: 'repeating';
+  dueDate: string;
+  dueWeekday: WeekdayType;
+  interval: number; // No default at DB level anymore, so we require it on insert
+};
+
+export type TaskInsert = SingleTaskInsert | RepeatingTaskInsert;
+
+// ============================================================================
+// COMPLETIONS & RELATIONS
+// ============================================================================
 
 export const taskCompletion = pgTable('task_completion', {
   id: text().primaryKey(),
@@ -285,76 +285,19 @@ export const taskCompletion = pgTable('task_completion', {
   date: date().notNull()
 });
 
-// export type TaskCompletion = typeof taskCompletion.$inferSelect;
-//
-// export const taskRelations = relations(task, ({ one, many }) => ({
-//   dueUser: one(user, { fields: [task.dueUserId], references: [user.id] }),
-//   completions: many(taskCompletion) // Technically repeating only, but tied to base table
-// }));
-//
-// export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
-//   task: one(task, { fields: [taskCompletion.taskId], references: [task.id] }),
-// }));
-//
-// // Strict generic relation type encompassing the discriminated union
-// export type TaskWithRelation = Task & {
-//   dueUser: InferSelectModel<typeof user> | null;
-//   completions: TaskCompletion[];
-// };
+export type TaskCompletion = typeof taskCompletion.$inferSelect;
 
+export const taskRelations = relations(task, ({ one, many }) => ({
+  dueUser: one(user, { fields: [task.dueUserId], references: [user.id] }),
+  completions: many(taskCompletion) // Technically repeating only, but tied to base table
+}));
 
-export const weeklyTask = pgTable('task_weekly', {
-  id: text().primaryKey(),
-  createdAt: timestamp().defaultNow().notNull(),
-  name: text().notNull(),
-  dueWeekday: weekday().notNull(),
-  interval: integer().notNull().default(1),
-  dueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
-  dueDate: date().notNull()
-});
-export type WeeklyTask = typeof weeklyTask.$inferSelect;
+export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
+  task: one(task, { fields: [taskCompletion.taskId], references: [task.id] }),
+}));
 
-export type WeeklyTaskWithRelation = InferSelectModel<typeof weeklyTask> & {
+// Strict generic relation type encompassing the discriminated union
+export type TaskWithRelation = Task & {
   dueUser: InferSelectModel<typeof user> | null;
-  completions: InferSelectModel<typeof weeklyTaskCompletion>[];
-};
-
-export const weeklyTasksRelations = relations(weeklyTask, ({ one, many }) => ({
-  dueUser: one(user, { fields: [weeklyTask.dueUserId], references: [user.id] }),
-  completions: many(weeklyTaskCompletion)
-}));
-
-export const weeklyTaskCompletion = pgTable('task_weekly_completion', {
-  id: text().primaryKey(),
-  taskId: text().notNull().references(() => weeklyTask.id, { onDelete: 'cascade' }),
-  userId: text().references(() => user.id, { onDelete: 'cascade' }).notNull(),
-  date: date().notNull()
-});
-export type TaskCompletion = typeof weeklyTaskCompletion.$inferSelect;
-
-export const weeklyTaskCompletionRelations = relations(weeklyTaskCompletion, ({ one }) => ({
-  task: one(weeklyTask, { fields: [weeklyTaskCompletion.taskId], references: [weeklyTask.id] }),
-}));
-
-export const singleTask = pgTable('task_single', {
-  id: text().primaryKey(),
-  createdAt: timestamp().defaultNow().notNull(),
-  name: text().notNull(),
-  dueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
-  dueDate: date(),
-  done: boolean().default(false).notNull(),
-});
-export type SingleTask = typeof singleTask.$inferSelect;
-
-export const singleTasksRelations = relations(singleTask, ({ one }) => ({
-  dueUser: one(user, { fields: [singleTask.dueUserId], references: [user.id] }),
-}));
-
-export type TaskWithRelation = {
-  id: string;
-  name: string;
-  dueUser: InferSelectModel<typeof user> | null;
-  dueDate: string | null;
-  done?: boolean;
-  completions?: InferSelectModel<typeof weeklyTaskCompletion>[];
+  completions: TaskCompletion[];
 };
