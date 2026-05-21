@@ -244,7 +244,7 @@ type WeekdayType = NonNullable<BaseTaskSelect['dueWeekday']>;
 export type SingleTask = BaseTaskSelect & {
   type: 'single';
   dueWeekday: null; // Enforced null
-  interval: null;   // Enforced null
+  dueInterval: null;   // Enforced null
   // dueDate is allowed to be string | null per your original singleTask
 };
 
@@ -252,7 +252,7 @@ export type RepeatingTask = BaseTaskSelect & {
   type: 'repeating';
   dueDate: string;         // Enforced not null
   dueWeekday: WeekdayType; // Enforced not null
-  interval: number;        // Enforced not null
+  dueInterval: number;        // Enforced not null
 };
 
 // Use this type anywhere you query tasks!
@@ -262,14 +262,14 @@ export type Task = SingleTask | RepeatingTask;
 export type SingleTaskInsert = BaseTaskInsert & {
   type: 'single';
   dueWeekday?: null;
-  interval?: null;
+  dueInterval?: null;
 };
 
 export type RepeatingTaskInsert = BaseTaskInsert & {
   type: 'repeating';
   dueDate: string;
   dueWeekday: WeekdayType;
-  interval: number; // No default at DB level anymore, so we require it on insert
+  dueInterval: number; // No default at DB level anymore, so we require it on insert
 };
 
 export type TaskInsert = SingleTaskInsert | RepeatingTaskInsert;
