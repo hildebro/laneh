@@ -1,8 +1,8 @@
 // noinspection JSUnusedGlobalSymbols The entities are referenced through svelte magic.
 
-import { type InferSelectModel, relations } from 'drizzle-orm';
+import { type InferSelectModel, relations, sql } from 'drizzle-orm';
 import {
-  boolean,
+  boolean, check,
   date,
   doublePrecision,
   integer,
@@ -204,6 +204,104 @@ export const balanceEntryDistributionRelations = relations(balanceEntryDistribut
 }));
 
 export const weekday = pgEnum('weekday', Weekday);
+
+export const taskTypeEnum = pgEnum('task_type', ['single', 'repeating']);
+
+export const task = pgTable('task', {
+  id: text().primaryKey(),
+  createdAt: timestamp().defaultNow().notNull(),
+  type: taskTypeEnum().notNull(),
+  name: text().notNull(),
+  dueUserId: text().references(() => user.id, { onDelete: 'cascade' }),
+  dueDate: date(),
+  // Single specific
+  done: boolean().default(false),
+  // Repeating specific
+  dueWeekday: weekday(),
+  dueInterval: integer(),
+}, (table) => ({
+  taskStateCheck: check(
+    'task_state_check',
+    sql`
+      (${table.type} = 'single' AND ${table.dueWeekday} IS NULL AND ${table.dueInterval} IS NULL)
+      OR
+      (${table.type} = 'repeating' AND ${table.dueWeekday} IS NOT NULL AND ${table.dueInterval} IS NOT NULL AND ${table.dueDate} IS NOT NULL)
+    `
+  )
+}));
+
+// ============================================================================
+// TYPESCRIPT: STRICT DISCRIMINATED UNIONS
+// ============================================================================
+
+// type BaseTaskSelect = typeof task.$inferSelect;
+// type BaseTaskInsert = typeof task.$inferInsert;
+
+// Utility to extract the exact Weekday type inferred by Drizzle
+// type WeekdayType = NonNullable<BaseTaskSelect['dueWeekday']>;
+
+// // --- SELECT TYPES ---
+// export type SingleTask = BaseTaskSelect & {
+//   type: 'single';
+//   dueWeekday: null; // Enforced null
+//   interval: null;   // Enforced null
+//   // dueDate is allowed to be string | null per your original singleTask
+// };
+//
+// export type RepeatingTask = BaseTaskSelect & {
+//   type: 'repeating';
+//   dueDate: string;         // Enforced not null
+//   dueWeekday: WeekdayType; // Enforced not null
+//   interval: number;        // Enforced not null
+// };
+//
+// // Use this type anywhere you query tasks!
+// export type Task = SingleTask | RepeatingTask;
+//
+// // --- INSERT TYPES ---
+// export type SingleTaskInsert = BaseTaskInsert & {
+//   type: 'single';
+//   dueWeekday?: null;
+//   interval?: null;
+// };
+//
+// export type RepeatingTaskInsert = BaseTaskInsert & {
+//   type: 'repeating';
+//   dueDate: string;
+//   dueWeekday: WeekdayType;
+//   interval: number; // No default at DB level anymore, so we require it on insert
+// };
+//
+// export type TaskInsert = SingleTaskInsert | RepeatingTaskInsert;
+//
+// // ============================================================================
+// // COMPLETIONS & RELATIONS
+// // ============================================================================
+
+export const taskCompletion = pgTable('task_completion', {
+  id: text().primaryKey(),
+  taskId: text().notNull().references(() => task.id, { onDelete: 'cascade' }),
+  userId: text().references(() => user.id, { onDelete: 'cascade' }).notNull(),
+  date: date().notNull()
+});
+
+// export type TaskCompletion = typeof taskCompletion.$inferSelect;
+//
+// export const taskRelations = relations(task, ({ one, many }) => ({
+//   dueUser: one(user, { fields: [task.dueUserId], references: [user.id] }),
+//   completions: many(taskCompletion) // Technically repeating only, but tied to base table
+// }));
+//
+// export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
+//   task: one(task, { fields: [taskCompletion.taskId], references: [task.id] }),
+// }));
+//
+// // Strict generic relation type encompassing the discriminated union
+// export type TaskWithRelation = Task & {
+//   dueUser: InferSelectModel<typeof user> | null;
+//   completions: TaskCompletion[];
+// };
+
 
 export const weeklyTask = pgTable('task_weekly', {
   id: text().primaryKey(),
