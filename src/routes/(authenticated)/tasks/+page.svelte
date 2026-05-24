@@ -11,7 +11,12 @@
 
   let { data } = $props();
 
-  function getDueCardPreset(task: TaskWithRelation): string {
+  type FrontendTaskWithRelation = Omit<TaskWithRelation, 'createdAt'> & {
+    createdAt: string;
+    dueDate: string | null;
+  };
+
+  function getDueCardPreset(task: FrontendTaskWithRelation): string {
     if (!task.dueDate) {
       return '';
     }
@@ -45,7 +50,7 @@
     }
   }
 
-  function openModalForTask(task: TaskWithRelation) {
+  function openModalForTask(task: FrontendTaskWithRelation) {
     markAsDoneTaskId = task.id;
     markAsDoneUserId = task.dueUser?.id || '';
     doneDialog.showModal();
