@@ -96,8 +96,7 @@
 </dialog>
 
 <div class="action-bar">
-  <a role="button" href={resolve('/tasks/single/add')}>{ m.schedule_single_task_add() }</a>
-  <a role="button" href={resolve('/tasks/weekly/add')}>{ m.schedule_weekly_task_add() }</a>
+  <a role="button" href={resolve('/tasks/add')}>{ m.schedule_task_add() }</a>
 </div>
 <h2 class="headline">{ m.schedule_due_tasks() }</h2>
 {#if data.dueTasks.length === 0}
@@ -107,12 +106,12 @@
   <article class={getDueCardPreset(task)}>
     <div class="action-bar">
       {#if task.completions !== undefined}
-        <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/weekly/[task]', {task: task.id})}>
+        <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/[task]', {task: task.id})}>
           <Pencil size={16} />
           { m.generic_edit() }
         </a>
       {:else}
-        <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/single/[task]', {task: task.id})}>
+        <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/[task]', {task: task.id})}>
           <Pencil size={16} />
           { m.generic_edit() }
         </a>
@@ -139,12 +138,12 @@
     <article>
       <div class="action-bar">
         {#if task.completions !== undefined}
-          <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/weekly/[task]', {task: task.id})}>
+          <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/[task]', {task: task.id})}>
             <Pencil size={16} />
             { m.generic_edit() }
           </a>
         {:else}
-          <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/single/[task]', {task: task.id})}>
+          <a class="icon-button" role="button" href={resolve('/(authenticated)/tasks/[task]', {task: task.id})}>
             <Pencil size={16} />
             { m.generic_edit() }
           </a>

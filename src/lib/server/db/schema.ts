@@ -234,45 +234,8 @@ export const task = pgTable('task', {
 // TYPESCRIPT: STRICT DISCRIMINATED UNIONS
 // ============================================================================
 
-type BaseTaskSelect = typeof task.$inferSelect;
-type BaseTaskInsert = typeof task.$inferInsert;
-
-// Utility to extract the exact Weekday type inferred by Drizzle
-type WeekdayType = NonNullable<BaseTaskSelect['dueWeekday']>;
-
-// --- SELECT TYPES ---
-export type SingleTask = BaseTaskSelect & {
-  type: 'single';
-  dueWeekday: null; // Enforced null
-  dueInterval: null;   // Enforced null
-  // dueDate is allowed to be string | null per your original singleTask
-};
-
-export type RepeatingTask = BaseTaskSelect & {
-  type: 'repeating';
-  dueDate: string;         // Enforced not null
-  dueWeekday: WeekdayType; // Enforced not null
-  dueInterval: number;        // Enforced not null
-};
-
 // Use this type anywhere you query tasks!
-export type Task = SingleTask | RepeatingTask;
-
-// --- INSERT TYPES ---
-export type SingleTaskInsert = BaseTaskInsert & {
-  type: 'single';
-  dueWeekday?: null;
-  dueInterval?: null;
-};
-
-export type RepeatingTaskInsert = BaseTaskInsert & {
-  type: 'repeating';
-  dueDate: string;
-  dueWeekday: WeekdayType;
-  dueInterval: number; // No default at DB level anymore, so we require it on insert
-};
-
-export type TaskInsert = SingleTaskInsert | RepeatingTaskInsert;
+export type Task = typeof task.$inferSelect;
 
 // ============================================================================
 // COMPLETIONS & RELATIONS

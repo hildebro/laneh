@@ -1,23 +1,6 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { randomBytes } from 'crypto';
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  gt,
-  gte,
-  inArray,
-  isNotNull,
-  isNull,
-  lt,
-  max,
-  min,
-  or,
-  SQL,
-  sql
-} from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, isNull, lt, max, min, or, SQL, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import { getTx } from '$lib/context';
@@ -31,9 +14,8 @@ import {
   type ShoppingItem,
   shoppingItem,
   stagedShoppingPurchaseItem,
-  type User,
-  type WeeklyTask,
-  type WeeklyTaskWithRelation
+  type TaskWithRelation,
+  type User
 } from '$lib/server/db/schema';
 import type { Weekday } from '$lib/utils/taskHelper';
 
@@ -835,105 +817,105 @@ export const deleteStagedList = async (userId: string) => {
 };
 
 // ------- TASKS -------
-export const findAllWeeklyTasks = async (): Promise<WeeklyTaskWithRelation[]> => {
+export const findTask = async (taskId: string) => {
   const db = getTx();
 
-  return db.query.weeklyTask.findMany({
+  return db.query.task.findFirst({
+    where: eq(table.task.id, taskId),
+    with: {
+      dueUser: {},
+      completions: {}
+    }
+  }).execute();
+};
+
+export const findDueTasks = async (): Promise<TaskWithRelation[]> => {
+  const db = getTx();
+  
+  return db.query.task.findMany({
+    where: or(
+      and(
+        eq(table.task.type, 'single'),
+        eq(table.task.done, false)
+      ),
+      and(
+        eq(table.task.type, 'repeating'),
+        lte(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
+      )
+    ),
     with: {
       dueUser: {},
       completions: {}
     }
   });
-};
+}
 
-export const findWeeklyTask = async (taskId: string) => {
+export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
   const db = getTx();
 
-  return db.query.weeklyTask.findFirst({
-    where: eq(table.weeklyTask.id, taskId),
+  return db.query.task.findMany({
+    where: or(
+      and(
+        eq(table.task.type, 'single'),
+        eq(table.task.done, true)
+      ),
+      and(
+        eq(table.task.type, 'repeating'),
+        gt(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
+      )
+    ),
     with: {
+      dueUser: {},
       completions: {}
     }
-  }).execute();
-};
+  });
+}
 
-export const addWeeklyTask = async (name: string, weekday: Weekday, interval: number, userId: string, dueDate: string | null) => {
+export const addTask = async (name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
-  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
-
-  await db.insert(table.weeklyTask).values({
+  await db.insert(table.task).values({
     id: generateUUID(),
     name: name,
+    type: weekday ? 'repeating' : 'single',
     dueWeekday: weekday,
-    interval,
+    dueInterval: interval,
     dueUserId: userId,
-    dueDate: nextDueDate
+    dueDate: getDueDateString(dueDate, weekday, interval)
   });
 };
 
-export const updateWeeklyTask = async (taskId: string, name: string, weekday: Weekday, interval: number, userId: string, dueDate: string | null) => {
+export const updateTask = async (taskId: string, name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
-  const nextDueDate = dueDate ?? formatDateToYYYYMMDD(getNextDueDate(weekday, interval));
-
-  await db.update(table.weeklyTask)
+  await db.update(table.task)
     .set({
       name: name,
+      type: weekday ? 'repeating' : 'single',
       dueWeekday: weekday as Weekday,
-      interval,
+      dueInterval: interval,
       dueUserId: userId,
-      dueDate: nextDueDate
+      dueDate: getDueDateString(dueDate, weekday, interval)
     })
-    .where(eq(table.weeklyTask.id, taskId));
+    .where(eq(table.task.id, taskId));
 };
 
-export const findAllSingleTasks = async () => {
-  const db = getTx();
+const getDueDateString = (dueDate: string | null, weekday: Weekday | null, interval: number | null) => {
+  if (dueDate) {
+    return dueDate;
+  }
 
-  return db.query.singleTask.findMany({
-    with: {
-      dueUser: {}
-    }
-  });
-};
+  if (weekday === null || interval === null) {
+    return null;
+  }
 
-export const findSingleTask = async (taskId: string) => {
-  const db = getTx();
-
-  return db.query.singleTask.findFirst({
-    where: eq(table.singleTask.id, taskId)
-  }).execute();
-};
-
-export const addSingleTask = async (name: string, userId: string | null, dueDate: string | null) => {
-  const db = getTx();
-
-  await db.insert(table.singleTask).values({
-    id: generateUUID(),
-    name: name,
-    dueUserId: userId,
-    dueDate
-  });
-};
-
-export const updateSingleTask = async (taskId: string, name: string, userId: string | null, dueDate: string | null) => {
-  const db = getTx();
-
-  await db.update(table.singleTask)
-    .set({
-      name: name,
-      dueUserId: userId,
-      dueDate
-    })
-    .where(eq(table.singleTask.id, taskId));
-};
-
+  return formatDateToYYYYMMDD(calculateNextDueDate(weekday, interval));
+}
 
 /**
  * Calculates the date of the next occurrence of a specific weekday based on the current time.
  */
-function getNextDueDate(weekdayName: Weekday, interval: number): Date {
+function calculateNextDueDate(weekdayName: Weekday, interval: number): Date {
   const weekdayMap: { [key: string]: number } = {
     'sun': 0,
     'mon': 1,
@@ -992,7 +974,7 @@ export const markTaskAsDone = async (taskId: string, doneByUserId: string | null
     date: formatDateToYYYYMMDD(new Date())
   });
 
-  const dueDate = formatDateToYYYYMMDD(getNextDueDate(task.dueWeekday, task.interval));
+  const dueDate = formatDateToYYYYMMDD(calculateNextDueDate(task.dueWeekday, task.interval));
   const dueUserId = await findNextDueUserId(taskId);
 
   await db.update(table.weeklyTask)
@@ -1036,25 +1018,21 @@ async function findNextDueUserId(taskId: string): Promise<string> {
 export const countDueTasks = async () => {
   const db = getTx();
 
-  const weeklyCount = (await db.select({ count: count(table.weeklyTask.id) })
-      .from(table.weeklyTask)
-      .where(lte(table.weeklyTask.dueDate, formatDateToYYYYMMDD(new Date())))
-      .execute()
-  ).at(0)?.count ?? 0;
-
-  const singleCount = (await db.select({ count: count(table.singleTask.id) })
-      .from(table.singleTask)
-      .where(
-        and(
-          eq(table.singleTask.done, false),
-          isNotNull(table.singleTask.dueDate),
-          lte(table.singleTask.dueDate, formatDateToYYYYMMDD(new Date()))
-        )
+  const tasks = await db.query.task.findMany({
+    where: or(
+      and(
+        eq(table.task.type, 'single'),
+        eq(table.task.done, false),
+        lte(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
+      ),
+      and(
+        eq(table.task.type, 'repeating'),
+        lte(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
       )
-      .execute()
-  ).at(0)?.count ?? 0;
+    ),
+  }).execute();
 
-  return weeklyCount + singleCount;
+  return tasks.length;
 };
 
 // ------- GENERIC -------
