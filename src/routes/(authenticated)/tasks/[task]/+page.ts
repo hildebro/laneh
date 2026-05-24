@@ -8,6 +8,6 @@ export const load: PageLoad = async ({ params, fetch }) => {
   const client = getApiClient(fetch);
 
   return {
-    task: await handleApiLoad(client.api.tasks.single[':task'].$get({ param: { task: params.task } }))
+    task: await handleApiLoad(client.api.tasks[':task'].$get({ param: { task: params.task } }))
   };
 };

@@ -11,14 +11,21 @@
   let id = $derived(data.task?.id);
   let name = $derived(data.task?.name ?? '');
   let weekday = $derived(data.task?.dueWeekday ?? '');
-  let interval = $derived(data.task?.interval ?? '');
+  let interval = $derived(data.task?.dueInterval ?? null);
   let dueDate = $derived(data.task?.dueDate ?? '');
   let dueUserId = $derived(data.task?.dueUserId ?? '');
 
   async function saveTask() {
     const client = getApiClient();
-    return client.api.tasks.weekly.$post({
-      json: { id, name, dueDate, dueUserId, weekday: weekday as Weekday, interval }
+    return client.api.tasks.$post({
+      json: {
+        id,
+        name,
+        dueDate,
+        dueUserId,
+        weekday: weekday.length === 0 ? null : weekday as Weekday,
+        interval: interval
+      }
     });
   }
 
@@ -63,7 +70,7 @@
       type="select"
       bind:value={dueUserId}
     >
-      <option value="" selected>{ m.generic_required() }</option>
+      <option value="" selected></option>
       {#each data.users as user (user.id)}
         <option value={user.id}>{user.username}</option>
       {/each}
@@ -74,7 +81,7 @@
       type="select"
       bind:value={weekday}
     >
-      <option value="" selected>{ m.generic_required() }</option>
+      <option value="" selected></option>
       {#each Object.values(Weekday) as weekdayOption (weekdayOption)}
         <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
       {/each}
