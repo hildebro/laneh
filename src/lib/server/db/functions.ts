@@ -831,7 +831,7 @@ export const findTask = async (taskId: string) => {
 
 export const findDueTasks = async (): Promise<TaskWithRelation[]> => {
   const db = getTx();
-  
+
   return db.query.task.findMany({
     where: or(
       and(
@@ -848,7 +848,7 @@ export const findDueTasks = async (): Promise<TaskWithRelation[]> => {
       completions: {}
     }
   });
-}
+};
 
 export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
   const db = getTx();
@@ -869,7 +869,7 @@ export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
       completions: {}
     }
   });
-}
+};
 
 export const addTask = async (name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
   const db = getTx();
@@ -910,7 +910,7 @@ const getDueDateString = (dueDate: string | null, weekday: Weekday | null, inter
   }
 
   return formatDateToYYYYMMDD(calculateNextDueDate(weekday, interval));
-}
+};
 
 /**
  * Calculates the date of the next occurrence of a specific weekday based on the current time.
@@ -954,32 +954,34 @@ function calculateNextDueDate(weekdayName: Weekday, interval: number): Date {
 export const markTaskAsDone = async (taskId: string, doneByUserId: string | null = null): Promise<void> => {
   const db = getTx();
 
-  const singleTask = await db.query.singleTask.findFirst({ where: eq(table.singleTask.id, taskId) });
-  if (singleTask) {
-    await db.update(table.singleTask).set({
+  const task = await db.query.task.findFirst({ where: eq(table.task.id, taskId) });
+  if (!task) {
+    throw new Error('entity not found');
+  }
+
+  if (task.type === 'single') {
+    await db.update(table.task).set({
       done: true,
       dueUserId: doneByUserId
-    }).where(eq(table.singleTask.id, taskId)).execute();
+    }).where(eq(table.task.id, taskId)).execute();
 
     return;
   }
 
-  const task = await db.query.weeklyTask.findFirst({ where: eq(table.weeklyTask.id, taskId) }) as WeeklyTask;
   const completionUserId = doneByUserId ?? task.dueUserId as string;
-
-  await db.insert(table.weeklyTaskCompletion).values({
+  await db.insert(table.taskCompletion).values({
     id: generateUUID(),
     taskId,
     userId: completionUserId,
     date: formatDateToYYYYMMDD(new Date())
   });
 
-  const dueDate = formatDateToYYYYMMDD(calculateNextDueDate(task.dueWeekday, task.interval));
+  const dueDate = formatDateToYYYYMMDD(calculateNextDueDate(task.dueWeekday as Weekday, task.dueInterval as number));
   const dueUserId = await findNextDueUserId(taskId);
 
-  await db.update(table.weeklyTask)
+  await db.update(table.task)
     .set({ dueDate, dueUserId })
-    .where(eq(table.weeklyTask.id, taskId))
+    .where(eq(table.task.id, taskId))
     .execute();
 };
 
@@ -996,21 +998,21 @@ async function findNextDueUserId(taskId: string): Promise<string> {
   const completionsPerUser = await db
     .select({
       id: table.user.id,
-      completionCount: count(table.weeklyTaskCompletion.id)
+      completionCount: count(table.taskCompletion.id)
         .mapWith(Number)
         .as('completionCount'),
-      earliestCompletionDate: min(table.weeklyTaskCompletion.date).as('earliestCompletionDate')
+      earliestCompletionDate: min(table.taskCompletion.date).as('earliestCompletionDate')
     })
     .from(table.user)
     .leftJoin(
-      table.weeklyTaskCompletion,
+      table.taskCompletion,
       and(
-        eq(table.user.id, table.weeklyTaskCompletion.userId),
-        eq(table.weeklyTaskCompletion.taskId, taskId)
+        eq(table.user.id, table.taskCompletion.userId),
+        eq(table.taskCompletion.taskId, taskId)
       )
     )
     .groupBy(table.user.id)
-    .orderBy(asc(count(table.weeklyTaskCompletion.id)), asc(min(table.weeklyTaskCompletion.date)));
+    .orderBy(asc(count(table.taskCompletion.id)), asc(min(table.taskCompletion.date)));
 
   return completionsPerUser[0].id;
 }
@@ -1029,7 +1031,7 @@ export const countDueTasks = async () => {
         eq(table.task.type, 'repeating'),
         lte(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
       )
-    ),
+    )
   }).execute();
 
   return tasks.length;

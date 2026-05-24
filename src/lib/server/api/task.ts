@@ -49,13 +49,9 @@ const tasksRouter = new Hono()
     zValidator('json', taskDoneSchema),
     async (c) => {
       const taskCompletion = c.req.valid('json');
-      try {
-        await markTaskAsDone(taskCompletion.taskId, taskCompletion.userId);
+      await markTaskAsDone(taskCompletion.taskId, taskCompletion.userId);
 
-        return c.json({ success: true });
-      } catch {
-        return c.json({ error: 'Database error' }, 500);
-      }
+      return c.json({ success: true });
     }
   )
   .get('/:task', async (c) => {
