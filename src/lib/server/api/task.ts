@@ -35,6 +35,19 @@ const taskSchema = z.object({
         path: ['weekday']
       }
     )
+    .refine(
+      (data) => {
+        if (!data.weekday && !data.interval) {
+          return true;
+        }
+
+        return !!data.dueDate;
+      },
+      {
+        message: 'schedule_error_due_date_repeating_task',
+        path: ['dueDate']
+      }
+    )
 ;
 
 const tasksRouter = new Hono()
