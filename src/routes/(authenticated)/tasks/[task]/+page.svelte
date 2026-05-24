@@ -52,9 +52,9 @@
 <article>
   <h2>
     {#if data.task}
-      { m.schedule_weekly_task_edit() }
+      { m.schedule_task_update() }
     {:else }
-      { m.schedule_weekly_task_add() }
+      { m.schedule_task_add() }
     {/if}
   </h2>
   <ApiForm submitAction={saveTask} onSuccess={resolve('/tasks')}>
@@ -65,7 +65,7 @@
       bind:value={name}
     />
     <ApiFormItem
-      label={m.schedule_next_assignee()}
+      label={m.schedule_assignee()}
       name="assignee"
       type="select"
       bind:value={dueUserId}
@@ -75,6 +75,12 @@
         <option value={user.id}>{user.username}</option>
       {/each}
     </ApiFormItem>
+    <ApiFormItem
+      label={ m.schedule_due_date() }
+      name="dueDate"
+      type="date"
+      bind:value={dueDate}
+    />
     <ApiFormItem
       label={m.schedule_weekday()}
       name="weekday"
@@ -96,15 +102,6 @@
       />
       <span>{ m.schedule_interval_weeks() }</span>
     </div>
-    <ApiFormItem
-      label={ m.schedule_next_date() }
-      name="date"
-      type="date"
-      bind:value={dueDate}
-    />
-    <p>
-      { m.schedule_next_date_info() }
-    </p>
     {#if data.task?.completions}
       <div>{ m.schedule_completions() }</div>
       <ul>
