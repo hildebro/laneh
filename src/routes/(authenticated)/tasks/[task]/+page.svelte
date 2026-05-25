@@ -97,7 +97,7 @@
         type="select"
         bind:value={weekday}
       >
-        <option value="" selected></option>
+        <option value="" selected>{ m.generic_required() }</option>
         {#each Object.values(Weekday) as weekdayOption (weekdayOption)}
           <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
         {/each}
