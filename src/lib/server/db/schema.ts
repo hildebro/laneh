@@ -12,7 +12,7 @@ import {
   text,
   timestamp
 } from 'drizzle-orm/pg-core';
-import { TaskType, Weekday } from '$lib/utils/taskHelper';
+import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
@@ -203,9 +203,11 @@ export const balanceEntryDistributionRelations = relations(balanceEntryDistribut
   }),
 }));
 
-export const weekday = pgEnum('weekday', Weekday);
+export const weekdayEnum = pgEnum('weekday', Weekday);
 
 export const taskTypeEnum = pgEnum('task_type', TaskType);
+
+export const assignmentEnum = pgEnum('assignment', Assignment);
 
 export const task = pgTable('task', {
   id: text().primaryKey(),
@@ -217,15 +219,16 @@ export const task = pgTable('task', {
   // Single specific
   done: boolean().default(false),
   // Repeating specific
-  dueWeekday: weekday(),
+  dueWeekday: weekdayEnum(),
   dueInterval: integer(),
+  assignment: assignmentEnum(),
 }, (table) => ({
   taskStateCheck: check(
     'task_state_check',
     sql`
-      (${table.type} = 'single' AND ${table.dueWeekday} IS NULL AND ${table.dueInterval} IS NULL)
+      (${table.type} = 'single' AND ${table.dueWeekday} IS NULL AND ${table.dueInterval} IS NULL AND ${table.assignment} IS NULL)
       OR
-      (${table.type} = 'repeating' AND ${table.dueWeekday} IS NOT NULL AND ${table.dueInterval} IS NOT NULL AND ${table.dueDate} IS NOT NULL)
+      (${table.type} = 'repeating' AND ${table.dueWeekday} IS NOT NULL AND ${table.dueInterval} IS NOT NULL AND ${table.dueDate} IS NOT NULL AND ${table.assignment} IS NOT NULL)
     `
   )
 }));

@@ -10,7 +10,7 @@ import {
   updateTask
 } from '$lib/server/db/functions';
 import type { Task } from '$lib/server/db/schema';
-import { TaskType, Weekday } from '$lib/utils/taskHelper';
+import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 import { z } from '$lib/zod';
 
 const taskDoneSchema = z.object({
@@ -25,7 +25,8 @@ const taskSchema = z.object({
     dueDate: z.string().trim().pipe(z.transform((val) => (val === '' ? null : val))),
     type: z.enum(TaskType),
     weekday: z.union([z.enum(Weekday), z.null()]),
-    interval: z.coerce.number().min(1).nullable()
+    interval: z.coerce.number().min(1).nullable(),
+    assignment: z.union([z.enum(Assignment), z.null()])
   })
     .refine(
       (data) => {
@@ -52,6 +53,15 @@ const taskSchema = z.object({
       {
         message: 'schedule_error_repeating_required',
         path: ['interval']
+      }
+    )
+    .refine(
+      (data) => {
+        return data.type === TaskType.Single || !!data.assignment;
+      },
+      {
+        message: 'schedule_error_repeating_required',
+        path: ['assignment']
       }
     )
 ;
@@ -86,7 +96,7 @@ const tasksRouter = new Hono()
     async (c) => {
       const task = c.req.valid('json');
       if (!task.id) {
-        await addTask(task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+        await addTask(task.type, task.name, task.weekday, task.interval, task.assignment, task.dueUserId, task.dueDate);
 
         return c.json({ success: true });
       }
@@ -104,7 +114,7 @@ const tasksRouter = new Hono()
         return c.json({ success: false, error }, 400);
       }
 
-      await updateTask(task.id, task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+      await updateTask(task.id, task.type, task.name, task.weekday, task.interval, task.assignment, task.dueUserId, task.dueDate);
 
       return c.json({ success: true });
     }

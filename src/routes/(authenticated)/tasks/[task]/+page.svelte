@@ -4,7 +4,7 @@
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import { TaskType, Weekday } from '$lib/utils/taskHelper';
+  import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 
   let { data } = $props();
 
@@ -16,6 +16,7 @@
   let type = $derived(isRepeating ? TaskType.Repeating : TaskType.Single);
   let weekday = $derived(data.task?.dueWeekday ?? '');
   let interval = $derived(data.task?.dueInterval ?? null);
+  let assignment = $derived(data.task?.assignment ?? '');
 
   async function saveTask() {
     const client = getApiClient();
@@ -27,7 +28,8 @@
         dueUserId,
         type,
         weekday: weekday.length === 0 ? null : weekday as Weekday,
-        interval: interval
+        interval,
+        assignment: assignment.length === 0 ? null : assignment as Assignment,
       }
     });
   }
@@ -48,6 +50,17 @@
         return m.schedule_weekday_sat();
       case Weekday.Sunday:
         return m.schedule_weekday_sun();
+    }
+  }
+
+  function translateAssignment(assignment: Assignment) {
+    switch (assignment) {
+      case Assignment.Everyone:
+        return m.schedule_assignment_everyone();
+      case Assignment.Someone:
+        return m.schedule_assignment_someone();
+      case Assignment.Noone:
+        return m.schedule_assignment_noone();
     }
   }
 </script>
@@ -112,6 +125,17 @@
         />
         <span>{ m.schedule_interval_weeks() }</span>
       </div>
+      <ApiFormItem
+        label={m.schedule_assignment()}
+        name="assignment"
+        type="select"
+        bind:value={assignment}
+      >
+        <option value="" selected>{ m.generic_required() }</option>
+        {#each Object.values(Assignment) as assignmentOption (assignmentOption)}
+          <option value={assignmentOption}>{translateAssignment(assignmentOption)}</option>
+        {/each}
+      </ApiFormItem>
       {#if data.task?.completions}
         <div>{ m.schedule_completions() }</div>
         <ul>

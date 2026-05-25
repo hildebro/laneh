@@ -12,3 +12,9 @@ export enum TaskType {
   Single = 'single',
   Repeating = 'repeating'
 }
+
+export enum Assignment {
+  Everyone = 'everyone',
+  Someone = 'someone',
+  Noone = 'noone'
+}
