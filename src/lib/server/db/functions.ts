@@ -17,7 +17,7 @@ import {
   type TaskWithRelation,
   type User
 } from '$lib/server/db/schema';
-import type { Weekday } from '$lib/utils/taskHelper';
+import { TaskType, type Weekday } from '$lib/utils/taskHelper';
 
 // ------- USER -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
@@ -835,11 +835,11 @@ export const findDueTasks = async (): Promise<TaskWithRelation[]> => {
   return db.query.task.findMany({
     where: or(
       and(
-        eq(table.task.type, 'single'),
+        eq(table.task.type, TaskType.Single),
         eq(table.task.done, false)
       ),
       and(
-        eq(table.task.type, 'repeating'),
+        eq(table.task.type, TaskType.Repeating),
         lte(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
       )
     ),
@@ -856,11 +856,11 @@ export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
   return db.query.task.findMany({
     where: or(
       and(
-        eq(table.task.type, 'single'),
+        eq(table.task.type, TaskType.Single),
         eq(table.task.done, true)
       ),
       and(
-        eq(table.task.type, 'repeating'),
+        eq(table.task.type, TaskType.Repeating),
         gt(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
       )
     ),
@@ -871,13 +871,13 @@ export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
   });
 };
 
-export const addTask = async (name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
+export const addTask = async (type: TaskType, name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
   await db.insert(table.task).values({
     id: generateUUID(),
     name: name,
-    type: weekday ? 'repeating' : 'single',
+    type,
     dueWeekday: weekday,
     dueInterval: interval,
     dueUserId: userId,
@@ -885,13 +885,13 @@ export const addTask = async (name: string, weekday: Weekday | null, interval: n
   });
 };
 
-export const updateTask = async (taskId: string, name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
+export const updateTask = async (taskId: string, type: TaskType, name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
   await db.update(table.task)
     .set({
       name: name,
-      type: weekday ? 'repeating' : 'single',
+      type,
       dueWeekday: weekday as Weekday,
       dueInterval: interval,
       dueUserId: userId,
@@ -1023,12 +1023,12 @@ export const countDueTasks = async () => {
   const tasks = await db.query.task.findMany({
     where: or(
       and(
-        eq(table.task.type, 'single'),
+        eq(table.task.type, TaskType.Single),
         eq(table.task.done, false),
         lte(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
       ),
       and(
-        eq(table.task.type, 'repeating'),
+        eq(table.task.type, TaskType.Repeating),
         lte(table.task.dueDate, formatDateToYYYYMMDD(new Date()))
       )
     )

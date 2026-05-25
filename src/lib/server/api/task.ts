@@ -1,6 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import * as m from '$lib/paraglide/messages.js';
 import {
   addTask,
   countDueTasks,
@@ -10,7 +9,7 @@ import {
   markTaskAsDone,
   updateTask
 } from '$lib/server/db/functions';
-import { Weekday } from '$lib/utils/taskHelper';
+import { TaskType, Weekday } from '$lib/utils/taskHelper';
 import { z } from '$lib/zod';
 
 const taskDoneSchema = z.object({
@@ -23,29 +22,35 @@ const taskSchema = z.object({
     name: z.string().trim().nonempty(),
     dueUserId: z.string().trim().pipe(z.transform((val) => (val === '' ? null : val))),
     dueDate: z.string().trim().pipe(z.transform((val) => (val === '' ? null : val))),
-    weekday: z.union([z.enum(Weekday, { error: () => m.schedule_weekday_nonoptional() }), z.null()]),
+    type: z.enum(TaskType),
+    weekday: z.union([z.enum(Weekday), z.null()]),
     interval: z.coerce.number().min(1).nullable()
   })
     .refine(
       (data) => {
-        return !!data.weekday === !!data.interval;
+        return data.type === TaskType.Single || !!data.dueDate;
       },
       {
-        message: 'schedule_error_task_state',
+        message: 'schedule_error_repeating_required',
+        path: ['dueDate']
+      }
+    )
+    .refine(
+      (data) => {
+        return data.type === TaskType.Single || !!data.weekday;
+      },
+      {
+        message: 'schedule_error_repeating_required',
         path: ['weekday']
       }
     )
     .refine(
       (data) => {
-        if (!data.weekday && !data.interval) {
-          return true;
-        }
-
-        return !!data.dueDate;
+        return data.type === TaskType.Single || !!data.interval;
       },
       {
-        message: 'schedule_error_due_date_repeating_task',
-        path: ['dueDate']
+        message: 'schedule_error_repeating_required',
+        path: ['interval']
       }
     )
 ;
@@ -81,9 +86,9 @@ const tasksRouter = new Hono()
       const task = c.req.valid('json');
       try {
         if (task.id) {
-          await updateTask(task.id, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+          await updateTask(task.id, task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
         } else {
-          await addTask(task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+          await addTask(task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
         }
         return c.json({ success: true });
       } catch {

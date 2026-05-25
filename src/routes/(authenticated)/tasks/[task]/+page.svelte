@@ -4,16 +4,17 @@
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import { Weekday } from '$lib/utils/taskHelper';
+  import { TaskType, Weekday } from '$lib/utils/taskHelper';
 
   let { data } = $props();
 
   let id = $derived(data.task?.id);
   let name = $derived(data.task?.name ?? '');
-  let weekday = $derived(data.task?.dueWeekday ?? '');
-  let interval = $derived(data.task?.dueInterval ?? null);
   let dueDate = $derived(data.task?.dueDate ?? '');
   let dueUserId = $derived(data.task?.dueUserId ?? '');
+  let type = $derived(data.task?.type ?? TaskType.Single);
+  let weekday = $derived(data.task?.dueWeekday ?? '');
+  let interval = $derived(data.task?.dueInterval ?? null);
 
   async function saveTask() {
     const client = getApiClient();
@@ -23,6 +24,7 @@
         name,
         dueDate,
         dueUserId,
+        type,
         weekday: weekday.length === 0 ? null : weekday as Weekday,
         interval: interval
       }
@@ -81,36 +83,44 @@
       type="date"
       bind:value={dueDate}
     />
-    <ApiFormItem
-      label={m.schedule_weekday()}
-      name="weekday"
-      type="select"
-      bind:value={weekday}
-    >
-      <option value="" selected></option>
-      {#each Object.values(Weekday) as weekdayOption (weekdayOption)}
-        <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
-      {/each}
-    </ApiFormItem>
-    <div class="label">{ m.schedule_interval() }</div>
-    <div class="interval-row">
-      <span>{ m.schedule_interval_every()}</span>
-      <ApiFormItem
-        label=""
-        name="interval"
-        bind:value={interval}
+    <label>
+      <input type="checkbox" checked={type === TaskType.Repeating}
+             onchange={() => type === TaskType.Single ? type = TaskType.Repeating : type = TaskType.Single}
       />
-      <span>{ m.schedule_interval_weeks() }</span>
-    </div>
-    {#if data.task?.completions}
-      <div>{ m.schedule_completions() }</div>
-      <ul>
-        {#each data.users as user (user.id)}
-          <li>
-            {user.username}: { data.task.completions?.filter(completion => completion.userId === user.id).length }
-          </li>
+      { m.schedule_task_repeating() }
+    </label>
+    {#if type === TaskType.Repeating}
+      <ApiFormItem
+        label={m.schedule_weekday()}
+        name="weekday"
+        type="select"
+        bind:value={weekday}
+      >
+        <option value="" selected></option>
+        {#each Object.values(Weekday) as weekdayOption (weekdayOption)}
+          <option value={weekdayOption}>{translateWeekday(weekdayOption)}</option>
         {/each}
-      </ul>
+      </ApiFormItem>
+      <div class="label">{ m.schedule_interval() }</div>
+      <div class="interval-row">
+        <span>{ m.schedule_interval_every()}</span>
+        <ApiFormItem
+          label=""
+          name="interval"
+          bind:value={interval}
+        />
+        <span>{ m.schedule_interval_weeks() }</span>
+      </div>
+      {#if data.task?.completions}
+        <div>{ m.schedule_completions() }</div>
+        <ul>
+          {#each data.users as user (user.id)}
+            <li>
+              {user.username}: { data.task.completions?.filter(completion => completion.userId === user.id).length }
+            </li>
+          {/each}
+        </ul>
+      {/if}
     {/if}
   </ApiForm>
 </article>
