@@ -9,6 +9,7 @@ import {
   markTaskAsDone,
   updateTask
 } from '$lib/server/db/functions';
+import type { Task } from '$lib/server/db/schema';
 import { TaskType, Weekday } from '$lib/utils/taskHelper';
 import { z } from '$lib/zod';
 
@@ -84,16 +85,28 @@ const tasksRouter = new Hono()
     zValidator('json', taskSchema),
     async (c) => {
       const task = c.req.valid('json');
-      try {
-        if (task.id) {
-          await updateTask(task.id, task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
-        } else {
-          await addTask(task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
-        }
+      if (!task.id) {
+        await addTask(task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+
         return c.json({ success: true });
-      } catch {
-        return c.json({ error: 'Database error' }, 500);
       }
+
+      const existingTask = await findTask(task.id) as Task;
+      if (existingTask.type !== task.type) {
+        const error = new z.ZodError([
+          {
+            code: 'custom',
+            path: ['type'],
+            message: 'schedule_error_type_update'
+          }
+        ]);
+
+        return c.json({ success: false, error }, 400);
+      }
+
+      await updateTask(task.id, task.type, task.name, task.weekday, task.interval, task.dueUserId, task.dueDate);
+
+      return c.json({ success: true });
     }
   );
 
