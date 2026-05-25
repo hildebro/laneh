@@ -7,3 +7,8 @@ export enum Weekday {
   Saturday = 'sat',
   Sunday = 'sun'
 }
+
+export enum TaskType {
+  Single = 'single',
+  Repeating = 'repeating'
+}

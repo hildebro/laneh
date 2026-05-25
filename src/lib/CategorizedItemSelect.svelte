@@ -1,4 +1,4 @@
-<script lang="ts">
+g'"<script lang="ts">
   import { type ShoppingCategoryWithRelation, type ShoppingItem } from '$lib/server/db/schema';
 
   // unfiltered implies that all items should be displayed, including deactivated ones.
