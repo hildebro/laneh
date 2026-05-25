@@ -17,7 +17,7 @@ import {
   type TaskWithRelation,
   type User
 } from '$lib/server/db/schema';
-import { TaskType, type Weekday } from '$lib/utils/taskHelper';
+import { Assignment, TaskType, type Weekday } from '$lib/utils/taskHelper';
 
 // ------- USER -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
@@ -871,7 +871,7 @@ export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
   });
 };
 
-export const addTask = async (type: TaskType, name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
+export const addTask = async (type: TaskType, name: string, weekday: Weekday | null, interval: number | null, assignment: Assignment | null,  userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
   await db.insert(table.task).values({
@@ -880,12 +880,13 @@ export const addTask = async (type: TaskType, name: string, weekday: Weekday | n
     type,
     dueWeekday: weekday,
     dueInterval: interval,
+    assignment,
     dueUserId: userId,
     dueDate: getDueDateString(dueDate, weekday, interval)
   });
 };
 
-export const updateTask = async (taskId: string, type: TaskType, name: string, weekday: Weekday | null, interval: number | null, userId: string | null, dueDate: string | null) => {
+export const updateTask = async (taskId: string, type: TaskType, name: string, weekday: Weekday | null, interval: number | null, assignment: Assignment | null, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
   await db.update(table.task)
@@ -894,6 +895,7 @@ export const updateTask = async (taskId: string, type: TaskType, name: string, w
       type,
       dueWeekday: weekday as Weekday,
       dueInterval: interval,
+      assignment,
       dueUserId: userId,
       dueDate: getDueDateString(dueDate, weekday, interval)
     })

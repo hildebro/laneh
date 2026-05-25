@@ -183,6 +183,13 @@
       "when": 1779355976661,
       "tag": "20260521093256_supreme_brother_voodoo",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1779738111107,
+      "tag": "20260525194151_peaceful_scarlet_spider",
+      "breakpoints": true
     }
   ]
 }
