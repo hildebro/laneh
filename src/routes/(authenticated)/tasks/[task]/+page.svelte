@@ -12,7 +12,8 @@
   let name = $derived(data.task?.name ?? '');
   let dueDate = $derived(data.task?.dueDate ?? '');
   let dueUserId = $derived(data.task?.dueUserId ?? '');
-  let type = $derived(data.task?.type ?? TaskType.Single);
+  let isRepeating = $derived((data.task?.type ?? TaskType.Single) === TaskType.Repeating);
+  let type = $derived(isRepeating ? TaskType.Repeating : TaskType.Single);
   let weekday = $derived(data.task?.dueWeekday ?? '');
   let interval = $derived(data.task?.dueInterval ?? null);
 
@@ -83,13 +84,13 @@
       type="date"
       bind:value={dueDate}
     />
-    <label>
-      <input type="checkbox" checked={type === TaskType.Repeating}
-             onchange={() => type === TaskType.Single ? type = TaskType.Repeating : type = TaskType.Single}
-      />
-      { m.schedule_task_repeating() }
-    </label>
-    {#if type === TaskType.Repeating}
+    <ApiFormItem
+      label={m.schedule_task_repeating()}
+      name="type"
+      type="checkbox"
+      bind:value={isRepeating}
+    />
+    {#if isRepeating}
       <ApiFormItem
         label={m.schedule_weekday()}
         name="weekday"

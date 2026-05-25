@@ -90,6 +90,7 @@
   "schedule_due_tasks": "Due tasks",
   "schedule_due_tasks_empty": "No tasks are currently due :)",
   "schedule_error_repeating_required": "Value required for repeating tasks",
+  "schedule_error_type_update": "The type of a task cannot be changed in retrospect",
   "schedule_interval": "Interval",
   "schedule_interval_every": "Every",
   "schedule_interval_weeks": "week(s)",

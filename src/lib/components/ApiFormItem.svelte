@@ -17,7 +17,7 @@
     value?: unknown;
     files?: FileList | null;
     accept?: string;
-    type?: 'text' | 'password' | 'number' | 'select' | 'money' | 'hidden' | 'date' | 'file';
+    type?: 'text' | 'password' | 'number' | 'select' | 'money' | 'hidden' | 'date' | 'file' | 'checkbox';
     error?: string;
     children?: Snippet;
   } = $props();
@@ -29,7 +29,9 @@
 </script>
 
 <div class="form-item">
-  <label for={name}>{label}</label>
+  {#if type !== 'checkbox'}
+    <label for={name}>{label}</label>
+  {/if}
   {#if type === 'select'}
     <select
       class="input"
@@ -60,6 +62,16 @@
       {accept}
       bind:files
     />
+  {:else if type === 'checkbox'}
+    <label for={name} class:error={!!displayError}>
+      <input
+        type="checkbox"
+        {name}
+        id={name}
+        bind:checked={value as boolean}
+      />
+      {label}
+    </label>
   {:else}
     <input
       class="input"
