@@ -994,8 +994,28 @@ export const markTaskAsDone = async (taskId: string, doneByUserId: string | null
  * 2. When was the first completion?
  *   => When multiple people has the same completion count, the one with the oldest completion is picked first.
  */
-async function findNextDueUserId(taskId: string): Promise<string> {
+async function findNextDueUserId(taskId: string): Promise<string | null> {
   const db = getTx();
+
+  const taskData = await db.select({
+    dueUserId: table.task.dueUserId,
+    assignment: table.task.assignment,
+  })
+    .from(table.task)
+    .where(eq(table.task.id, taskId));
+
+  const task = taskData.at(0);
+  if (!task) {
+    throw new Error('entity not found');
+  }
+
+  if (task.assignment === Assignment.Someone) {
+    return task.dueUserId;
+  }
+
+  if (task.assignment === Assignment.Noone) {
+    return null;
+  }
 
   const completionsPerUser = await db
     .select({
