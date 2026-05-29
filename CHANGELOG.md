@@ -1,3 +1,25 @@
+# [2.10.0](https://github.com/hildebro/laneh/compare/v2.9.0...v2.10.0) (2026-05-29)
+
+
+### Bug Fixes
+
+* broken file ([8217429](https://github.com/hildebro/laneh/commit/8217429bb9556fed0533260ca1cf9376def8f228))
+* interval column name ([470b528](https://github.com/hildebro/laneh/commit/470b528e9ace65f473741db07986aed75e9aff3c))
+* migration table order ([823b74b](https://github.com/hildebro/laneh/commit/823b74ba1b9cc91c94f88c36f6ed8b4a81a4b0d1))
+* proper empty-value label for weekday ([786a7d4](https://github.com/hildebro/laneh/commit/786a7d49f35214b8f3b2e3782238c4aa8a5f6390))
+
+
+### Features
+
+* add assignment column to task ([8778b50](https://github.com/hildebro/laneh/commit/8778b50ac0832c70ce1b96a63c524fc0766553b9))
+* better dueDate handling ([dd787e6](https://github.com/hildebro/laneh/commit/dd787e6475594cd949b42034fc26514d11d4b8da))
+* don't allow type switch on existing task ([39e47bb](https://github.com/hildebro/laneh/commit/39e47bb476355c5588576a60d7eeca556126b667))
+* explicit type input for tasks ([7292d66](https://github.com/hildebro/laneh/commit/7292d667c1e5e78fdc74ebf6e5a53fd89558299c))
+* migrate add/update/count task ([5121ba4](https://github.com/hildebro/laneh/commit/5121ba48a5531747697e459ac32de95ef0a52edb))
+* migrate markAsDone ([abad6d4](https://github.com/hildebro/laneh/commit/abad6d4f2bfdbf21c4291348b6c32f13e2cd5684))
+* new merged task table ([80d708b](https://github.com/hildebro/laneh/commit/80d708b671c221e3294d50d4ea89035cc39b408e))
+* use assignment column to find next due user ([3d1ac2d](https://github.com/hildebro/laneh/commit/3d1ac2d980ae8857a033a7e4a373edd4d3f7439e))
+
 # [2.9.0](https://github.com/hildebro/laneh/compare/v2.8.1...v2.9.0) (2026-05-17)
 
 
