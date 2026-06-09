@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/hildebro/laneh/compare/v2.10.0...v2.11.0) (2026-06-09)
+
+
+### Features
+
+* use proper icon ([c14665f](https://github.com/hildebro/laneh/commit/c14665fcaeeac4de343eb90d9f23088c7f3ab75c))
+
 # [2.10.0](https://github.com/hildebro/laneh/compare/v2.9.0...v2.10.0) (2026-05-29)
 
 
