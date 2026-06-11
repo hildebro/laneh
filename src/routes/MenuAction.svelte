@@ -13,8 +13,8 @@
 
   let { logged_in_user } = $props();
 
-  let remoteVersion = $state();
-  let serverVersion = $state();
+  let remoteVersion = $state<string|undefined>();
+  let serverVersion = $state<string|undefined>();
 
   let isOpen = $state(false);
   let wrapper = $state<HTMLElement>();
@@ -45,6 +45,18 @@
     await invalidateAll();
     await goto(resolve('/login'));
     isOpen = false;
+  }
+
+  const newVersionAvailable = (version: string) => {
+    if (!remoteVersion) {
+      return false;
+    }
+
+    if (remoteVersion === '?') {
+      return false;
+    }
+
+    return remoteVersion !== version;
   }
 
   onMount(async () => {
@@ -85,12 +97,12 @@
           </div>
         {/if}
         {#if serverVersion}
-          <div class:warning={remoteVersion !== '?' && serverVersion !== remoteVersion}>
+          <div class:warning={newVersionAvailable(serverVersion)}>
             {m.footer_server_version({ version: serverVersion })}
           </div>
         {/if}
         {#if Capacitor.isNativePlatform()}
-          <div class:warning={remoteVersion !== '?' && __APP_VERSION__ !== remoteVersion}>
+          <div class:warning={newVersionAvailable(__APP_VERSION__)}>
             {m.footer_app_version({ version: __APP_VERSION__ })}
           </div>
         {/if}
