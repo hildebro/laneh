@@ -22,6 +22,19 @@ const importSchema = z.object({
 });
 
 const publicRouter = new Hono()
+  .get('/version', async (c) => {
+    const serverVersion = __APP_VERSION__;
+    const res = await fetch('https://api.github.com/repos/hildebro/laneh/releases/latest');
+
+    if (!res.ok) {
+      return c.json({ remoteVersion: '?', serverVersion });
+    }
+
+    const data = await res.json();
+    const remoteVersion = data.tag_name.replace('v', '') as string;
+
+    return c.json({ remoteVersion, serverVersion });
+  })
   .get('/needsInitiation', async (c) => {
     const users = await findAllUsers();
     return c.json(users.length === 0);
