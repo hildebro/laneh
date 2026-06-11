@@ -1,6 +1,7 @@
 <script lang="ts">
   import '../app.css';
   import { App } from '@capacitor/app';
+  import type { PluginListenerHandle } from '@capacitor/core';
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
   import { onMount } from 'svelte';
@@ -10,23 +11,59 @@
   import { page } from '$app/state';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { addToast } from '$lib/stores/toast';
 
   let { children } = $props();
+  let lastBackPressed = 0;
 
-  onMount(async () => {
-    if (Capacitor.isNativePlatform()) {
-      // Option A: Make the status bar transparent (Content goes BEHIND it)
-      // You MUST use Method 1 (CSS padding) with this for it to look good.
-      await StatusBar.setOverlaysWebView({ overlay: true });
+  async function initCapacitor(onRegister: (listener: PluginListenerHandle) => void) {
+    if (!Capacitor.isNativePlatform()) {
+      return;
     }
-  });
 
-  App.addListener('backButton', ({ canGoBack }) => {
-    if (canGoBack) {
-      window.history.back();
-    } else {
-      App.exitApp();
-    }
+    await StatusBar.setOverlaysWebView({ overlay: true });
+
+    const listener = await App.addListener('backButton', ({ canGoBack }) => {
+      if (canGoBack) {
+        window.history.back();
+
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastBackPressed < 2000) {
+        App.exitApp();
+      } else {
+        lastBackPressed = now;
+        addToast({
+          message: 'Press back again to exit',
+          type: 'primary',
+          duration: 2000
+        });
+      }
+    });
+
+    onRegister(listener);
+  }
+
+  onMount(() => {
+    let backButtonListener: PluginListenerHandle | undefined;
+    let isUnmounted = false;
+
+    initCapacitor((listener) => {
+      if (isUnmounted) {
+        listener.remove();
+      } else {
+        backButtonListener = listener;
+      }
+    });
+
+    return () => {
+      isUnmounted = true;
+      if (backButtonListener) {
+        backButtonListener.remove();
+      }
+    };
   });
 </script>
 
@@ -53,7 +90,6 @@
 </div>
 
 <style>
-    /* This ensures the background color extends BEHIND the status bar, but content starts BELOW it. */
     .app-shell {
         min-height: 100vh;
     }
