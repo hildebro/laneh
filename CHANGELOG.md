@@ -1,3 +1,17 @@
+# [2.12.0](https://github.com/hildebro/laneh/compare/v2.11.0...v2.12.0) (2026-06-11)
+
+
+### Bug Fixes
+
+* don't display warning on version, if remote is not present ([25c37ba](https://github.com/hildebro/laneh/commit/25c37bae262beeb5f846cbd06fda3a4334b7368a))
+
+
+### Features
+
+* add confirm double-back ([f249cc9](https://github.com/hildebro/laneh/commit/f249cc90de93c47fd74527aa0b4d11c3c83b7a95))
+* differentiate app and server version ([ca5dfd7](https://github.com/hildebro/laneh/commit/ca5dfd7855b110c4e22b001d65ae23772922e4f4))
+* enable "back" button on android ([6aefc22](https://github.com/hildebro/laneh/commit/6aefc22618061c50cf76f72c72d2b43453c9e417))
+
 # [2.11.0](https://github.com/hildebro/laneh/compare/v2.10.0...v2.11.0) (2026-06-09)
 
 
