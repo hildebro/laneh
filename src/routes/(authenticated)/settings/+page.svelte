@@ -18,6 +18,20 @@
     });
   }
 
+  async function exportDatabase() {
+    const res = await getApiClient().api.users.export.$get();
+
+    // Trigger the browser download using a streamlined anchor trick
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await res.blob());
+
+    // Extract the filename from the header, falling back to a default if empty
+    a.download = res.headers.get('content-disposition')?.split('filename=')[1]?.replace(/["']/g, '')
+      || 'database-dump.tar.gz';
+
+    a.click();
+  }
+
   async function onSuccess() {
     password = undefined;
     await invalidateAll();
@@ -45,9 +59,9 @@
       <a role="button" href={resolve('/settings/register')}>
         {m.settings_users_add()}
       </a>
-      <a role="button" href={resolve('/api/export')} download="database-dump.tar.gz">
+      <button type="button" onclick={exportDatabase}>
         {m.settings_actions_export()}
-      </a>
+      </button>
     </div>
   </article>
 </div>
@@ -66,5 +80,3 @@
     />
   </ApiForm>
 </article>
-
-
