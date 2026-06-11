@@ -1,16 +1,20 @@
 <script lang="ts">
   import { Capacitor } from '@capacitor/core';
-  import { CloudAlert, Menu } from 'lucide-svelte';
+  import { Menu } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
+  import { getBaseUrl } from '$lib/config';
+  import { isDemoMode } from '$lib/demo';
   import * as m from '$lib/paraglide/messages.js';
+  import { handleApiLoad } from '$lib/utils/apiHelper';
 
   let { logged_in_user } = $props();
 
-  let updateAvailable = $state(false);
+  let remoteVersion = $state();
+  let serverVersion = $state();
 
   let isOpen = $state(false);
   let wrapper = $state<HTMLElement>();
@@ -44,15 +48,18 @@
   }
 
   onMount(async () => {
-    try {
-      const res = await fetch(resolve('/api/update'));
-      const updateData = await res.json();
-      if (updateData.hasUpdate) {
-        updateAvailable = true;
-      }
-    } catch {
-      console.error('Failed to check for updates');
+    // Don't check for version, if we are on mobile and don't have a defined server yet.
+    if (Capacitor.isNativePlatform() && getBaseUrl() === '') {
+      return;
     }
+
+    // Can't check versions on demo mode either.
+    if (await isDemoMode()) {
+      return;
+    }
+
+    const client = getApiClient(fetch);
+    ({ remoteVersion, serverVersion } = await handleApiLoad(client.api.public.version.$get()));
   });
 </script>
 
@@ -66,18 +73,27 @@
 
   {#if isOpen}
     <div class="header-dropdown">
-      <div class="header-dropdown-info" class:warning={updateAvailable}>
+      <div class="header-dropdown-info">
         <div>
           {#if logged_in_user}
             { m.header_user({ name: logged_in_user.username }) }
           {/if}
         </div>
-        <div>
-          {#if updateAvailable}
-            <CloudAlert size={20} class="icon" />
-          {/if}
-          {m.footer_version({ app_version: __APP_VERSION__ })}
-        </div>
+        {#if remoteVersion}
+          <div>
+            {m.footer_remote_version({ version: remoteVersion })}
+          </div>
+        {/if}
+        {#if serverVersion}
+          <div class:warning={remoteVersion !== '?' && serverVersion !== remoteVersion}>
+            {m.footer_server_version({ version: serverVersion })}
+          </div>
+        {/if}
+        {#if Capacitor.isNativePlatform()}
+          <div class:warning={remoteVersion !== '?' && __APP_VERSION__ !== remoteVersion}>
+            {m.footer_app_version({ version: __APP_VERSION__ })}
+          </div>
+        {/if}
       </div>
 
       <div class="header-dropdown-actions">
