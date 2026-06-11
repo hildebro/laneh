@@ -1,5 +1,6 @@
 <script lang="ts">
   import '../app.css';
+  import { App } from '@capacitor/app';
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
   import { onMount } from 'svelte';
@@ -19,6 +20,14 @@
       await StatusBar.setOverlaysWebView({ overlay: true });
     }
   });
+
+  App.addListener('backButton', ({ canGoBack }) => {
+    if (canGoBack) {
+      window.history.back();
+    } else {
+      App.exitApp();
+    }
+  });
 </script>
 
 <ToastContainer />
@@ -34,7 +43,7 @@
         { m.header_head() }
       </div>
       <div class="header-action-container">
-        <ThemeAction/>
+        <ThemeAction />
         <LanguageAction />
         <MenuAction logged_in_user={page.data.logged_in_user} />
       </div>
