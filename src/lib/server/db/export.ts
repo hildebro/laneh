@@ -20,7 +20,7 @@ function toSnakeCase(str: string) {
   return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }
 
-export async function GET() {
+export function generateDatabaseBackup() {
   const pack = tar.pack();
   const gzip = createGzip();
 
@@ -40,12 +40,10 @@ export async function GET() {
     });
   };
 
-  // Process tables asynchronously without blocking the stream
+  // Process tables asynchronously without blocking the stream initialization
   const processTables = async () => {
     try {
       for (const [, entity] of Object.entries(schema)) {
-        // Try to get the table name. If it fails or returns undefined, it's not a table (e.g., it's
-        // a relation or enum).
         let tableName: string;
         try {
           tableName = getTableName(entity as Table);
@@ -64,25 +62,20 @@ export async function GET() {
         }
 
         const tableCols = getTableColumns(entity as Table);
-
         let sql = `-- Dump for table: ${tableName}\n\n`;
 
         // Convert the JS keys back to their snake_case DB equivalents
         const columns = Object.keys(rows[0])
           .map((jsKey) => {
             const col = tableCols[jsKey];
-            // If Drizzle has a specific name for this column, use it (and snake_case it just in case)
-            // Otherwise, just snake_case the TypeScript key directly.
             const dbColName = col?.name ? toSnakeCase(col.name) : toSnakeCase(jsKey);
-
             return `"${dbColName}"`;
           })
           .join(', ');
 
         for (const row of rows) {
           const values = Object.values(row).map(escapeSqlValue).join(', ');
-          sql += `INSERT INTO "${tableName}" (${columns})
-                  VALUES (${values});  \n`;
+          sql += `INSERT INTO "${tableName}" (${columns}) VALUES (${values});  \n`;
         }
 
         await appendEntry(`${tableName}.sql`, sql);
@@ -91,18 +84,18 @@ export async function GET() {
       console.error('Export error:', error);
       await appendEntry('error.log', 'ERROR GENERATING DUMP');
     } finally {
-      // Finalize the tar stream to end it, which will propagate to gzip and passThrough
+      // Finalize the tar stream to end it, which propagates to gzip and passThrough
       pack.finalize();
     }
   };
 
-  // Start processing in the background
-  // noinspection ES6MissingAwait
+  // Start processing in the background immediately
   processTables();
 
-  // Convert Node stream to Web Stream for SvelteKit Response
+  // Convert Node stream to Web Stream
   const webStream = Readable.toWeb(passThrough) as ReadableStream;
 
+  // Generate filename timestamp
   const now = new Date();
   const Y = now.getFullYear();
   const m = String(now.getMonth() + 1).padStart(2, '0');
@@ -111,10 +104,7 @@ export async function GET() {
   const min = String(now.getMinutes()).padStart(2, '0');
   const timestamp = `${Y}${m}${d}-${H}${min}`;
 
-  return new Response(webStream, {
-    headers: {
-      'Content-Type': 'application/gzip',
-      'Content-Disposition': `attachment; filename="laneh-${__APP_VERSION__}-db-${timestamp}.tar.gz"`
-    }
-  });
+  const filename = `laneh-${__APP_VERSION__}-db-${timestamp}.tar.gz`;
+
+  return { webStream, filename };
 }

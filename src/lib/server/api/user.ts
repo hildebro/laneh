@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import * as m from '$lib/paraglide/messages.js';
 import type { AppEnv } from '$lib/server/api/types';
 import { logout } from '$lib/server/auth';
+import { generateDatabaseBackup } from '$lib/server/db/export'; // <-- Import your new helper
 import {
   addUser,
   findAllUsers,
@@ -42,6 +43,14 @@ const distributionSchema = z.array(
 const usersRouter = new Hono<AppEnv>()
   .get('/', async (c) => {
     return c.json(await findAllUsers());
+  })
+  .get('/export', async (c) => {
+    const { webStream, filename } = generateDatabaseBackup();
+
+    c.header('Content-Type', 'application/gzip');
+    c.header('Content-Disposition', `attachment; filename="${filename}"`);
+
+    return c.body(webStream);
   })
   .put('/', zValidator('json', registerSchema), async (c) => {
     const putData = c.req.valid('json');
@@ -89,7 +98,6 @@ const usersRouter = new Hono<AppEnv>()
     await logout(c);
 
     return c.json({ success: true });
-  })
-;
+  });
 
 export default usersRouter;
