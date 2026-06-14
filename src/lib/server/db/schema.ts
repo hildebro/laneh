@@ -14,27 +14,61 @@ import {
 } from 'drizzle-orm/pg-core';
 import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 
+// ============================================================================
+// HOUSEHOLD
+// ============================================================================
+
+export const household = pgTable('household', {
+  id: text().primaryKey(),
+  name: text().notNull(),
+  createdAt: timestamp().defaultNow().notNull()
+});
+export type Household = typeof household.$inferSelect;
+
+export const householdRelations = relations(household, ({ many }) => ({
+  users: many(user),
+  shoppingCategories: many(shoppingCategory),
+  shoppingItems: many(shoppingItem),
+  shoppingPurchases: many(shoppingPurchase),
+  balanceEntries: many(balanceEntry),
+  tasks: many(task)
+}));
+
+// ============================================================================
+// USER & SESSION
+// ============================================================================
+
 export const user = pgTable('user', {
   id: text().primaryKey(),
+  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   username: text().notNull().unique(),
   password: text().notNull(),
   defaultDistribution: doublePrecision()
 });
 export type User = typeof user.$inferSelect;
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ one, many }) => ({
+  household: one(household, {
+    fields: [user.householdId],
+    references: [household.id]
+  }),
   shoppingPurchases: many(shoppingPurchase)
 }));
 
 export const session = pgTable('session', {
   id: text().primaryKey(),
-  userId: text().references(() => user.id).notNull(),
+  userId: text().references(() => user.id, { onDelete: 'cascade' }).notNull(),
   expiresAt: timestamp().notNull(),
 });
 export type Session = typeof session.$inferSelect;
 
+// ============================================================================
+// SHOPPING
+// ============================================================================
+
 export const shoppingCategory = pgTable('shopping_category', {
   id: text().primaryKey(),
+  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   name: text().notNull().unique(),
   priority: integer().notNull()
 });
@@ -46,12 +80,17 @@ export type ShoppingCategoryWithRelation = InferSelectModel<typeof shoppingCateg
   })[];
 };
 
-export const shoppingCategoryRelations = relations(shoppingCategory, ({ many }) => ({
+export const shoppingCategoryRelations = relations(shoppingCategory, ({ one, many }) => ({
+  household: one(household, {
+    fields: [shoppingCategory.householdId],
+    references: [household.id]
+  }),
   shoppingItems: many(shoppingItem)
 }));
 
 export const shoppingItem = pgTable('shopping_item', {
   id: text().primaryKey(),
+  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   categoryId: text().references(() => shoppingCategory.id),
   name: text().notNull().unique(),
   amount: text().notNull().default(''),
@@ -61,6 +100,10 @@ export const shoppingItem = pgTable('shopping_item', {
 export type ShoppingItem = typeof shoppingItem.$inferSelect;
 
 export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => ({
+  household: one(household, {
+    fields: [shoppingItem.householdId],
+    references: [household.id]
+  }),
   category: one(shoppingCategory, {
     fields: [shoppingItem.categoryId],
     references: [shoppingCategory.id]
@@ -74,6 +117,7 @@ export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => 
 
 export const shoppingPurchase = pgTable('shopping_purchase', {
   id: text().primaryKey(),
+  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   date: timestamp().notNull(),
   userId: text().references(() => user.id).notNull(),
   balanceEntryId: text().references(() => balanceEntry.id),
@@ -81,6 +125,10 @@ export const shoppingPurchase = pgTable('shopping_purchase', {
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
 export const shoppingPurchaseRelations = relations(shoppingPurchase, ({ one, many }) => ({
+  household: one(household, {
+    fields: [shoppingPurchase.householdId],
+    references: [household.id]
+  }),
   user: one(user, {
     fields: [shoppingPurchase.userId],
     references: [user.id]
@@ -94,8 +142,8 @@ export const shoppingPurchaseRelations = relations(shoppingPurchase, ({ one, man
 
 // Junction table for many-to-many relationship between shoppingPurchase and shoppingItem
 export const shoppingPurchaseItem = pgTable('shopping_purchase_item', {
-    purchaseId: text().notNull().references(() => shoppingPurchase.id),
-    itemId: text().notNull().references(() => shoppingItem.id)
+    purchaseId: text().notNull().references(() => shoppingPurchase.id, { onDelete: 'cascade' }),
+    itemId: text().notNull().references(() => shoppingItem.id, { onDelete: 'cascade' })
   },
   (t) => [
     primaryKey({ columns: [t.purchaseId, t.itemId] })
@@ -114,8 +162,8 @@ export const shoppingPurchaseItemRelations = relations(shoppingPurchaseItem, ({ 
 }));
 
 export const stagedShoppingPurchaseItem = pgTable('staged_shopping_purchase_item', {
-  itemId: text().primaryKey().references(() => shoppingItem.id),
-  userId: text().notNull().references(() => user.id)
+  itemId: text().primaryKey().references(() => shoppingItem.id, { onDelete: 'cascade' }),
+  userId: text().notNull().references(() => user.id, { onDelete: 'cascade' })
 });
 
 export const stagedShoppingList = pgTable('staged_shopping_list', {
@@ -168,8 +216,13 @@ export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one 
   })
 }));
 
+// ============================================================================
+// FINANCES
+// ============================================================================
+
 export const balanceEntry = pgTable('balance_entry', {
   id: text().primaryKey(),
+  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   date: timestamp().notNull(),
   userId: text().notNull().references(() => user.id),
   price: integer().notNull(),
@@ -178,13 +231,14 @@ export const balanceEntry = pgTable('balance_entry', {
 export type BalanceEntry = typeof balanceEntry.$inferSelect;
 
 export const balanceEntryRelations = relations(balanceEntry, ({ one, many }) => ({
+  household: one(household, { fields: [balanceEntry.householdId], references: [household.id] }),
   user: one(user, { fields: [balanceEntry.userId], references: [user.id] }),
   distributions: many(balanceEntryDistribution)
 }));
 
 export const balanceEntryDistribution = pgTable('balance_entry_distribution', {
-    entryId: text().notNull().references(() => balanceEntry.id),
-    userId: text().notNull().references(() => user.id),
+    entryId: text().notNull().references(() => balanceEntry.id, { onDelete: 'cascade' }),
+    userId: text().notNull().references(() => user.id, { onDelete: 'cascade' }),
     percent: doublePrecision().notNull()
   },
   (t) => [
@@ -203,14 +257,17 @@ export const balanceEntryDistributionRelations = relations(balanceEntryDistribut
   }),
 }));
 
+// ============================================================================
+// TASKS
+// ============================================================================
+
 export const weekdayEnum = pgEnum('weekday', Weekday);
-
 export const taskTypeEnum = pgEnum('task_type', TaskType);
-
 export const assignmentEnum = pgEnum('assignment', Assignment);
 
 export const task = pgTable('task', {
   id: text().primaryKey(),
+  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   createdAt: timestamp().defaultNow().notNull(),
   type: taskTypeEnum().notNull(),
   name: text().notNull(),
@@ -233,16 +290,7 @@ export const task = pgTable('task', {
   )
 }));
 
-// ============================================================================
-// TYPESCRIPT: STRICT DISCRIMINATED UNIONS
-// ============================================================================
-
-// Use this type anywhere you query tasks!
 export type Task = typeof task.$inferSelect;
-
-// ============================================================================
-// COMPLETIONS & RELATIONS
-// ============================================================================
 
 export const taskCompletion = pgTable('task_completion', {
   id: text().primaryKey(),
@@ -254,6 +302,7 @@ export const taskCompletion = pgTable('task_completion', {
 export type TaskCompletion = typeof taskCompletion.$inferSelect;
 
 export const taskRelations = relations(task, ({ one, many }) => ({
+  household: one(household, { fields: [task.householdId], references: [household.id] }),
   dueUser: one(user, { fields: [task.dueUserId], references: [user.id] }),
   completions: many(taskCompletion) // Technically repeating only, but tied to base table
 }));
