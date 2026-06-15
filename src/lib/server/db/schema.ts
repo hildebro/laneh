@@ -2,11 +2,13 @@
 
 import { type InferSelectModel, relations, sql } from 'drizzle-orm';
 import {
-  boolean, check,
+  boolean,
+  check,
   date,
   doublePrecision,
   integer,
   pgEnum,
+  pgPolicy,
   pgTable,
   primaryKey,
   text,
@@ -58,7 +60,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
 export const session = pgTable('session', {
   id: text().primaryKey(),
   userId: text().references(() => user.id, { onDelete: 'cascade' }).notNull(),
-  expiresAt: timestamp().notNull(),
+  expiresAt: timestamp().notNull()
 });
 export type Session = typeof session.$inferSelect;
 
@@ -71,7 +73,12 @@ export const shoppingCategory = pgTable('shopping_category', {
   householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   name: text().notNull().unique(),
   priority: integer().notNull()
-});
+}, () => [
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  })
+]);
 export type ShoppingCategory = typeof shoppingCategory.$inferSelect;
 
 export type ShoppingCategoryWithRelation = InferSelectModel<typeof shoppingCategory> & {
@@ -96,7 +103,12 @@ export const shoppingItem = pgTable('shopping_item', {
   amount: text().notNull().default(''),
   priority: integer().notNull(),
   active: boolean().notNull()
-});
+}, () => [
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  })
+]);
 export type ShoppingItem = typeof shoppingItem.$inferSelect;
 
 export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => ({
@@ -120,8 +132,13 @@ export const shoppingPurchase = pgTable('shopping_purchase', {
   householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
   date: timestamp().notNull(),
   userId: text().references(() => user.id).notNull(),
-  balanceEntryId: text().references(() => balanceEntry.id),
-});
+  balanceEntryId: text().references(() => balanceEntry.id)
+}, () => [
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  })
+]);
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
 export const shoppingPurchaseRelations = relations(shoppingPurchase, ({ one, many }) => ({
@@ -227,7 +244,12 @@ export const balanceEntry = pgTable('balance_entry', {
   userId: text().notNull().references(() => user.id),
   price: integer().notNull(),
   name: text()
-});
+}, () => [
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  })
+]);
 export type BalanceEntry = typeof balanceEntry.$inferSelect;
 
 export const balanceEntryRelations = relations(balanceEntry, ({ one, many }) => ({
@@ -254,7 +276,7 @@ export const balanceEntryDistributionRelations = relations(balanceEntryDistribut
   user: one(user, {
     fields: [balanceEntryDistribution.userId],
     references: [user.id]
-  }),
+  })
 }));
 
 // ============================================================================
@@ -278,9 +300,13 @@ export const task = pgTable('task', {
   // Repeating specific
   dueWeekday: weekdayEnum(),
   dueInterval: integer(),
-  assignment: assignmentEnum(),
-}, (table) => ({
-  taskStateCheck: check(
+  assignment: assignmentEnum()
+}, (table) => [
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  }),
+  check(
     'task_state_check',
     sql`
       (${table.type} = 'single' AND ${table.dueWeekday} IS NULL AND ${table.dueInterval} IS NULL AND ${table.assignment} IS NULL)
@@ -288,7 +314,7 @@ export const task = pgTable('task', {
       (${table.type} = 'repeating' AND ${table.dueWeekday} IS NOT NULL AND ${table.dueInterval} IS NOT NULL AND ${table.dueDate} IS NOT NULL AND ${table.assignment} IS NOT NULL)
     `
   )
-}));
+]);
 
 export type Task = typeof task.$inferSelect;
 
@@ -308,7 +334,7 @@ export const taskRelations = relations(task, ({ one, many }) => ({
 }));
 
 export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
-  task: one(task, { fields: [taskCompletion.taskId], references: [task.id] }),
+  task: one(task, { fields: [taskCompletion.taskId], references: [task.id] })
 }));
 
 // Strict generic relation type encompassing the discriminated union

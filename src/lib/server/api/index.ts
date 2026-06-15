@@ -1,6 +1,7 @@
+import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { transactionContext } from '$lib/context';
+import { transactionContext, getTx } from '$lib/context';
 import balanceRouter from '$lib/server/api/balance';
 import publicRouter from '$lib/server/api/public';
 import shoppingRouter from '$lib/server/api/shopping';
@@ -31,7 +32,7 @@ app.use('*', async (c, next) => {
   });
 });
 
-// Authentication
+// Authentication + context injection
 app.use('*', async (c, next) => {
   if (c.req.path.startsWith('/api/public')) {
     return await next();
@@ -41,6 +42,13 @@ app.use('*', async (c, next) => {
   if (!user) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
+
+  // Inject the household ID into the current Postgres transaction
+  const tx = getTx();
+  await tx.execute(
+    // 'true' ensures this config only lasts until the transaction ends
+    sql`SELECT set_config('app.current_household_id', ${user.householdId}, true)`
+  );
 
   c.set('loggedInUser', user);
 
