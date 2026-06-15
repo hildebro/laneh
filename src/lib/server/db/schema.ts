@@ -42,7 +42,10 @@ export const householdRelations = relations(household, ({ many }) => ({
 
 export const user = pgTable('user', {
   id: text().primaryKey(),
-  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
   username: text().notNull().unique(),
   password: text().notNull(),
   defaultDistribution: doublePrecision()
@@ -70,7 +73,10 @@ export type Session = typeof session.$inferSelect;
 
 export const shoppingCategory = pgTable('shopping_category', {
   id: text().primaryKey(),
-  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
   name: text().notNull().unique(),
   priority: integer().notNull()
 }, () => [
@@ -97,7 +103,10 @@ export const shoppingCategoryRelations = relations(shoppingCategory, ({ one, man
 
 export const shoppingItem = pgTable('shopping_item', {
   id: text().primaryKey(),
-  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
   categoryId: text().references(() => shoppingCategory.id),
   name: text().notNull().unique(),
   amount: text().notNull().default(''),
@@ -129,7 +138,10 @@ export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => 
 
 export const shoppingPurchase = pgTable('shopping_purchase', {
   id: text().primaryKey(),
-  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
   date: timestamp().notNull(),
   userId: text().references(() => user.id).notNull(),
   balanceEntryId: text().references(() => balanceEntry.id)
@@ -239,7 +251,10 @@ export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one 
 
 export const balanceEntry = pgTable('balance_entry', {
   id: text().primaryKey(),
-  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
   date: timestamp().notNull(),
   userId: text().notNull().references(() => user.id),
   price: integer().notNull(),
@@ -289,7 +304,10 @@ export const assignmentEnum = pgEnum('assignment', Assignment);
 
 export const task = pgTable('task', {
   id: text().primaryKey(),
-  householdId: text().notNull().references(() => household.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
   createdAt: timestamp().defaultNow().notNull(),
   type: taskTypeEnum().notNull(),
   name: text().notNull(),
