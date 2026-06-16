@@ -22,7 +22,7 @@ import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 
 export const household = pgTable('household', {
   id: text().primaryKey(),
-  name: text().notNull(),
+  name: text().notNull().unique(),
   createdAt: timestamp().defaultNow().notNull()
 });
 export type Household = typeof household.$inferSelect;
