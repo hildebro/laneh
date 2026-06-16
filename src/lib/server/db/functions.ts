@@ -1,6 +1,23 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { randomBytes } from 'crypto';
-import { and, asc, count, desc, eq, gt, gte, inArray, isNull, lt, max, min, or, SQL, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  gt,
+  gte,
+  inArray,
+  isNull,
+  lt,
+  max,
+  min,
+  or,
+  SQL,
+  sql
+} from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
 import { getTx } from '$lib/context';
@@ -110,12 +127,19 @@ export const isUsernameTaken = async (username: string, householdId: string) => 
   return !!user;
 };
 
-export const findAndVerifyUser = async (username: string, password: string): Promise<User | undefined> => {
+export const findAndVerifyUser = async (username: string, password: string, householdName: string): Promise<User | undefined> => {
   const db = getTx();
 
-  const user = await db.query.user.findFirst({
-    where: eq(table.user.username, username)
-  }).execute();
+  const user = (
+      await db.select(getTableColumns(table.user))
+        .from(table.user)
+        .innerJoin(table.household, eq(table.user.householdId, table.household.id))
+        .where(and(
+          eq(table.user.username, username),
+          eq(table.household.name, householdName)
+        ))
+    ).at(0);
+
   if (!user) {
     return undefined;
   }
