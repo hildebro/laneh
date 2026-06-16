@@ -65,7 +65,7 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
-export const addUser = async (username: string, password: string, householdId: string | undefined = undefined): Promise<string> => {
+export const addUser = async (username: string, password: string, householdId: string): Promise<string> => {
   const db = getTx();
 
   const userId = generateUUID();
@@ -94,11 +94,16 @@ export const updateUser = async (userId: string, username: string, password: str
   await db.update(table.user).set(update).where(eq(table.user.id, userId)).execute();
 };
 
-export const isUsernameTaken = async (username: string) => {
+export const isUsernameTaken = async (username: string, householdId: string) => {
   const db = getTx();
 
   const user = await db.query.user
-    .findFirst({ where: eq(table.user.username, username) })
+    .findFirst({
+      where: and(
+        eq(table.user.username, username),
+        eq(table.user.householdId, householdId)
+      )
+    })
     .execute();
 
   return !!user;
