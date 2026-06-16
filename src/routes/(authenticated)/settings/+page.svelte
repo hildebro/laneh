@@ -53,6 +53,9 @@
   <article>
     <h2>{m.settings_actions()}</h2>
     <div class="action-row">
+      <a role="button" href={resolve('/settings/households')}>
+        {m.settings_households()}
+      </a>
       <a role="button" href={resolve('/settings/users')}>
         {m.settings_users_distributions()}
       </a>

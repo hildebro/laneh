@@ -30,6 +30,26 @@ export const addHousehold = async (name: string): Promise<string> => {
   return householdId;
 };
 
+export const updateHousehold = async (id: string, name: string) => {
+  const db = getTx();
+
+  await db.update(table.household).set({ name }).where(eq(table.household.id, id)).execute();
+};
+
+export const findHousehold = async (id: string) => {
+  const db = getTx();
+
+  const result = await db.select().from(table.household).where(eq(table.household.id, id));
+
+  return result.at(0);
+};
+
+export const findAllHouseholds = async () => {
+  const db = getTx();
+
+  return db.select().from(table.household).execute();
+};
+
 // ------- USER -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
   const db = getTx();
