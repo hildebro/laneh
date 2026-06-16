@@ -65,15 +65,16 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
-export const addUser = async (username: string, password: string, householdId: string): Promise<string> => {
+export const addUser = async (username: string, password: string, householdId: string, admin: boolean = false): Promise<string> => {
   const db = getTx();
 
   const userId = generateUUID();
 
-  let insertValue: { id: string, username: string, password: string, householdId?: string } = {
+  let insertValue: { id: string, username: string, password: string, admin: boolean, householdId?: string } = {
     id: userId,
     username,
-    password: await hashPassword(password)
+    password: await hashPassword(password),
+    admin
   };
   if (householdId) {
     insertValue = { ...insertValue, householdId };

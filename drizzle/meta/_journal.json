@@ -218,6 +218,13 @@
       "when": 1781611684031,
       "tag": "20260616120804_aberrant_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1781638706915,
+      "tag": "20260616193826_special_luminals",
+      "breakpoints": true
     }
   ]
 }
