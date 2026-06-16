@@ -53,6 +53,7 @@
   "footer_remote_version": "Neueste Version {version}",
   "footer_server_version": "Server Version {version}",
   "form_error": "Fehler",
+  "form_error_forbidden": "Du hast nicht die nötigen Rechte für diese Funktion.",
   "form_error_generic": "Die Daten konnten nicht gespeichert werden. Bitte versuche es erneut.",
   "form_invalid": "Ungültige Eingabe",
   "form_invalid_minimum": "Mindestens {minimum} Zeichen benötigt",

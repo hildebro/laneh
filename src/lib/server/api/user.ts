@@ -53,6 +53,11 @@ const usersRouter = new Hono<AppEnv>()
     return c.body(webStream);
   })
   .put('/', zValidator('json', registerSchema), async (c) => {
+    const loggedInUser = c.get('loggedInUser');
+    if (!loggedInUser.admin) {
+      return c.json({ success: false }, 403);
+    }
+
     const putData = c.req.valid('json');
 
     if (await isUsernameTaken(putData.username, putData.householdId)) {
@@ -72,6 +77,11 @@ const usersRouter = new Hono<AppEnv>()
     return c.json({ success: true });
   })
   .post('/update', zValidator('json', updateSchema), async (c) => {
+    const loggedInUser = c.get('loggedInUser');
+    if (!loggedInUser.admin) {
+      return c.json({ success: false }, 403);
+    }
+
     const updateData = c.req.valid('json');
 
     const user = c.get('loggedInUser');

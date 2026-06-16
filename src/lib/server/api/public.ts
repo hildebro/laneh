@@ -158,7 +158,8 @@ const publicRouter = new Hono()
 
     return c.json({
       id: user.id,
-      username: user.username
+      username: user.username,
+      admin: user.admin
     });
   })
   .get('/marco', async (c) => {

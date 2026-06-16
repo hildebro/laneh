@@ -53,14 +53,19 @@
   <article>
     <h2>{m.settings_actions()}</h2>
     <div class="action-row">
-      <a role="button" href={resolve('/settings/households')}>
-        {m.settings_households()}
-      </a>
+      {#if data.logged_in_user.admin}
+        <a role="button" href={resolve('/settings/households')}>
+          {m.settings_households()}
+        </a>
+        <a role="button" href={resolve('/settings/register')}>
+          {m.settings_users_add()}
+        </a>
+      {:else}
+        <button disabled>{m.settings_households()}</button>
+        <button disabled>{m.settings_users_add()}</button>
+      {/if}
       <a role="button" href={resolve('/settings/users')}>
         {m.settings_users_distributions()}
-      </a>
-      <a role="button" href={resolve('/settings/register')}>
-        {m.settings_users_add()}
       </a>
       <button type="button" onclick={exportDatabase}>
         {m.settings_actions_export()}

@@ -19,6 +19,11 @@ const householdRouter = new Hono<AppEnv>()
     return c.json(await findHousehold(householdId));
   })
   .post('/', zValidator('json', householdSchema), async (c) => {
+    const loggedInUser = c.get('loggedInUser');
+    if (!loggedInUser.admin) {
+      return c.json({ success: false }, 403);
+    }
+
     const household = c.req.valid('json');
 
     if (!household.id) {
