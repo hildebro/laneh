@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { transactionContext, getTx } from '$lib/context';
 import balanceRouter from '$lib/server/api/balance';
+import householdRouter from '$lib/server/api/household';
 import publicRouter from '$lib/server/api/public';
 import shoppingRouter from '$lib/server/api/shopping';
 import tasksRouter from '$lib/server/api/task';
@@ -59,6 +60,7 @@ app.use('*', async (c, next) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const routes = app
   .route('/tasks', tasksRouter)
+  .route('/households', householdRouter)
   .route('/users', usersRouter)
   .route('/shopping', shoppingRouter)
   .route('/balance', balanceRouter)
