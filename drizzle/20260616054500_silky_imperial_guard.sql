@@ -1,0 +1,1 @@
+ALTER TABLE "household" ADD CONSTRAINT "household_name_unique" UNIQUE("name");
