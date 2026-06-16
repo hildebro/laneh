@@ -53,6 +53,7 @@
   "footer_remote_version": "Latest Version {version}",
   "footer_server_version": "Server Version {version}",
   "form_error": "Error",
+  "form_error_forbidden": "You don't have permission for this action.",
   "form_error_generic": "Failed to save data. Please try again.",
   "form_invalid": "Invalid input",
   "form_invalid_minimum": "At least {minimum} characters required",

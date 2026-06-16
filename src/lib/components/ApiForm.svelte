@@ -69,6 +69,8 @@
         });
 
         formState.errors = newErrors;
+      } else if (response.status === 403) {
+        addToast({ title: m.form_error(), message: m.form_error_forbidden(), type: 'error' });
       } else {
         const errorMsg = result.message || result.error || m.form_error_generic();
 
