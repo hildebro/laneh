@@ -5,12 +5,13 @@
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
+  let householdName = $state('');
   let username = $state('');
   let password = $state('');
 
   async function initiate() {
     const client = getApiClient();
-    return client.api.public.initiate.$post({ json: { username, password } });
+    return client.api.public.initiate.$post({ json: { householdName, username, password } });
   }
 
   let files: FileList | undefined = $state();
@@ -27,13 +28,17 @@
 
 <main>
   <article>
-    { m.settings_users_add_disclaimer_no_users() }
+    { m.initiate_info() }
   </article>
   <article>
-    <h2>{ m.settings_users_add() }</h2>
-    <ApiForm submitAction={initiate} submitButtonText={m.settings_users_add()} onSuccess={resolve('/')}>
+    <ApiForm submitAction={initiate} submitButtonText={m.initiate_submit()} onSuccess={resolve('/')}>
       <ApiFormItem
-        label={m.generic_name()}
+        label={m.initiate_household_name()}
+        name="householdName"
+        bind:value={householdName}
+      />
+      <ApiFormItem
+        label={m.initiate_username()}
         name="username"
         bind:value={username}
       />
