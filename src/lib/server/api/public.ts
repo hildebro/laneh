@@ -19,6 +19,7 @@ const initiateSchema = z.object({
 });
 
 const loginSchema = z.object({
+  householdName: z.string().trim().nonempty(),
   username: z.string().trim(),
   password: z.string()
 });
@@ -126,7 +127,7 @@ const publicRouter = new Hono()
   .post('/login', zValidator('json', loginSchema), async (c) => {
     const user = c.req.valid('json');
 
-    const matchingUser = await findAndVerifyUser(user.username, user.password);
+    const matchingUser = await findAndVerifyUser(user.username, user.password, user.householdName);
     if (!matchingUser) {
       const error = new z.ZodError([
         {

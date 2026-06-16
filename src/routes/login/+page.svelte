@@ -10,10 +10,11 @@
 
   let username = $state('');
   let password = $state('');
+  let householdName = $state('');
 
   async function submitAction() {
     const client = getApiClient();
-    return client.api.public.login.$post({ json: { username, password } });
+    return client.api.public.login.$post({ json: { username, password, householdName } });
   }
 
   async function onSuccess(response: Response) {
@@ -33,6 +34,11 @@
   <article>
     <h2>{m.login_headline()}</h2>
     <ApiForm {submitAction} {onSuccess} submitButtonText={m.auth_login()}>
+      <ApiFormItem
+        label={m.initiate_household_name()}
+        name="householdName"
+        bind:value={householdName}
+      />
       <ApiFormItem
         label={m.generic_name()}
         name="username"
