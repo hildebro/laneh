@@ -12,7 +12,8 @@ import {
   pgTable,
   primaryKey,
   text,
-  timestamp
+  timestamp,
+  unique
 } from 'drizzle-orm/pg-core';
 import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 
@@ -46,10 +47,12 @@ export const user = pgTable('user', {
     .notNull()
     .references(() => household.id, { onDelete: 'cascade' })
     .default(sql`current_setting('app.current_household_id')`),
-  username: text().notNull().unique(),
+  username: text().notNull(),
   password: text().notNull(),
   defaultDistribution: doublePrecision()
-});
+}, (table) => [
+  unique().on(table.username, table.householdId)
+]);
 export type User = typeof user.$inferSelect;
 
 export const userRelations = relations(user, ({ one, many }) => ({
