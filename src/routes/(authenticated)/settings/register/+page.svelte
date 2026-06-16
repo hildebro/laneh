@@ -3,16 +3,19 @@
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
-  import * as m from '$lib/paraglide/messages.js';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
+  import * as m from '$lib/paraglide/messages.js';
+
+  let { data } = $props();
 
   let username = $state('');
   let password = $state('');
+  let householdId = $state('');
 
   async function submitAction() {
     const client = getApiClient();
 
-    return client.api.users.$put({ json: { username, password } });
+    return client.api.users.$put({ json: { username, password, householdId } });
   }
   
   async function onSuccess() {
@@ -25,6 +28,17 @@
 <article>
   <h2>{ m.settings_users_add() }</h2>
   <ApiForm {submitAction} {onSuccess} submitButtonText={m.settings_users_add()}>
+    <ApiFormItem
+      label={m.settings_users_household()}
+      name="householdId"
+      type="select"
+      bind:value={householdId}
+    >
+      <option value="" selected></option>
+      {#each data.households as household (household.id)}
+        <option value={household.id}>{household.name}</option>
+      {/each}
+    </ApiFormItem>
     <ApiFormItem
       label={m.generic_name()}
       name="username"

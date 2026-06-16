@@ -1,6 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import * as m from '$lib/paraglide/messages.js';
 import type { AppEnv } from '$lib/server/api/types';
 import { logout } from '$lib/server/auth';
 import { generateDatabaseBackup } from '$lib/server/db/export'; // <-- Import your new helper
@@ -20,7 +19,8 @@ const updateSchema = z.object({
 
 const registerSchema = z.object({
   username: z.string().trim().min(3).max(30),
-  password: z.string().min(6).max(64)
+  password: z.string().min(6).max(64),
+  householdId: z.string().nonempty()
 });
 
 const distributionSchema = z.array(
@@ -55,19 +55,19 @@ const usersRouter = new Hono<AppEnv>()
   .put('/', zValidator('json', registerSchema), async (c) => {
     const putData = c.req.valid('json');
 
-    if (await isUsernameTaken(putData.username)) {
+    if (await isUsernameTaken(putData.username, putData.householdId)) {
       const error = new z.ZodError([
         {
           code: 'custom',
           path: ['username'],
-          message: m.auth_register_error_taken()
+          message: 'auth_register_error_taken'
         }
       ]);
 
       return c.json({ success: false, error }, 400);
     }
 
-    await addUser(putData.username, putData.password);
+    await addUser(putData.username, putData.password, putData.householdId);
 
     return c.json({ success: true });
   })
