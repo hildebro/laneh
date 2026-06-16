@@ -19,6 +19,17 @@ import {
 } from '$lib/server/db/schema';
 import { Assignment, TaskType, type Weekday } from '$lib/utils/taskHelper';
 
+// ------- HOUSEHOLD -------
+export const addHousehold = async (name: string): Promise<string> => {
+  const db = getTx();
+
+  const householdId = generateUUID();
+
+  await db.insert(table.household).values({ id: householdId, name }).execute();
+
+  return householdId;
+};
+
 // ------- USER -------
 export const findUser = async (userId: string): Promise<User | undefined> => {
   const db = getTx();
@@ -34,12 +45,20 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
-export const addUser = async (username: string, password: string): Promise<string> => {
+export const addUser = async (username: string, password: string, householdId: string | undefined = undefined): Promise<string> => {
   const db = getTx();
 
   const userId = generateUUID();
 
-  await db.insert(table.user).values({ id: userId, username, password: await hashPassword(password) }).execute();
+  let insertValue: { id: string, username: string, password: string, householdId?: string } = {
+    id: userId,
+    username,
+    password: await hashPassword(password)
+  };
+  if (householdId) {
+    insertValue = { ...insertValue, householdId };
+  }
+  await db.insert(table.user).values(insertValue).execute();
 
   return userId;
 };
@@ -871,7 +890,7 @@ export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
   });
 };
 
-export const addTask = async (type: TaskType, name: string, weekday: Weekday | null, interval: number | null, assignment: Assignment | null,  userId: string | null, dueDate: string | null) => {
+export const addTask = async (type: TaskType, name: string, weekday: Weekday | null, interval: number | null, assignment: Assignment | null, userId: string | null, dueDate: string | null) => {
   const db = getTx();
 
   await db.insert(table.task).values({
@@ -999,7 +1018,7 @@ async function findNextDueUserId(taskId: string): Promise<string | null> {
 
   const taskData = await db.select({
     dueUserId: table.task.dueUserId,
-    assignment: table.task.assignment,
+    assignment: table.task.assignment
   })
     .from(table.task)
     .where(eq(table.task.id, taskId));

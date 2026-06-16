@@ -9,12 +9,18 @@ import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
 import { getTx } from '$lib/context';
 import { getLoggedInUser } from '$lib/server/auth';
-import { addUser, createSession, findAllUsers, findAndVerifyUser } from '$lib/server/db/functions';
+import { addHousehold, addUser, createSession, findAllUsers, findAndVerifyUser } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
 
-const userSchema = z.object({
+const initiateSchema = z.object({
+  householdName: z.string().trim().nonempty(),
   username: z.string().trim().nonempty(),
   password: z.string().min(6).max(64)
+});
+
+const loginSchema = z.object({
+  username: z.string().trim(),
+  password: z.string()
 });
 
 const importSchema = z.object({
@@ -39,15 +45,16 @@ const publicRouter = new Hono()
     const users = await findAllUsers();
     return c.json(users.length === 0);
   })
-  .post('/initiate', zValidator('json', userSchema), async (c) => {
+  .post('/initiate', zValidator('json', initiateSchema), async (c) => {
     const users = await findAllUsers();
     if (users.length > 0) {
       return c.json({ success: false }, 405);
     }
 
-    const user = c.req.valid('json');
+    const initiateData = c.req.valid('json');
 
-    const userId = await addUser(user.username, user.password);
+    const householdId = await addHousehold(initiateData.householdName);
+    const userId = await addUser(initiateData.username, initiateData.password, householdId);
 
     const session = await createSession(userId);
     setCookie(c, SESSION_COOKIE, session.id, {
@@ -116,7 +123,7 @@ const publicRouter = new Hono()
 
     return c.json({ success: true });
   })
-  .post('/login', zValidator('json', userSchema), async (c) => {
+  .post('/login', zValidator('json', loginSchema), async (c) => {
     const user = c.req.valid('json');
 
     const matchingUser = await findAndVerifyUser(user.username, user.password);
