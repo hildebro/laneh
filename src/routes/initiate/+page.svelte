@@ -45,6 +45,7 @@
       <ApiFormItem
         label={m.auth_register_password()}
         name="password"
+        type="password"
         bind:value={password}
       />
     </ApiForm>
