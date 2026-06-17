@@ -82,6 +82,15 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
+export const findHouseholdUsers = async (householdId: string): Promise<User[]> => {
+  const db = getTx();
+
+  return db.select()
+    .from(table.user)
+    .where(eq(table.user.householdId, householdId))
+    .execute();
+};
+
 export const addUser = async (username: string, password: string, householdId: string, admin: boolean = false): Promise<string> => {
   const db = getTx();
 
@@ -131,14 +140,14 @@ export const findAndVerifyUser = async (username: string, password: string, hous
   const db = getTx();
 
   const user = (
-      await db.select(getTableColumns(table.user))
-        .from(table.user)
-        .innerJoin(table.household, eq(table.user.householdId, table.household.id))
-        .where(and(
-          eq(table.user.username, username),
-          eq(table.household.name, householdName)
-        ))
-    ).at(0);
+    await db.select(getTableColumns(table.user))
+      .from(table.user)
+      .innerJoin(table.household, eq(table.user.householdId, table.household.id))
+      .where(and(
+        eq(table.user.username, username),
+        eq(table.household.name, householdName)
+      ))
+  ).at(0);
 
   if (!user) {
     return undefined;

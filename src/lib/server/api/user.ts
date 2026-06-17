@@ -5,7 +5,7 @@ import { logout } from '$lib/server/auth';
 import { generateDatabaseBackup } from '$lib/server/db/export'; // <-- Import your new helper
 import {
   addUser,
-  findAllUsers,
+  findHouseholdUsers,
   isUsernameTaken,
   updateDefaultDistribution,
   updateUser
@@ -42,7 +42,9 @@ const distributionSchema = z.array(
 
 const usersRouter = new Hono<AppEnv>()
   .get('/', async (c) => {
-    return c.json(await findAllUsers());
+    const user = c.get('loggedInUser');
+
+    return c.json(await findHouseholdUsers(user.householdId));
   })
   .get('/export', async (c) => {
     const { webStream, filename } = generateDatabaseBackup();
