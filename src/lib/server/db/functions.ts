@@ -64,7 +64,11 @@ export const findHousehold = async (id: string) => {
 export const findAllHouseholds = async () => {
   const db = getTx();
 
-  return db.select().from(table.household).execute();
+  return db.query.household.findMany({
+    with: {
+      users: {}
+    }
+  }).execute();
 };
 
 // ------- USER -------
