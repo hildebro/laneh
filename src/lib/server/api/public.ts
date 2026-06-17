@@ -55,7 +55,7 @@ const publicRouter = new Hono()
     const initiateData = c.req.valid('json');
 
     const householdId = await addHousehold(initiateData.householdName);
-    const userId = await addUser(initiateData.username, initiateData.password, householdId);
+    const userId = await addUser(initiateData.username, initiateData.password, householdId, true);
 
     const session = await createSession(userId);
     setCookie(c, SESSION_COOKIE, session.id, {
