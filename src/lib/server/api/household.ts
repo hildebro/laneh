@@ -11,6 +11,11 @@ const householdSchema = z.object({
 
 const householdRouter = new Hono<AppEnv>()
   .get('/', async (c) => {
+    const loggedInUser = c.get('loggedInUser');
+    if (!loggedInUser.admin) {
+      return c.json({ error: 'Unauthorized' }, 403);
+    }
+
     return c.json(await findAllHouseholds());
   })
   .get('/:id', async (c) => {

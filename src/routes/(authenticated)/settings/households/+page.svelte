@@ -12,11 +12,16 @@
 <div class="single-col-wrapper">
   {#each data.households as household (household.id)}
     <article>
-      <h2>{household.name}</h2>
-      <div class="action-row">
+      <div class="action-bar">
         <a role="button" href={resolve('/(authenticated)/settings/households/[id]', {id: household.id})}>
-          <Pencil />
+          <Pencil size={16} />
         </a>
+      </div>
+      <h3>{household.name}</h3>
+      <div>
+        {#each household.users as user (user.id)}
+          - {user.username}<br />
+        {/each}
       </div>
     </article>
   {/each}
