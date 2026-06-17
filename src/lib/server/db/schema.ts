@@ -53,7 +53,7 @@ export const user = pgTable('user', {
   defaultDistribution: doublePrecision()
 }, (table) => [
   unique().on(table.username, table.householdId)
-]);
+]).enableRLS();
 export type User = typeof user.$inferSelect;
 
 export const userRelations = relations(user, ({ one, many }) => ({
@@ -88,7 +88,7 @@ export const shoppingCategory = pgTable('shopping_category', {
     for: 'all',
     using: sql`household_id = current_setting('app.current_household_id', true)`
   })
-]);
+]).enableRLS();
 export type ShoppingCategory = typeof shoppingCategory.$inferSelect;
 
 export type ShoppingCategoryWithRelation = InferSelectModel<typeof shoppingCategory> & {
@@ -121,7 +121,7 @@ export const shoppingItem = pgTable('shopping_item', {
     for: 'all',
     using: sql`household_id = current_setting('app.current_household_id', true)`
   })
-]);
+]).enableRLS();
 export type ShoppingItem = typeof shoppingItem.$inferSelect;
 
 export const shoppingItemRelations = relations(shoppingItem, ({ one, many }) => ({
@@ -154,7 +154,7 @@ export const shoppingPurchase = pgTable('shopping_purchase', {
     for: 'all',
     using: sql`household_id = current_setting('app.current_household_id', true)`
   })
-]);
+]).enableRLS();
 export type ShoppingPurchase = typeof shoppingPurchase.$inferSelect;
 
 export const shoppingPurchaseRelations = relations(shoppingPurchase, ({ one, many }) => ({
@@ -268,7 +268,7 @@ export const balanceEntry = pgTable('balance_entry', {
     for: 'all',
     using: sql`household_id = current_setting('app.current_household_id', true)`
   })
-]);
+]).enableRLS();
 export type BalanceEntry = typeof balanceEntry.$inferSelect;
 
 export const balanceEntryRelations = relations(balanceEntry, ({ one, many }) => ({
@@ -336,7 +336,7 @@ export const task = pgTable('task', {
       (${table.type} = 'repeating' AND ${table.dueWeekday} IS NOT NULL AND ${table.dueInterval} IS NOT NULL AND ${table.dueDate} IS NOT NULL AND ${table.assignment} IS NOT NULL)
     `
   )
-]);
+]).enableRLS();
 
 export type Task = typeof task.$inferSelect;
 
