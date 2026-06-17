@@ -53,7 +53,7 @@ export const user = pgTable('user', {
   defaultDistribution: doublePrecision()
 }, (table) => [
   unique().on(table.username, table.householdId)
-]).enableRLS();
+]);
 export type User = typeof user.$inferSelect;
 
 export const userRelations = relations(user, ({ one, many }) => ({
