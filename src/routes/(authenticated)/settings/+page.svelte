@@ -84,6 +84,7 @@
     <ApiFormItem
       label={m.settings_user_data_password()}
       name="password"
+      type="password"
       bind:value={password}
     />
   </ApiForm>
