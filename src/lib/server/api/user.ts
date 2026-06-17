@@ -78,7 +78,7 @@ const usersRouter = new Hono<AppEnv>()
 
     return c.json({ success: true });
   })
-  .post('/update', zValidator('json', updateSchema), async (c) => {
+  .post('/update/me', zValidator('json', updateSchema), async (c) => {
     const updateData = c.req.valid('json');
 
     const user = c.get('loggedInUser');
