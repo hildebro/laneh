@@ -13,7 +13,7 @@
 
   async function updateUser() {
     const client = getApiClient();
-    return client.api.users.update.$post({
+    return client.api.users.update.me.$post({
       json: { username, password }
     });
   }
