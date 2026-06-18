@@ -140,7 +140,7 @@ export const updateUser = async (userId: string, username: string, password: str
   await db.update(table.user).set(update).where(eq(table.user.id, userId)).execute();
 };
 
-export const isUsernameTaken = async (username: string, householdId: string) => {
+export const isUsernameTaken = async (username: string, householdId: string, updatedUserId: string | null) => {
   const db = getTx();
 
   const user = await db.query.user
@@ -152,7 +152,15 @@ export const isUsernameTaken = async (username: string, householdId: string) => 
     })
     .execute();
 
-  return !!user;
+  if (!user) {
+    return false;
+  }
+
+  if (!updatedUserId) {
+    return true;
+  }
+
+  return user.id !== updatedUserId;
 };
 
 export const findAndVerifyUser = async (username: string, password: string, householdName: string): Promise<User | undefined> => {

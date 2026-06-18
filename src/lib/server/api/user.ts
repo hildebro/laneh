@@ -81,7 +81,7 @@ const usersRouter = new Hono<AppEnv>()
       return c.json({ error: 'Unauthorized' }, 403);
     }
 
-    if (await isUsernameTaken(user.username, user.householdId)) {
+    if (await isUsernameTaken(user.username, user.householdId, user.id)) {
       const error = new z.ZodError([
         {
           code: 'custom',
