@@ -27,12 +27,6 @@ const updateMeSchema = z.object({
   password: z.union([z.string().min(6).max(64), z.undefined()])
 });
 
-const registerSchema = z.object({
-  username: z.string().trim().min(3).max(30),
-  password: z.string().min(6).max(64),
-  householdId: z.string().nonempty()
-});
-
 const distributionSchema = z.array(
   z.object({
     userId: z.string().nonempty(),
@@ -80,37 +74,13 @@ const usersRouter = new Hono<AppEnv>()
 
     const loggedInUser = c.get('loggedInUser');
     if (
-      loggedInUser.serverAdmin
-      || (loggedInUser.householdAdmin && loggedInUser.householdId === user.householdId)
+      !loggedInUser.serverAdmin
+      && (!loggedInUser.householdAdmin || loggedInUser.householdId !== user.householdId)
     ) {
-      if (user.id) {
-        await updateUser(user.id, user.username, user.password, user.serverAdmin, user.householdAdmin)
-      } else {
-        await addUser(user.username, user.password as string, user.householdId, user.serverAdmin, user.householdAdmin)
-      }
-
-      return c.json({ success: true });
+      return c.json({ error: 'Unauthorized' }, 403);
     }
 
-    return c.json({ error: 'Unauthorized' }, 403);
-  })
-  .get('/export', async (c) => {
-    const { webStream, filename } = generateDatabaseBackup();
-
-    c.header('Content-Type', 'application/gzip');
-    c.header('Content-Disposition', `attachment; filename="${filename}"`);
-
-    return c.body(webStream);
-  })
-  .put('/', zValidator('json', registerSchema), async (c) => {
-    const loggedInUser = c.get('loggedInUser');
-    if (!loggedInUser.householdAdmin) {
-      return c.json({ success: false }, 403);
-    }
-
-    const putData = c.req.valid('json');
-
-    if (await isUsernameTaken(putData.username, putData.householdId)) {
+    if (await isUsernameTaken(user.username, user.householdId)) {
       const error = new z.ZodError([
         {
           code: 'custom',
@@ -122,9 +92,32 @@ const usersRouter = new Hono<AppEnv>()
       return c.json({ success: false, error }, 400);
     }
 
-    await addUser(putData.username, putData.password, putData.householdId);
+    if (user.id) {
+      await updateUser(user.id, user.username, user.password, user.serverAdmin, user.householdAdmin);
+    } else {
+      if (!user.password) {
+        const error = new z.ZodError([
+          {
+            code: 'custom',
+            path: ['password'],
+            message: 'form_invalid_nonempty'
+          }
+        ]);
+
+        return c.json({ success: false, error }, 400);
+      }
+      await addUser(user.username, user.password as string, user.householdId, user.serverAdmin, user.householdAdmin);
+    }
 
     return c.json({ success: true });
+  })
+  .get('/export', async (c) => {
+    const { webStream, filename } = generateDatabaseBackup();
+
+    c.header('Content-Type', 'application/gzip');
+    c.header('Content-Disposition', `attachment; filename="${filename}"`);
+
+    return c.body(webStream);
   })
   .post('/update/me', zValidator('json', updateMeSchema), async (c) => {
     const updateData = c.req.valid('json');
