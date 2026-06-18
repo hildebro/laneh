@@ -56,7 +56,7 @@ const usersRouter = new Hono<AppEnv>()
   })
   .put('/', zValidator('json', registerSchema), async (c) => {
     const loggedInUser = c.get('loggedInUser');
-    if (!loggedInUser.admin) {
+    if (!loggedInUser.householdAdmin) {
       return c.json({ success: false }, 403);
     }
 
