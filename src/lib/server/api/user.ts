@@ -30,7 +30,7 @@ const updateMeSchema = z.object({
 const distributionSchema = z.array(
   z.object({
     userId: z.string().nonempty(),
-    percent: z.coerce.number().positive()
+    percent: z.coerce.number().min(0).max(100),
   })
 )
   .refine(
