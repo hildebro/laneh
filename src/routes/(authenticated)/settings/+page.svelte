@@ -69,27 +69,22 @@
 </article>
 {#if data.logged_in_user.householdAdmin}
   <article>
-    <h2>{m.settings_household_admin()}</h2>
+    <h2>{m.settings_admin()}</h2>
     <div class="action-row">
+      <a role="button" href={resolve('/settings/households')}>
+        {m.settings_households()}
+      </a>
       <a role="button" href={resolve('/settings/users/add')}>
         {m.settings_users_add()}
       </a>
       <a role="button" href={resolve('/settings/users')}>
         {m.settings_users_distributions()}
       </a>
-    </div>
-  </article>
-{/if}
-{#if data.logged_in_user.serverAdmin}
-  <article>
-    <h2>{m.settings_server_admin()}</h2>
-    <div class="action-row">
-      <a role="button" href={resolve('/settings/households')}>
-        {m.settings_households()}
-      </a>
-      <button type="button" onclick={exportDatabase}>
-        {m.settings_actions_export()}
-      </button>
+      {#if data.logged_in_user.serverAdmin}
+        <button type="button" onclick={exportDatabase}>
+          {m.settings_actions_export()}
+        </button>
+      {/if}
     </div>
   </article>
 {/if}
