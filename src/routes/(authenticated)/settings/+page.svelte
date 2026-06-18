@@ -71,7 +71,7 @@
   <article>
     <h2>{m.settings_household_admin()}</h2>
     <div class="action-row">
-      <a role="button" href={resolve('/settings/register')}>
+      <a role="button" href={resolve('/settings/users/add')}>
         {m.settings_users_add()}
       </a>
       <a role="button" href={resolve('/settings/users')}>
