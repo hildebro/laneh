@@ -7,6 +7,7 @@
 </script>
 
 <div class="action-bar">
+  <a role="button" href={resolve('/settings/users/add')}>{ m.settings_users_add() }</a>
   <a role="button" href={resolve('/settings/households/add')}>{ m.settings_households_add() }</a>
 </div>
 <div class="single-col-wrapper">
