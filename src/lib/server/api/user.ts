@@ -5,6 +5,7 @@ import { logout } from '$lib/server/auth';
 import { generateDatabaseBackup } from '$lib/server/db/export'; // <-- Import your new helper
 import {
   addUser,
+  assertMatchingHousehold,
   findHouseholdUsers,
   findUser,
   isUsernameTaken,
@@ -133,13 +134,21 @@ const usersRouter = new Hono<AppEnv>()
     zValidator('json', distributionSchema),
     async (c) => {
       const distributions = c.req.valid('json');
-      try {
-        await updateDefaultDistribution(distributions);
 
-        return c.json({ success: true });
-      } catch {
-        return c.json({ error: 'Database error' }, 500);
+      const loggedInUser = c.get('loggedInUser');
+      if (!loggedInUser.householdAdmin) {
+        return c.json({ error: 'Unauthorized' }, 403);
       }
+
+      const userIds = distributions.map((distribution) => distribution.userId);
+      userIds.push(loggedInUser.id);
+      if (!(await assertMatchingHousehold(userIds))) {
+        return c.json({ error: 'Household of all users must match your household' }, 400);
+      }
+
+      await updateDefaultDistribution(distributions);
+
+      return c.json({ success: true });
     }
   )
   .post('/logout', async (c) => {

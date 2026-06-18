@@ -179,6 +179,17 @@ export const findAndVerifyUser = async (username: string, password: string, hous
   return undefined;
 };
 
+export const assertMatchingHousehold = async (userIds: string[]): Promise<boolean> => {
+  const db = getTx();
+
+  const householdIds = await db.selectDistinct({ householdId: table.user.householdId })
+    .from(table.user)
+    .where(inArray(table.user.id, userIds))
+    .execute();
+
+  return householdIds.length === 1;
+};
+
 export const updateDefaultDistribution = async (
   distributions: { userId: string; percent: number }[]
 ): Promise<void> => {
