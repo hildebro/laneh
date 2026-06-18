@@ -7,6 +7,7 @@
     name,
     value = $bindable(),
     files = $bindable(),
+    disabled = false,
     accept,
     type = 'text',
     error = '',
@@ -16,6 +17,7 @@
     name: string;
     value?: unknown;
     files?: FileList | null;
+    disabled?: boolean;
     accept?: string;
     type?: 'text' | 'password' | 'number' | 'select' | 'money' | 'hidden' | 'date' | 'file' | 'checkbox';
     error?: string;
@@ -39,6 +41,7 @@
       {name}
       id={name}
       bind:value
+      {disabled}
     >
       <!-- Conditional to make the type-check happy. Even though select without children should not happen. -->
       {#if children}
@@ -51,6 +54,7 @@
       id={name}
       bind:value={value as number}
       hasError={!!displayError}
+      {disabled}
     />
   {:else if type === 'file'}
     <input
@@ -61,6 +65,7 @@
       id={name}
       {accept}
       bind:files
+      {disabled}
     />
   {:else if type === 'checkbox'}
     <label for={name} class:error={!!displayError}>
@@ -69,6 +74,7 @@
         {name}
         id={name}
         bind:checked={value as boolean}
+        {disabled}
       />
       {label}
     </label>
@@ -80,6 +86,7 @@
       {name}
       id={name}
       bind:value
+      {disabled}
     />
   {/if}
   <div class="error-spacer">
