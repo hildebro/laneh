@@ -55,7 +55,7 @@ const publicRouter = new Hono()
     const initiateData = c.req.valid('json');
 
     const householdId = await addHousehold(initiateData.householdName);
-    const userId = await addUser(initiateData.username, initiateData.password, householdId, true);
+    const userId = await addUser(initiateData.username, initiateData.password, householdId, true, true);
 
     const session = await createSession(userId);
     setCookie(c, SESSION_COOKIE, session.id, {
@@ -160,7 +160,8 @@ const publicRouter = new Hono()
     return c.json({
       id: user.id,
       username: user.username,
-      admin: user.admin
+      householdAdmin: user.householdAdmin,
+      serverAdmin: user.serverAdmin
     });
   })
   .get('/marco', async (c) => {

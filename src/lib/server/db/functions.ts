@@ -95,16 +95,24 @@ export const findHouseholdUsers = async (householdId: string): Promise<User[]> =
     .execute();
 };
 
-export const addUser = async (username: string, password: string, householdId: string, admin: boolean = false): Promise<string> => {
+export const addUser = async (username: string, password: string, householdId: string, serverAdmin: boolean = false, householdAdmin: boolean = false): Promise<string> => {
   const db = getTx();
 
   const userId = generateUUID();
 
-  let insertValue: { id: string, username: string, password: string, admin: boolean, householdId?: string } = {
+  let insertValue: {
+    id: string,
+    username: string,
+    password: string,
+    householdAdmin: boolean,
+    serverAdmin: boolean,
+    householdId?: string
+  } = {
     id: userId,
     username,
     password: await hashPassword(password),
-    admin
+    householdAdmin,
+    serverAdmin
   };
   if (householdId) {
     insertValue = { ...insertValue, householdId };

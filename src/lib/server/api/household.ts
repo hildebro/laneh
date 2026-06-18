@@ -12,7 +12,7 @@ const householdSchema = z.object({
 const householdRouter = new Hono<AppEnv>()
   .get('/', async (c) => {
     const loggedInUser = c.get('loggedInUser');
-    if (!loggedInUser.admin) {
+    if (!loggedInUser.serverAdmin) {
       return c.json({ error: 'Unauthorized' }, 403);
     }
 
@@ -25,7 +25,7 @@ const householdRouter = new Hono<AppEnv>()
   })
   .post('/', zValidator('json', householdSchema), async (c) => {
     const loggedInUser = c.get('loggedInUser');
-    if (!loggedInUser.admin) {
+    if (!loggedInUser.serverAdmin) {
       return c.json({ success: false }, 403);
     }
 

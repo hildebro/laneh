@@ -49,7 +49,8 @@ export const user = pgTable('user', {
     .default(sql`current_setting('app.current_household_id')`),
   username: text().notNull(),
   password: text().notNull(),
-  admin: boolean().notNull().default(false),
+  householdAdmin: boolean().notNull().default(false),
+  serverAdmin: boolean().notNull().default(false),
   defaultDistribution: doublePrecision()
 }, (table) => [
   unique().on(table.username, table.householdId)
