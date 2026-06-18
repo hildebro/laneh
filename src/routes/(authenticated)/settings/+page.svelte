@@ -50,28 +50,6 @@
       </a>
     </div>
   </article>
-  <article>
-    <h2>{m.settings_actions()}</h2>
-    <div class="action-row">
-      {#if data.logged_in_user.admin}
-        <a role="button" href={resolve('/settings/households')}>
-          {m.settings_households()}
-        </a>
-        <a role="button" href={resolve('/settings/register')}>
-          {m.settings_users_add()}
-        </a>
-      {:else}
-        <button disabled>{m.settings_households()}</button>
-        <button disabled>{m.settings_users_add()}</button>
-      {/if}
-      <a role="button" href={resolve('/settings/users')}>
-        {m.settings_users_distributions()}
-      </a>
-      <button type="button" onclick={exportDatabase}>
-        {m.settings_actions_export()}
-      </button>
-    </div>
-  </article>
 </div>
 <article>
   <h2>{m.settings_user_data()}</h2>
@@ -89,3 +67,27 @@
     />
   </ApiForm>
 </article>
+<article>
+  <h2>{m.settings_household_admin()}</h2>
+  <div class="action-row">
+    <a role="button" href={resolve('/settings/register')}>
+      {m.settings_users_add()}
+    </a>
+    <a role="button" href={resolve('/settings/users')}>
+      {m.settings_users_distributions()}
+    </a>
+  </div>
+</article>
+{#if data.logged_in_user.admin}
+  <article>
+    <h2>{m.settings_server_admin()}</h2>
+    <div class="action-row">
+      <a role="button" href={resolve('/settings/households')}>
+        {m.settings_households()}
+      </a>
+      <button type="button" onclick={exportDatabase}>
+        {m.settings_actions_export()}
+      </button>
+    </div>
+  </article>
+{/if}
