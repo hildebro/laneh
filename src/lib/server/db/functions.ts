@@ -56,9 +56,12 @@ export const updateHousehold = async (id: string, name: string) => {
 export const findHousehold = async (id: string) => {
   const db = getTx();
 
-  const result = await db.select().from(table.household).where(eq(table.household.id, id));
-
-  return result.at(0);
+  return db.query.household.findFirst({
+    with: {
+      users: {}
+    },
+    where: eq(table.household.id, id)
+  }).execute();
 };
 
 export const findAllHouseholds = async () => {
@@ -122,10 +125,14 @@ export const addUser = async (username: string, password: string, householdId: s
   return userId;
 };
 
-export const updateUser = async (userId: string, username: string, password: string | undefined): Promise<void> => {
+export const updateUser = async (userId: string, username: string, password: string | undefined, serverAdmin: boolean, householdAdmin: boolean): Promise<void> => {
   const db = getTx();
 
-  let update: { username: string, password?: string } = { username };
+  let update: { username: string, password?: string, serverAdmin: boolean, householdAdmin: boolean } = {
+    username,
+    serverAdmin,
+    householdAdmin
+  };
   if (password) {
     update = { ...update, password: await hashPassword(password) };
   }
