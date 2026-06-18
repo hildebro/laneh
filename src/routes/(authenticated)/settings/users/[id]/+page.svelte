@@ -61,12 +61,14 @@
         name="serverAdmin"
         type="checkbox"
         bind:value={serverAdmin}
+        disabled={!data.logged_in_user.serverAdmin}
       />
       <ApiFormItem
         label={m.settings_household_admin()}
         name="householdAdmin"
         type="checkbox"
         bind:value={householdAdmin}
+        disabled={!data.logged_in_user.householdAdmin}
       />
     </ApiForm>
   </div>

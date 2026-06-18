@@ -5,12 +5,14 @@
     value = $bindable(),
     name,
     id,
-    hasError = false
+    hasError = false,
+    disabled = false,
   }: {
     value: number;
     name: string;
     id: string;
     hasError?: boolean;
+    disabled?: boolean;
   } = $props();
 
   let formattedValue = $derived(priceFormatter.format(value / 100));
@@ -49,4 +51,5 @@
   value={formattedValue}
   onkeydown={handleKeyDown}
   placeholder="0,00 €"
+  {disabled}
 />
