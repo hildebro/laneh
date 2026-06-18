@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Pencil } from 'lucide-svelte';
+  import { CheckIcon, Pencil, XIcon } from 'lucide-svelte';
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
 
@@ -18,11 +18,40 @@
         </a>
       </div>
       <h3>{household.name}</h3>
-      <div>
+      <table>
+        <thead>
+        <tr>
+          <th>{m.initiate_username()}</th>
+          <th>{m.settings_users_admin()}</th>
+        </tr>
+        </thead>
+        <tbody>
         {#each household.users as user (user.id)}
-          - {user.username}<br />
+          <tr>
+            <td>{user.username}</td>
+            <td>
+              {m.settings_users_admin_server()}
+              {#if user.serverAdmin}
+                <CheckIcon />
+              {:else}
+                <XIcon />
+              {/if}
+              {m.settings_users_admin_household()}
+              {#if user.householdAdmin}
+                <CheckIcon />
+              {:else}
+                <XIcon />
+              {/if}
+            </td>
+            <td>
+              <a role="button" href={resolve('/(authenticated)/settings/users/[id]', {id: user.id})}>
+                <Pencil size={16} />
+              </a>
+            </td>
+          </tr>
         {/each}
-      </div>
+        </tbody>
+      </table>
     </article>
   {/each}
 </div>
