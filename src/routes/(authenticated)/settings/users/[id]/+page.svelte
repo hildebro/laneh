@@ -12,7 +12,7 @@
   let username = $derived(data.user?.username || '');
   let password = $derived(undefined);
   let serverAdmin = $derived(data.user?.serverAdmin || false);
-  let householdAdmin = $derived(data.user?.householdAdmin || false);
+  let householdAdmin = $derived(serverAdmin === true ? true : (data.user?.householdAdmin || false));
 
   async function saveUser() {
     const client = getApiClient();
@@ -68,7 +68,7 @@
         name="householdAdmin"
         type="checkbox"
         bind:value={householdAdmin}
-        disabled={!data.logged_in_user.householdAdmin}
+        disabled={!data.logged_in_user.householdAdmin || serverAdmin}
       />
     </ApiForm>
   </div>
