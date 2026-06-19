@@ -1,12 +1,12 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
-  import type { ApiBalanceEntry } from '$lib/server/api/balance';
+  import type { BalanceEntry } from '$lib/server/db/schema';
   import { dateFormatter, priceFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
 
-  const getLabel = (balanceEntry: ApiBalanceEntry) => {
+  const getLabel = (balanceEntry: BalanceEntry) => {
     if (balanceEntry.name) {
       return balanceEntry.name;
     }
@@ -55,7 +55,7 @@
     </div>
     <span>{entry.user.username}</span>
     <footer>
-      <span>{dateFormatter.format(new Date(entry.date))}</span>
+      <span>{dateFormatter.format(entry.date)}</span>
     </footer>
   </article>
 {/each}
