@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Capacitor } from '@capacitor/core';
   import { Preferences } from '@capacitor/preferences';
+  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
@@ -11,6 +12,13 @@
   let username = $state('');
   let password = $state('');
   let householdName = $state('');
+
+  onMount(async () => {
+    const savedHouseholdName = await Preferences.get({ key: 'householdName' });
+    if (savedHouseholdName.value) {
+      householdName = savedHouseholdName.value;
+    }
+  });
 
   async function submitAction() {
     const client = getApiClient();
@@ -25,6 +33,11 @@
         value: sessionToken
       });
     }
+
+    await Preferences.set({
+      key: 'householdName',
+      value: householdName
+    });
 
     await goto(resolve('/shopping'));
   }
