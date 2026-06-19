@@ -6,6 +6,7 @@ import { generateDatabaseBackup } from '$lib/server/db/export'; // <-- Import yo
 import {
   addUser,
   assertMatchingHousehold,
+  assertPermissibleAdminUpdate,
   findHouseholdUsers,
   findUser,
   isUsernameTaken,
@@ -22,6 +23,7 @@ const userSchema = z.object({
   serverAdmin: z.boolean().nonoptional(),
   householdAdmin: z.boolean().nonoptional()
 });
+export type UserPayload = z.infer<typeof userSchema>;
 
 const updateMeSchema = z.object({
   username: z.string().trim().min(3).max(30),
@@ -87,6 +89,18 @@ const usersRouter = new Hono<AppEnv>()
           code: 'custom',
           path: ['username'],
           message: 'auth_register_error_taken'
+        }
+      ]);
+
+      return c.json({ success: false, error }, 400);
+    }
+
+    if (!(await assertPermissibleAdminUpdate(user))) {
+      const error = new z.ZodError([
+        {
+          code: 'custom',
+          path: ['form'],
+          message: 'settings_users_admin_invalid_state'
         }
       ]);
 
