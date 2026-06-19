@@ -35,6 +35,7 @@ import {
   type User
 } from '$lib/server/db/schema';
 import { Assignment, TaskType, type Weekday } from '$lib/utils/taskHelper';
+import type { UserPayload } from '$lib/server/api/user';
 
 // ------- HOUSEHOLD -------
 export const addHousehold = async (name: string): Promise<string> => {
@@ -186,6 +187,55 @@ export const findAndVerifyUser = async (username: string, password: string, hous
 
   return undefined;
 };
+
+/**
+ * Asserts that there will be at least one server admin after the payload is applied. Also asserts that the household
+ * the user belongs to will have at least one household admin.
+ */
+export const assertPermissibleAdminUpdate = async (user: UserPayload) => {
+  // A new user payload cannot produce a state without admins.
+  if (!user.id) {
+    return true;
+  }
+
+  // No database checks needed, if the new state of the user is full admin.
+  if (user.serverAdmin && user.householdAdmin) {
+    return true;
+  }
+
+  const db = getTx();
+
+  if (!user.serverAdmin) {
+    const serverAdmins = await db.select()
+      .from(table.user)
+      .where(eq(table.user.serverAdmin, true))
+      .execute();
+
+    if (serverAdmins.length === 1 && serverAdmins.at(0)!.id === user.id) {
+      // Only one server admin exists and the payload would remove that last flag.
+      return false;
+    }
+  }
+
+  if (!user.householdAdmin) {
+    const householdAdmins = await db.select()
+      .from(table.user)
+      .where(
+        and(
+          eq(table.user.householdId, user.householdId),
+          eq(table.user.householdAdmin, true),
+        )
+      )
+      .execute();
+
+    if (householdAdmins.length === 1 && householdAdmins.at(0)!.id === user.id) {
+      // Only one admin for the household exists and the payload would remove that last flag.
+      return false;
+    }
+  }
+
+  return true;
+}
 
 export const assertMatchingHousehold = async (userIds: string[]): Promise<boolean> => {
   const db = getTx();
