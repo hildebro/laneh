@@ -25,9 +25,9 @@
 <article>
   <h2>
     {#if data.user}
-      { m.settings_categories_edit() }
+      { m.settings_users_edit() }
     {:else }
-      { m.settings_categories_add() }
+      { m.settings_users_add() }
     {/if}
   </h2>
   <div class="action-row">
@@ -51,7 +51,7 @@
         bind:value={username}
       />
       <ApiFormItem
-        label={m.settings_user_data_password()}
+        label={data.user ? m.settings_user_data_password() : m.auth_register_password()}
         name="password"
         type="password"
         bind:value={password}
