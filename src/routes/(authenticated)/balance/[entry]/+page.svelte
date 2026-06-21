@@ -39,9 +39,11 @@
 
   async function saveEntry() {
     const client = getApiClient();
-    return client.api.balance.$post({
-      json: { id, name, creditorId, price: purchasePrice, distributions, purchaseId }
-    });
+    const payload = { name, creditorId, price: purchasePrice, distributions, purchaseId };
+
+    return id
+      ? client.api.balance.$patch({ json: { id, ...payload } })
+      : client.api.balance.$post({ json: payload });
   }
 </script>
 
