@@ -9,25 +9,30 @@ import {
 } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
 
-const expenseSchema = z
-  .object({
-    id: z.string().nullable(),
-    purchaseId: z.transform((val) => (val !== '' ? val : null)).pipe(z.string().nullable()),
-    name: z.string().min(1),
-    creditorId: z.string().min(1),
-    price: z.coerce.number().min(0.01),
-    distributions: z.array(z.object({ userId: z.string().nonempty(), percent: z.coerce.number().min(0) }))
-  })
-  .refine(
-    (data) => {
-      const total = data.distributions.reduce((sum, d) => sum + d.percent, 0);
-      return Math.abs(total - 100) < 0.1;
-    },
-    {
-      message: 'balance_expense_distribution_invalid_sum',
-      path: ['distributions']
-    }
-  );
+const baseExpenseSchema = z.object({
+  purchaseId: z.transform((val) => (val !== '' ? val : null)).pipe(z.string().nullable()),
+  name: z.string().min(1),
+  creditorId: z.string().min(1),
+  price: z.coerce.number().min(0.01),
+  distributions: z.array(z.object({ userId: z.string().nonempty(), percent: z.coerce.number().min(0) }))
+});
+
+const distributionValidation = (data: { distributions: { percent: number }[] }) => {
+  const total = data.distributions.reduce((sum, d) => sum + d.percent, 0);
+  return Math.abs(total - 100) < 0.1;
+};
+
+const distributionValidationMessage = {
+  message: 'balance_expense_distribution_invalid_sum',
+  path: ['distributions']
+};
+
+const createExpenseSchema = baseExpenseSchema
+  .refine(distributionValidation, distributionValidationMessage);
+
+const updateExpenseSchema = baseExpenseSchema
+  .extend({ id: z.string().min(1) })
+  .refine(distributionValidation, distributionValidationMessage);
 
 const balanceRouter = new Hono()
   .get('/', async (c) => {
@@ -45,28 +50,33 @@ const balanceRouter = new Hono()
   })
   .post(
     '/',
-    zValidator('json', expenseSchema),
+    zValidator('json', createExpenseSchema),
     async (c) => {
       const expense = c.req.valid('json');
-      try {
-        if (expense.id) {
-          await updateBalanceEntry(
-            expense.id,
-            expense.creditorId,
-            expense.name,
-            expense.price,
-            expense.distributions
-          );
-        } else {
-          await addBalanceEntry(expense.creditorId, expense.name, expense.price, expense.distributions, expense.purchaseId);
-        }
-
-        return c.json({ success: true });
-      } catch {
-        return c.json({ error: 'Database error' }, 500);
-      }
+      await addBalanceEntry(
+        expense.creditorId,
+        expense.name,
+        expense.price,
+        expense.distributions,
+        expense.purchaseId
+      );
+      return c.json({ success: true });
     }
   )
-;
+  .patch(
+    '/',
+    zValidator('json', updateExpenseSchema),
+    async (c) => {
+      const expense = c.req.valid('json');
+      await updateBalanceEntry(
+        expense.id,
+        expense.creditorId,
+        expense.name,
+        expense.price,
+        expense.distributions
+      );
+      return c.json({ success: true });
+    }
+  );
 
 export default balanceRouter;
