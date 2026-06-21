@@ -17,13 +17,13 @@ const app = new Hono<AppEnv>().basePath('/api');
 // Cors settings for capacitor
 app.use('*', cors({
   origin: ['capacitor://localhost', 'http://localhost', 'https://localhost'],
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowMethods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
   exposeHeaders: ['x-refreshed-token']
 }));
 
 // Database Transaction
-app.use('*', async (c, next) => {
+app.use('*', async (_c, next) => {
   // Start the Drizzle transaction using the main db client
   await db.transaction(async (tx) => {
     // Run the downstream Hono routes within the ALS context
