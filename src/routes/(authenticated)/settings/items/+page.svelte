@@ -53,7 +53,6 @@
   </label>
 </div>
 <CategorizedItemSelect bind:value={itemIds} categories={data.categories} unfiltered={showInactiveItems} />
-<h2 class="headline">{m.settings_actions()}</h2>
 <article>
   <ApiForm
     submitAction={setCategory}
