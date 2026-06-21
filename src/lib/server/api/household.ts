@@ -4,9 +4,12 @@ import type { AppEnv } from '$lib/server/api/types';
 import { addHousehold, findAllHouseholds, findHousehold, updateHousehold } from '$lib/server/db/functions';
 import { z } from '$lib/zod';
 
-const householdSchema = z.object({
-  id: z.union([z.string().nonempty(), z.null()]),
+const createHouseholdSchema = z.object({
   name: z.string().nonempty()
+});
+
+const updateHouseholdSchema = createHouseholdSchema.extend({
+  id: z.string().min(1)
 });
 
 const householdRouter = new Hono<AppEnv>()
@@ -28,25 +31,47 @@ const householdRouter = new Hono<AppEnv>()
     return c.json({ error: 'Unauthorized' }, 403);
   })
   .get('/:id', async (c) => {
+    const loggedInUser = c.get('loggedInUser');
     const householdId = c.req.param('id');
 
-    return c.json(await findHousehold(householdId));
+    if (!loggedInUser.serverAdmin && loggedInUser.householdId !== householdId) {
+      return c.json({ error: 'Unauthorized' }, 403);
+    }
+
+    const household = await findHousehold(householdId);
+    if (!household) {
+      return c.json({ error: 'Household not found' }, 404);
+    }
+
+    return c.json(household);
   })
-  .post('/', zValidator('json', householdSchema), async (c) => {
-    const loggedInUser = c.get('loggedInUser');
-    if (!loggedInUser.serverAdmin) {
-      return c.json({ success: false }, 403);
-    }
+  .post(
+    '/',
+    zValidator('json', createHouseholdSchema),
+    async (c) => {
+      const loggedInUser = c.get('loggedInUser');
+      if (!loggedInUser.serverAdmin) {
+        return c.json({ error: 'Unauthorized' }, 403);
+      }
 
-    const household = c.req.valid('json');
-
-    if (!household.id) {
+      const household = c.req.valid('json');
       await addHousehold(household.name);
-    } else {
-      await updateHousehold(household.id, household.name);
-    }
 
-    return c.json({ success: true });
-  });
+      return c.json({ success: true });
+    })
+  .patch(
+    '/',
+    zValidator('json', updateHouseholdSchema),
+    async (c) => {
+      const loggedInUser = c.get('loggedInUser');
+      if (!loggedInUser.serverAdmin) {
+        return c.json({ error: 'Unauthorized' }, 403);
+      }
+
+      const household = c.req.valid('json');
+      await updateHousehold(household.id, household.name);
+
+      return c.json({ success: true });
+    });
 
 export default householdRouter;
