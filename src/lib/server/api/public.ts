@@ -112,15 +112,16 @@ const publicRouter = new Hono()
     });
 
     const db = getTx();
-    // Temporarily disable foreign key constraints and triggers for the import
-    await db.execute(sql`SET session_replication_role = replica;`);
+    try {
+      // Temporarily disable foreign key constraints and triggers for the import
+      await db.execute(sql`SET session_replication_role = replica;`);
 
-    for (const query of queries) {
-      await db.execute(sql.raw(query));
+      for (const query of queries) {
+        await db.execute(sql.raw(query));
+      }
+    } finally {
+      await db.execute(sql`SET session_replication_role = origin;`);
     }
-
-    // Re-enable constraints
-    await db.execute(sql`SET session_replication_role = origin;`);
 
     return c.json({ success: true });
   })
