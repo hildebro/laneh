@@ -1,11 +1,43 @@
-<script>
+<script lang="ts">
   import { X } from 'lucide-svelte';
   import { flip } from 'svelte/animate';
   import { fade, fly } from 'svelte/transition';
-  import { removeToast, toasts } from '$lib/stores/toast';
+  import { removeToast, type Toast, toasts } from '$lib/stores/toast';
+
+  function manageTopLayer(node: HTMLElement, toastList: Toast[]) {
+    let prevLength = toastList.length;
+
+    if (prevLength > 0) node.showPopover();
+
+    return {
+      update(newList: Toast[]) {
+        const newLength = newList.length;
+
+        if (newLength > 0) {
+          // If a toast was added, force the container to the top of the Top Layer stack
+          if (newLength > prevLength) {
+            if (node.matches(':popover-open')) node.hidePopover();
+            node.showPopover();
+          } else if (!node.matches(':popover-open')) {
+            node.showPopover();
+          }
+        } else {
+          // Clean up and close when empty
+          if (node.matches(':popover-open')) node.hidePopover();
+        }
+
+        prevLength = newLength;
+      }
+    };
+  }
 </script>
 
-<section class="gui-toast-group" aria-live="polite">
+<section
+  class="gui-toast-group"
+  aria-live="polite"
+  popover="manual"
+  use:manageTopLayer={$toasts}
+>
   {#each $toasts as toast (toast.id)}
     <output
       class="gui-toast"
@@ -34,15 +66,22 @@
 
 <style>
     .gui-toast-group {
-        position: fixed;
-        z-index: 999;
-        top: 0;
-        left: 0;
+        margin: 0;
+        border: none;
+        background: transparent;
+        color: inherit;
         padding: 1.5rem;
+        box-sizing: border-box;
+
+        inset: 0;
+        width: 100dvw;
+        height: 100dvh;
+        overflow: hidden;
 
         display: grid;
         justify-content: start;
         justify-items: start;
+        align-content: start;
         gap: 0.75rem;
         pointer-events: none;
     }
