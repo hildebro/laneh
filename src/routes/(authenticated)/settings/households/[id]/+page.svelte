@@ -12,9 +12,10 @@
 
   async function saveHousehold() {
     const client = getApiClient();
-    return client.api.households.$post({
-      json: { id: id ?? null, name }
-    });
+
+    return id
+      ? client.api.households.$patch({ json: { id, name } })
+      : client.api.households.$post({ json: { name } });
   }
 </script>
 
