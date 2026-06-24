@@ -1,3 +1,53 @@
+# [2.13.0](https://github.com/hildebro/laneh/compare/v2.12.0...v2.13.0) (2026-06-24)
+
+
+### Bug Fixes
+
+* actually enable rls ([93248f0](https://github.com/hildebro/laneh/commit/93248f0b42ea5253660913984e85e5077bef3daa))
+* add missing migration for policies/defaults ([9408e24](https://github.com/hildebro/laneh/commit/9408e24a69752590d376be7ae4fd9d54ec742f6b))
+* allow 0% as default distribution ([037e249](https://github.com/hildebro/laneh/commit/037e24968cc9fce9d80f9c8d81c47dfb9356a84f))
+* allow PATCH on hono ([4c02050](https://github.com/hildebro/laneh/commit/4c020502ded712d2ea88c45fdc5a1eb1beb19ef7))
+* data.users only includes matching household ([fd40816](https://github.com/hildebro/laneh/commit/fd4081625a06dd8ac44103aa281f16e7e0ef01d4))
+* incorrect username-taken error ([1b6f230](https://github.com/hildebro/laneh/commit/1b6f230d867652d5140925c36260a53651924925))
+* make initial user admin ([a562807](https://github.com/hildebro/laneh/commit/a56280771f2d9042a49ac08602ee19857343ef87))
+* password display for user cruds ([40d74ff](https://github.com/hildebro/laneh/commit/40d74ff0524da08618fc2d774d62e5fd68011cae))
+* prevent cross-household distribution updates ([eb9b074](https://github.com/hildebro/laneh/commit/eb9b0741044f96a8377e87bf6cde3a6cbb5ca020))
+* prevent faulty state due to failing database import ([8851e8c](https://github.com/hildebro/laneh/commit/8851e8c7e0cda0dd7d77b016555340e4d79639a3))
+* prevent removal of last server/household admin ([9cb2adf](https://github.com/hildebro/laneh/commit/9cb2adf81eb79c8ecf4a310991fe641df06b755f))
+* prevent serverAdmin = true while householdAdmin = false ([4974a16](https://github.com/hildebro/laneh/commit/4974a160ab45b46384e20ba1b1fb8f86621ab9f1))
+* remove admin check from self-update api ([f0c987b](https://github.com/hildebro/laneh/commit/f0c987b95c9fa1cb43a3d96dae09c0ba6d22fa03))
+* remove missing translation key ([3772df5](https://github.com/hildebro/laneh/commit/3772df5b1823d22e9c54426fe953666590a65ab9))
+* remove RLS from user ([71dc568](https://github.com/hildebro/laneh/commit/71dc56832d0e60506b2acb832f4beba5dcfdd2dc))
+* settings password field hidden ([c34afc4](https://github.com/hildebro/laneh/commit/c34afc40a38a8ec1bd4fa148bd4df84b5f43886b))
+* show /settings/households for household admin ([d9808de](https://github.com/hildebro/laneh/commit/d9808de3fdb72e575aeced29469ae7f83fbe6d7f))
+* toasts blurred by dialog ([ab0bec1](https://github.com/hildebro/laneh/commit/ab0bec1ea0d9e64c120bebc6d91bb570be0577a9))
+* use new user crud instead of /register ([9e0e1d0](https://github.com/hildebro/laneh/commit/9e0e1d048ca085cac4882a90e5a371d6e2bc1af8))
+* user form translations ([c26f3cd](https://github.com/hildebro/laneh/commit/c26f3cddc7301b65a91a0d507c45e3c66f867198))
+
+
+### Features
+
+* add default for householdId columns ([8fc4d97](https://github.com/hildebro/laneh/commit/8fc4d97772739d52b150779476587209e2496074))
+* add household name field to /initialize ([5eeff2e](https://github.com/hildebro/laneh/commit/5eeff2ea17f60d316c8cc463b5147d790d0ef428))
+* add household table + columns everywhere ([9620c26](https://github.com/hildebro/laneh/commit/9620c265b93c3bc185f8e1718a8f6d8b153174f2))
+* add household to login ([cc19cf6](https://github.com/hildebro/laneh/commit/cc19cf6f655368a05bc7da0c9ef03c7c3fa5c1d0))
+* add policies for household restriction ([fbb06b3](https://github.com/hildebro/laneh/commit/fbb06b358e09b837e593057bc672ce2de89da7ff))
+* add-user button in household view ([1ec70e9](https://github.com/hildebro/laneh/commit/1ec70e92cb0592e91c5fb647c5fc88145a90fdd2))
+* add/edit household in settings ([fda679d](https://github.com/hildebro/laneh/commit/fda679ddbee463745e72579a72555377594e7906))
+* admin flag for users ([6718ed9](https://github.com/hildebro/laneh/commit/6718ed94fd4ebbf28e64a5861f59616cf8bd8107))
+* differentiate server vs household admin ([ba74a34](https://github.com/hildebro/laneh/commit/ba74a34eccc8764d17af472895e054add7354639))
+* disable admin inputs based on user state ([2eb1b93](https://github.com/hildebro/laneh/commit/2eb1b936745fb10d1631d73d2b7b5d0259914691))
+* hide household/user action for non-admin. also harden api ([1604133](https://github.com/hildebro/laneh/commit/160413391b7f40105cfce5709b2a9606486067e3))
+* household dropdown for new user ([bcd8697](https://github.com/hildebro/laneh/commit/bcd8697bf4c1fe768929bd062a72f72f69d46059))
+* household name unique ([3b18829](https://github.com/hildebro/laneh/commit/3b1882973ff845bb62affddfbc7c692f78e55255))
+* improve household users overview ([55820ab](https://github.com/hildebro/laneh/commit/55820abc3e5beebbc729e4fd0c3ea8e0e49a17e6))
+* list users in household settings ([c139a59](https://github.com/hildebro/laneh/commit/c139a59fdea9e778ef4906d687becf01eeb3e62d))
+* recategorize settings page ([49fa680](https://github.com/hildebro/laneh/commit/49fa6804ee26aa6a88bfa6492e340ae242d39d8e))
+* save household name after login ([8686e81](https://github.com/hildebro/laneh/commit/8686e81021e9620127922b8b2f80e2e86dc0b9f8))
+* unprivileged app pq user for RLS ([78f9e8d](https://github.com/hildebro/laneh/commit/78f9e8d700bdc7e196c341c3ac4759bc5a158237))
+* user crud for admins ([62c374a](https://github.com/hildebro/laneh/commit/62c374a6da2643e6dfb5b0a086190c39f9cea27a))
+* username unique per household ([2807c37](https://github.com/hildebro/laneh/commit/2807c37d1a3148066abb52cca6d25f3f069ef604))
+
 # [2.12.0](https://github.com/hildebro/laneh/compare/v2.11.0...v2.12.0) (2026-06-11)
 
 
