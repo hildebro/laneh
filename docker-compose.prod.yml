@@ -6,11 +6,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      APP_DB_USER: ${APP_DB_USER}
-      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
     volumes:
       - ${DATABASE_LOCATION}:/var/lib/postgresql/data
-      - ./init-db-user.sh:/docker-entrypoint-initdb.d/init-db-user.sh
+    configs:
+      - source: init-db-user
+        target: /docker-entrypoint-initdb.d/init-db-user.sql
     networks:
       - laneh-network
     healthcheck:
@@ -34,6 +34,15 @@ services:
         condition: service_healthy
     networks:
       - laneh-network
+
+configs:
+  init-db-user:
+    content: |
+      CREATE USER ${APP_DB_USER} WITH PASSWORD '${APP_DB_PASSWORD}';
+      GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO ${APP_DB_USER};
+      GRANT USAGE ON SCHEMA public TO ${APP_DB_USER};
+      GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ${APP_DB_USER};
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${APP_DB_USER};
 
 networks:
   laneh-network:
