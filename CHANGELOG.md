@@ -1,3 +1,10 @@
+## [2.13.1](https://github.com/hildebro/laneh/compare/v2.13.0...v2.13.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* docker compose user creation ([7ec35f1](https://github.com/hildebro/laneh/commit/7ec35f106686bf552407ad169dc3a6675424f4db))
+
 # [2.13.0](https://github.com/hildebro/laneh/compare/v2.12.0...v2.13.0) (2026-06-24)
 
 
