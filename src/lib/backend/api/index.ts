@@ -9,8 +9,8 @@ import tasksRouter from '$lib/backend/api/task';
 import type { AppEnv } from '$lib/backend/api/types';
 import usersRouter from '$lib/backend/api/user';
 import { getLoggedInUser } from '$lib/backend/auth';
-import { db } from '$lib/backend/db';
-import { getTx, transactionContext } from '$lib/context';
+import { getDb } from '$lib/backend/db';
+import { getTx, runInTransactionContext } from '$lib/context';
 
 const app = new Hono<AppEnv>().basePath('/api');
 
@@ -25,9 +25,9 @@ app.use('*', cors({
 // Database Transaction
 app.use('*', async (_c, next) => {
   // Start the Drizzle transaction using the main db client
-  await db.transaction(async (tx) => {
-    // Run the downstream Hono routes within the ALS context
-    await transactionContext.run(tx, async () => {
+  await getDb().transaction(async (tx) => {
+    // Run the downstream Hono routes within the transaction context
+    await runInTransactionContext(tx, async () => {
       await next();
     });
   });
