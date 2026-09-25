@@ -18,7 +18,7 @@
     children
   }: {
     submitAction: () => Promise<Response>;
-    onSuccess?: ResolvedPathname | ((response: Response) => void) | undefined;
+    onSuccess?: ResolvedPathname | ((response: Response) => void | Promise<void>) | undefined;
     additionalButtons?: Snippet,
     submitButtonText?: string;
     submitButtonClasses?: string,
@@ -46,7 +46,7 @@
         addToast({ message: m.form_success() });
 
         if (typeof onSuccess === 'function') {
-          onSuccess(response);
+          await onSuccess(response);
           await invalidateAll();
         } else if (typeof onSuccess === 'string') {
           // `redirectTo` is typed as ResolvedPathname, so it's fine to navigate without resolve.

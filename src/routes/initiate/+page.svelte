@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { Capacitor } from '@capacitor/core';
+  import { Preferences } from '@capacitor/preferences';
+  import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
@@ -12,6 +15,17 @@
   async function initiate() {
     const client = getApiClient();
     return client.api.public.initiate.$post({ json: { householdName, username, password } });
+  }
+
+  async function onInitiated(response: Response) {
+    if (Capacitor.isNativePlatform()) {
+      const { sessionToken } = await response.json();
+      await Preferences.set({ key: 'session_token', value: sessionToken });
+    }
+
+    await Preferences.set({ key: 'householdName', value: householdName });
+
+    await goto(resolve('/'));
   }
 
   let files: FileList | undefined = $state();
@@ -28,7 +42,7 @@
 
 <main>
   <article>
-    <ApiForm submitAction={initiate} submitButtonText={m.initiate_submit()} onSuccess={resolve('/')}>
+    <ApiForm submitAction={initiate} submitButtonText={m.initiate_submit()} onSuccess={onInitiated}>
       <ApiFormItem
         label={m.initiate_household_name()}
         name="householdName"

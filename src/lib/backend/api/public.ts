@@ -44,8 +44,9 @@ const publicRouter = new Hono()
       return c.json({ remoteVersion: cachedRemoteVersion, serverVersion });
     }
 
-    const res = await fetch('https://api.github.com/repos/hildebro/laneh/releases/latest');
-    if (!res.ok) {
+    // Fails without internet access, which is common in offline mode.
+    const res = await fetch('https://api.github.com/repos/hildebro/laneh/releases/latest').catch(() => null);
+    if (!res?.ok) {
       return c.json({ remoteVersion: '?', serverVersion });
     }
 
@@ -79,7 +80,8 @@ const publicRouter = new Hono()
       expires: session.expiresAt
     });
 
-    return c.json({ success: true });
+    // The mobile app can't use the cookie, so it needs the token as well.
+    return c.json({ success: true, sessionToken: session.id });
   })
   .post('/importDatabase', zValidator('form', importSchema), async (c) => {
     const users = await findAllUsers();
