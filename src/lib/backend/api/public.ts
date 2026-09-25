@@ -1,16 +1,18 @@
 import { zValidator } from '@hono/zod-validator';
+import { encodeHexLowerCase } from '@oslojs/encoding';
 import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
-import { getLoggedInUser } from '$lib/backend/auth';
+import { getLoggedInUser, isOfflineLoginEnabled } from '$lib/backend/auth';
 import {
   addHousehold,
   addUser,
   createSession,
   findAllUsers,
   findAndVerifyUser,
+  findOfflineUser,
   getCachedRemoteVersion,
   setCachedRemoteVersion
 } from '$lib/backend/db/functions';
@@ -23,6 +25,11 @@ const initiateSchema = z.object({
   householdName: z.string().trim().nonempty(),
   username: z.string().trim().nonempty(),
   password: z.string().min(6).max(64)
+});
+
+const offlineInitiateSchema = z.object({
+  householdName: z.string().trim().nonempty(),
+  username: z.string().trim().nonempty()
 });
 
 const loginSchema = z.object({
@@ -82,6 +89,43 @@ const publicRouter = new Hono()
 
     // The mobile app can't use the cookie, so it needs the token as well.
     return c.json({ success: true, sessionToken: session.id });
+  })
+  .post('/offline/initiate', zValidator('json', offlineInitiateSchema), async (c) => {
+    if (!isOfflineLoginEnabled()) {
+      return c.json({ success: false }, 404);
+    }
+
+    const users = await findAllUsers();
+    if (users.length > 0) {
+      return c.json({ success: false }, 405);
+    }
+
+    const initiateData = c.req.valid('json');
+
+    // Nobody ever needs this password, since the offline app logs in without credentials.
+    const password = encodeHexLowerCase(crypto.getRandomValues(new Uint8Array(32)));
+
+    const householdId = await addHousehold(initiateData.householdName);
+    const userId = await addUser(initiateData.username, password, householdId, Admin.Server);
+
+    const session = await createSession(userId);
+
+    return c.json({ success: true, sessionToken: session.id });
+  })
+  .post('/offline/login', async (c) => {
+    if (!isOfflineLoginEnabled()) {
+      return c.json({ sessionToken: null }, 404);
+    }
+
+    // Null, if the offline instance still needs initiation.
+    const user = await findOfflineUser();
+    if (!user) {
+      return c.json({ sessionToken: null });
+    }
+
+    const session = await createSession(user.id);
+
+    return c.json({ sessionToken: session.id });
   })
   .post('/importDatabase', zValidator('form', importSchema), async (c) => {
     const users = await findAllUsers();

@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import { resolve } from '$app/paths';
 import { getApiClient } from '$lib/apiClient';
+import { isOfflineMode } from '$lib/offline';
 import * as m from '$lib/paraglide/messages.js';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 
@@ -12,6 +13,10 @@ export const load: PageLoad = async ({ fetch }) => {
   // Navigate away, if initiation is already initiated.
   if (!needsInitiation) {
     return redirect(302, resolve('/'));
+  }
+
+  if (isOfflineMode()) {
+    return redirect(302, resolve('/initiate/offline'));
   }
 
   return {
