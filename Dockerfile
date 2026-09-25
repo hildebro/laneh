@@ -26,6 +26,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/drizzle.config.ts ./
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/src/lib/backend/db/roles.ts ./src/lib/backend/db/roles.ts
 
 EXPOSE 3000
 

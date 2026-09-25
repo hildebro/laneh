@@ -1,6 +1,7 @@
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { migrate } from 'drizzle-orm/pglite/migrator';
+import { APP_USER_ROLE_SQL } from '../src/lib/backend/db/roles.ts';
 
 const dataDir = process.env.DOCKER_DATABASE_LOCATION || '/data/pglite';
 
@@ -13,26 +14,7 @@ async function run() {
 
   await migrate(db, { migrationsFolder: 'drizzle' });
 
-  await client.exec(`
-    DO $$ 
-    BEGIN
-      IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'app_user') THEN
-        CREATE ROLE app_user;
-      END IF;
-    END
-    $$;
-
-    -- Grant basic access to the schema
-    GRANT USAGE ON SCHEMA public TO app_user;
-
-    -- Grant access to all existing tables and sequences
-    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app_user;
-    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO app_user;
-
-    -- CRITICAL: Automatically grant permissions for any FUTURE tables/sequences you add later
-    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO app_user;
-    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO app_user;
-  `);
+  await client.exec(APP_USER_ROLE_SQL);
 
   console.log('✅ Migrations complete!');
 
