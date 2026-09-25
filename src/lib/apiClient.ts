@@ -4,7 +4,7 @@ import { hc } from 'hono/client';
 import { resolve } from '$app/paths';
 import type { AppType } from '$lib/backend/api';
 import { getBaseUrl } from '$lib/config';
-import { handleDemoMode, isDemoMode } from '$lib/demo';
+import { getOfflineBackend, isOfflineMode } from '$lib/offline';
 
 export function getApiClient(customFetch?: typeof fetch) {
   // Use the provided fetch (useful for SvelteKit load functions) or fallback to the global browser fetch
@@ -12,10 +12,6 @@ export function getApiClient(customFetch?: typeof fetch) {
 
   // Create our interceptor
   const authFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-    if (await isDemoMode()) {
-      return handleDemoMode(input, init);
-    }
-
     // 1. Clone the init object and headers so we don't mutate the original
     const requestInit = { ...init };
     const headers = new Headers(requestInit.headers);
@@ -38,8 +34,10 @@ export function getApiClient(customFetch?: typeof fetch) {
 
     requestInit.headers = headers;
 
-    // 3. Execute the actual network request
-    const response = await baseFetch(input, requestInit);
+    // 3. Execute the actual network request, or hand it to the backend running on the device
+    const response = isOfflineMode()
+      ? await (await getOfflineBackend())(new Request(input, requestInit))
+      : await baseFetch(input, requestInit);
 
     // 4. Intercept the response to check for a refreshed token globally!
     if (Capacitor.isNativePlatform()) {

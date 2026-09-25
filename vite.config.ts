@@ -39,7 +39,12 @@ export default defineConfig({
       exposedHeaders: ['x-refreshed-token']
     }
   },
+  // PGlite loads its wasm and data files relative to its own module, which breaks when vite pre-bundles it.
+  optimizeDeps: {
+    exclude: ['@electric-sql/pglite']
+  },
   define: {
-    __APP_VERSION__: JSON.stringify(pkg.version)
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __CAPACITOR_BUILD__: JSON.stringify(process.env.CAPACITOR_BUILD === 'true')
   }
 });

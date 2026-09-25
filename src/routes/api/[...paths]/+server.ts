@@ -1,5 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import app from '$lib/server/backend';
+import { getServerApp } from '$lib/server/backend';
 
 const handleRequest: RequestHandler = ({ request }) => {
   const url = new URL(request.url);
@@ -10,7 +10,7 @@ const handleRequest: RequestHandler = ({ request }) => {
     url.pathname = url.pathname.substring(apiIndex);
   }
 
-  return app.fetch(new Request(url, request));
+  return getServerApp().fetch(new Request(url, request));
 };
 
 // Forward all requests to Hono

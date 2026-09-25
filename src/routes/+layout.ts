@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { redirect } from '@sveltejs/kit';
 import { resolve } from '$app/paths';
+import { getOfflineBackend, isOfflineMode } from '$lib/offline';
 
 export const ssr = false;
 export const prerender = false;
@@ -12,6 +13,12 @@ export const load = async ({ url }) => {
     if (!serverUrl && url.pathname !== resolve('/server-picker')) {
       return redirect(302, resolve('/server-picker'));
     }
+  }
+
+  // Start the offline database up front. The first start runs all migrations, which might exceed the timeout of the
+  // first API call.
+  if (isOfflineMode()) {
+    await getOfflineBackend();
   }
 
   // logged_in_user will be overridden in the (authenticated) area with the actual user.
