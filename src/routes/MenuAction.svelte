@@ -87,7 +87,8 @@
     <div class="header-dropdown">
       <div class="header-dropdown-info">
         <div>
-          {#if logged_in_user}
+          <!-- The offline app only has a dummy user. -->
+          {#if logged_in_user && !isOfflineMode()}
             { m.header_user({ name: logged_in_user.username }) }
           {/if}
         </div>
