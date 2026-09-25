@@ -7,19 +7,19 @@ import * as m from '$lib/paraglide/messages.js';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 
 export const load: PageLoad = async ({ fetch }) => {
-	const client = getApiClient(fetch);
+  if (!isOfflineMode()) {
+    return redirect(302, resolve('/initiate'));
+  }
 
-	const needsInitiation =  await handleApiLoad(client.api.public.needsInitiation.$get());
+  const client = getApiClient(fetch);
+
+  const needsInitiation = await handleApiLoad(client.api.public.needsInitiation.$get());
   // Navigate away, if initiation is already initiated.
   if (!needsInitiation) {
     return redirect(302, resolve('/'));
   }
 
-  if (isOfflineMode()) {
-    return redirect(302, resolve('/initiate/offline'));
-  }
-
   return {
-    help_text: m.initiate_info()
+    help_text: m.initiate_offline_info()
   };
 };

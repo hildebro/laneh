@@ -4,12 +4,16 @@
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
+  import { isOfflineMode } from '$lib/offline';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
   import { saveFile } from '$lib/utils/fileHelper';
   import { Admin } from '$lib/utils/userHelper';
 
   let { data } = $props();
+
+  // The offline app has a single dummy user and household, so there is nothing to manage about them.
+  const offline = isOfflineMode();
 
   let username = $derived(data.logged_in_user.username);
   let password = $state(undefined);
@@ -61,35 +65,39 @@
     </div>
   </article>
 </div>
-<article>
-  <h2>{m.settings_user_data()}</h2>
-  <ApiForm submitAction={updateUser} {onSuccess}>
-    <ApiFormItem
-      label={m.generic_name()}
-      name="username"
-      bind:value={username}
-    />
-    <ApiFormItem
-      label={m.settings_user_data_password()}
-      name="password"
-      type="password"
-      bind:value={password}
-    />
-  </ApiForm>
-</article>
+{#if !offline}
+  <article>
+    <h2>{m.settings_user_data()}</h2>
+    <ApiForm submitAction={updateUser} {onSuccess}>
+      <ApiFormItem
+        label={m.generic_name()}
+        name="username"
+        bind:value={username}
+      />
+      <ApiFormItem
+        label={m.settings_user_data_password()}
+        name="password"
+        type="password"
+        bind:value={password}
+      />
+    </ApiForm>
+  </article>
+{/if}
 {#if data.logged_in_user.admin !== Admin.None}
   <article>
     <h2>{m.settings_admin()}</h2>
     <div class="action-row">
-      <a role="button" href={resolve('/settings/households')}>
-        {m.settings_households()}
-      </a>
-      <a role="button" href={resolve('/settings/users/add')}>
-        {m.settings_users_add()}
-      </a>
-      <a role="button" href={resolve('/settings/users')}>
-        {m.settings_users_distributions()}
-      </a>
+      {#if !offline}
+        <a role="button" href={resolve('/settings/households')}>
+          {m.settings_households()}
+        </a>
+        <a role="button" href={resolve('/settings/users/add')}>
+          {m.settings_users_add()}
+        </a>
+        <a role="button" href={resolve('/settings/users')}>
+          {m.settings_users_distributions()}
+        </a>
+      {/if}
       {#if data.logged_in_user.admin === Admin.Server}
         <button type="button" onclick={exportDatabase}>
           {m.settings_actions_export()}

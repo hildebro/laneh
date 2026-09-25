@@ -7,6 +7,18 @@ import { createSession, deleteSession, findSession, findUser } from '$lib/backen
 const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 const THREE_DAYS_IN_MS = 3 * ONE_DAY_IN_MS;
 
+// The offline app runs this backend on the device for a single person, so it may log in without credentials. Only the
+// offline runtime enables this, a server instance never does.
+let offlineLoginEnabled = false;
+
+export function enableOfflineLogin() {
+  offlineLoginEnabled = true;
+}
+
+export function isOfflineLoginEnabled() {
+  return offlineLoginEnabled;
+}
+
 function getAuthData(c: Context): [string | undefined, boolean] {
   const authHeader = c.req.header('Authorization');
   if (authHeader && authHeader.startsWith('Bearer ')) {

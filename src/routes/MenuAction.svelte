@@ -114,11 +114,14 @@
             { m.header_settings() }
           </a>
 
-          <ApiForm submitAction={logout} submitButtonHidden {onSuccess}>
-            <button type="submit" class="header-dropdown-item" style="width: 100%">
-              {m.auth_logout()}
-            </button>
-          </ApiForm>
+          <!-- The offline app would log in again right away. -->
+          {#if !isOfflineMode()}
+            <ApiForm submitAction={logout} submitButtonHidden {onSuccess}>
+              <button type="submit" class="header-dropdown-item" style="width: 100%">
+                {m.auth_logout()}
+              </button>
+            </ApiForm>
+          {/if}
         {/if}
 
         {#if Capacitor.isNativePlatform() && localStorage.getItem('serverUrl')}
