@@ -2,9 +2,6 @@ import { zValidator } from '@hono/zod-validator';
 import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
-import { Readable } from 'node:stream';
-import zlib from 'node:zlib';
-import tar from 'tar-stream';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
 import { getLoggedInUser } from '$lib/backend/auth';
@@ -17,6 +14,7 @@ import {
   getCachedRemoteVersion,
   setCachedRemoteVersion
 } from '$lib/backend/db/functions';
+import { extractTarGz } from '$lib/backend/db/tar';
 import { getAdminTx } from '$lib/context';
 import { Admin } from '$lib/utils/userHelper';
 import { z } from '$lib/zod';
@@ -91,42 +89,11 @@ const publicRouter = new Hono()
 
     const importFile = c.req.valid('form');
 
-    // Convert the uploaded file to a Node Buffer
-    const arrayBuffer = await importFile.dumpFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const queries: string[] = [];
-
-    await new Promise<void>((resolve, reject) => {
-      const extract = tar.extract();
-
-      extract.on('entry', (header, stream, next) => {
-        // Only process .sql files
-        if (!header.name.endsWith('.sql')) {
-          stream.on('end', () => next());
-          stream.resume();
-
-          return;
-        }
-
-        let sqlContent = '';
-        stream.on('data', (chunk) => {
-          sqlContent += chunk;
-        });
-        stream.on('end', () => {
-          if (sqlContent.trim()) {
-            queries.push(sqlContent.trim());
-          }
-          next();
-        });
-      });
-
-      extract.on('finish', () => resolve());
-      extract.on('error', (err) => reject(err));
-
-      // Pipe the buffer through gunzip and into the tar extractor
-      Readable.from(buffer).pipe(zlib.createGunzip()).pipe(extract);
-    });
+    const files = await extractTarGz(await importFile.dumpFile.arrayBuffer());
+    const queries = files
+      .filter((file) => file.name.endsWith('.sql'))
+      .map((file) => file.content.trim())
+      .filter((query) => query);
 
     const tx = await getAdminTx();
     try {

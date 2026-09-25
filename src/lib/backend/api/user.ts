@@ -56,12 +56,12 @@ const usersRouter = new Hono<AppEnv>()
     return c.json(await findHouseholdUsers(user.householdId));
   })
   .get('/export', async (c) => {
-    const { webStream, filename } = generateDatabaseBackup();
+    const { archive, filename } = await generateDatabaseBackup();
 
     c.header('Content-Type', 'application/gzip');
     c.header('Content-Disposition', `attachment; filename="${filename}"`);
 
-    return c.body(webStream);
+    return c.body(archive);
   })
   .get('/:id', async (c) => {
     const userId = c.req.param('id');

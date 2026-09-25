@@ -1,5 +1,4 @@
-import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { randomBytes } from 'crypto';
+import { encodeBase32LowerCase, encodeHexLowerCase } from '@oslojs/encoding';
 import {
   and,
   asc,
@@ -333,7 +332,7 @@ export const dismissHelpDisclaimer = async (userId: string) => {
 export const createSession = async (userId: string) => {
   const db = getTx();
 
-  const sessionToken = randomBytes(32).toString('hex');
+  const sessionToken = encodeHexLowerCase(crypto.getRandomValues(new Uint8Array(32)));
 
   const daysToKeepAlive = 10;
   const secondsToKeepAlive = 60 * 60 * 24 * daysToKeepAlive;

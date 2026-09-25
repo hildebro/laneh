@@ -1,8 +1,6 @@
 import { getTableColumns, getTableName, type Table } from 'drizzle-orm';
-import { PassThrough, Readable } from 'node:stream';
-import { createGzip } from 'node:zlib';
-import tar from 'tar-stream';
 import * as schema from '$lib/backend/db/schema';
+import { createTarGz } from '$lib/backend/db/tar';
 import { getAdminTx } from '$lib/context';
 
 function escapeSqlValue(val: unknown): string {
@@ -20,84 +18,53 @@ function toSnakeCase(str: string) {
   return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }
 
-export function generateDatabaseBackup() {
-  const pack = tar.pack();
-  const gzip = createGzip();
+export async function generateDatabaseBackup() {
+  const files: { name: string; content: string }[] = [];
 
-  // Create a PassThrough stream to bridge Node streams to Web streams
-  const passThrough = new PassThrough();
-
-  // Pipe the tar stream through gzip, then to the passthrough
-  pack.pipe(gzip).pipe(passThrough);
-
-  // Helper to append entries as Promises for proper backpressure handling
-  const appendEntry = (name: string, content: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      pack.entry({ name }, content, (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-  };
-
-  // Process tables asynchronously without blocking the stream initialization
-  const processTables = async () => {
+  // Everything is read before responding, since the request transaction closes afterward.
+  for (const [, entity] of Object.entries(schema)) {
+    let tableName: string;
     try {
-      for (const [, entity] of Object.entries(schema)) {
-        let tableName: string;
-        try {
-          tableName = getTableName(entity as Table);
-        } catch {
-          continue;
-        }
-
-        // system_store is automatically populated, so no need to export.
-        if (!tableName || tableName === 'system_store') {
-          continue;
-        }
-
-        const tx = await getAdminTx();
-        const rows = await tx.select().from(entity as Table);
-
-        if (rows.length === 0) {
-          continue;
-        }
-
-        const tableCols = getTableColumns(entity as Table);
-
-        // Convert the JS keys back to their snake_case DB equivalents
-        const columns = Object.keys(rows[0])
-          .map((jsKey) => {
-            const col = tableCols[jsKey];
-            const dbColName = col?.name ? toSnakeCase(col.name) : toSnakeCase(jsKey);
-            return `"${dbColName}"`;
-          })
-          .join(', ');
-
-        // Map all rows into grouped value strings with indentation
-        const allValues = rows.map((row) => {
-          return `  (${Object.values(row).map(escapeSqlValue).join(', ')})`;
-        }).join(',\n'); // Add a newline after each row
-
-        // Create exactly ONE massive INSERT statement per table, properly formatted
-        const sql = `INSERT INTO "${tableName}" (${columns}) VALUES\n${allValues};\n`;
-
-        await appendEntry(`${tableName}.sql`, sql);
-      }
-    } catch (error) {
-      console.error('Export error:', error);
-      await appendEntry('error.log', 'ERROR GENERATING DUMP');
-    } finally {
-      // Finalize the tar stream to end it, which propagates to gzip and passThrough
-      pack.finalize();
+      tableName = getTableName(entity as Table);
+    } catch {
+      continue;
     }
-  };
 
-  // Start processing in the background immediately
-  processTables();
+    // system_store is automatically populated, so no need to export.
+    if (!tableName || tableName === 'system_store') {
+      continue;
+    }
 
-  // Convert Node stream to Web Stream
-  const webStream = Readable.toWeb(passThrough) as ReadableStream;
+    const tx = await getAdminTx();
+    const rows = await tx.select().from(entity as Table);
+
+    if (rows.length === 0) {
+      continue;
+    }
+
+    const tableCols = getTableColumns(entity as Table);
+
+    // Convert the JS keys back to their snake_case DB equivalents
+    const columns = Object.keys(rows[0])
+      .map((jsKey) => {
+        const col = tableCols[jsKey];
+        const dbColName = col?.name ? toSnakeCase(col.name) : toSnakeCase(jsKey);
+        return `"${dbColName}"`;
+      })
+      .join(', ');
+
+    // Map all rows into grouped value strings with indentation
+    const allValues = rows.map((row) => {
+      return `  (${Object.values(row).map(escapeSqlValue).join(', ')})`;
+    }).join(',\n'); // Add a newline after each row
+
+    // Create exactly ONE massive INSERT statement per table, properly formatted
+    const sql = `INSERT INTO "${tableName}" (${columns}) VALUES\n${allValues};\n`;
+
+    files.push({ name: `${tableName}.sql`, content: sql });
+  }
+
+  const archive = await createTarGz(files);
 
   // Generate filename timestamp
   const now = new Date();
@@ -110,5 +77,5 @@ export function generateDatabaseBackup() {
 
   const filename = `laneh-${__APP_VERSION__}-db-${timestamp}.tar.gz`;
 
-  return { webStream, filename };
+  return { archive, filename };
 }
