@@ -5,7 +5,7 @@ import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
-import { getLoggedInUser, isOfflineLoginEnabled } from '$lib/backend/auth';
+import { getLoggedInUser } from '$lib/backend/auth';
 import {
   addHousehold,
   addUser,
@@ -17,6 +17,7 @@ import {
   setCachedRemoteVersion
 } from '$lib/backend/db/functions';
 import { extractTarGz } from '$lib/backend/db/tar';
+import { isOfflineRuntime } from '$lib/backend/runtime';
 import { getAdminTx } from '$lib/context';
 import { Admin } from '$lib/utils/userHelper';
 import { z } from '$lib/zod';
@@ -91,7 +92,7 @@ const publicRouter = new Hono()
     return c.json({ success: true, sessionToken: session.id });
   })
   .post('/offline/initiate', zValidator('json', offlineInitiateSchema), async (c) => {
-    if (!isOfflineLoginEnabled()) {
+    if (!isOfflineRuntime()) {
       return c.json({ success: false }, 404);
     }
 
@@ -113,7 +114,7 @@ const publicRouter = new Hono()
     return c.json({ success: true, sessionToken: session.id });
   })
   .post('/offline/login', async (c) => {
-    if (!isOfflineLoginEnabled()) {
+    if (!isOfflineRuntime()) {
       return c.json({ sessionToken: null }, 404);
     }
 
