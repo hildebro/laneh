@@ -10,6 +10,7 @@ declare global {
     }
   }
   const __APP_VERSION__: string;
+  const __CAPACITOR_BUILD__: boolean;
 }
 
 export {};

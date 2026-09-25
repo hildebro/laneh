@@ -7,7 +7,7 @@
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import { getBaseUrl } from '$lib/config';
-  import { isDemoMode } from '$lib/demo';
+  import { isOfflineMode } from '$lib/offline';
   import * as m from '$lib/paraglide/messages.js';
   import { handleApiLoad } from '$lib/utils/apiHelper';
 
@@ -65,13 +65,13 @@
       return;
     }
 
-    // Can't check versions on demo mode either.
-    if (await isDemoMode()) {
-      return;
-    }
-
     const client = getApiClient(fetch);
-    ({ remoteVersion, serverVersion } = await handleApiLoad(client.api.public.version.$get()));
+    const versions = await handleApiLoad(client.api.public.version.$get());
+    remoteVersion = versions.remoteVersion;
+    // In offline mode, the server is part of the app, so its version is already shown as the app version.
+    if (!isOfflineMode()) {
+      serverVersion = versions.serverVersion;
+    }
   });
 </script>
 

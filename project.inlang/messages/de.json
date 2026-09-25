@@ -44,7 +44,7 @@
     }
   ],
   "dashboard_shopping_last_purchase": "Letzter Einkauf am {date}",
-  "demo_mode": "Demo Modus ausprobieren",
+  "offline_mode": "Offline nutzen",
   "error_category_not_found": "Kategorie nicht gefunden",
   "error_balance_entry_not_found": "Eintrag nicht gefunden",
   "error_database_export": "Es gab einen Server Fehler, während der Datenbank Export erstellt wurde.",
