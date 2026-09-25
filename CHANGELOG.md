@@ -1,3 +1,29 @@
+# [3.0.0](https://github.com/hildebro/laneh/compare/v2.17.1...v3.0.0) (2026-09-25)
+
+
+### Bug Fixes
+
+* don't run migration via hooks ([5973493](https://github.com/hildebro/laneh/commit/5973493ab12963f581c7c047225965be3eaf0086))
+* env variable cleanup ([3439a2d](https://github.com/hildebro/laneh/commit/3439a2d422e7d858c69170109067e3dbb7b421de))
+* generated android folder stuff ([122f6f0](https://github.com/hildebro/laneh/commit/122f6f0647413932d4c03e69b377ed6504b30be3))
+* rename server folder ([7990828](https://github.com/hildebro/laneh/commit/799082868d240ae33034e57d71fedbaa096fdab2))
+* replace db/adminDb setup with local role ([bd9d637](https://github.com/hildebro/laneh/commit/bd9d637497dc001d9e18fd6fbefe12b08eb8daaf))
+* update readme ([57bd05b](https://github.com/hildebro/laneh/commit/57bd05b4332548dd34bb2dd91eaaa361c3c4166f))
+
+
+### Features
+
+* bundled migrations for the offline database ([7f4b226](https://github.com/hildebro/laneh/commit/7f4b2269bb3cc1a17930f4829a5036a7685d17c5))
+* make initiation, version check and export work in the app ([01a32eb](https://github.com/hildebro/laneh/commit/01a32eb03d427ec4239fc5381cd199d167f81228))
+* replace argon package ([5d3631e](https://github.com/hildebro/laneh/commit/5d3631eb194ba21d668cd232edb7d6b6c4514f6a))
+* replace demo mode with offline mode ([d4c51d1](https://github.com/hildebro/laneh/commit/d4c51d17da2a066a0214319972bc8a4786ed358d))
+* replace postgres with pglite ([2814ca4](https://github.com/hildebro/laneh/commit/2814ca4591ba8f47d85086aa21462ff898a0fe08))
+
+
+### BREAKING CHANGES
+
+* docker compose setup has changed
+
 ## [2.17.1](https://github.com/hildebro/laneh/compare/v2.17.0...v2.17.1) (2026-08-25)
 
 
