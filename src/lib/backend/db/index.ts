@@ -1,9 +1,24 @@
-import { PGlite } from '@electric-sql/pglite';
-import { drizzle } from 'drizzle-orm/pglite';
+import type { PGlite } from '@electric-sql/pglite';
+import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 import * as schema from './schema';
-import { env } from '$env/dynamic/private';
 
-const dataDir = env.DOCKER_DATABASE_LOCATION || '/data/pglite';
+export type Database = PgliteDatabase<typeof schema>;
 
-export const client = new PGlite(dataDir);
-export const db = drizzle(client, { casing: 'snake_case', schema });
+// The database is injected by the runtime (node server or offline app), since each one stores its data differently.
+let database: Database | undefined;
+
+export function createDb(client: PGlite): Database {
+  return drizzle(client, { casing: 'snake_case', schema });
+}
+
+export function setDb(db: Database) {
+  database = db;
+}
+
+export function getDb(): Database {
+  if (!database) {
+    throw new Error('Database is not initialized. Call setDb() before handling requests.');
+  }
+
+  return database;
+}
