@@ -2,18 +2,25 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
-  import { setLocalMode } from '$lib/local';
+  import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+  import { getLocalBackend, setLocalMode } from '$lib/local';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
   import { handleApiLoad } from '$lib/utils/apiHelper';
 
   let inputUrl = $state('');
 
+  // Both actions can take a while, so the buttons are locked until the redirect happens.
+  let pending = $state<'server' | 'local' | null>(null);
+
   async function saveUrl() {
     if (!inputUrl) {
       addToast({ message: m.server_picker_input_invalid(), type: 'warning' });
+
+      return;
     }
 
+    pending = 'server';
     localStorage.setItem('serverUrl', inputUrl);
     const client = getApiClient();
 
@@ -29,12 +36,25 @@
     } catch (error) {
       localStorage.removeItem('serverUrl');
       addToast({ title: m.server_picker_error(), message: error as string });
+    } finally {
+      pending = null;
     }
   }
 
   async function localMode() {
+    pending = 'local';
     setLocalMode();
-    await goto(resolve('/'));
+
+    try {
+      // The first start runs all migrations, so it's done here with feedback instead of silently during navigation.
+      await getLocalBackend();
+      await goto(resolve('/'));
+    } catch (error) {
+      localStorage.removeItem('serverUrl');
+      addToast({ title: m.server_picker_local_error(), message: String(error), type: 'error' });
+    } finally {
+      pending = null;
+    }
   }
 </script>
 
@@ -49,8 +69,18 @@
       placeholder="https://your-server.com"
     />
     <div class="action-row">
-      <button type="button" onclick={saveUrl}>{m.server_picker_connect()}</button>
-      <button type="button" onclick={localMode}>{m.local_mode()}</button>
+      <button type="button" class="icon-button" disabled={pending !== null} onclick={saveUrl}>
+        {#if pending === 'server'}
+          <LoadingSpinner size={6} bright />
+        {/if}
+        {m.server_picker_connect()}
+      </button>
+      <button type="button" class="icon-button" disabled={pending !== null} onclick={localMode}>
+        {#if pending === 'local'}
+          <LoadingSpinner size={6} bright />
+        {/if}
+        {m.local_mode()}
+      </button>
     </div>
   </article>
 </main>
