@@ -19,7 +19,6 @@ const config = {
       })
       : adapterNode(),
     csrf: {
-      checkOrigin: true,
       trustedOrigins: [
         'capacitor://localhost',
         'http://localhost',

@@ -12,6 +12,8 @@ const file = fileURLToPath(new URL('package.json', import.meta.url));
 const json = readFileSync(file, 'utf8');
 const pkg = JSON.parse(json);
 
+const isCapacitor = process.env.CAPACITOR_BUILD === 'true';
+
 export default defineConfig({
   plugins: [
     sveltekit(),
@@ -43,8 +45,25 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@electric-sql/pglite']
   },
+  build: {
+    // The mobile build bundles the local backend (PGlite + drizzle) into one lazy chunk. It's loaded from the app
+    // package, not over the network, so its size doesn't matter.
+    chunkSizeWarningLimit: isCapacitor ? 1024 : 500,
+    rollupOptions: {
+      // SvelteKit replaces onwarn, so filtering has to happen in onLog.
+      onLog(level, log, handler) {
+        // PGlite ships an eval-based loader and a node file system module, which is never used in the browser.
+        const fromPglite = log.id?.includes('@electric-sql/pglite');
+        if (fromPglite && (log.code === 'EVAL' || log.code === 'MISSING_EXPORT')) {
+          return;
+        }
+
+        handler(level, log);
+      }
+    }
+  },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
-    __CAPACITOR_BUILD__: JSON.stringify(process.env.CAPACITOR_BUILD === 'true')
+    __CAPACITOR_BUILD__: JSON.stringify(isCapacitor)
   }
 });
