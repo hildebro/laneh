@@ -209,6 +209,34 @@ export const shoppingPurchaseItemRelations = relations(shoppingPurchaseItem, ({ 
   })
 }));
 
+// Purchase statistics per item, recalculated by a nightly job. Items without purchases have no entry.
+export const shoppingItemStats = pgTable('shopping_item_stats', {
+  itemId: text().primaryKey().references(() => shoppingItem.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
+  purchaseCount: integer().notNull(),
+  // Null, if the item has only been purchased once.
+  averageDaysBetweenPurchases: doublePrecision(),
+  lastPurchaseDate: timestamp().notNull(),
+  // Last purchase date + average distance. Null, if the item has only been purchased once.
+  nextPurchaseDate: timestamp()
+}, () => [
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  })
+]).enableRLS();
+export type ShoppingItemStats = typeof shoppingItemStats.$inferSelect;
+
+export const shoppingItemStatsRelations = relations(shoppingItemStats, ({ one }) => ({
+  shoppingItem: one(shoppingItem, {
+    fields: [shoppingItemStats.itemId],
+    references: [shoppingItem.id]
+  })
+}));
+
 export const stagedShoppingPurchaseItem = pgTable('staged_shopping_purchase_item', {
   itemId: text().primaryKey().references(() => shoppingItem.id, { onDelete: 'cascade' }),
   userId: text().notNull().references(() => user.id, { onDelete: 'cascade' })

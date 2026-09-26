@@ -34,7 +34,7 @@ import {
   type TaskWithRelation,
   type User
 } from '$lib/backend/db/schema';
-import { getTx } from '$lib/context';
+import { getAdminTx, getTx } from '$lib/context';
 import { SystemStoreKey } from '$lib/utils/systemStoreHelper';
 import { Assignment, TaskType, type Weekday } from '$lib/utils/taskHelper';
 import { Admin } from '$lib/utils/userHelper';
@@ -629,47 +629,101 @@ export const findAllShoppingItems = async () => {
 
 export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 4) => {
   const db = getTx();
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  // Subquery to exclude recently bought items or currently active items
-  const excludedItems = db.$with('recent_purchases').as(
-    db.select({
-      itemId: table.shoppingPurchaseItem.itemId
-    })
-      .from(table.shoppingPurchaseItem)
-      .innerJoin(table.shoppingItem, eq(table.shoppingPurchaseItem.itemId, table.shoppingItem.id))
-      .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
-      .where(
-        or(
-          gte(table.shoppingPurchase.date, sevenDaysAgo),
-          eq(table.shoppingItem.active, true)
-        )
-      )
-  );
-
-  return db.with(excludedItems).select({
+  return db.select({
     id: shoppingItem.id,
     name: shoppingItem.name,
-    purchaseCount: count(table.shoppingPurchaseItem.itemId),
-    lastPurchaseDate: max(table.shoppingPurchase.date) as SQL<Date>
+    purchaseCount: table.shoppingItemStats.purchaseCount,
+    lastPurchaseDate: table.shoppingItemStats.lastPurchaseDate,
+    nextPurchaseDate: table.shoppingItemStats.nextPurchaseDate
   })
-    .from(shoppingItem)
-    .innerJoin(table.shoppingPurchaseItem, eq(shoppingItem.id, table.shoppingPurchaseItem.itemId))
-    .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
-    // Any item that isn't excluded
-    .where(sql`NOT EXISTS (SELECT 1 FROM
-    ${excludedItems}
-    WHERE
-    ${excludedItems.itemId}
-    =
-    ${shoppingItem.id}
-    )`)
-    .groupBy(shoppingItem.id, shoppingItem.name)
-    // That has been bought at least X amount of times
-    .having(gte(count(table.shoppingPurchaseItem.itemId), frequentlyBoughtThreshold))
-    .orderBy(desc(count(table.shoppingPurchaseItem.itemId)))
+    .from(table.shoppingItemStats)
+    .innerJoin(shoppingItem, eq(table.shoppingItemStats.itemId, shoppingItem.id))
+    .where(and(
+      // That has been bought at least X amount of times
+      gte(table.shoppingItemStats.purchaseCount, frequentlyBoughtThreshold),
+      // And isn't on the list already
+      eq(shoppingItem.active, false)
+    ))
+    .orderBy(sql`${table.shoppingItemStats.nextPurchaseDate} ASC NULLS LAST`)
     .limit(6);
+};
+
+// ------- SHOPPING ITEM STATS -------
+// Recalculates the purchase stats of the items matching the filter. Works within the household of the current
+// request, or across all households with an admin transaction.
+const upsertShoppingItemStats = async (itemFilter?: SQL) => {
+  const tx = getTx();
+
+  const purchaseCount = count(table.shoppingPurchaseItem.purchaseId);
+  const firstPurchase = min(table.shoppingPurchase.date);
+  const lastPurchase = max(table.shoppingPurchase.date);
+  // Average distance between purchases. Null for a single purchase, since there is no distance yet.
+  const averageDistance = sql`(${lastPurchase} - ${firstPurchase}) / NULLIF(${purchaseCount} - 1, 0)`;
+
+  await tx.insert(table.shoppingItemStats).select(
+    tx.select({
+      itemId: shoppingItem.id,
+      householdId: shoppingItem.householdId,
+      purchaseCount: sql<number>`${purchaseCount}::int`.as('purchase_count'),
+      averageDaysBetweenPurchases: sql<number>`EXTRACT(EPOCH FROM ${averageDistance}) / 86400`
+        .as('average_days_between_purchases'),
+      lastPurchaseDate: sql<Date>`${lastPurchase}`.as('last_purchase_date'),
+      nextPurchaseDate: sql<Date>`${lastPurchase} + ${averageDistance}`.as('next_purchase_date')
+    })
+      .from(shoppingItem)
+      .innerJoin(table.shoppingPurchaseItem, eq(shoppingItem.id, table.shoppingPurchaseItem.itemId))
+      .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
+      .where(itemFilter)
+      .groupBy(shoppingItem.id, shoppingItem.householdId)
+  ).onConflictDoUpdate({
+    target: table.shoppingItemStats.itemId,
+    set: {
+      purchaseCount: sql`excluded.purchase_count`,
+      averageDaysBetweenPurchases: sql`excluded.average_days_between_purchases`,
+      lastPurchaseDate: sql`excluded.last_purchase_date`,
+      nextPurchaseDate: sql`excluded.next_purchase_date`
+    }
+  });
+};
+
+export const updateShoppingItemStats = async (itemIds: string[]) => {
+  if (itemIds.length > 0) {
+    await upsertShoppingItemStats(inArray(shoppingItem.id, itemIds));
+  }
+};
+
+// Recalculates the stats of all items across all households, that were purchased after the given date. Without a
+// date, all items are recalculated. Needs to run in a transaction context.
+export const refreshShoppingItemStats = async (purchasedSince: Date | null) => {
+  const tx = await getAdminTx();
+
+  // Taken before the calculation, so purchases made in the meantime are picked up by the next run.
+  const calculatedAt = new Date();
+
+  await upsertShoppingItemStats(purchasedSince
+    ? inArray(shoppingItem.id, tx.selectDistinct({ itemId: table.shoppingPurchaseItem.itemId })
+      .from(table.shoppingPurchaseItem)
+      .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
+      .where(gt(table.shoppingPurchase.date, purchasedSince)))
+    : undefined);
+
+  await tx.delete(table.systemStore).where(eq(table.systemStore.key, SystemStoreKey.ItemStatsCalculatedAt));
+  await tx.insert(table.systemStore).values({
+    key: SystemStoreKey.ItemStatsCalculatedAt,
+    value: calculatedAt.toISOString()
+  });
+};
+
+// Null, if the stats have never been calculated.
+export const getShoppingItemStatsCalculatedAt = async () => {
+  const tx = await getAdminTx();
+
+  const entry = await tx.query.systemStore.findFirst({
+    where: eq(table.systemStore.key, SystemStoreKey.ItemStatsCalculatedAt)
+  });
+
+  return entry ? new Date(entry.value) : null;
 };
 
 // ------- SHOPPING PURCHASE -------
@@ -698,6 +752,7 @@ export const createShoppingPurchase = async (userId: string) => {
     itemId
   }));
   await db.insert(table.shoppingPurchaseItem).values(purchaseItemInserts);
+  await updateShoppingItemStats(stagedItems);
 
   // Remove items from staging and deactivate them
   await db.delete(table.stagedShoppingPurchaseItem).where(inArray(stagedShoppingPurchaseItem.itemId, stagedItems));
