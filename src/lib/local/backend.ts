@@ -1,6 +1,7 @@
 import { PGlite } from '@electric-sql/pglite';
+import { drizzle } from 'drizzle-orm/pglite';
 import app from '$lib/backend/api';
-import { createDb, setDb } from '$lib/backend/db';
+import { dbOptions, setDb } from '$lib/backend/db';
 import { migrateDb } from '$lib/backend/db/migrate';
 import { runNightlyJobsIfDue, startNightlyJobs } from '$lib/backend/jobs';
 import { enableLocalRuntime } from '$lib/backend/runtime';
@@ -12,7 +13,7 @@ export async function startLocalBackend(dataDir = 'idb://laneh') {
   await navigator.storage?.persist?.().catch(() => false);
 
   const client = await PGlite.create(dataDir);
-  const db = createDb(client);
+  const db = drizzle(client, dbOptions);
   await migrateDb(client, db);
 
   setDb(db);

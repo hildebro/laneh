@@ -2,7 +2,8 @@ import { PGlite } from '@electric-sql/pglite';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { env } from '$env/dynamic/private';
 import app from '$lib/backend/api';
-import { createDb, setDb } from '$lib/backend/db';
+import { drizzle } from 'drizzle-orm/pglite';
+import { dbOptions, setDb } from '$lib/backend/db';
 import { setTransactionContext } from '$lib/context';
 
 let initialized = false;
@@ -13,7 +14,7 @@ export function getServerApp() {
   if (!initialized) {
     const dataDir = env.DOCKER_DATABASE_LOCATION || '/data/pglite';
 
-    setDb(createDb(new PGlite(dataDir)));
+    setDb(drizzle(new PGlite(dataDir), dbOptions));
     setTransactionContext(new AsyncLocalStorage());
     initialized = true;
   }
