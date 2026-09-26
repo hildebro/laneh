@@ -17,18 +17,18 @@
     await goto(resolve('/shopping'));
   }
 
-  let attentionDialog: HTMLDialogElement;
+  let attentionDialog = $state<HTMLDialogElement>();
 </script>
 
 {#if attentionRequired}
   <dialog bind:this={attentionDialog}>
     <p>{m.initiate_disclaimer()}</p>
     <ApiForm {submitAction} {onSuccess} submitButtonText={m.initiate_disclaimer_dismiss()}>
-      <button type="button" onclick={() => attentionDialog.close()}>{m.generic_close()}</button>
+      <button type="button" onclick={() => attentionDialog?.close()}>{m.generic_close()}</button>
     </ApiForm>
   </dialog>
 
-  <button class="header-action flashing" onclick={() => attentionDialog.showModal()}>
+  <button class="header-action flashing" onclick={() => attentionDialog?.showModal()}>
     <CircleAlert />
     {m.generic_attention()}
   </button>

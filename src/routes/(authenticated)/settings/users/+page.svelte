@@ -9,7 +9,7 @@
 
   let { data } = $props();
 
-  let distributions = $state(
+  let distributions = $derived(
     data.users.map((user) => ({
       userId: user.id,
       username: user.username,

@@ -40,10 +40,10 @@
 
   async function onDeleteSuccess() {
     await onSuccess();
-    deleteDialog.close();
+    deleteDialog?.close();
   }
 
-  let deleteDialog: HTMLDialogElement;
+  let deleteDialog = $state<HTMLDialogElement>();
 </script>
 
 {#if data.categories.every(category => category.shoppingItems.length === 0)}
@@ -91,7 +91,7 @@
           type="hidden"
         />
       </ApiForm>
-      <button class="error" onclick={() => deleteDialog.showModal()}>
+      <button class="error" onclick={() => deleteDialog?.showModal()}>
         { m.settings_items_delete() }
       </button>
     </div>
@@ -114,7 +114,7 @@
       {#snippet additionalButtons()}
         <button
           type="button"
-          onclick={() => deleteDialog.close()}
+          onclick={() => deleteDialog?.close()}
         >
           <Undo2 />
           { m.generic_cancel() }

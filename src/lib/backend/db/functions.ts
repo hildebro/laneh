@@ -14,7 +14,7 @@ import {
   max,
   min,
   or,
-  SQL,
+  type SQL,
   sql
 } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
