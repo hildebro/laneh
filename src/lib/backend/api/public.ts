@@ -15,6 +15,7 @@ import {
   findAndVerifyUser,
   findLocalUser,
   getCachedRemoteVersion,
+  refreshShoppingItemStats,
   setCachedRemoteVersion
 } from '$lib/backend/db/functions';
 import { extractTarGz } from '$lib/backend/db/tar';
@@ -199,6 +200,10 @@ const publicRouter = new Hono()
         return c.json({ success: false, error: serverDumpError }, 400);
       }
     }
+
+    // Dumps don't contain the stats. The imported purchases are older than the last calculation, so all items need to
+    // be recalculated.
+    await refreshShoppingItemStats(null);
 
     return c.json({ success: true });
   })
