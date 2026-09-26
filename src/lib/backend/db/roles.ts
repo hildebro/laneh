@@ -1,5 +1,5 @@
 // Role used for row level security. Applied after migrations on the node server (scripts/migrate.ts) and in the
-// offline app. Kept free of imports, so the migration script can load it with plain node.
+// local app. Kept free of imports, so the migration script can load it with plain node.
 export const APP_USER_ROLE_SQL = `
   DO $$ 
   BEGIN

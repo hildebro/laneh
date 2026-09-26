@@ -6,18 +6,19 @@ import { setCookie } from 'hono/cookie';
 import { dev } from '$app/environment';
 import { SESSION_COOKIE } from '$lib';
 import { getLoggedInUser } from '$lib/backend/auth';
+import { DUMP_MANIFEST_FILE, type DumpManifest } from '$lib/backend/db/export';
 import {
   addHousehold,
   addUser,
   createSession,
   findAllUsers,
   findAndVerifyUser,
-  findOfflineUser,
+  findLocalUser,
   getCachedRemoteVersion,
   setCachedRemoteVersion
 } from '$lib/backend/db/functions';
 import { extractTarGz } from '$lib/backend/db/tar';
-import { isOfflineRuntime } from '$lib/backend/runtime';
+import { isLocalRuntime } from '$lib/backend/runtime';
 import { getAdminTx } from '$lib/context';
 import { Admin } from '$lib/utils/userHelper';
 import { z } from '$lib/zod';
@@ -28,7 +29,7 @@ const initiateSchema = z.object({
   password: z.string().min(6).max(64)
 });
 
-const offlineInitiateSchema = z.object({
+const localInitiateSchema = z.object({
   householdName: z.string().trim().nonempty(),
   username: z.string().trim().nonempty()
 });
@@ -43,6 +44,28 @@ const importSchema = z.object({
   dumpFile: z.file().mime(['application/gzip']).nonoptional()
 });
 
+// Reads the manifest of a dump. Null for dumps from before the manifest existed.
+function readDumpManifest(files: { name: string; content: string }[]): DumpManifest | null {
+  const manifestFile = files.find((file) => file.name === DUMP_MANIFEST_FILE);
+  if (!manifestFile) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(manifestFile.content) as DumpManifest;
+  } catch {
+    return null;
+  }
+}
+
+const serverDumpError = new z.ZodError([
+  {
+    code: 'custom',
+    path: ['dumpFile'],
+    message: 'settings_actions_import_server_dump'
+  }
+]);
+
 const publicRouter = new Hono()
   .get('/version', async (c) => {
     const serverVersion = __APP_VERSION__;
@@ -52,7 +75,7 @@ const publicRouter = new Hono()
       return c.json({ remoteVersion: cachedRemoteVersion, serverVersion });
     }
 
-    // Fails without internet access, which is common in offline mode.
+    // Fails without internet access, which the local app doesn't need otherwise.
     const res = await fetch('https://api.github.com/repos/hildebro/laneh/releases/latest').catch(() => null);
     if (!res?.ok) {
       return c.json({ remoteVersion: '?', serverVersion });
@@ -91,8 +114,8 @@ const publicRouter = new Hono()
     // The mobile app can't use the cookie, so it needs the token as well.
     return c.json({ success: true, sessionToken: session.id });
   })
-  .post('/offline/initiate', zValidator('json', offlineInitiateSchema), async (c) => {
-    if (!isOfflineRuntime()) {
+  .post('/local/initiate', zValidator('json', localInitiateSchema), async (c) => {
+    if (!isLocalRuntime()) {
       return c.json({ success: false }, 404);
     }
 
@@ -103,7 +126,7 @@ const publicRouter = new Hono()
 
     const initiateData = c.req.valid('json');
 
-    // Nobody ever needs this password, since the offline app logs in without credentials.
+    // Nobody ever needs this password, since the local app logs in without credentials.
     const password = encodeHexLowerCase(crypto.getRandomValues(new Uint8Array(32)));
 
     const householdId = await addHousehold(initiateData.householdName);
@@ -113,13 +136,13 @@ const publicRouter = new Hono()
 
     return c.json({ success: true, sessionToken: session.id });
   })
-  .post('/offline/login', async (c) => {
-    if (!isOfflineRuntime()) {
+  .post('/local/login', async (c) => {
+    if (!isLocalRuntime()) {
       return c.json({ sessionToken: null }, 404);
     }
 
-    // Null, if the offline instance still needs initiation.
-    const user = await findOfflineUser();
+    // Null, if the local instance still needs initiation.
+    const user = await findLocalUser();
     if (!user) {
       return c.json({ sessionToken: null });
     }
@@ -137,6 +160,13 @@ const publicRouter = new Hono()
     const importFile = c.req.valid('form');
 
     const files = await extractTarGz(await importFile.dumpFile.arrayBuffer());
+
+    // A local instance is meant for a single household, so server dumps don't belong there.
+    const manifest = readDumpManifest(files);
+    if (isLocalRuntime() && manifest && !manifest.local) {
+      return c.json({ success: false, error: serverDumpError }, 400);
+    }
+
     const queries = files
       .filter((file) => file.name.endsWith('.sql'))
       .map((file) => file.content.trim())
@@ -147,6 +177,7 @@ const publicRouter = new Hono()
       // SET LOCAL automatically reverts when the transaction ends!
       // No need for a finally block to clean it up.
       await tx.execute(sql`SET LOCAL session_replication_role = 'replica';`);
+      await tx.execute(sql`SAVEPOINT import`);
 
       for (const query of queries) {
         await tx.execute(sql.raw(query));
@@ -157,6 +188,16 @@ const publicRouter = new Hono()
 
       // Re-throw the error so Drizzle knows to safely ROLLBACK the transaction
       throw err;
+    }
+
+    // Dumps from before the manifest can't tell where they came from. The household count has to decide instead.
+    if (isLocalRuntime() && !manifest) {
+      const result = await tx.execute<{ count: number }>(sql`SELECT count(*)::int AS count FROM household`);
+      if (result.rows[0].count > 1) {
+        await tx.execute(sql`ROLLBACK TO SAVEPOINT import`);
+
+        return c.json({ success: false, error: serverDumpError }, 400);
+      }
     }
 
     return c.json({ success: true });

@@ -1,9 +1,9 @@
 import { Capacitor } from '@capacitor/core';
-import { isOfflineMode, OFFLINE_BASE_URL } from '$lib/offline';
+import { isLocalMode, LOCAL_BASE_URL } from '$lib/local';
 
 export function getBaseUrl(): string {
-  if (isOfflineMode()) {
-    return OFFLINE_BASE_URL;
+  if (isLocalMode()) {
+    return LOCAL_BASE_URL;
   }
 
   if (Capacitor.isNativePlatform()) {

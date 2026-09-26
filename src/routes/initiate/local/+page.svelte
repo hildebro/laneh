@@ -7,11 +7,11 @@
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
-  // Offline mode has no use for households and users, so dummies are created instead of asking for them.
+  // Local mode has no use for households and users, so dummies are created instead of asking for them.
   async function startFresh() {
     const client = getApiClient();
-    return client.api.public.offline.initiate.$post({
-      json: { householdName: m.initiate_offline_household_name(), username: m.initiate_offline_username() }
+    return client.api.public.local.initiate.$post({
+      json: { householdName: m.initiate_local_household_name(), username: m.initiate_local_username() }
     });
   }
 
@@ -36,8 +36,8 @@
 
 <main>
   <article>
-    <ApiForm submitAction={startFresh} submitButtonText={m.initiate_offline_submit()} onSuccess={onStarted}>
-      <p>{m.initiate_offline_text()}</p>
+    <ApiForm submitAction={startFresh} submitButtonText={m.initiate_local_submit()} onSuccess={onStarted}>
+      <p>{m.initiate_local_text()}</p>
     </ApiForm>
   </article>
   <article>

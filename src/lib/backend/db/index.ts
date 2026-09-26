@@ -4,7 +4,7 @@ import * as schema from './schema';
 
 export type Database = PgliteDatabase<typeof schema>;
 
-// The database is injected by the runtime (node server or offline app), since each one stores its data differently.
+// The database is injected by the runtime (node server or local app), since each one stores its data differently.
 let database: Database | undefined;
 
 export function createDb(client: PGlite): Database {

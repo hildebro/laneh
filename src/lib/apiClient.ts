@@ -4,7 +4,7 @@ import { hc } from 'hono/client';
 import { resolve } from '$app/paths';
 import type { AppType } from '$lib/backend/api';
 import { getBaseUrl } from '$lib/config';
-import { getOfflineBackend, isOfflineMode } from '$lib/offline';
+import { getLocalBackend, isLocalMode } from '$lib/local';
 
 export function getApiClient(customFetch?: typeof fetch) {
   // Use the provided fetch (useful for SvelteKit load functions) or fallback to the global browser fetch
@@ -35,8 +35,8 @@ export function getApiClient(customFetch?: typeof fetch) {
     requestInit.headers = headers;
 
     // 3. Execute the actual network request, or hand it to the backend running on the device
-    const response = isOfflineMode()
-      ? await (await getOfflineBackend())(new Request(input, requestInit))
+    const response = isLocalMode()
+      ? await (await getLocalBackend())(new Request(input, requestInit))
       : await baseFetch(input, requestInit);
 
     // 4. Intercept the response to check for a refreshed token globally!

@@ -1,7 +1,7 @@
 import { getTableColumns, getTableName, type Table } from 'drizzle-orm';
 import * as schema from '$lib/backend/db/schema';
 import { createTarGz } from '$lib/backend/db/tar';
-import { isOfflineRuntime } from '$lib/backend/runtime';
+import { isLocalRuntime } from '$lib/backend/runtime';
 import { getAdminTx } from '$lib/context';
 
 // Metadata about the instance that created a dump. The import only runs .sql files, so it doesn't interfere.
@@ -9,8 +9,8 @@ export const DUMP_MANIFEST_FILE = 'manifest.json';
 
 export type DumpManifest = {
   version: string;
-  // Offline dumps contain a dummy household and user, which might need special handling on import.
-  offline: boolean;
+  // Local dumps contain a dummy household and user, which might need special handling on import.
+  local: boolean;
 };
 
 function escapeSqlValue(val: unknown): string {
@@ -74,7 +74,7 @@ export async function generateDatabaseBackup() {
     files.push({ name: `${tableName}.sql`, content: sql });
   }
 
-  const manifest: DumpManifest = { version: __APP_VERSION__, offline: isOfflineRuntime() };
+  const manifest: DumpManifest = { version: __APP_VERSION__, local: isLocalRuntime() };
   files.push({ name: DUMP_MANIFEST_FILE, content: JSON.stringify(manifest, null, 2) });
 
   const archive = await createTarGz(files);

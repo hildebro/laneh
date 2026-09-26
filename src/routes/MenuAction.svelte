@@ -7,7 +7,7 @@
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import { getBaseUrl } from '$lib/config';
-  import { isOfflineMode } from '$lib/offline';
+  import { isLocalMode } from '$lib/local';
   import * as m from '$lib/paraglide/messages.js';
   import { handleApiLoad } from '$lib/utils/apiHelper';
 
@@ -68,8 +68,8 @@
     const client = getApiClient(fetch);
     const versions = await handleApiLoad(client.api.public.version.$get());
     remoteVersion = versions.remoteVersion;
-    // In offline mode, the server is part of the app, so its version is already shown as the app version.
-    if (!isOfflineMode()) {
+    // In local mode, the server is part of the app, so its version is already shown as the app version.
+    if (!isLocalMode()) {
       serverVersion = versions.serverVersion;
     }
   });
@@ -87,8 +87,8 @@
     <div class="header-dropdown">
       <div class="header-dropdown-info">
         <div>
-          <!-- The offline app only has a dummy user. -->
-          {#if logged_in_user && !isOfflineMode()}
+          <!-- The local app only has a dummy user. -->
+          {#if logged_in_user && !isLocalMode()}
             { m.header_user({ name: logged_in_user.username }) }
           {/if}
         </div>
@@ -115,8 +115,8 @@
             { m.header_settings() }
           </a>
 
-          <!-- The offline app would log in again right away. -->
-          {#if !isOfflineMode()}
+          <!-- The local app would log in again right away. -->
+          {#if !isLocalMode()}
             <ApiForm submitAction={logout} submitButtonHidden {onSuccess}>
               <button type="submit" class="header-dropdown-item" style="width: 100%">
                 {m.auth_logout()}

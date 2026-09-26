@@ -3,16 +3,16 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutLoad } from './$types';
 import { resolve } from '$app/paths';
 import { getApiClient } from '$lib/apiClient';
-import { isOfflineMode } from '$lib/offline';
+import { isLocalMode } from '$lib/local';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 
 export const load: LayoutLoad = async ({ fetch }) => {
   const client = getApiClient(fetch);
   let logged_in_user = await handleApiLoad(client.api.public.loggedInUser.$get());
 
-  // Sessions are pointless in offline mode, so a missing or expired one is silently replaced.
-  if (!logged_in_user && isOfflineMode()) {
-    const { sessionToken } = await handleApiLoad(client.api.public.offline.login.$post());
+  // Sessions are pointless in local mode, so a missing or expired one is silently replaced.
+  if (!logged_in_user && isLocalMode()) {
+    const { sessionToken } = await handleApiLoad(client.api.public.local.login.$post());
     if (sessionToken) {
       await Preferences.set({ key: 'session_token', value: sessionToken });
       logged_in_user = await handleApiLoad(client.api.public.loggedInUser.$get());
