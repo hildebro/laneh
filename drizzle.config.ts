@@ -1,7 +1,7 @@
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
-  schema: './src/lib/server/db/schema.ts',
+  schema: './src/lib/backend/db/schema.ts',
 
   dbCredentials: {
     // Provide a fallback empty string to satisfy TypeScript during the build stage.
