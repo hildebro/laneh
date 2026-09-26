@@ -1,10 +1,10 @@
 import { type ExtractTablesWithRelations, sql } from 'drizzle-orm';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
-import type { PgliteQueryResultHKT } from 'drizzle-orm/pglite';
+import type { QueryResultHKT } from '$lib/backend/db';
 import type * as schema from '$lib/backend/db/schema';
 
 // Define the type for the value stored in the context (our transactional client)
-type TransactionalDbClient = PgTransaction<PgliteQueryResultHKT, typeof schema, ExtractTablesWithRelations<typeof schema>>;
+type TransactionalDbClient = PgTransaction<QueryResultHKT, typeof schema, ExtractTablesWithRelations<typeof schema>>;
 
 // Subset of node's AsyncLocalStorage, so the server can use the real thing while the local app uses SerialContext.
 export interface TransactionContext<T> {
