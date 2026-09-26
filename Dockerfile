@@ -3,8 +3,6 @@ FROM node:25-alpine AS builder
 
 WORKDIR /app
 
-RUN mkdir -p /data/pglite
-
 # Copy package files and install dependencies (cached layer)
 COPY package*.json ./
 RUN npm install
