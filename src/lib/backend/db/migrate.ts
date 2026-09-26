@@ -7,7 +7,7 @@ import journal from '../../../../drizzle/meta/_journal.json';
 import type { Database } from '$lib/backend/db';
 import { APP_USER_ROLE_SQL } from '$lib/backend/db/roles';
 
-// The migration files are bundled at build time, since the offline app has no file system access to read them.
+// The migration files are bundled at build time, since the local app has no file system access to read them.
 const migrationFiles = import.meta.glob<string>('/drizzle/*.sql', { query: '?raw', import: 'default', eager: true });
 
 // Same as drizzle's readMigrationFiles(), but based on the bundled files.

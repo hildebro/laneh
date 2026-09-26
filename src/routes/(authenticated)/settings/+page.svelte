@@ -4,7 +4,7 @@
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
-  import { isOfflineMode } from '$lib/offline';
+  import { isLocalMode } from '$lib/local';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
   import { saveFile } from '$lib/utils/fileHelper';
@@ -12,8 +12,8 @@
 
   let { data } = $props();
 
-  // The offline app has a single dummy user and household, so there is nothing to manage about them.
-  const offline = isOfflineMode();
+  // The local app has a single dummy user and household, so there is nothing to manage about them.
+  const local = isLocalMode();
 
   let username = $derived(data.logged_in_user.username);
   let password = $state(undefined);
@@ -65,7 +65,7 @@
     </div>
   </article>
 </div>
-{#if !offline}
+{#if !local}
   <article>
     <h2>{m.settings_user_data()}</h2>
     <ApiForm submitAction={updateUser} {onSuccess}>
@@ -87,7 +87,7 @@
   <article>
     <h2>{m.settings_admin()}</h2>
     <div class="action-row">
-      {#if !offline}
+      {#if !local}
         <a role="button" href={resolve('/settings/households')}>
           {m.settings_households()}
         </a>

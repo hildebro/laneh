@@ -2,12 +2,12 @@ import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import { resolve } from '$app/paths';
 import { getApiClient } from '$lib/apiClient';
-import { isOfflineMode } from '$lib/offline';
+import { isLocalMode } from '$lib/local';
 import * as m from '$lib/paraglide/messages.js';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 
 export const load: PageLoad = async ({ fetch }) => {
-  if (!isOfflineMode()) {
+  if (!isLocalMode()) {
     return redirect(302, resolve('/initiate'));
   }
 
@@ -20,6 +20,6 @@ export const load: PageLoad = async ({ fetch }) => {
   }
 
   return {
-    help_text: m.initiate_offline_info()
+    help_text: m.initiate_local_info()
   };
 };

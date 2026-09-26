@@ -115,9 +115,9 @@ export const findAllUsers = async (): Promise<User[]> => {
   return db.select().from(table.user).execute();
 };
 
-// The offline app logs in without credentials. Prefer the server admin, since an imported database might contain more
+// The local app logs in without credentials. Prefer the server admin, since an imported database might contain more
 // users.
-export const findOfflineUser = async (): Promise<User | undefined> => {
+export const findLocalUser = async (): Promise<User | undefined> => {
   const db = getTx();
 
   const result = await db.select()

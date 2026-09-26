@@ -1,4 +1,4 @@
-// Minimal tar.gz handling based on web APIs, so database dumps work on the node server and in the offline app alike.
+// Minimal tar.gz handling based on web APIs, so database dumps work on the node server and in the local app alike.
 
 const BLOCK_SIZE = 512;
 

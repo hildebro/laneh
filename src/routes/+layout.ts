@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { redirect } from '@sveltejs/kit';
 import { resolve } from '$app/paths';
-import { getOfflineBackend, isOfflineMode } from '$lib/offline';
+import { getLocalBackend, isLocalMode } from '$lib/local';
 
 export const ssr = false;
 export const prerender = false;
@@ -15,10 +15,10 @@ export const load = async ({ url }) => {
     }
   }
 
-  // Start the offline database up front. The first start runs all migrations, which might exceed the timeout of the
+  // Start the local database up front. The first start runs all migrations, which might exceed the timeout of the
   // first API call.
-  if (isOfflineMode()) {
-    await getOfflineBackend();
+  if (isLocalMode()) {
+    await getLocalBackend();
   }
 
   // logged_in_user will be overridden in the (authenticated) area with the actual user.
