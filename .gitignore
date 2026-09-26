@@ -12,7 +12,9 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
-/pglite-data/*
+/postgres-data
+# Data of the PGlite server from 3.x. Kept until the backup was imported.
+/pglite-data
 
 # OS
 .DS_Store

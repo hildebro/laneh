@@ -1,24 +1,27 @@
-import { PGlite } from '@electric-sql/pglite';
-import { drizzle } from 'drizzle-orm/pglite';
-import { migrate } from 'drizzle-orm/pglite/migrator';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import pg from 'pg';
 import { APP_USER_ROLE_SQL } from '../src/lib/backend/db/roles.ts';
 
-const dataDir = process.env.DOCKER_DATABASE_LOCATION || '/data/pglite';
-
 async function run() {
-  console.log(`⏳ Running migrations on database at ${dataDir}...`);
+  if (!process.env.DATABASE_URL) {
+    throw new Error('DATABASE_URL is not set.');
+  }
+
+  console.log('⏳ Running migrations...');
 
   // Initialize minimal client just for migrations
-  const client = new PGlite(dataDir);
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
   const db = drizzle(client, { casing: 'snake_case' });
 
   await migrate(db, { migrationsFolder: 'drizzle' });
 
-  await client.exec(APP_USER_ROLE_SQL);
+  await client.query(APP_USER_ROLE_SQL);
 
   console.log('✅ Migrations complete!');
 
-  await client.close();
+  await client.end();
 
   process.exit(0);
 }
