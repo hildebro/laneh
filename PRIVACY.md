@@ -1,6 +1,6 @@
 Privacy Policy for Laneh
 
-Effective Date: April 27, 2026
+Effective Date: September 26, 2026
 
 This privacy policy applies to the Laneh mobile application (hereby referred to as "Application") for mobile devices that was created by Hildedev (hereby referred to as "Developer") as a Free and Open Source Software (FOSS) service.
 
@@ -16,7 +16,7 @@ The Application may request certain permissions on your device to function corre
 The Developer does not use these permissions to harvest or collect data.
 
 4. Third-Party Services
-The Application does not use any third-party trackers, advertising SDKs, or analytics services. (Note: If you use something like Sentry/Firebase for crash reporting, you MUST state that here instead. If not, leave this as is).
+The Application does not use any third-party trackers, advertising SDKs, or analytics services.
 
 5. Changes to This Privacy Policy
 The Developer may update this Privacy Policy from time to time. You are advised to review this page periodically for any changes. Changes are effective immediately after they are published on this page.
