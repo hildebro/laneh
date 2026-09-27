@@ -65,9 +65,13 @@
     items.push({ amount: '', name: '', preventCorrection: false });
   }
 
-  function suggestionNotPresent(name: string) {
-    return !items.find(item => item.name === name);
-  }
+  // Show the first few suggestions that aren't in the list yet, so picked ones get replaced by the next in line.
+  const maxVisibleSuggestions = 6;
+  let visibleSuggestions = $derived(
+    data.suggestions
+      .filter(suggestion => !items.some(item => item.name === suggestion.name))
+      .slice(0, maxVisibleSuggestions)
+  );
 
   function deleteItem(index: number) {
     if (items.length > 1) {
@@ -311,15 +315,13 @@
       </tbody>
     </table>
 
-    {#if data.suggestions.length > 0}
+    {#if visibleSuggestions.length > 0}
       {m.shopping_add_items_suggestions()}
       <div class="suggestion-box">
-        {#each data.suggestions as suggestion(suggestion.name)}
-          {#if suggestionNotPresent(suggestion.name)}
-            <button class="tertiary" type="button" onclick={() => addSuggestion(suggestion.name)}>
-              {suggestion.name}
-            </button>
-          {/if}
+        {#each visibleSuggestions as suggestion(suggestion.name)}
+          <button class="tertiary" type="button" onclick={() => addSuggestion(suggestion.name)}>
+            {suggestion.name}
+          </button>
         {/each}
       </div>
     {/if}
