@@ -33,27 +33,29 @@
   <p class="month-total">{priceFormatter.format(monthTotal / 100)}</p>
 </article>
 
-<article>
-  <h2>{m.balance()}</h2>
-  {#if data.userDebts.length === 0}
-    <p>{ m.balance_none() }</p>
-  {/if}
-  {#each data.userDebts as userDebt (userDebt.creditor.id)}
-    <div>
-      <h4>{m.balance_owed({ user: userDebt.creditor.username })}</h4>
-      <ul>
-        {#each userDebt.debtorData as debtorEntry (debtorEntry.debtor.id)}
-          <li>
-            {m.balance_owed_debtor({
-              amount: priceFormatter.format(debtorEntry.amount / 100),
-              debtor: debtorEntry.debtor.username
-            })}
-          </li>
-        {/each}
-      </ul>
-    </div>
-  {/each}
-</article>
+{#if data.showDebts}
+  <article>
+    <h2>{m.balance()}</h2>
+    {#if data.userDebts.length === 0}
+      <p>{ m.balance_none() }</p>
+    {/if}
+    {#each data.userDebts as userDebt (userDebt.creditor.id)}
+      <div>
+        <h4>{m.balance_owed({ user: userDebt.creditor.username })}</h4>
+        <ul>
+          {#each userDebt.debtorData as debtorEntry (debtorEntry.debtor.id)}
+            <li>
+              {m.balance_owed_debtor({
+                amount: priceFormatter.format(debtorEntry.amount / 100),
+                debtor: debtorEntry.debtor.username
+              })}
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/each}
+  </article>
+{/if}
 
 <h2 class="headline">{ m.balance_expenses() }</h2>
 {#each data.entries as entry (entry.id)}
