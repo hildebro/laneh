@@ -13,8 +13,12 @@ export const load: PageLoad = async ({ fetch }) => {
     };
   });
 
+  const users = await handleApiLoad(client.api.users.$get());
+
   return {
     userDebts: await handleApiLoad(client.api.balance.debts.$get()),
+    // Balances between users are meaningless in a single person household.
+    showDebts: users.length > 1,
     entries
   };
 };
