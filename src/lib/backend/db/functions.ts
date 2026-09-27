@@ -465,6 +465,20 @@ export const addShoppingCategory = async (name: string): Promise<void> => {
   });
 };
 
+// Creates the given categories for a household in the given order. The household is passed explicitly, since this
+// runs during initiation, before any household context exists.
+export const addDefaultShoppingCategories = async (householdId: string, names: string[]): Promise<void> => {
+  if (names.length === 0) {
+    return;
+  }
+
+  const db = getTx();
+
+  await db.insert(table.shoppingCategory).values(
+    names.map((name, index) => ({ id: generateUUID(), householdId, name, priority: index }))
+  );
+};
+
 export const deleteCategory = async (categoryId: string): Promise<void> => {
   const db = getTx();
 

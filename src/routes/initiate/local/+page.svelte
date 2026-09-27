@@ -6,12 +6,17 @@
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { getLocale } from '$lib/paraglide/runtime.js';
 
   // Local mode has no use for households and users, so dummies are created instead of asking for them.
   async function startFresh() {
     const client = getApiClient();
     return client.api.public.local.initiate.$post({
-      json: { householdName: m.initiate_local_household_name(), username: m.initiate_local_username() }
+      json: {
+        householdName: m.initiate_local_household_name(),
+        username: m.initiate_local_username(),
+        locale: getLocale()
+      }
     });
   }
 

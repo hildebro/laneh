@@ -7,6 +7,7 @@
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { getLocale } from '$lib/paraglide/runtime.js';
 
   let householdName = $state('');
   let username = $state('');
@@ -14,7 +15,7 @@
 
   async function initiate() {
     const client = getApiClient();
-    return client.api.public.initiate.$post({ json: { householdName, username, password } });
+    return client.api.public.initiate.$post({ json: { householdName, username, password, locale: getLocale() } });
   }
 
   async function onInitiated(response: Response) {
