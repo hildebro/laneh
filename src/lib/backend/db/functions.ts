@@ -627,7 +627,7 @@ export const findAllShoppingItems = async () => {
   return db.query.shoppingItem.findMany().execute();
 };
 
-export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 4) => {
+export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 8) => {
   const db = getTx();
 
   return db.select({
