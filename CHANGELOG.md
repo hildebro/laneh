@@ -1,3 +1,38 @@
+# [4.0.0](https://github.com/hildebro/laneh/compare/v3.0.0...v4.0.0) (2026-09-27)
+
+
+### Bug Fixes
+
+* build warnings ([aeba9f8](https://github.com/hildebro/laneh/commit/aeba9f8fe3b99c7edbd52dcbbfef7bd9b91ae23f))
+* don't gitkeep the data folder ([24529e4](https://github.com/hildebro/laneh/commit/24529e4d688bcd5a4889261319403a614dea9282))
+* missing blank folder in dev ([006b0ed](https://github.com/hildebro/laneh/commit/006b0edf66655e87f996ae72b829736296299135))
+* PRIVACY.md placeholder text ([c3cbd50](https://github.com/hildebro/laneh/commit/c3cbd500de2e64c204e5b6cd4975890f6f147b78))
+* schema path in drizzle config ([197d967](https://github.com/hildebro/laneh/commit/197d96771d0428f3c1dd1ed801a7b1e0fc8567ac))
+
+
+### Features
+
+* abstract away household/user stuff from offline mode ([634a06c](https://github.com/hildebro/laneh/commit/634a06c01d65e585f095e4b05a1bfeaa6fe941b5))
+* default category add ([3832f9c](https://github.com/hildebro/laneh/commit/3832f9c50d5cd21ce5875ddfe4aa32de299cf95b))
+* hide balances between users in single user households ([7210270](https://github.com/hildebro/laneh/commit/721027009e274be7a7e9b5e5d3b2622e830cee32))
+* increase item suggestion threshold ([2fb39ca](https://github.com/hildebro/laneh/commit/2fb39ca986f5c6d58531216475d58f39320c5896))
+* item stats based on background runner, used for suggestion list ([64522b6](https://github.com/hildebro/laneh/commit/64522b6a8976c6d9e9b64dfc1ccb848ef7b260f2))
+* keep item suggestions coming ([0857722](https://github.com/hildebro/laneh/commit/0857722d7dda6f8c68ab2a27d2dc64330e4d092d))
+* rename offline to local + prevent server to local dump ([015cad2](https://github.com/hildebro/laneh/commit/015cad21524b3b0c108c6befaeee71c8a4de4eab))
+* show total spent this month in balance area ([3c5e830](https://github.com/hildebro/laneh/commit/3c5e83010c1e71efcb92fbe8b571f3c3f6612b87))
+* spinner while local mode initializes ([8340bfe](https://github.com/hildebro/laneh/commit/8340bfe9c1ba55de6ada7f2893a1e4abf16e4dca))
+* tag db dumps with version and mode ([5e36325](https://github.com/hildebro/laneh/commit/5e363255a81b4ab4ced6dbcbdf9513865d3c012d))
+* use a postgres container for the server, keep pglite for local mode ([d615d2a](https://github.com/hildebro/laneh/commit/d615d2a2a99072e7c8c0de00918b7f834e9e9d30))
+
+
+### BREAKING CHANGES
+
+* the server requires a postgres container. Existing PGlite data
+has to be exported as a backup before updating and imported afterward. See the
+README for the upgrade steps.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
 # [3.0.0](https://github.com/hildebro/laneh/compare/v2.17.1...v3.0.0) (2026-09-25)
 
 
