@@ -645,8 +645,7 @@ export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 
       // And isn't on the list already
       eq(shoppingItem.active, false)
     ))
-    .orderBy(sql`${table.shoppingItemStats.nextPurchaseDate} ASC NULLS LAST`)
-    .limit(6);
+    .orderBy(sql`${table.shoppingItemStats.nextPurchaseDate} ASC NULLS LAST`);
 };
 
 // ------- SHOPPING ITEM STATS -------
