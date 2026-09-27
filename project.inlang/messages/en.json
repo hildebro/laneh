@@ -9,6 +9,7 @@
   "balance": "Balances",
   "balance_none": "There are no balances between users yet.",
   "balance_expenses": "Expenses",
+  "balance_month_total": "Spent this month",
   "balance_expense_add": "Add expense",
   "balance_expense_distribution": "Distribution (%)",
   "balance_expense_distribution_invalid_sum": "Sum of amounts must be exactly 100%",
