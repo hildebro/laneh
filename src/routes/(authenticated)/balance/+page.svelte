@@ -13,11 +13,25 @@
 
     return m.balance_no_name_label();
   };
+
+  // Based on the local time, so the month matches the user's calendar.
+  const monthTotal = $derived.by(() => {
+    const now = new Date();
+
+    return data.entries
+      .filter(entry => entry.date.getFullYear() === now.getFullYear() && entry.date.getMonth() === now.getMonth())
+      .reduce((sum, entry) => sum + entry.price, 0);
+  });
 </script>
 
 <div class="action-bar">
   <a role="button" href={resolve('/balance/add')}>{ m.balance_expense_add() }</a>
 </div>
+
+<article>
+  <h2>{m.balance_month_total()}</h2>
+  <p class="month-total">{priceFormatter.format(monthTotal / 100)}</p>
+</article>
 
 <article>
   <h2>{m.balance()}</h2>
@@ -59,3 +73,11 @@
     </footer>
   </article>
 {/each}
+
+<style>
+    .month-total {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+    }
+</style>
