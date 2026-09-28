@@ -160,16 +160,6 @@
         type="date"
         bind:value={endDate}
       />
-      {#if data.task?.completions}
-        <div>{ m.schedule_completions() }</div>
-        <ul>
-          {#each data.users as user (user.id)}
-            <li>
-              {user.username}: { data.task.completions?.filter(completion => completion.userId === user.id).length }
-            </li>
-          {/each}
-        </ul>
-      {/if}
     {/if}
   </ApiForm>
 </article>
