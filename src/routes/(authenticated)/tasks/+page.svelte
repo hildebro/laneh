@@ -70,6 +70,16 @@
     <div>
       <h3>{ taskToComplete.name }</h3>
       <p>{ taskToComplete.description }</p>
+      {#if taskToComplete.type === TaskType.Repeating}
+        <div>{ m.schedule_completions() }</div>
+        <ul>
+          {#each data.users as user (user.id)}
+            <li>
+              {user.username}: { taskToComplete.completions.filter(completion => completion.userId === user.id).length }
+            </li>
+          {/each}
+        </ul>
+      {/if}
     </div>
     <ApiForm
       submitAction={markAsDone}
