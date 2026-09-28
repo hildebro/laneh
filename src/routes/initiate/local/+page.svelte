@@ -5,6 +5,7 @@
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
+  import HelpHint from '$lib/components/HelpHint.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { getLocale } from '$lib/paraglide/runtime.js';
 
@@ -40,6 +41,7 @@
 </script>
 
 <main>
+  <HelpHint />
   <article>
     <ApiForm submitAction={startFresh} submitButtonText={m.initiate_local_submit()} onSuccess={onStarted}>
       <p>{m.initiate_local_text()}</p>

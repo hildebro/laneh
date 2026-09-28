@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
+  import HelpHint from '$lib/components/HelpHint.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import { getLocalBackend, setLocalMode } from '$lib/local';
   import * as m from '$lib/paraglide/messages.js';
@@ -59,6 +60,7 @@
 </script>
 
 <main>
+  <HelpHint />
   <article>
     <h2>{m.server_picker_header()}</h2>
     <p>{m.server_picker_text()}</p>
