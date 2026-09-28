@@ -120,6 +120,8 @@
   "navigation_dashboard": "Übersicht",
   "navigation_schedule": "Aufgaben",
   "navigation_shopping": "Einkaufsliste",
+  "notification_task_done_title": "Aufgabe erledigt",
+  "notification_task_done_body": "{user} hat „{task}“ erledigt",
   "schedule_assignee": "Zuständige/r",
   "schedule_assignment": "Wer ist zuständig?",
   "schedule_assignment_everyone": "Alle",

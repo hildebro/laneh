@@ -40,8 +40,9 @@ export async function generateDatabaseBackup() {
       continue;
     }
 
-    // system_store and shopping_item_stats are automatically populated, so no need to export.
-    if (!tableName || tableName === 'system_store' || tableName === 'shopping_item_stats') {
+    // system_store and shopping_item_stats are automatically populated and notifications are short-lived, so no need
+    // to export.
+    if (!tableName || ['system_store', 'shopping_item_stats', 'notification'].includes(tableName)) {
       continue;
     }
 

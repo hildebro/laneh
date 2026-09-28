@@ -1,9 +1,15 @@
 <script lang="ts">
   import { LoaderCircle } from 'lucide-svelte';
+  import { onMount } from 'svelte';
   import Navigation from './Navigation.svelte';
   import { invalidateAll } from '$app/navigation';
+  import { requestNotificationPermission } from '$lib/notifications';
 
   let { children, data } = $props();
+
+  onMount(() => {
+    void requestNotificationPermission();
+  });
 
   // --- Pull to Refresh State ---
   const resistance = 0.3;

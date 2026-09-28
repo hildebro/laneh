@@ -2,6 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import type { AppEnv } from '$lib/backend/api/types';
 import {
+  addNotification,
   addTask,
   completeTask,
   countDueTasks,
@@ -12,6 +13,7 @@ import {
   updateTask
 } from '$lib/backend/db/functions';
 import type { Task, TaskWithRelation } from '$lib/backend/db/schema';
+import { isLocalRuntime } from '$lib/backend/runtime';
 import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 import { z } from '$lib/zod';
 
@@ -116,6 +118,10 @@ const tasksRouter = new Hono<AppEnv>()
       }
 
       await completeTask(task, taskCompletion.userId);
+      // Nobody else to notify in the single person local app.
+      if (!isLocalRuntime()) {
+        await addNotification('task_done', c.get('loggedInUser').id, task.name);
+      }
 
       return c.json({ success: true });
     }

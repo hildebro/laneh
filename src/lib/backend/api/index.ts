@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import balanceRouter from '$lib/backend/api/balance';
 import householdRouter from '$lib/backend/api/household';
+import notificationRouter from '$lib/backend/api/notification';
 import publicRouter from '$lib/backend/api/public';
 import shoppingRouter from '$lib/backend/api/shopping';
 import tasksRouter from '$lib/backend/api/task';
@@ -65,6 +66,7 @@ const routes = app
   .route('/users', usersRouter)
   .route('/shopping', shoppingRouter)
   .route('/balance', balanceRouter)
+  .route('/notifications', notificationRouter)
   .route('/public', publicRouter);
 
 export type AppType = typeof routes;

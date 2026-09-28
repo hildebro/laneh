@@ -13,6 +13,7 @@ import {
   lt,
   max,
   min,
+  ne,
   or,
   type SQL,
   sql
@@ -23,6 +24,7 @@ import type { UserPayload } from '$lib/backend/api/user';
 import { hashPassword, verifyPassword } from '$lib/backend/db/crypto';
 import * as table from '$lib/backend/db/schema';
 import {
+  type Notification,
   type Session,
   shoppingCategory,
   type ShoppingCategory,
@@ -1375,6 +1377,53 @@ export const countDueTasks = async (userId: string) => {
   }).execute();
 
   return tasks.length;
+};
+
+// ------- NOTIFICATIONS -------
+// Notifications older than this are neither delivered nor kept. Prevents a flood of stale notifications after a
+// device was offline for a while.
+const NOTIFICATION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+const NOTIFICATION_BATCH_SIZE = 20;
+
+export const addNotification = async (type: Notification['type'], actorUserId: string, subject: string) => {
+  const db = getTx();
+
+  await db.insert(table.notification).values({
+    id: generateUUID(),
+    createdAt: new Date(),
+    type,
+    actorUserId,
+    subject
+  });
+};
+
+// Notifications created by other users after the given point in time, oldest first.
+export const findNotificationsSince = async (userId: string, since: Date) => {
+  const db = getTx();
+
+  const oldestDeliverable = new Date(Date.now() - NOTIFICATION_MAX_AGE_MS);
+
+  return db.query.notification.findMany({
+    where: and(
+      ne(table.notification.actorUserId, userId),
+      gt(table.notification.createdAt, since > oldestDeliverable ? since : oldestDeliverable)
+    ),
+    with: {
+      actor: {
+        columns: { username: true }
+      }
+    },
+    orderBy: asc(table.notification.createdAt),
+    limit: NOTIFICATION_BATCH_SIZE
+  });
+};
+
+// Runs in the nightly jobs across all households.
+export const deleteExpiredNotifications = async () => {
+  const db = getTx();
+
+  await db.delete(table.notification)
+    .where(lt(table.notification.createdAt, new Date(Date.now() - NOTIFICATION_MAX_AGE_MS)));
 };
 
 // ------- GENERIC -------

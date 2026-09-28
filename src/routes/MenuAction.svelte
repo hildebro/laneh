@@ -8,6 +8,7 @@
   import ApiForm from '$lib/components/ApiForm.svelte';
   import { getBaseUrl } from '$lib/config';
   import { isLocalMode } from '$lib/local';
+  import { clearNotificationSession } from '$lib/notifications';
   import * as m from '$lib/paraglide/messages.js';
   import { handleApiLoad } from '$lib/utils/apiHelper';
 
@@ -29,6 +30,7 @@
   }
 
   function exitInstance() {
+    void clearNotificationSession();
     localStorage.removeItem('serverUrl');
     goto(resolve('/server-picker'));
     isOpen = false;
@@ -42,6 +44,7 @@
   };
 
   async function onSuccess() {
+    await clearNotificationSession();
     await invalidateAll();
     await goto(resolve('/login'));
     isOpen = false;

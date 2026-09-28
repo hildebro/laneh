@@ -47,7 +47,8 @@ export const householdRelations = relations(household, ({ many }) => ({
   shoppingItems: many(shoppingItem),
   shoppingPurchases: many(shoppingPurchase),
   balanceEntries: many(balanceEntry),
-  tasks: many(task)
+  tasks: many(task),
+  notifications: many(notification)
 }));
 
 // ============================================================================
@@ -408,3 +409,35 @@ export type TaskWithRelation = Task & {
   dueUser: InferSelectModel<typeof user> | null;
   completions: TaskCompletion[];
 };
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+export const notificationTypeEnum = pgEnum('notification_type', ['task_done']);
+
+// Events the mobile app polls for and shows as system notifications to everyone but the actor. Old rows are removed
+// by the nightly jobs.
+export const notification = pgTable('notification', {
+  id: text().primaryKey(),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`),
+  createdAt: timestamp({ precision: 3 }).notNull(),
+  type: notificationTypeEnum().notNull(),
+  actorUserId: text().notNull().references(() => user.id, { onDelete: 'cascade' }),
+  // Snapshot of the affected entity's name (e.g. the task), so the text stays intact if the entity changes.
+  subject: text().notNull()
+}, () => [
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  })
+]).enableRLS();
+export type Notification = typeof notification.$inferSelect;
+
+export const notificationRelations = relations(notification, ({ one }) => ({
+  household: one(household, { fields: [notification.householdId], references: [household.id] }),
+  actor: one(user, { fields: [notification.actorUserId], references: [user.id] })
+}));
