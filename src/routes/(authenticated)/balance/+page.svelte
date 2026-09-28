@@ -1,18 +1,18 @@
 <script lang="ts">
+  import ExpenseEntry from './ExpenseEntry.svelte';
   import { resolve } from '$app/paths';
-  import type { BalanceEntry } from '$lib/backend/db/schema';
   import * as m from '$lib/paraglide/messages.js';
-  import { dateFormatter, priceFormatter } from '$lib/utils/formatter';
+  import { priceFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
 
-  const getLabel = (balanceEntry: BalanceEntry) => {
-    if (balanceEntry.name) {
-      return balanceEntry.name;
-    }
+  // The full history lives on the list page, so the overview stays short.
+  const recentEntries = $derived.by(() => {
+    const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
 
-    return m.balance_no_name_label();
-  };
+    return data.entries.filter(entry => now - entry.date.getTime() <= sevenDaysInMs);
+  });
 
   // Based on the local time, so the month matches the user's calendar.
   const monthTotal = $derived.by(() => {
@@ -25,6 +25,7 @@
 </script>
 
 <div class="action-bar">
+  <a href={resolve('/balance/list')}>{ m.balance_expenses_all() }</a>
   <a role="button" href={resolve('/balance/add')}>{ m.balance_expense_add() }</a>
 </div>
 
@@ -57,23 +58,12 @@
   </article>
 {/if}
 
-<h2 class="headline">{ m.balance_expenses() }</h2>
-{#each data.entries as entry (entry.id)}
-  <article>
-    <div class="action-bar">
-      <a role="button" href={resolve('/(authenticated)/balance/[entry]', {entry: entry.id})}>
-        {m.generic_edit()}
-      </a>
-    </div>
-    <div>
-      {getLabel(entry)}
-      <b>{priceFormatter.format(entry.price / 100)}</b>
-    </div>
-    <span>{entry.user.username}</span>
-    <footer>
-      <span>{dateFormatter.format(entry.date)}</span>
-    </footer>
-  </article>
+<h2 class="headline">{ m.balance_expenses_recent() }</h2>
+{#if recentEntries.length === 0}
+  <p class="headline">{ m.balance_expenses_recent_none() }</p>
+{/if}
+{#each recentEntries as entry (entry.id)}
+  <ExpenseEntry {entry} />
 {/each}
 
 <style>
