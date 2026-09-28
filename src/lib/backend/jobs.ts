@@ -1,5 +1,9 @@
 import { getDb } from '$lib/backend/db';
-import { getShoppingItemStatsCalculatedAt, refreshShoppingItemStats } from '$lib/backend/db/functions';
+import {
+  deleteExpiredNotifications,
+  getShoppingItemStatsCalculatedAt,
+  refreshShoppingItemStats
+} from '$lib/backend/db/functions';
 import { runInTransactionContext } from '$lib/context';
 
 // Local hour at which the nightly jobs become due.
@@ -32,6 +36,7 @@ export async function runNightlyJobsIfDue() {
       const calculatedAt = await getShoppingItemStatsCalculatedAt();
       if (!calculatedAt || calculatedAt < lastScheduledRun(new Date())) {
         await refreshShoppingItemStats(calculatedAt);
+        await deleteExpiredNotifications();
       }
     }));
   } catch (error) {

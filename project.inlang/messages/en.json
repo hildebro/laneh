@@ -120,6 +120,8 @@
   "navigation_dashboard": "Dashboard",
   "navigation_schedule": "Tasks",
   "navigation_shopping": "Shopping",
+  "notification_task_done_title": "Task done",
+  "notification_task_done_body": "{user} marked \"{task}\" as done",
   "schedule_assignee": "Assignee",
   "schedule_assignment": "Who is responsible?",
   "schedule_assignment_everyone": "Everyone",

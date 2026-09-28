@@ -32,6 +32,8 @@ export async function getLoggedInUser(c: Context) {
 
     if (isMobile) {
       c.header('x-refreshed-token', newSession.id);
+      // The background runner of the mobile app can't read response headers, so routes may pass it on in the body.
+      c.set('refreshedToken', newSession.id);
     } else {
       setCookie(c, SESSION_COOKIE, newSession.id, {
         path: '/',

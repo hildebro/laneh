@@ -4,6 +4,7 @@ import type { LayoutLoad } from './$types';
 import { resolve } from '$app/paths';
 import { getApiClient } from '$lib/apiClient';
 import { isLocalMode } from '$lib/local';
+import { syncNotificationSession } from '$lib/notifications';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 
 export const load: LayoutLoad = async ({ fetch }) => {
@@ -22,6 +23,9 @@ export const load: LayoutLoad = async ({ fetch }) => {
   if (!logged_in_user) {
     return redirect(302, resolve('/login'));
   }
+
+  // Not awaited, since the page doesn't depend on it.
+  void syncNotificationSession(logged_in_user);
 
   return {
     // This overrides the default null from the root layout.
