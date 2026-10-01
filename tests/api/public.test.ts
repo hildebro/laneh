@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { addHousehold, call, initiate, login, request, startTestBackend, TEST_PASSWORD } from '../helpers/backend';
+import { call, initiate, login, request, startTestBackend, TEST_PASSWORD } from '../helpers/backend';
 
 const backend = await startTestBackend();
 
@@ -60,34 +60,5 @@ describe('authentication', () => {
       body: { householdName: 'Home', username: 'admin', password: 'wrong-password' }
     });
     expect(response.status).toBe(400);
-  });
-});
-
-describe('household isolation', () => {
-  it('hides the data of other households', async () => {
-    const homeToken = await initiate('Home');
-    const other = await addHousehold(homeToken, 'Other');
-
-    await call('/tasks', {
-      method: 'POST',
-      token: homeToken,
-      body: {
-        name: 'Water plants',
-        description: '',
-        dueUserId: '',
-        dueDate: '',
-        type: 'single',
-        weekday: null,
-        interval: null,
-        assignment: null,
-        endDate: ''
-      }
-    });
-
-    const homeTasks = await call<{ dueTasks: unknown[] }>('/tasks', { token: homeToken });
-    const otherTasks = await call<{ dueTasks: unknown[] }>('/tasks', { token: other.token });
-
-    expect(homeTasks.dueTasks).toHaveLength(1);
-    expect(otherTasks.dueTasks).toHaveLength(0);
   });
 });

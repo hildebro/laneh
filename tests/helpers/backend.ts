@@ -69,6 +69,33 @@ export async function request(path: string, { method = 'GET', body, token }: Req
   });
 }
 
+// Uploads a file as form data, like the import on the setup page.
+export async function upload(path: string, field: string, file: File, token?: string) {
+  const headers = new Headers();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const body = new FormData();
+  body.set(field, file);
+
+  return app.request(`/api${path}`, { method: 'POST', headers, body });
+}
+
+// Downloads a backup of the database and wraps it as a file, ready to be imported again.
+export async function exportBackup(token: string) {
+  const response = await request('/users/export', { token });
+  if (response.status !== 200) {
+    throw new Error(`Export failed with ${response.status}\n${await response.text()}`);
+  }
+
+  return new File([await response.arrayBuffer()], 'backup.tar.gz', { type: 'application/gzip' });
+}
+
+export async function importBackup(file: File) {
+  return upload('/public/importDatabase', 'dumpFile', file);
+}
+
 // Sends a request and returns the parsed body. Fails on unexpected status codes, to keep the tests short.
 export async function call<T = unknown>(path: string, options: RequestOptions & { status?: number } = {}) {
   const { status = 200, ...requestOptions } = options;
