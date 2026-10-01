@@ -1,3 +1,22 @@
+# [4.1.0](https://github.com/hildebro/laneh/compare/v4.0.0...v4.1.0) (2026-10-01)
+
+
+### Bug Fixes
+
+* icon for system bar ([ae8a9ce](https://github.com/hildebro/laneh/commit/ae8a9ce69c253439702ff9b4a56b3d056123dcbc))
+* more bugs discovered through tests ([5a0250c](https://github.com/hildebro/laneh/commit/5a0250c49c8c251e4a1ccad58ebdc1a642fabe50))
+* notification request method ([b45e05b](https://github.com/hildebro/laneh/commit/b45e05bb4ee8e7c1654b35b37183e056575125d5))
+* task completions shown in completion-dialog ([65e7b79](https://github.com/hildebro/laneh/commit/65e7b7971cf916b0cab2fc6b38f2242d83884c87))
+* task rotation bug ([6286f82](https://github.com/hildebro/laneh/commit/6286f82d95613139b08b328025473421498b5e60))
+
+
+### Features
+
+* balance entry type ([c5413a6](https://github.com/hildebro/laneh/commit/c5413a6fac12f669da885653bcc423c783c52dd6))
+* helper card on initial pages ([2fcdf6d](https://github.com/hildebro/laneh/commit/2fcdf6d9a18a03f89ebf2635ae6006dfbc8cd459))
+* improved help text for local mode ([0452c7c](https://github.com/hildebro/laneh/commit/0452c7cfb941a42e111cb2a36c31686b7bab9eb2))
+* only expenses for one week in overview ([93bcf85](https://github.com/hildebro/laneh/commit/93bcf8599965d99fe0e4a7b85103c57be64e5d39))
+
 # [4.0.0](https://github.com/hildebro/laneh/compare/v3.0.0...v4.0.0) (2026-09-27)
 
 
