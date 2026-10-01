@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { call, initiate, login, request, startTestBackend, TEST_PASSWORD } from '../helpers/backend';
 
 const backend = await startTestBackend();
@@ -60,5 +60,45 @@ describe('authentication', () => {
       body: { householdName: 'Home', username: 'admin', password: 'wrong-password' }
     });
     expect(response.status).toBe(400);
+  });
+});
+
+describe('version', () => {
+  type Versions = { remoteVersion: string; serverVersion: string };
+
+  // Stubs the GitHub release lookup with the given latest release.
+  const stubLatestRelease = (version: string) => {
+    const fetchMock = vi.fn(async () => Response.json({ tag_name: `v${version}` }));
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('caches the remote version', async () => {
+    stubLatestRelease('99.0.0');
+    expect((await call<Versions>('/public/version')).remoteVersion).toBe('99.0.0');
+
+    const fetchMock = stubLatestRelease('99.1.0');
+    expect((await call<Versions>('/public/version')).remoteVersion).toBe('99.0.0');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('refetches the remote version when the app is newer than the cached one', async () => {
+    stubLatestRelease('99.0.0');
+    await call('/public/version');
+
+    stubLatestRelease('99.1.0');
+    expect((await call<Versions>('/public/version?appVersion=99.1.0')).remoteVersion).toBe('99.1.0');
+  });
+
+  it('refetches the remote version when the server is newer than the cached one', async () => {
+    stubLatestRelease('0.0.1');
+    const { serverVersion } = await call<Versions>('/public/version');
+
+    stubLatestRelease(serverVersion);
+    expect((await call<Versions>('/public/version')).remoteVersion).toBe(serverVersion);
   });
 });

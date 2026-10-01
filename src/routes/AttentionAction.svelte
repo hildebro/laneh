@@ -1,38 +1,23 @@
 <script lang="ts">
   import { CircleAlert } from 'lucide-svelte';
-  import { goto } from '$app/navigation';
-  import { resolve } from '$app/paths';
-  import { getApiClient } from '$lib/apiClient';
-  import ApiForm from '$lib/components/ApiForm.svelte';
-  import * as m from '$lib/paraglide/messages.js';
+  import type { Snippet } from 'svelte';
 
-  let { attentionRequired } = $props();
-
-  async function submitAction() {
-    const client = getApiClient();
-    return client.api.users.dismissHelpDisclaimer.$post();
-  }
-
-  async function onSuccess() {
-    await goto(resolve('/shopping'));
-  }
+  // A flashing header button that opens a dialog. The content receives a function to close the dialog.
+  let { label, children }: { label: string; children: Snippet<[close: () => void]> } = $props();
 
   let attentionDialog = $state<HTMLDialogElement>();
+
+  const close = () => attentionDialog?.close();
 </script>
 
-{#if attentionRequired}
-  <dialog bind:this={attentionDialog}>
-    <p>{m.initiate_disclaimer()}</p>
-    <ApiForm {submitAction} {onSuccess} submitButtonText={m.initiate_disclaimer_dismiss()}>
-      <button type="button" onclick={() => attentionDialog?.close()}>{m.generic_close()}</button>
-    </ApiForm>
-  </dialog>
+<dialog bind:this={attentionDialog}>
+  {@render children(close)}
+</dialog>
 
-  <button class="header-action flashing" onclick={() => attentionDialog?.showModal()}>
-    <CircleAlert />
-    {m.generic_attention()}
-  </button>
-{/if}
+<button class="header-action flashing" onclick={() => attentionDialog?.showModal()}>
+  <CircleAlert />
+  {label}
+</button>
 
 <style>
     dialog {

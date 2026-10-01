@@ -5,15 +5,17 @@
   import { Capacitor } from '@capacitor/core';
   import { StatusBar } from '@capacitor/status-bar';
   import { onMount } from 'svelte';
-  import AttentionAction from './AttentionAction.svelte';
+  import DisclaimerAction from './DisclaimerAction.svelte';
   import HelpAction from './HelpAction.svelte';
   import LanguageAction from './LanguageAction.svelte';
   import MenuAction from './MenuAction.svelte';
   import ThemeAction from './ThemeAction.svelte';
+  import VersionMismatchAction from './VersionMismatchAction.svelte';
   import { page } from '$app/state';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
+  import { loadVersions } from '$lib/stores/versions';
 
   let { children } = $props();
   let lastBackPressed = 0;
@@ -54,6 +56,8 @@
     let backButtonListener: PluginListenerHandle | undefined;
     let isUnmounted = false;
 
+    void loadVersions();
+
     initCapacitor((listener) => {
       if (isUnmounted) {
         listener.remove();
@@ -84,7 +88,10 @@
         { m.header_head() }
       </div>
       <div class="header-action-container">
-        <AttentionAction attentionRequired={loggedInUser && !loggedInUser.helpDisclaimerDismissed} />
+        <VersionMismatchAction />
+        {#if loggedInUser && !loggedInUser.helpDisclaimerDismissed}
+          <DisclaimerAction />
+        {/if}
         <HelpAction help_text={page.data.help_text} />
         <ThemeAction />
         <LanguageAction />
