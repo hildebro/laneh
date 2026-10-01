@@ -1,5 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "attention_app_outdated": "Diese App (Version {appVersion}) ist älter als der verbundene Server (Version {serverVersion}). Es könnte zu Fehlermeldungen kommen. Bitte lade dir das neue Update aus dem Play Store herunter.",
+  "attention_server_outdated": "Diese App (Version {appVersion}) ist neuer als der verbundene Server (Version {serverVersion}). Es könnte zu Fehlermeldungen kommen. Bitte frage den Serveradmin nach einem Update.",
+  "attention_version": "Version",
   "auth_access_code": "Zugangscode",
   "auth_login": "Einloggen",
   "auth_login_invalid": "Daten sind nicht valide",

@@ -25,6 +25,7 @@ import { getAdminTx } from '$lib/context';
 import * as m from '$lib/paraglide/messages.js';
 import { type Locale, locales } from '$lib/paraglide/runtime.js';
 import { Admin } from '$lib/utils/userHelper';
+import { compareVersions } from '$lib/utils/versionHelper';
 import { z } from '$lib/zod';
 
 const initiateSchema = z.object({
@@ -97,12 +98,21 @@ const serverDumpError = new z.ZodError([
   }
 ]);
 
-const publicRouter = new Hono()
-  .get('/version', async (c) => {
-    const serverVersion = __APP_VERSION__;
+const versionSchema = z.object({
+  appVersion: z.string().optional()
+});
 
+const publicRouter = new Hono()
+  .get('/version', zValidator('query', versionSchema), async (c) => {
+    const serverVersion = __APP_VERSION__;
+    const { appVersion } = c.req.valid('query');
+
+    // A server or app newer than the cached remote version means a release happened since it was cached.
     const cachedRemoteVersion = await getCachedRemoteVersion();
-    if (cachedRemoteVersion) {
+    const cacheOutdated =
+      cachedRemoteVersion &&
+      [serverVersion, appVersion].some((version) => version && compareVersions(version, cachedRemoteVersion) > 0);
+    if (cachedRemoteVersion && !cacheOutdated) {
       return c.json({ remoteVersion: cachedRemoteVersion, serverVersion });
     }
 

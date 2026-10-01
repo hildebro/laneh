@@ -1,21 +1,19 @@
 <script lang="ts">
   import { Capacitor } from '@capacitor/core';
   import { Menu } from 'lucide-svelte';
-  import { onMount } from 'svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
-  import { getBaseUrl } from '$lib/config';
   import { isLocalMode } from '$lib/local';
   import { clearNotificationSession } from '$lib/notifications';
   import * as m from '$lib/paraglide/messages.js';
-  import { handleApiLoad } from '$lib/utils/apiHelper';
+  import { versions } from '$lib/stores/versions';
 
   let { logged_in_user } = $props();
 
-  let remoteVersion = $state<string|undefined>();
-  let serverVersion = $state<string|undefined>();
+  let remoteVersion = $derived($versions?.remoteVersion);
+  let serverVersion = $derived($versions?.serverVersion);
 
   let isOpen = $state(false);
   let wrapper = $state<HTMLElement>();
@@ -61,21 +59,6 @@
 
     return remoteVersion !== version;
   }
-
-  onMount(async () => {
-    // Don't check for version, if we are on mobile and don't have a defined server yet.
-    if (Capacitor.isNativePlatform() && getBaseUrl() === '') {
-      return;
-    }
-
-    const client = getApiClient(fetch);
-    const versions = await handleApiLoad(client.api.public.version.$get());
-    remoteVersion = versions.remoteVersion;
-    // In local mode, the server is part of the app, so its version is already shown as the app version.
-    if (!isLocalMode()) {
-      serverVersion = versions.serverVersion;
-    }
-  });
 </script>
 
 <svelte:window onclick={handleOutsideClick} />
