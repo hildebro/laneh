@@ -19,3 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep line numbers for readable crash reports in Play Console
+# (the mapping file is bundled into the AAB automatically).
+-keepattributes SourceFile,LineNumberTable
+
+# @capacitor/background-runner: the native JS engine (libandroid_js_engine.so)
+# looks up these classes and methods by name via JNI and ships no keep rules.
+-keep class io.ionic.android_js_engine.** { *; }
+-keep class io.ionic.backgroundrunner.** { *; }
