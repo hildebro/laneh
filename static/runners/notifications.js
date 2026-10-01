@@ -31,7 +31,9 @@ async function checkNotifications() {
 
   const cursor = get('cursor');
   const query = cursor ? `?since=${encodeURIComponent(cursor)}` : '';
+  // The runner's fetch has no default method.
   const response = await fetch(`${apiBase}api/notifications${query}`, {
+    method: 'GET',
     headers: { Authorization: `Bearer ${token}` }
   });
 
@@ -56,6 +58,8 @@ async function checkNotifications() {
       id: toNotificationId(notification.id),
       title: fillTemplate(get('titleTaskDone') || 'Task done', notification),
       body: fillTemplate(get('bodyTaskDone') || '{user}: {task}', notification),
+      // Drawable in android/app/src/main/res/drawable. Without it, Android shows a generic info icon.
+      smallIcon: 'ic_stat_notification',
       autoCancel: true
     }));
 
