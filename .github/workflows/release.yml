@@ -10,8 +10,14 @@ permissions:
   issues: write
 
 jobs:
+  test:
+    name: Test
+    uses: ./.github/workflows/test.yml
+
   release:
     name: Release new version
+    # Nothing is released or deployed, if the tests fail.
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
