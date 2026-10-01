@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { readFileSync } from 'node:fs';
@@ -61,6 +62,12 @@ export default defineConfig({
         handler(level, log);
       }
     }
+  },
+  test: {
+    include: ['tests/**/*.test.ts'],
+    environment: 'node',
+    // All test files share one real Postgres database, so they can't run in parallel. PGlite runs in memory per file.
+    fileParallelism: !process.env.TEST_DATABASE_URL
   },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
