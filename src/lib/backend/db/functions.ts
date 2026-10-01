@@ -1329,7 +1329,8 @@ async function findNextDueUserId(taskId: string): Promise<string | null> {
 
   const taskData = await db.select({
     dueUserId: table.task.dueUserId,
-    assignment: table.task.assignment
+    assignment: table.task.assignment,
+    householdId: table.task.householdId
   })
     .from(table.task)
     .where(eq(table.task.id, taskId));
@@ -1363,6 +1364,8 @@ async function findNextDueUserId(taskId: string): Promise<string | null> {
         eq(table.taskCompletion.taskId, taskId)
       )
     )
+    // The user table has no row level security, so other households have to be excluded explicitly.
+    .where(eq(table.user.householdId, task.householdId))
     .groupBy(table.user.id)
     .orderBy(asc(count(table.taskCompletion.id)), asc(min(table.taskCompletion.date)));
 
