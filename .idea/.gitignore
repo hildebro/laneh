@@ -6,3 +6,5 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# Per-file datasource mappings, e.g. for scratch files
+/data_source_mapping.xml

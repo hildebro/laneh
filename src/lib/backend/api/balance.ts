@@ -7,11 +7,13 @@ import {
   findBalanceEntry,
   updateBalanceEntry
 } from '$lib/backend/db/functions';
+import { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { z } from '$lib/zod';
 
 const baseExpenseSchema = z.object({
   purchaseId: z.transform((val) => (val !== '' ? val : null)).pipe(z.string().nullable()),
-  name: z.string().min(1),
+  type: z.enum(BalanceEntryType),
+  description: z.string().trim().transform((val) => (val !== '' ? val : null)),
   creditorId: z.string().min(1),
   price: z.coerce.number().min(0.01),
   distributions: z.array(z.object({ userId: z.string().nonempty(), percent: z.coerce.number().min(0) }))
@@ -55,7 +57,8 @@ const balanceRouter = new Hono()
       const expense = c.req.valid('json');
       await addBalanceEntry(
         expense.creditorId,
-        expense.name,
+        expense.type,
+        expense.description,
         expense.price,
         expense.distributions,
         expense.purchaseId
@@ -71,7 +74,8 @@ const balanceRouter = new Hono()
       await updateBalanceEntry(
         expense.id,
         expense.creditorId,
-        expense.name,
+        expense.type,
+        expense.description,
         expense.price,
         expense.distributions
       );

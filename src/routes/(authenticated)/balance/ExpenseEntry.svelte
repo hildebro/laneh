@@ -2,16 +2,18 @@
   import { resolve } from '$app/paths';
   import type { BalanceEntry } from '$lib/backend/db/schema';
   import * as m from '$lib/paraglide/messages.js';
+  import { translateBalanceEntryType } from '$lib/utils/balanceTranslations';
   import { dateFormatter, priceFormatter } from '$lib/utils/formatter';
 
   let { entry }: { entry: BalanceEntry & { user: { username: string } } } = $props();
 
   const getLabel = (balanceEntry: BalanceEntry) => {
-    if (balanceEntry.name) {
-      return balanceEntry.name;
+    const typeLabel = translateBalanceEntryType(balanceEntry.type);
+    if (balanceEntry.description) {
+      return `${typeLabel}: ${balanceEntry.description}`;
     }
 
-    return m.balance_no_name_label();
+    return typeLabel;
   };
 </script>
 
