@@ -1,3 +1,16 @@
+# [4.2.0](https://github.com/hildebro/laneh/compare/v4.1.0...v4.2.0) (2026-10-01)
+
+
+### Features
+
+* version mismatch notification ([57a9198](https://github.com/hildebro/laneh/commit/57a919833ed95c1d4d342fef1bc378bee1af4818))
+* warn when navigating away from unsaved form ([ef9cb42](https://github.com/hildebro/laneh/commit/ef9cb42a7b41087d29b65c042d0d977376c369d9))
+
+
+### Performance Improvements
+
+* various mobile improvements ([6969a6b](https://github.com/hildebro/laneh/commit/6969a6bcc05abe7f2460c9196dceedecd4a06d96))
+
 # [4.1.0](https://github.com/hildebro/laneh/compare/v4.0.0...v4.1.0) (2026-10-01)
 
 
