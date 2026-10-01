@@ -77,6 +77,7 @@
   "form_invalid_nonempty": "Darf nicht leergelassen werden",
   "form_invalid_number_too_small": "Zahl muss mindestens {minimum} sein",
   "form_success": "Aktion erfolgreich!",
+  "form_unsaved_changes": "Du hast ungespeicherte Änderungen. Möchtest du die Seite wirklich verlassen?",
   "generic_amount": "Menge",
   "generic_attention": "Achtung",
   "generic_cancel": "Abbrechen",

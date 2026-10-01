@@ -77,6 +77,7 @@
   "form_invalid_nonempty": "Cannot be left empty",
   "form_invalid_number_too_small": "Value must be at least {minimum}",
   "form_success": "Success!",
+  "form_unsaved_changes": "You have unsaved changes. Are you sure you want to leave?",
   "generic_amount": "Amount",
   "generic_attention": "Attention",
   "generic_cancel": "Cancel",

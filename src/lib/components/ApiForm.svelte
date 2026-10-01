@@ -2,7 +2,7 @@
   import { setContext } from 'svelte';
   import type { Snippet } from 'svelte';
   import type { z } from 'zod';
-  import { goto, invalidateAll } from '$app/navigation';
+  import { beforeNavigate, goto, invalidateAll } from '$app/navigation';
   import type { ResolvedPathname } from '$app/types';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
@@ -15,6 +15,7 @@
     submitButtonText = m.generic_save(),
     submitButtonClasses = '',
     submitButtonHidden = false,
+    warnOnUnsavedChanges = true,
     children
   }: {
     submitAction: () => Promise<Response>;
@@ -23,6 +24,7 @@
     submitButtonText?: string;
     submitButtonClasses?: string,
     submitButtonHidden?: boolean,
+    warnOnUnsavedChanges?: boolean,
     children: Snippet;
   } = $props();
 
@@ -34,6 +36,29 @@
 
   setContext('api-form-context', formState);
 
+  // Set by any input/change event bubbling up from a field inside the form
+  let isDirty = $state(false);
+
+  function markDirty() {
+    isDirty = true;
+  }
+
+  beforeNavigate((navigation) => {
+    if (!warnOnUnsavedChanges || !isDirty) {
+      return;
+    }
+
+    // Leaving the app (reload, closing the tab, external link): cancel() triggers the browser's native dialog
+    if (navigation.type === 'leave') {
+      navigation.cancel();
+      return;
+    }
+
+    if (!confirm(m.form_unsaved_changes())) {
+      navigation.cancel();
+    }
+  });
+
   async function handleSubmit(event: Event) {
     event.preventDefault();
     isSubmitting = true;
@@ -43,6 +68,7 @@
       const response = await submitAction();
 
       if (response.ok) {
+        isDirty = false;
         addToast({ message: m.form_success() });
 
         if (typeof onSuccess === 'function') {
@@ -85,7 +111,7 @@
   }
 </script>
 
-<form onsubmit={handleSubmit}>
+<form onsubmit={handleSubmit} oninput={markDirty} onchange={markDirty}>
   {#if formWideError}
     <span class="error-text">{formWideError}</span>
   {/if}
