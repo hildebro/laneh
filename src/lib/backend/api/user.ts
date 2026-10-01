@@ -56,6 +56,11 @@ const usersRouter = new Hono<AppEnv>()
     return c.json(await findHouseholdUsers(user.householdId));
   })
   .get('/export', async (c) => {
+    // The backup contains all households, including password hashes and sessions.
+    if (c.get('loggedInUser').admin !== Admin.Server) {
+      return c.json({ error: 'Unauthorized' }, 403);
+    }
+
     const { archive, filename } = await generateDatabaseBackup();
 
     c.header('Content-Type', 'application/gzip');
@@ -91,6 +96,18 @@ const usersRouter = new Hono<AppEnv>()
       && (loggedInUser.admin !== Admin.Household || loggedInUser.householdId !== user.householdId)
     ) {
       return c.json({ error: 'Unauthorized' }, 403);
+    }
+
+    // The checks above trust the household of the payload, so it has to be the actual household of the user.
+    if (user.id) {
+      const existingUser = await findUser(user.id);
+      if (!existingUser) {
+        return c.json({ error: 'User not found' }, 404);
+      }
+
+      if (existingUser.householdId !== user.householdId) {
+        return c.json({ error: 'Unauthorized' }, 403);
+      }
     }
 
     if (await isUsernameTaken(user.username, user.householdId, user.id)) {

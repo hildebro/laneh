@@ -198,3 +198,31 @@ describe('notifications', () => {
     expect(davePoll.notifications).toEqual([]);
   });
 });
+
+describe('password hashes', () => {
+  it('never leave the backend', async () => {
+    const { alice, bob } = await setup();
+    await call('/tasks', { method: 'POST', token: alice.token, body: singleTask('Water plants', { dueUserId: bob.id }) });
+    await call('/balance', {
+      method: 'POST',
+      token: alice.token,
+      body: expense(alice.id, 1000, [{ userId: bob.id, percent: 100 }])
+    });
+
+    const paths = [
+      '/users',
+      `/users/${bob.id}`,
+      '/households',
+      `/households/${alice.householdId}`,
+      '/tasks',
+      '/balance',
+      '/balance/debts',
+      '/public/loggedInUser'
+    ];
+    for (const path of paths) {
+      const body = await (await request(path, { token: alice.token })).text();
+
+      expect(body, path).not.toContain('"password"');
+    }
+  });
+});

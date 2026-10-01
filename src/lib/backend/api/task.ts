@@ -4,6 +4,7 @@ import type { AppEnv } from '$lib/backend/api/types';
 import {
   addNotification,
   addTask,
+  assertMatchingHousehold,
   completeTask,
   countDueTasks,
   findCompletedTasks,
@@ -12,7 +13,7 @@ import {
   findUpcomingTasks,
   updateTask
 } from '$lib/backend/db/functions';
-import type { Task, TaskWithRelation } from '$lib/backend/db/schema';
+import type { TaskWithRelation } from '$lib/backend/db/schema';
 import { isLocalRuntime } from '$lib/backend/runtime';
 import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 import { z } from '$lib/zod';
@@ -77,6 +78,12 @@ const taskSchema = z.object({
     )
 ;
 
+// Tasks can only be assigned to and completed by members of the own household.
+const isHouseholdMember = (loggedInUserId: string, userId: string | null | undefined) =>
+  !userId || assertMatchingHousehold([loggedInUserId, userId]);
+
+const householdMismatchError = { error: 'Household of all users must match your household' };
+
 const tasksRouter = new Hono<AppEnv>()
   .get('/', async (c) => {
     return c.json({
@@ -99,6 +106,10 @@ const tasksRouter = new Hono<AppEnv>()
       const task = await findTask(taskCompletion.taskId);
       if (!task) {
         return c.json({ error: 'Task not found' }, 404);
+      }
+
+      if (!(await isHouseholdMember(c.get('loggedInUser').id, taskCompletion.userId))) {
+        return c.json(householdMismatchError, 400);
       }
 
       if (
@@ -138,13 +149,22 @@ const tasksRouter = new Hono<AppEnv>()
     zValidator('json', taskSchema),
     async (c) => {
       const task = c.req.valid('json');
+      if (!(await isHouseholdMember(c.get('loggedInUser').id, task.dueUserId))) {
+        return c.json(householdMismatchError, 400);
+      }
+
       if (!task.id) {
         await addTask(task.type, task.name, task.description, task.weekday, task.interval, task.assignment, task.dueUserId, task.dueDate, task.endDate);
 
         return c.json({ success: true });
       }
 
-      const existingTask = await findTask(task.id) as Task;
+      // Only finds tasks of the own household.
+      const existingTask = await findTask(task.id);
+      if (!existingTask) {
+        return c.json({ error: 'Task not found' }, 404);
+      }
+
       if (existingTask.type !== task.type) {
         const error = new z.ZodError([
           {

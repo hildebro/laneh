@@ -1,7 +1,9 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import type { AppEnv } from '$lib/backend/api/types';
 import {
   addBalanceEntry,
+  assertMatchingHousehold,
   calculateUserDebts,
   findAllBalanceEntries,
   findBalanceEntry,
@@ -36,7 +38,17 @@ const updateExpenseSchema = baseExpenseSchema
   .extend({ id: z.string().min(1) })
   .refine(distributionValidation, distributionValidationMessage);
 
-const balanceRouter = new Hono()
+// The creditor and all debtors must belong to the household of the logged-in user.
+const involvesOnlyHouseholdMembers = (loggedInUserId: string, expense: z.infer<typeof baseExpenseSchema>) =>
+  assertMatchingHousehold([
+    loggedInUserId,
+    expense.creditorId,
+    ...expense.distributions.map((distribution) => distribution.userId)
+  ]);
+
+const householdMismatchError = { error: 'Household of all users must match your household' };
+
+const balanceRouter = new Hono<AppEnv>()
   .get('/', async (c) => {
     return c.json(await findAllBalanceEntries());
   })
@@ -55,6 +67,10 @@ const balanceRouter = new Hono()
     zValidator('json', createExpenseSchema),
     async (c) => {
       const expense = c.req.valid('json');
+      if (!(await involvesOnlyHouseholdMembers(c.get('loggedInUser').id, expense))) {
+        return c.json(householdMismatchError, 400);
+      }
+
       await addBalanceEntry(
         expense.creditorId,
         expense.type,
@@ -71,6 +87,15 @@ const balanceRouter = new Hono()
     zValidator('json', updateExpenseSchema),
     async (c) => {
       const expense = c.req.valid('json');
+      // Only finds entries of the own household. The distributions have no row level security, so this check guards them.
+      if (!(await findBalanceEntry(expense.id))) {
+        return c.json({ error: 'Entry not found' }, 404);
+      }
+
+      if (!(await involvesOnlyHouseholdMembers(c.get('loggedInUser').id, expense))) {
+        return c.json(householdMismatchError, 400);
+      }
+
       await updateBalanceEntry(
         expense.id,
         expense.creditorId,

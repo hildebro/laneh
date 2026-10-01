@@ -1,7 +1,7 @@
-import type { User } from '$lib/backend/db/schema';
+import type { PublicUser } from '$lib/backend/db/schema';
 
 export type Variables = {
-  loggedInUser: User;
+  loggedInUser: PublicUser;
   // Set when the session of a mobile request was renewed.
   refreshedToken?: string;
 };
