@@ -117,5 +117,5 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_SERVICE_ACCOUNT_JSON }}
           packageName: dev.laneh.app
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-          track: Beta test
+          tracks: Beta test
           status: draft
