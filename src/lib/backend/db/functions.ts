@@ -37,6 +37,7 @@ import {
   type User
 } from '$lib/backend/db/schema';
 import { getAdminTx, getTx } from '$lib/context';
+import type { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { SystemStoreKey } from '$lib/utils/systemStoreHelper';
 import { Assignment, TaskType, type Weekday } from '$lib/utils/taskHelper';
 import { Admin } from '$lib/utils/userHelper';
@@ -831,7 +832,8 @@ export const findStagedPurchaseItemsByUser = async (userId: string) => {
 // ------- BALANCE --------
 export const addBalanceEntry = async (
   userId: string,
-  name: string,
+  type: BalanceEntryType,
+  description: string | null,
   price: number,
   distributions: { userId: string, percent: number }[],
   purchaseId: string | null
@@ -843,7 +845,8 @@ export const addBalanceEntry = async (
     id: entryId,
     userId,
     date: new Date(),
-    name,
+    type,
+    description,
     price
   });
 
@@ -869,7 +872,8 @@ export const addBalanceEntry = async (
 export const updateBalanceEntry = async (
   entryId: string,
   userId: string,
-  name: string,
+  type: BalanceEntryType,
+  description: string | null,
   price: number,
   distributions: { userId: string; percent: number }[]
 ): Promise<void> => {
@@ -877,7 +881,7 @@ export const updateBalanceEntry = async (
 
   await db
     .update(table.balanceEntry)
-    .set({ name, userId, price })
+    .set({ type, description, userId, price })
     .where(eq(table.balanceEntry.id, entryId))
     .execute();
 

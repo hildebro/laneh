@@ -15,6 +15,7 @@ import {
   timestamp,
   unique
 } from 'drizzle-orm/pg-core';
+import { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { SystemStoreKey } from '$lib/utils/systemStoreHelper';
 import { Assignment, TaskType, Weekday } from '$lib/utils/taskHelper';
 import { Admin } from '$lib/utils/userHelper';
@@ -296,6 +297,7 @@ export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one 
 // ============================================================================
 // FINANCES
 // ============================================================================
+export const balanceEntryTypeEnum = pgEnum('balance_entry_type', BalanceEntryType);
 
 export const balanceEntry = pgTable('balance_entry', {
   id: text().primaryKey(),
@@ -306,7 +308,8 @@ export const balanceEntry = pgTable('balance_entry', {
   date: timestamp().notNull(),
   userId: text().notNull().references(() => user.id),
   price: integer().notNull(),
-  name: text()
+  type: balanceEntryTypeEnum().notNull(),
+  description: text()
 }, () => [
   pgPolicy('isolate_households', {
     for: 'all',

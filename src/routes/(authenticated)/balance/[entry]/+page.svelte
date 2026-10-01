@@ -5,6 +5,8 @@
   import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { BalanceEntryType } from '$lib/utils/balanceHelper';
+  import { translateBalanceEntryType } from '$lib/utils/balanceTranslations';
 
   let { data } = $props();
 
@@ -31,7 +33,8 @@
   };
 
   let id = $derived(data.entry?.id || '');
-  let name = $derived(data.entry?.name || '');
+  let type = $derived(data.entry?.type ?? BalanceEntryType.Groceries);
+  let description = $derived(data.entry?.description ?? '');
   let creditorId = $derived(data.entry?.userId || data.logged_in_user?.id);
   let purchasePrice = $derived(data.entry?.price || '0');
   let distributions = $derived(getBalanceDistributions());
@@ -39,7 +42,7 @@
 
   async function saveEntry() {
     const client = getApiClient();
-    const payload = { name, creditorId, price: purchasePrice, distributions, purchaseId };
+    const payload = { type, description, creditorId, price: purchasePrice, distributions, purchaseId };
 
     return id
       ? client.api.balance.$patch({ json: { id, ...payload } })
@@ -62,9 +65,25 @@
     <input type="hidden" name="id" value={id}>
     <input type="hidden" name="purchaseId" value={purchaseId}>
     <ApiFormItem
-      label={m.generic_name()}
-      name="name"
-      bind:value={name}
+      label={m.balance_price()}
+      name="price"
+      type="money"
+      bind:value={purchasePrice}
+    />
+    <ApiFormItem
+      label={m.balance_type()}
+      name="type"
+      type="select"
+      bind:value={type}
+    >
+      {#each Object.values(BalanceEntryType) as entryType (entryType)}
+        <option value={entryType}>{translateBalanceEntryType(entryType)}</option>
+      {/each}
+    </ApiFormItem>
+    <ApiFormItem
+      label={m.balance_description()}
+      name="description"
+      bind:value={description}
     />
     <ApiFormItem
       label={m.balance_expense_user()}
@@ -76,12 +95,6 @@
         <option value={user.id}>{user.username}</option>
       {/each}
     </ApiFormItem>
-    <ApiFormItem
-      label={m.balance_price()}
-      name="price"
-      type="money"
-      bind:value={purchasePrice}
-    />
     <ApiFormGroup
       label={m.balance_expense_distribution()}
       name="distributions"
