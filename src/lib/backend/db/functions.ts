@@ -25,6 +25,7 @@ import { hashPassword, verifyPassword } from '$lib/backend/db/crypto';
 import * as table from '$lib/backend/db/schema';
 import {
   type Notification,
+  type PublicUser,
   type Session,
   shoppingCategory,
   type ShoppingCategory,
@@ -41,6 +42,9 @@ import type { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { SystemStoreKey } from '$lib/utils/systemStoreHelper';
 import { Assignment, TaskType, type Weekday } from '$lib/utils/taskHelper';
 import { Admin } from '$lib/utils/userHelper';
+
+// Relation config for users that end up in a response. The password hash never leaves the backend.
+const withoutPassword = { columns: { password: false } } as const;
 
 // ------- SYSTEM STORE -------
 export const getCachedRemoteVersion = async () => {
@@ -87,7 +91,7 @@ export const findHousehold = async (id: string) => {
 
   return db.query.household.findFirst({
     with: {
-      users: {}
+      users: withoutPassword
     },
     where: eq(table.household.id, id)
   }).execute();
@@ -98,18 +102,19 @@ export const findAllHouseholds = async () => {
 
   return db.query.household.findMany({
     with: {
-      users: {}
+      users: withoutPassword
     }
   }).execute();
 };
 
 // ------- USER -------
-export const findUser = async (userId: string): Promise<User | undefined> => {
+export const findUser = async (userId: string): Promise<PublicUser | undefined> => {
   const db = getTx();
 
-  const result = await db.select().from(table.user).where(eq(table.user.id, userId));
-
-  return result.at(0);
+  return db.query.user.findFirst({
+    ...withoutPassword,
+    where: eq(table.user.id, userId)
+  }).execute();
 };
 
 export const findAllUsers = async (): Promise<User[]> => {
@@ -131,13 +136,13 @@ export const findLocalUser = async (): Promise<User | undefined> => {
   return result.at(0);
 };
 
-export const findHouseholdUsers = async (householdId: string): Promise<User[]> => {
+export const findHouseholdUsers = async (householdId: string): Promise<PublicUser[]> => {
   const db = getTx();
 
-  return db.select()
-    .from(table.user)
-    .where(eq(table.user.householdId, householdId))
-    .execute();
+  return db.query.user.findMany({
+    ...withoutPassword,
+    where: eq(table.user.householdId, householdId)
+  }).execute();
 };
 
 export const addUser = async (username: string, password: string, householdId: string, admin: Admin): Promise<string> => {
@@ -229,7 +234,7 @@ export const findAndVerifyUser = async (username: string, password: string, hous
 /**
  * Asserts that the logged-in-user is authorized to run the given update payload.
  */
-export const assertLoggedInUserAuthorizedUpdate = async (loggedInUser: User, userUpdatePayload: UserPayload) => {
+export const assertLoggedInUserAuthorizedUpdate = async (loggedInUser: PublicUser, userUpdatePayload: UserPayload) => {
   // Server admins can do anything.
   if (loggedInUser.admin === Admin.Server) {
     return true;
@@ -255,7 +260,7 @@ export const assertLoggedInUserAuthorizedUpdate = async (loggedInUser: User, use
     return true;
   }
 
-  const dbUser = await findUser(userUpdatePayload.id) as User;
+  const dbUser = await findUser(userUpdatePayload.id) as PublicUser;
 
   // The existing user admin status cannot be on a higher level than the logged-in-user.
   return dbUser.admin !== Admin.Server;
@@ -792,7 +797,7 @@ export const findAllPurchases = async () => {
   return db.query.shoppingPurchase.findMany({
     with: {
       shoppingItems: {},
-      user: {},
+      user: withoutPassword,
       balanceEntry: {}
     },
     orderBy: [desc(table.shoppingPurchase.date)]
@@ -919,7 +924,7 @@ export const findAllBalanceEntries = async () => {
   return db.query.balanceEntry
     .findMany({
       with: {
-        user: {}
+        user: withoutPassword
       },
       orderBy: [desc(table.balanceEntry.date)]
     })
@@ -927,9 +932,9 @@ export const findAllBalanceEntries = async () => {
 };
 
 export type DebtResult = {
-  creditor: User;
+  creditor: PublicUser;
   debtorData: {
-    debtor: User;
+    debtor: PublicUser;
     amount: number;
   }[];
 };
@@ -939,12 +944,12 @@ export async function calculateUserDebts(): Promise<DebtResult[]> {
 
   const entries = await db.query.balanceEntry.findMany({
     with: {
-      user: true,
-      distributions: { with: { user: true } }
+      user: withoutPassword,
+      distributions: { with: { user: withoutPassword } }
     }
   });
 
-  const userRegistry = new Map<string, User>();
+  const userRegistry = new Map<string, PublicUser>();
   const grossDebtMap: Record<string, Record<string, number>> = {};
 
   // Accumulate Gross Debts
@@ -981,13 +986,13 @@ export async function calculateUserDebts(): Promise<DebtResult[]> {
 
       if (!resultsByCreditor.has(creditorId)) {
         resultsByCreditor.set(creditorId, {
-          creditor: userRegistry.get(creditorId) as User,
+          creditor: userRegistry.get(creditorId) as PublicUser,
           debtorData: []
         });
       }
 
       resultsByCreditor.get(creditorId)!.debtorData.push({
-        debtor: userRegistry.get(debtorId) as User,
+        debtor: userRegistry.get(debtorId) as PublicUser,
         amount: netAmount
       });
     }
@@ -1142,7 +1147,7 @@ export const findTask = async (taskId: string) => {
   return db.query.task.findFirst({
     where: eq(table.task.id, taskId),
     with: {
-      dueUser: {},
+      dueUser: withoutPassword,
       completions: {}
     }
   }).execute();
@@ -1160,7 +1165,7 @@ export const findDueTasks = async (): Promise<TaskWithRelation[]> => {
       )
     ),
     with: {
-      dueUser: {},
+      dueUser: withoutPassword,
       completions: {}
     },
     orderBy: asc(table.task.dueDate)
@@ -1173,7 +1178,7 @@ export const findUpcomingTasks = async (): Promise<TaskWithRelation[]> => {
   return db.query.task.findMany({
     where: gt(table.task.dueDate, formatDateToYYYYMMDD(new Date())),
     with: {
-      dueUser: {},
+      dueUser: withoutPassword,
       completions: {}
     },
     orderBy: asc(table.task.dueDate)
@@ -1186,7 +1191,7 @@ export const findCompletedTasks = async (): Promise<TaskWithRelation[]> => {
   return db.query.task.findMany({
     where: eq(table.task.done, true),
     with: {
-      dueUser: {},
+      dueUser: withoutPassword,
       completions: {}
     },
     orderBy: asc(table.task.dueDate)

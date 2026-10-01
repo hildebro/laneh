@@ -72,6 +72,8 @@ export const user = pgTable('user', {
   unique().on(table.username, table.householdId)
 ]);
 export type User = typeof user.$inferSelect;
+// Users as they are sent to the frontend. The password hash never leaves the backend.
+export type PublicUser = Omit<User, 'password'>;
 
 export const userRelations = relations(user, ({ one, many }) => ({
   household: one(household, {
@@ -409,7 +411,7 @@ export const taskCompletionRelations = relations(taskCompletion, ({ one }) => ({
 
 // Strict generic relation type encompassing the discriminated union
 export type TaskWithRelation = Task & {
-  dueUser: InferSelectModel<typeof user> | null;
+  dueUser: PublicUser | null;
   completions: TaskCompletion[];
 };
 
