@@ -2,7 +2,7 @@
 
 ###### /lä-neh/ (*Farsi*: لانه); Nest, den, home.
 
-Self-hosted app to manage shopping, expenses and (recurring) tasks. Can be used on your own, but really shines in a
+Self-hosted app to manage shopping, expenses and tasks. Can be used on your own, but really shines in a
 shared household with multiple users.
 
 ## Getting started with Docker
@@ -17,29 +17,17 @@ shared household with multiple users.
 - Replace `CHANGE_ME` in `.env` with a random password for the database. Only use letters and digits.
 - Feel free to adjust the timezone in `.env` to fit your location. The remaining values can be kept as-is without any
   issues.
-- Create an empty folder called `postgres-data` (must match `DATABASE_LOCATION` value from .env)
+- Create an empty folder called `postgres-data` in the folder (based on `DATABASE_LOCATION` from .env)
 - run `docker compose up -d`
 - Access the app via http://localhost:3000
 
 ### Updating
 
-- The app menu will show you, if there's a new version available
+The app menu will show you, if there's a new version available. On mobile, you will also see a warning, if there's a 
+version mismatch between the mobile app and the server instance.
+
 - Navigate to your Laneh folder
 - Run `docker compose pull && docker compose up -d`
-
-### Upgrading from 3.x (PGlite) to Postgres
-
-Version 3.x stored its data with PGlite. The server now uses a regular Postgres container, so the data has to be moved
-over once via a backup:
-
-- In the old version, download a database backup on the settings page
-- Run `docker compose down`
-- Replace your `docker-compose.yml` with the new [docker-compose.prod.yml](docker-compose.prod.yml)
-- Add the new DB values from [.env.example](.env.example) to your `.env` and remove `DOCKER_DATABASE_LOCATION`. Point
-  `DATABASE_LOCATION` to a new, empty folder (e.g. `postgres-data`). Keep the old `pglite-data` folder until everything
-  works.
-- Run `docker compose pull && docker compose up -d`
-- Open the app and import your backup on the setup page
 
 ### Run at startup
 
@@ -68,7 +56,7 @@ WantedBy=multi-user.target
 
 ## Android
 
-There is no publicly available prebuilt android version yet. I will add a link to the Play Store here, when it's ready.
+There is no publicly available build for android yet. I will add a link to the Play Store here, when it's ready.
 
 In the meantime, you can follow the steps in [Android (static)](#android-static) to build your own APK.
 
