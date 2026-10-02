@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+  # Builds and publishes an already tagged version, e.g. when semantic-release failed after pushing the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag to build and publish (e.g. v4.2.2)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -23,6 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.tag }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -36,6 +44,7 @@ jobs:
         run: npm ci
 
       - name: Run Semantic Release
+        if: github.event_name == 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -47,12 +56,30 @@ jobs:
 
       - name: Check for new release tag
         id: check_tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
-          NEW_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "")
+          if [ -n "$INPUT_TAG" ]; then
+            NEW_TAG="$INPUT_TAG"
+          else
+            NEW_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "")
+          fi
 
           CLEAN_VERSION=${NEW_TAG#v}
 
           echo "tag=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+
+      # semantic-release creates the GitHub release on push. A manual run only adds it when it's missing, using the
+      # notes semantic-release wrote into the release commit.
+      - name: Create missing GitHub release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          if ! gh release view "$TAG" > /dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes "$(git log -1 --format=%b "$TAG")"
+          fi
 
       - name: Set up Docker Buildx
         if: steps.check_tag.outputs.tag != ''
