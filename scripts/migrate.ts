@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from 'pg';
-import { APP_USER_ROLE_SQL } from '../src/lib/backend/db/roles';
+import { APP_USER_ROLE_SQL } from '../src/lib/backend/db/roles.ts';
 
 async function run() {
   if (!process.env.DATABASE_URL) {
