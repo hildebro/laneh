@@ -1,3 +1,10 @@
+## [4.2.1](https://github.com/hildebro/laneh/compare/v4.2.0...v4.2.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* mobile app notification crash ([0375025](https://github.com/hildebro/laneh/commit/0375025b20df08e8a7f18be785a2ff3869f089be))
+
 # [4.2.0](https://github.com/hildebro/laneh/compare/v4.1.0...v4.2.0) (2026-10-01)
 
 
