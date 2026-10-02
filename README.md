@@ -50,6 +50,45 @@ ExecStop=/usr/bin/docker-compose down
 Restart=on-failure
 RestartSec=5s
 
+# Hardening: docker-compose is only a client that talks to the Docker daemon via its UNIX socket.
+# The containers themselves are started by the daemon and are not affected by these settings.
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+UMask=0077
+RemoveIPC=yes
+
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateDevices=yes
+DevicePolicy=closed
+PrivateMounts=yes
+ProtectProc=invisible
+ProcSubset=pid
+
+ProtectClock=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+
+# Filesystem UNIX sockets (/var/run/docker.sock) stay reachable inside a private network namespace.
+# Remove these three lines if you use DOCKER_HOST=tcp://... or ssh://...
+PrivateNetwork=yes
+IPAddressDeny=any
+RestrictAddressFamilies=AF_UNIX
+
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+SystemCallErrorNumber=EPERM
+
 [Install]
 WantedBy=multi-user.target
 ```
