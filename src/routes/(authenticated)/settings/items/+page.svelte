@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Undo2 } from 'lucide-svelte';
+  import { Undo2 } from '@lucide/svelte';
   import { invalidateAll } from '$app/navigation';
   import { getApiClient } from '$lib/apiClient';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';

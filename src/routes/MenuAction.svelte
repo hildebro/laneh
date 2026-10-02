@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Capacitor } from '@capacitor/core';
-  import { Menu } from 'lucide-svelte';
+  import { Menu } from '@lucide/svelte';
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';

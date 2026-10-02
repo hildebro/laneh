@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CalendarDays, House, Receipt, ShoppingCart } from 'lucide-svelte';
+  import { CalendarDays, House, Receipt, ShoppingCart } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CircleQuestionMark } from 'lucide-svelte';
+  import { CircleQuestionMark } from '@lucide/svelte';
   import * as m from '$lib/paraglide/messages.js';
 </script>
 

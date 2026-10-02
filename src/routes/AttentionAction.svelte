@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CircleAlert } from 'lucide-svelte';
+  import { CircleAlert } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
 
   // A flashing header button that opens a dialog. The content receives a function to close the dialog.

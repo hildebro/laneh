@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Check, Pencil } from 'lucide-svelte';
+  import { Check, Pencil } from '@lucide/svelte';
   import { SvelteDate } from 'svelte/reactivity';
   import { resolve } from '$app/paths';
   import type { FrontendTask } from '$lib/backend/api/task';

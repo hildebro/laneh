@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Globe } from 'lucide-svelte';
+  import { Globe } from '@lucide/svelte';
   import { transLocale } from '$lib/locale-translations.js';
   import * as m from '$lib/paraglide/messages.js';
   import { locales, setLocale } from '$lib/paraglide/runtime.js';

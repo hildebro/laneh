@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LoaderCircle } from 'lucide-svelte';
+  import { LoaderCircle } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import Navigation from './Navigation.svelte';
   import { invalidateAll } from '$app/navigation';
