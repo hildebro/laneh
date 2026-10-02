@@ -2,7 +2,16 @@
 // available (fetch without response headers, no DOM), so the app hands over everything required via syncSession.
 /* global CapacitorKV, CapacitorNotifications */
 
-const KEYS = ['apiBase', 'token', 'userId', 'cursor', 'titleTaskDone', 'bodyTaskDone'];
+const KEYS = ['apiBase', 'token', 'userId', 'cursor', 'templates', 'expenseTypes'];
+// Stored by older app versions.
+const LEGACY_KEYS = ['titleTaskDone', 'bodyTaskDone'];
+
+// Used until the app hands over the translated templates.
+const DEFAULT_TEMPLATES = {
+  task_done: { title: 'Task done', body: '{user}: {subject}' },
+  purchase_made: { title: 'Purchase made', body: '{user}: {subject}' },
+  expense_created: { title: 'New expense', body: '{user}: {subject}' }
+};
 
 function get(key) {
   return CapacitorKV.get(key)?.value || null;
@@ -18,8 +27,22 @@ function toNotificationId(uuid) {
   return hash;
 }
 
-function fillTemplate(template, notification) {
-  return template.replaceAll('{user}', notification.actor).replaceAll('{task}', notification.subject);
+function getJson(key) {
+  const value = get(key);
+
+  return value ? JSON.parse(value) : {};
+}
+
+function subjectOf(notification, expenseTypes) {
+  if (notification.type === 'expense_created') {
+    return expenseTypes[notification.subject] || notification.subject;
+  }
+
+  return notification.subject;
+}
+
+function fillTemplate(template, user, subject) {
+  return template.replaceAll('{user}', user).replaceAll('{subject}', subject);
 }
 
 async function checkNotifications() {
@@ -52,16 +75,24 @@ async function checkNotifications() {
     CapacitorKV.set('token', data.refreshedToken);
   }
 
+  const templates = { ...DEFAULT_TEMPLATES, ...getJson('templates') };
+  const expenseTypes = getJson('expenseTypes');
   const notifications = data.notifications
-    .filter((notification) => notification.type === 'task_done')
-    .map((notification) => ({
-      id: toNotificationId(notification.id),
-      title: fillTemplate(get('titleTaskDone') || 'Task done', notification),
-      body: fillTemplate(get('bodyTaskDone') || '{user}: {task}', notification),
-      // Drawable in android/app/src/main/res/drawable. Without it, Android shows a generic info icon.
-      smallIcon: 'ic_stat_notification',
-      autoCancel: true
-    }));
+    // Skips types introduced by a newer server.
+    .filter((notification) => templates[notification.type])
+    .map((notification) => {
+      const template = templates[notification.type];
+      const subject = subjectOf(notification, expenseTypes);
+
+      return {
+        id: toNotificationId(notification.id),
+        title: fillTemplate(template.title, notification.actor, subject),
+        body: fillTemplate(template.body, notification.actor, subject),
+        // Drawable in android/app/src/main/res/drawable. Without it, Android shows a generic info icon.
+        smallIcon: 'ic_stat_notification',
+        autoCancel: true
+      };
+    });
 
   if (notifications.length > 0) {
     CapacitorNotifications.schedule(notifications);
@@ -85,8 +116,10 @@ addEventListener('syncSession', (resolve, reject, details) => {
     CapacitorKV.set('apiBase', details.apiBase);
     CapacitorKV.set('token', details.token);
     CapacitorKV.set('userId', details.userId);
-    CapacitorKV.set('titleTaskDone', details.titleTaskDone);
-    CapacitorKV.set('bodyTaskDone', details.bodyTaskDone);
+    // The key-value store only holds strings.
+    CapacitorKV.set('templates', JSON.stringify(details.templates));
+    CapacitorKV.set('expenseTypes', JSON.stringify(details.expenseTypes));
+    LEGACY_KEYS.forEach((key) => CapacitorKV.remove(key));
     resolve();
   } catch (error) {
     reject(error);
@@ -96,7 +129,7 @@ addEventListener('syncSession', (resolve, reject, details) => {
 // Dispatched by the app on logout or when leaving the instance.
 addEventListener('clearSession', (resolve, reject) => {
   try {
-    KEYS.forEach((key) => CapacitorKV.remove(key));
+    [...KEYS, ...LEGACY_KEYS].forEach((key) => CapacitorKV.remove(key));
     resolve();
   } catch (error) {
     reject(error);

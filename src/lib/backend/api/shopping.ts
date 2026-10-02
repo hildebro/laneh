@@ -2,6 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import type { AppEnv } from '$lib/backend/api/types';
 import {
+  addNotification,
   addShoppingCategory,
   addStagedShoppingList,
   assignCategoryToShoppingItems,
@@ -28,6 +29,7 @@ import {
   unstagePurchaseItem,
   updateShoppingCategory
 } from '$lib/backend/db/functions';
+import { isLocalRuntime } from '$lib/backend/runtime';
 import * as m from '$lib/paraglide/messages.js';
 import { z } from '$lib/zod';
 
@@ -275,9 +277,13 @@ const shoppingRouter = new Hono<AppEnv>()
   .post('/commitPurchase', async (c) => {
     const loggedInUser = c.get('loggedInUser');
 
-    const purchaseId = await createShoppingPurchase(loggedInUser.id) ?? null;
+    const purchase = await createShoppingPurchase(loggedInUser.id);
+    // Nobody else to notify in the single person local app.
+    if (purchase && !isLocalRuntime()) {
+      await addNotification('purchase_made', loggedInUser.id, purchase.itemNames.join(', '));
+    }
 
-    return c.json({ success: true, purchaseId });
+    return c.json({ success: true, purchaseId: purchase?.purchaseId ?? null });
   })
 ;
 

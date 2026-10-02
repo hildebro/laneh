@@ -419,7 +419,7 @@ export type TaskWithRelation = Task & {
 // NOTIFICATIONS
 // ============================================================================
 
-export const notificationTypeEnum = pgEnum('notification_type', ['task_done']);
+export const notificationTypeEnum = pgEnum('notification_type', ['task_done', 'purchase_made', 'expense_created']);
 
 // Events the mobile app polls for and shows as system notifications to everyone but the actor. Old rows are removed
 // by the nightly jobs.
@@ -432,7 +432,8 @@ export const notification = pgTable('notification', {
   createdAt: timestamp({ precision: 3 }).notNull(),
   type: notificationTypeEnum().notNull(),
   actorUserId: text().notNull().references(() => user.id, { onDelete: 'cascade' }),
-  // Snapshot of the affected entity's name (e.g. the task), so the text stays intact if the entity changes.
+  // Snapshot of the affected entity's name (e.g. the task), so the text stays intact if the entity changes. Expenses
+  // without description store their type instead, which the app translates.
   subject: text().notNull()
 }, () => [
   pgPolicy('isolate_households', {

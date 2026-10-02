@@ -3,12 +3,14 @@ import { Hono } from 'hono';
 import type { AppEnv } from '$lib/backend/api/types';
 import {
   addBalanceEntry,
+  addNotification,
   assertMatchingHousehold,
   calculateUserDebts,
   findAllBalanceEntries,
   findBalanceEntry,
   updateBalanceEntry
 } from '$lib/backend/db/functions';
+import { isLocalRuntime } from '$lib/backend/runtime';
 import { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { z } from '$lib/zod';
 
@@ -79,6 +81,11 @@ const balanceRouter = new Hono<AppEnv>()
         expense.distributions,
         expense.purchaseId
       );
+      // Nobody else to notify in the single person local app.
+      if (!isLocalRuntime()) {
+        await addNotification('expense_created', c.get('loggedInUser').id, expense.description ?? expense.type);
+      }
+
       return c.json({ success: true });
     }
   )
