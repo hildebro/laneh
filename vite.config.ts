@@ -50,7 +50,7 @@ export default defineConfig({
     // The mobile build bundles the local backend (PGlite + drizzle) into one lazy chunk. It's loaded from the app
     // package, not over the network, so its size doesn't matter.
     chunkSizeWarningLimit: isCapacitor ? 1024 : 500,
-    rollupOptions: {
+    rolldownOptions: {
       // SvelteKit replaces onwarn, so filtering has to happen in onLog.
       onLog(level, log, handler) {
         // PGlite ships an eval-based loader and a node file system module, which is never used in the browser.
