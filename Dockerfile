@@ -3,12 +3,17 @@ FROM node:26-alpine AS builder
 
 WORKDIR /app
 
+# Run as the unprivileged node user (UID 1000) so the dev container,
+# which mounts node_modules from this image, can write to it
+RUN chown node:node /app
+USER node
+
 # Copy package files and install dependencies (cached layer)
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 RUN npm install
 
 # Copy the rest of the application code
-COPY . .
+COPY --chown=node:node . .
 
 # Build the SvelteKit application
 RUN npm run build
