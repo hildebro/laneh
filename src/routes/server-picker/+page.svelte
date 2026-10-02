@@ -8,6 +8,7 @@
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
   import { handleApiLoad } from '$lib/utils/apiHelper';
+  import { getServerUrlCandidates } from '$lib/utils/serverUrlHelper';
 
   let inputUrl = $state('');
 
@@ -15,28 +16,46 @@
   let pending = $state<'server' | 'local' | null>(null);
 
   async function saveUrl() {
-    if (!inputUrl) {
+    const candidates = getServerUrlCandidates(inputUrl);
+
+    if (candidates.length === 0) {
       addToast({ message: m.server_picker_input_invalid(), type: 'warning' });
 
       return;
     }
 
     pending = 'server';
-    localStorage.setItem('serverUrl', inputUrl);
-    const client = getApiClient();
+    // A leftover local mode marker would send the requests to the backend on the device instead
+    localStorage.removeItem('serverUrl');
+
+    // All candidates are tried at once, so an unreachable host costs one timeout instead of one per candidate.
+    // The attempts never reject, so the ones still running when a winner is found don't cause unhandled rejections.
+    const attempts = candidates.map((candidate) =>
+      handleApiLoad(getApiClient(undefined, candidate).api.public.marco.$get()).then(
+        (result) => (result === 'polo' ? { ok: true as const, candidate } : { ok: false as const, error: result }),
+        (error) => ({ ok: false as const, error: error as string })
+      )
+    );
+
+    // Awaiting in candidate order picks the highest ranked server that answered, e.g. https over http.
+    // Only the error of the last attempt is shown, as the earlier ones are just fallbacks that didn't work out.
+    let lastError = '';
 
     try {
-      const result = await handleApiLoad(client.api.public.marco.$get());
+      for (const attempt of attempts) {
+        const outcome = await attempt;
 
-      if (result === 'polo') {
-        await goto(resolve('/'));
-      } else {
-        localStorage.removeItem('serverUrl');
-        addToast({ title: m.server_picker_error(), message: result });
+        if (outcome.ok) {
+          localStorage.setItem('serverUrl', outcome.candidate);
+          await goto(resolve('/'));
+
+          return;
+        }
+
+        lastError = outcome.error;
       }
-    } catch (error) {
-      localStorage.removeItem('serverUrl');
-      addToast({ title: m.server_picker_error(), message: error as string });
+
+      addToast({ title: m.server_picker_error(), message: lastError });
     } finally {
       pending = null;
     }

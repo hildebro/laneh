@@ -6,7 +6,8 @@ import type { AppType } from '$lib/backend/api';
 import { getBaseUrl } from '$lib/config';
 import { getLocalBackend, isLocalMode } from '$lib/local';
 
-export function getApiClient(customFetch?: typeof fetch) {
+// The base URL can be overridden to talk to a server before it is saved, e.g. when picking one
+export function getApiClient(customFetch?: typeof fetch, baseUrl: string = getBaseUrl()) {
   // Use the provided fetch (useful for SvelteKit load functions) or fallback to the global browser fetch
   const baseFetch = customFetch || fetch;
 
@@ -54,5 +55,5 @@ export function getApiClient(customFetch?: typeof fetch) {
   };
 
   // Pass our intercepted fetch to Hono
-  return hc<AppType>(getBaseUrl() + resolve('/'), { fetch: authFetch });
+  return hc<AppType>(baseUrl + resolve('/'), { fetch: authFetch });
 }
