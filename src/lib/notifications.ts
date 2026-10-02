@@ -42,6 +42,25 @@ export async function syncNotificationSession(user: Pick<User, 'id'>) {
     });
   } catch (error) {
     console.error('❌ Syncing the notification session failed:', error);
+
+    return;
+  }
+
+  // The periodic run can take up to 15 minutes, so opening the app checks right away.
+  await checkNotificationsNow();
+}
+
+// Runs the same check as the periodic background run, in addition to it. Duplicates from overlapping runs are harmless,
+// since a notification ID derived from the same event replaces the shown notification.
+export async function checkNotificationsNow() {
+  if (!isSupported()) {
+    return;
+  }
+
+  try {
+    await BackgroundRunner.dispatchEvent({ label: RUNNER_LABEL, event: 'checkNotifications', details: {} });
+  } catch (error) {
+    console.error('❌ Checking notifications failed:', error);
   }
 }
 
