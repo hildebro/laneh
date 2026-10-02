@@ -28,3 +28,10 @@
 # looks up these classes and methods by name via JNI and ships no keep rules.
 -keep class io.ionic.android_js_engine.** { *; }
 -keep class io.ionic.backgroundrunner.** { *; }
+
+# Capacitor reads @CapacitorPlugin/@Permission/@NativePlugin via reflection. Nothing in the app instantiates these
+# annotation types, so R8 full mode assumes their values are always null and strips PluginHandle.pluginAnnotation,
+# which crashes every permission check (e.g. BackgroundRunner.checkPermissions after login).
+-keep @interface com.getcapacitor.annotation.** { *; }
+-keep @interface com.getcapacitor.NativePlugin { *; }
+-keep @interface com.getcapacitor.PluginMethod { *; }
