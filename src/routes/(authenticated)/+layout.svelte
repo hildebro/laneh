@@ -1,14 +1,32 @@
 <script lang="ts">
+  import { App } from '@capacitor/app';
+  import type { PluginListenerHandle } from '@capacitor/core';
   import { LoaderCircle } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import Navigation from './Navigation.svelte';
   import { invalidateAll } from '$app/navigation';
-  import { requestNotificationPermission } from '$lib/notifications';
+  import { checkNotificationsNow, requestNotificationPermission } from '$lib/notifications';
 
   let { children, data } = $props();
 
   onMount(() => {
     void requestNotificationPermission();
+
+    // Returning from the background doesn't reload the page, so the session sync in the load function won't check.
+    let resumeListener: PluginListenerHandle | undefined;
+    let isUnmounted = false;
+    void App.addListener('resume', () => void checkNotificationsNow()).then((listener) => {
+      if (isUnmounted) {
+        void listener.remove();
+      } else {
+        resumeListener = listener;
+      }
+    });
+
+    return () => {
+      isUnmounted = true;
+      void resumeListener?.remove();
+    };
   });
 
   // --- Pull to Refresh State ---
