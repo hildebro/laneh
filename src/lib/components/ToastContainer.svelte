@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { X } from 'lucide-svelte';
+  import { X } from '@lucide/svelte';
   import { flip } from 'svelte/animate';
   import { fade, fly } from 'svelte/transition';
   import { removeToast, type Toast, toasts } from '$lib/stores/toast';

@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { CircleAlert, CirclePlus, Trash } from '@lucide/svelte';
   import levenshteinPkg from 'fast-levenshtein';
-  import { CircleAlert, CirclePlus, Trash2 } from 'lucide-svelte';
   import { tick } from 'svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -300,7 +300,7 @@
               tabindex="-1"
               onclick={() => deleteItem(index)}
             >
-              <Trash2 />
+              <Trash />
             </button>
           </td>
         </tr>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Capacitor } from '@capacitor/core';
   import { StatusBar, Style } from '@capacitor/status-bar';
-  import { Moon, Sun } from 'lucide-svelte';
+  import { Moon, Sun } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import * as m from '$lib/paraglide/messages.js';
 

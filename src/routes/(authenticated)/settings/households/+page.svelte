@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Pencil } from 'lucide-svelte';
+  import { Pencil } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
   import { Admin } from '$lib/utils/userHelper';

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Undo2 } from 'lucide-svelte';
+  import { Undo2 } from '@lucide/svelte';
   import TaskDrawer from './TaskDrawer.svelte';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';

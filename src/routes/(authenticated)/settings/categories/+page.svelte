@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowDown, ArrowUp, Pencil } from 'lucide-svelte';
+  import { ArrowDown, ArrowUp, Pencil } from '@lucide/svelte';
   import { flip } from 'svelte/animate';
   import { invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';

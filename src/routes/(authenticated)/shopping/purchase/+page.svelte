@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Circle, CircleCheck, LoaderCircle, RefreshCw } from 'lucide-svelte';
+  import { Circle, CircleCheck, LoaderCircle, RefreshCw } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { flip } from 'svelte/animate';
   import { quintOut } from 'svelte/easing';
