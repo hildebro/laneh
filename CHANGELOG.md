@@ -1,3 +1,15 @@
+## [4.2.2](https://github.com/hildebro/laneh/compare/v4.2.1...v4.2.2) (2026-10-02)
+
+
+### Bug Fixes
+
+* add dockerignore ([fcb4fb8](https://github.com/hildebro/laneh/commit/fcb4fb82aec4cab7eacf6f8eb4c7d4843e6af9b0))
+
+
+### Performance Improvements
+
+* add debug symbol level ([b2ebe00](https://github.com/hildebro/laneh/commit/b2ebe00392717a7876ac2e77a6b5ba108895f69d))
+
 ## [4.2.1](https://github.com/hildebro/laneh/compare/v4.2.0...v4.2.1) (2026-10-02)
 
 
