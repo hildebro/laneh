@@ -197,6 +197,52 @@ describe('notifications', () => {
     expect(bobPoll.notifications.map((n) => n.subject)).toEqual(['Water plants']);
     expect(davePoll.notifications).toEqual([]);
   });
+
+  it('are created for purchases and expenses', async () => {
+    const { alice, bob } = await setup();
+    const since = new Date(Date.now() - 1000).toISOString();
+
+    await call('/shopping/category', { method: 'POST', token: alice.token, body: { id: null, name: 'Food' } });
+    const [food] = await call<{ id: string }[]>('/shopping/categoriesWithItems', { token: alice.token });
+    const items = [{ name: 'Milk', amount: '' }, { name: 'Bread', amount: '' }];
+    await call('/shopping/items', { method: 'POST', token: alice.token, body: items });
+    const staged = await call<{ stagedItems: { id: string }[] }>('/shopping/stagedItems', { token: alice.token });
+    await call('/shopping/categorizeItems', {
+      method: 'POST',
+      token: alice.token,
+      body: { itemIds: staged.stagedItems.map((item) => item.id), categoryId: food.id }
+    });
+
+    for (const item of await call<{ id: string }[]>('/shopping/items', { token: alice.token })) {
+      await call('/shopping/stagePurchaseItem', { method: 'POST', token: alice.token, body: { itemId: item.id } });
+    }
+    const { purchaseId } = await call<{ purchaseId: string }>('/shopping/commitPurchase', {
+      method: 'POST',
+      token: alice.token
+    });
+
+    await call('/balance', {
+      method: 'POST',
+      token: alice.token,
+      body: { ...expense(alice.id, 10, [{ userId: bob.id, percent: 100 }]), purchaseId }
+    });
+    await call('/balance', {
+      method: 'POST',
+      token: alice.token,
+      body: { ...expense(alice.id, 5, [{ userId: bob.id, percent: 100 }]), description: 'Pizza' }
+    });
+
+    type Poll = { notifications: { type: string; actor: string; subject: string }[] };
+    const bobPoll = await call<Poll>(`/notifications?since=${since}`, { token: bob.token });
+    const alicePoll = await call<Poll>(`/notifications?since=${since}`, { token: alice.token });
+    expect(bobPoll.notifications.map(({ type, actor, subject }) => ({ type, actor, subject }))).toEqual([
+      { type: 'purchase_made', actor: 'alice', subject: 'Bread, Milk' },
+      // Expenses without description fall back to their type.
+      { type: 'expense_created', actor: 'alice', subject: 'groceries' },
+      { type: 'expense_created', actor: 'alice', subject: 'Pizza' }
+    ]);
+    expect(alicePoll.notifications).toEqual([]);
+  });
 });
 
 describe('password hashes', () => {

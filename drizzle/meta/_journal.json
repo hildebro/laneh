@@ -309,6 +309,13 @@
       "when": 1790847767152,
       "tag": "20261001094247_rare_gunslinger",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1790973961131,
+      "tag": "20261002204601_flippant_daimon_hellstrom",
+      "breakpoints": true
     }
   ]
 }

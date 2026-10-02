@@ -779,7 +779,12 @@ export const createShoppingPurchase = async (userId: string) => {
   await db.delete(table.stagedShoppingPurchaseItem).where(inArray(stagedShoppingPurchaseItem.itemId, stagedItems));
   await deactivateShoppingItems(stagedItems);
 
-  return purchaseId;
+  const purchasedItems = await db.select({ name: table.shoppingItem.name })
+    .from(table.shoppingItem)
+    .where(inArray(table.shoppingItem.id, stagedItems))
+    .orderBy(asc(table.shoppingItem.name));
+
+  return { purchaseId, itemNames: purchasedItems.map((item) => item.name) };
 };
 
 export const fetchLastPurchaseDate = async () => {

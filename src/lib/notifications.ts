@@ -6,6 +6,8 @@ import type { User } from '$lib/backend/db/schema';
 import { getBaseUrl } from '$lib/config';
 import { isLocalMode } from '$lib/local';
 import * as m from '$lib/paraglide/messages.js';
+import { BalanceEntryType } from '$lib/utils/balanceHelper';
+import { translateBalanceEntryType } from '$lib/utils/balanceTranslations';
 
 // Must match the BackgroundRunner label in capacitor.config.ts.
 const RUNNER_LABEL = 'dev.laneh.app.notifications';
@@ -35,9 +37,25 @@ export async function syncNotificationSession(user: Pick<User, 'id'>) {
         apiBase: getBaseUrl() + resolve('/'),
         token,
         userId: user.id,
-        // The runner has no access to the translations, so it gets templates with placeholders.
-        titleTaskDone: m.notification_task_done_title(),
-        bodyTaskDone: m.notification_task_done_body({ user: '{user}', task: '{task}' })
+        // The runner has no access to the translations, so it gets templates with placeholders, keyed by type.
+        templates: {
+          task_done: {
+            title: m.notification_task_done_title(),
+            body: m.notification_task_done_body({ user: '{user}', task: '{subject}' })
+          },
+          purchase_made: {
+            title: m.notification_purchase_made_title(),
+            body: m.notification_purchase_made_body({ user: '{user}', items: '{subject}' })
+          },
+          expense_created: {
+            title: m.notification_expense_created_title(),
+            body: m.notification_expense_created_body({ user: '{user}', expense: '{subject}' })
+          }
+        },
+        // Expenses without description are named after their type.
+        expenseTypes: Object.fromEntries(
+          Object.values(BalanceEntryType).map((type) => [type, translateBalanceEntryType(type)])
+        )
       }
     });
   } catch (error) {
