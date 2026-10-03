@@ -7,7 +7,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import pg from 'pg';
 import app from '$lib/backend/api';
 import { type Database, dbOptions, setDb } from '$lib/backend/db';
-import { migrateDb } from '$lib/backend/db/migrate';
+import { migrateDb, pgliteExtensions } from '$lib/backend/db/migrate';
 import { APP_USER_ROLE_SQL } from '$lib/backend/db/roles';
 import { SerialContext, setTransactionContext } from '$lib/context';
 import { Admin } from '$lib/utils/userHelper';
@@ -28,7 +28,7 @@ export async function startTestBackend() {
     setTransactionContext(new AsyncLocalStorage());
     close = () => pool.end();
   } else {
-    const client = await PGlite.create();
+    const client = await PGlite.create({ extensions: pgliteExtensions });
     db = drizzlePglite(client, dbOptions);
     await migrateDb(client, db);
     setTransactionContext(new SerialContext());

@@ -1,4 +1,6 @@
 import type { PGlite } from '@electric-sql/pglite';
+import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
+import { unaccent } from '@electric-sql/pglite/contrib/unaccent';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeHexLowerCase } from '@oslojs/encoding';
 import type { MigrationMeta } from 'drizzle-orm/migrator';
@@ -9,6 +11,9 @@ import { APP_USER_ROLE_SQL } from '$lib/backend/db/roles';
 
 // The migration files are bundled at build time, since the local app has no file system access to read them.
 const migrationFiles = import.meta.glob<string>('/drizzle/*.sql', { query: '?raw', import: 'default', eager: true });
+
+// Postgres extensions created by the migrations. PGlite only ships them, if they are passed to PGlite.create().
+export const pgliteExtensions = { pg_trgm, unaccent };
 
 // Same as drizzle's readMigrationFiles(), but based on the bundled files.
 function getMigrations(): MigrationMeta[] {
