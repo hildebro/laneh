@@ -5,6 +5,8 @@
   let {
     label,
     name,
+    // Only needed, if the same field occurs more than once on a page.
+    id = name,
     value = $bindable(),
     files = $bindable(),
     disabled = false,
@@ -16,6 +18,7 @@
   }: {
     label: string;
     name: string;
+    id?: string;
     value?: unknown;
     files?: FileList | null;
     disabled?: boolean;
@@ -34,14 +37,14 @@
 
 <div class="form-item">
   {#if type !== 'checkbox'}
-    <label for={name}>{label}</label>
+    <label for={id}>{label}</label>
   {/if}
   {#if type === 'select'}
     <select
       class="input"
       class:error-border={!!displayError}
       {name}
-      id={name}
+      {id}
       bind:value
       {disabled}
       {onchange}
@@ -54,7 +57,7 @@
   {:else if type === 'money'}
     <MoneyInput
       {name}
-      id={name}
+      {id}
       bind:value={value as number}
       hasError={!!displayError}
       {disabled}
@@ -65,7 +68,7 @@
       class:error-border={!!displayError}
       type="file"
       {name}
-      id={name}
+      {id}
       {accept}
       bind:files
       {disabled}
@@ -75,7 +78,7 @@
       <input
         type="checkbox"
         {name}
-        id={name}
+        {id}
         bind:checked={value as boolean}
         {disabled}
       />
@@ -86,7 +89,7 @@
       class="input"
       class:error-border={!!displayError}
       {name}
-      id={name}
+      {id}
       bind:value
       {disabled}
     >
@@ -97,7 +100,7 @@
       class:error-border={!!displayError}
       {type}
       {name}
-      id={name}
+      {id}
       bind:value
       {disabled}
     />

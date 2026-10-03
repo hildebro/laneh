@@ -14,6 +14,8 @@ import {
   max,
   min,
   ne,
+  notExists,
+  notInArray,
   or,
   type SQL,
   sql
@@ -598,6 +600,10 @@ const similarNameThreshold = 0.5;
 
 const normalized = (value: SQL | AnyPgColumn | string) => sql`unaccent(lower(${value}))`;
 
+// Reduces a name to its word stems, e.g. "Tomaten" to "tomat". Empty for names without stems, like numbers.
+const stemsOf = (locale: Locale, value: SQL | AnyPgColumn | string) =>
+  sql`array_to_string(tsvector_to_array(to_tsvector(${textSearchConfigs[locale]}::regconfig, ${normalized(value)})), ' ')`;
+
 /**
  * Finds the existing item each of the given names most likely refers to. A name matches, if it is one of the item's
  * synonyms, has the same stems (plurals and inflections) as the item or one of its synonyms, or is similar enough to the
@@ -607,8 +613,7 @@ const normalized = (value: SQL | AnyPgColumn | string) => sql`unaccent(lower(${v
 export const findSimilarShoppingItems = async (names: string[], locale: Locale) => {
   const db = getTx();
 
-  const config = sql`${textSearchConfigs[locale]}::regconfig`;
-  const stems = (value: SQL | AnyPgColumn | string) => sql`array_to_string(tsvector_to_array(to_tsvector(${config}, ${normalized(value)})), ' ')`;
+  const stems = (value: SQL | AnyPgColumn | string) => stemsOf(locale, value);
 
   const result: Record<string, ShoppingItem | null> = {};
   for (const name of names) {
@@ -639,16 +644,16 @@ export const findSimilarShoppingItems = async (names: string[], locale: Locale) 
 
 /**
  * Finds the first synonym that is already the name or a synonym of another item. Such a synonym would be ambiguous or
- * never be applied, since existing names aren't corrected. The item itself is excluded, unless it doesn't exist yet.
+ * never be applied, since existing names aren't corrected. The excluded items are the ones the synonyms are meant for.
  */
-export const findTakenSynonym = async (itemId: string | null, synonyms: string[]) => {
+export const findTakenSynonym = async (excludedItemIds: string[], synonyms: string[]) => {
   const db = getTx();
 
   for (const synonym of synonyms) {
     const item = (await db.select({ name: table.shoppingItem.name })
         .from(table.shoppingItem)
         .where(and(
-          itemId ? ne(table.shoppingItem.id, itemId) : undefined,
+          excludedItemIds.length > 0 ? notInArray(table.shoppingItem.id, excludedItemIds) : undefined,
           or(eq(normalized(table.shoppingItem.name), normalized(synonym)), hasSynonym(synonym))
         ))
         .limit(1)
@@ -675,12 +680,15 @@ const hasSynonym = (name: string) => {
  * Finds the item that has the given name as a synonym. Item names and synonyms are unique together, so a new item or a
  * renamed one must not take the name.
  */
-export const findShoppingItemWithSynonym = async (name: string, excludedItemId: string | null = null) => {
+export const findShoppingItemWithSynonym = async (name: string, excludedItemIds: string[] = []) => {
   const db = getTx();
 
   return (await db.select()
       .from(table.shoppingItem)
-      .where(and(excludedItemId ? ne(table.shoppingItem.id, excludedItemId) : undefined, hasSynonym(name)))
+      .where(and(
+        excludedItemIds.length > 0 ? notInArray(table.shoppingItem.id, excludedItemIds) : undefined,
+        hasSynonym(name)
+      ))
       .limit(1)
   ).at(0);
 };
@@ -709,6 +717,144 @@ export const updateShoppingItem = async (itemId: string, name: string, synonyms:
   const db = getTx();
 
   await db.update(table.shoppingItem).set({ name, synonyms }).where(eq(table.shoppingItem.id, itemId)).execute();
+};
+
+/**
+ * Finds groups of items that most likely mean the same, by the same rules findSimilarShoppingItems() corrects names
+ * with: same stems, similar enough to be a typo, or the same stems as one of the other item's synonyms. Items are grouped
+ * transitively, pairs marked as different via dismissShoppingItemMergeCandidates() aren't matched.
+ */
+export const findShoppingItemMergeCandidates = async (locale: Locale): Promise<ShoppingItem[][]> => {
+  const db = getTx();
+
+  // Both sides of the self join are the same CTE, since the stems are calculated once per item that way.
+  const stemmedItems = (name: string) => db.$with(name).as(db.select({
+    id: table.shoppingItem.id,
+    normalizedName: sql<string>`${normalized(table.shoppingItem.name)}`.as('normalized_name'),
+    stems: sql<string>`${stemsOf(locale, table.shoppingItem.name)}`.as('stems'),
+    synonymStems: sql<string[]>`ARRAY(
+      SELECT ${stemsOf(locale, sql.raw('synonym'))} FROM unnest(${table.shoppingItem.synonyms}) AS synonym
+    )`.as('synonym_stems')
+  }).from(table.shoppingItem));
+  const a = stemmedItems('a');
+  const b = stemmedItems('b');
+  // Drizzle leaves CTE columns unqualified in sql templates, which is ambiguous in a self join.
+  const column = (cte: typeof a, name: string) => sql`${sql.identifier(cte._.alias)}.${sql.identifier(name)}`;
+  const [aId, bId] = [column(a, 'id'), column(b, 'id')];
+  const [aStems, bStems] = [column(a, 'stems'), column(b, 'stems')];
+  const distinction = table.shoppingItemDistinction;
+
+  const pairs = await db.with(a, b)
+    .select({ id: sql<string>`${aId}`, otherId: sql<string>`${bId}` })
+    .from(a)
+    .innerJoin(b, sql`${aId} < ${bId}`)
+    .where(and(
+      or(
+        sql`${aStems} = ${bStems} AND ${aStems} <> ''`,
+        sql`similarity(${column(a, 'normalized_name')}, ${column(b, 'normalized_name')}) >= ${similarNameThreshold}`,
+        sql`${aStems} <> '' AND ${aStems} = ANY(${column(b, 'synonym_stems')})`,
+        sql`${bStems} <> '' AND ${bStems} = ANY(${column(a, 'synonym_stems')})`
+      ),
+      notExists(db.select().from(distinction).where(or(
+        sql`${distinction.itemId} = ${aId} AND ${distinction.otherItemId} = ${bId}`,
+        sql`${distinction.itemId} = ${bId} AND ${distinction.otherItemId} = ${aId}`
+      )))
+    ));
+
+  // Union find, so "Tomate", "Tomaten" and "Tomatte" end up in one group, even if not every pair matches directly.
+  const parents = new Map<string, string>();
+  const root = (id: string): string => {
+    const parent = parents.get(id) ?? id;
+    return parent === id ? id : root(parent);
+  };
+  for (const pair of pairs) {
+    parents.set(root(pair.otherId), root(pair.id));
+  }
+
+  const itemIds = [...new Set(pairs.flatMap((pair) => [pair.id, pair.otherId]))];
+  if (itemIds.length === 0) {
+    return [];
+  }
+
+  const items = await db.select()
+    .from(table.shoppingItem)
+    .where(inArray(table.shoppingItem.id, itemIds))
+    .orderBy(asc(table.shoppingItem.name));
+
+  const groups = new Map<string, ShoppingItem[]>();
+  for (const item of items) {
+    const group = groups.get(root(item.id)) ?? [];
+    group.push(item);
+    groups.set(root(item.id), group);
+  }
+
+  return [...groups.values()].sort((first, second) => first[0].name.localeCompare(second[0].name));
+};
+
+// Marks all given items as different from each other, so they aren't suggested for a merge again.
+export const dismissShoppingItemMergeCandidates = async (itemIds: string[]): Promise<void> => {
+  const db = getTx();
+
+  const pairs = itemIds.flatMap((itemId, index) => itemIds.slice(index + 1).map((otherItemId) => ({ itemId, otherItemId })));
+  if (pairs.length > 0) {
+    await db.insert(table.shoppingItemDistinction).values(pairs).onConflictDoNothing();
+  }
+};
+
+/**
+ * Merges the other items into the main item, which gets the given name and synonyms. Their purchases are moved over, so
+ * the purchase history and stats stay complete. A purchase that contained several of the items counts once. The other
+ * items are deleted afterward.
+ */
+export const mergeShoppingItems = async (
+  mainItemId: string,
+  otherItemIds: string[],
+  item: { name: string, synonyms: string[], categoryId: string }
+) => {
+  const db = getTx();
+
+  const items = await db.select().from(table.shoppingItem)
+    .where(inArray(table.shoppingItem.id, [mainItemId, ...otherItemIds]));
+  const mainItem = items.find((item) => item.id === mainItemId)!;
+  const otherItems = otherItemIds.map((itemId) => items.find((item) => item.id === itemId)!);
+
+  const purchaseIds = await db.selectDistinct({ purchaseId: table.shoppingPurchaseItem.purchaseId })
+    .from(table.shoppingPurchaseItem)
+    .where(inArray(table.shoppingPurchaseItem.itemId, otherItemIds));
+  if (purchaseIds.length > 0) {
+    await db.insert(table.shoppingPurchaseItem)
+      .values(purchaseIds.map(({ purchaseId }) => ({ purchaseId, itemId: mainItemId })))
+      .onConflictDoNothing();
+  }
+
+  // An item staged in the current purchase stays staged, so the user doesn't lose track of it in the shop.
+  const stagedItems = await db.select().from(table.stagedShoppingPurchaseItem)
+    .where(inArray(table.stagedShoppingPurchaseItem.itemId, [mainItemId, ...otherItemIds]));
+  if (stagedItems.length > 0 && !stagedItems.some((staged) => staged.itemId === mainItemId)) {
+    await db.update(table.stagedShoppingPurchaseItem)
+      .set({ itemId: mainItemId })
+      .where(eq(table.stagedShoppingPurchaseItem.itemId, stagedItems[0].itemId));
+  }
+
+  // Everything else of the other items goes with them, the purchases have been moved already.
+  await db.delete(table.shoppingPurchaseItem).where(inArray(table.shoppingPurchaseItem.itemId, otherItemIds));
+  await db.delete(table.shoppingItem).where(inArray(table.shoppingItem.id, otherItemIds));
+
+  // The item stays on the shopping list, if any of the merged items was on it. Their amounts are kept side by side.
+  const activeItems = [mainItem, ...otherItems].filter((other) => other.active);
+
+  await db.update(table.shoppingItem).set({
+    name: item.name,
+    synonyms: item.synonyms,
+    categoryId: item.categoryId,
+    priority: item.categoryId === mainItem.categoryId
+      ? mainItem.priority
+      : await nextShoppingItemPriority(item.categoryId),
+    active: activeItems.length > 0,
+    amount: activeItems.map((other) => other.amount).filter((amount) => amount.length > 0).join(', ')
+  }).where(eq(table.shoppingItem.id, mainItemId));
+
+  await updateShoppingItemStats([mainItemId]);
 };
 
 export const reactivateShoppingItem = async (itemId: string, amount: string | undefined): Promise<void> => {
