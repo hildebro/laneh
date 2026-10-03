@@ -20,6 +20,9 @@ function escapeSqlValue(val: unknown): string {
   // Format Dates to ISO strings for Postgres
   if (val instanceof Date) return `'${val.toISOString()}'`;
 
+  // An empty ARRAY[] has no type, but the '{}' literal is converted to the column's array type.
+  if (Array.isArray(val)) return val.length > 0 ? `ARRAY[${val.map(escapeSqlValue).join(', ')}]` : `'{}'`;
+
   // Escape single quotes by doubling them (standard SQL)
   return `'${String(val).replace(/'/g, '\'\'')}'`;
 }

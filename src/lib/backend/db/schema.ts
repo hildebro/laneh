@@ -137,7 +137,10 @@ export const shoppingItem = pgTable('shopping_item', {
   name: text().notNull(),
   amount: text().notNull().default(''),
   priority: integer().notNull(),
-  active: boolean().notNull()
+  active: boolean().notNull(),
+  // Other names of the item, e.g. "Möhre" for "Karotte". Entered names are corrected to the item, see
+  // findSimilarShoppingItems().
+  synonyms: text().array().notNull().default(sql`'{}'::text[]`)
 }, (table) => [
   unique().on(table.name, table.householdId),
   pgPolicy('isolate_households', {

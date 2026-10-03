@@ -596,17 +596,19 @@ const textSearchConfigs: Record<Locale, string> = {
 // items, especially compound words like "Milch" and "Milchreis" (0.45) or short words like "Reis" and "Eis" (0.29).
 const similarNameThreshold = 0.5;
 
+const normalized = (value: SQL | AnyPgColumn | string) => sql`unaccent(lower(${value}))`;
+
 /**
- * Finds the existing item each of the given names most likely refers to. A name matches, if it has the same stems
- * (plurals and inflections) or is similar enough to be a typo. Case and accents are ignored. Names that exist exactly or
- * resemble nothing are mapped to null.
+ * Finds the existing item each of the given names most likely refers to. A name matches, if it is one of the item's
+ * synonyms, has the same stems (plurals and inflections) as the item or one of its synonyms, or is similar enough to the
+ * item's name to be a typo. Case and accents are ignored. Names that exist exactly or resemble nothing are mapped to
+ * null.
  */
 export const findSimilarShoppingItems = async (names: string[], locale: Locale) => {
   const db = getTx();
 
   const config = sql`${textSearchConfigs[locale]}::regconfig`;
-  const normalized = (value: AnyPgColumn | string) => sql`unaccent(lower(${value}))`;
-  const stems = (value: AnyPgColumn | string) => sql`array_to_string(tsvector_to_array(to_tsvector(${config}, ${normalized(value)})), ' ')`;
+  const stems = (value: SQL | AnyPgColumn | string) => sql`array_to_string(tsvector_to_array(to_tsvector(${config}, ${normalized(value)})), ' ')`;
 
   const result: Record<string, ShoppingItem | null> = {};
   for (const name of names) {
@@ -616,18 +618,81 @@ export const findSimilarShoppingItems = async (names: string[], locale: Locale) 
       continue;
     }
 
+    const synonym = sql.raw('synonym');
+    const synonymMatch = sql<boolean>`EXISTS (
+      SELECT 1 FROM unnest(${table.shoppingItem.synonyms}) AS ${synonym}
+      WHERE ${normalized(synonym)} = ${normalized(name)} OR (${stems(synonym)} = ${stems(name)} AND ${stems(name)} <> '')
+    )`;
     const sameStems = sql<boolean>`${stems(table.shoppingItem.name)} = ${stems(name)} AND ${stems(name)} <> ''`;
     const similarity = sql<number>`similarity(${normalized(table.shoppingItem.name)}, ${normalized(name)})`;
 
     result[name] = (await db.select()
         .from(table.shoppingItem)
-        .where(or(sameStems, gte(similarity, similarNameThreshold)))
-        .orderBy(desc(sameStems), desc(similarity))
+        .where(or(synonymMatch, sameStems, gte(similarity, similarNameThreshold)))
+        .orderBy(desc(synonymMatch), desc(sameStems), desc(similarity))
         .limit(1)
     ).at(0) ?? null;
   }
 
   return result;
+};
+
+/**
+ * Finds the first synonym that is already the name or a synonym of another item. Such a synonym would be ambiguous or
+ * never be applied, since existing names aren't corrected. The item itself is excluded, unless it doesn't exist yet.
+ */
+export const findTakenSynonym = async (itemId: string | null, synonyms: string[]) => {
+  const db = getTx();
+
+  for (const synonym of synonyms) {
+    const otherSynonym = sql.raw('other_synonym');
+    const item = (await db.select({ name: table.shoppingItem.name })
+        .from(table.shoppingItem)
+        .where(and(
+          itemId ? ne(table.shoppingItem.id, itemId) : undefined,
+          or(
+            eq(normalized(table.shoppingItem.name), normalized(synonym)),
+            sql`EXISTS (
+              SELECT 1 FROM unnest(${table.shoppingItem.synonyms}) AS ${otherSynonym}
+              WHERE ${normalized(otherSynonym)} = ${normalized(synonym)}
+            )`
+          )
+        ))
+        .limit(1)
+    ).at(0);
+
+    if (item) {
+      return { synonym, item: item.name };
+    }
+  }
+
+  return null;
+};
+
+export const findShoppingItemById = async (itemId: string) => {
+  const db = getTx();
+
+  return db.query.shoppingItem.findFirst({ where: eq(table.shoppingItem.id, itemId) }).execute();
+};
+
+// New items are only defined here, so they don't end up on the shopping list right away.
+export const createShoppingItem = async (categoryId: string, name: string, synonyms: string[]): Promise<void> => {
+  const db = getTx();
+
+  await db.insert(table.shoppingItem).values({
+    id: generateUUID(),
+    categoryId,
+    name,
+    synonyms,
+    priority: await nextShoppingItemPriority(categoryId),
+    active: false
+  });
+};
+
+export const updateShoppingItem = async (itemId: string, name: string, synonyms: string[]): Promise<void> => {
+  const db = getTx();
+
+  await db.update(table.shoppingItem).set({ name, synonyms }).where(eq(table.shoppingItem.id, itemId)).execute();
 };
 
 export const reactivateShoppingItem = async (itemId: string, amount: string | undefined): Promise<void> => {
@@ -681,22 +746,28 @@ export const addShoppingItem = async (categoryId: string, name: string, amount: 
   }
 
   // Otherwise we add a new item at the end of the list.
+  await db.insert(table.shoppingItem).values({
+    id: generateUUID(),
+    categoryId: categoryId,
+    name: name,
+    amount: amount,
+    priority: await nextShoppingItemPriority(categoryId),
+    active: true
+  });
+};
+
+// The priority that puts an item at the end of the category.
+const nextShoppingItemPriority = async (categoryId: string) => {
+  const db = getTx();
+
   const currentMaxPriority = (
     await db
       .select({ value: max(table.shoppingItem.priority) })
       .from(table.shoppingItem)
       .where(eq(table.shoppingItem.categoryId, categoryId))
   ).at(0);
-  const nextPriority = typeof currentMaxPriority?.value === 'number' ? currentMaxPriority.value + 1 : 0;
 
-  await db.insert(table.shoppingItem).values({
-    id: generateUUID(),
-    categoryId: categoryId,
-    name: name,
-    amount: amount,
-    priority: nextPriority,
-    active: true
-  });
+  return typeof currentMaxPriority?.value === 'number' ? currentMaxPriority.value + 1 : 0;
 };
 
 export const assignCategoryToShoppingItems = async (itemIds: string[], categoryId: string) => {

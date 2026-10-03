@@ -337,6 +337,13 @@
       "when": 1791033997427,
       "tag": "20261003132637_shopping_names_per_household",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1791035076575,
+      "tag": "20261003134436_shopping_item_synonyms",
+      "breakpoints": true
     }
   ]
 }
