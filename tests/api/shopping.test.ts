@@ -187,6 +187,35 @@ describe('item settings', () => {
     expect((await saveItem(token, { id: item('Gurke').id, name: 'gurke', synonyms: [] })).status).toBe(200);
   });
 
+  it('rejects names that are synonyms of other items', async () => {
+    const { token, food, item } = await setUpItems(['Karotte', 'Gurke']);
+    await saveItem(token, { id: item('Karotte').id, name: 'Karotte', synonyms: ['Möhre'] });
+
+    expect((await saveItem(token, { id: item('Gurke').id, name: 'mohre', synonyms: [] })).status).toBe(400);
+    expect((await saveItem(token, { id: null, name: 'Möhre', categoryId: food.id, synonyms: [] })).status).toBe(400);
+  });
+
+  it('rejects new items named like a synonym, even with a category', async () => {
+    const { token, food, item } = await setUpItems(['Karotte']);
+    await saveItem(token, { id: item('Karotte').id, name: 'Karotte', synonyms: ['Möhre'] });
+
+    const response = await request('/shopping/items', {
+      method: 'POST',
+      token,
+      body: [{ name: 'Gurke', amount: '' }, { name: 'möhre', amount: '', categoryId: food.id }]
+    });
+
+    expect(response.status).toBe(400);
+    expect(JSON.parse((await response.json()).error.message)).toEqual([expect.objectContaining({
+      path: ['form'],
+      message: 'shopping_add_items_synonym_taken',
+      params: { name: 'möhre', item: 'Karotte' }
+    })]);
+    expect((await call<Item[]>('/shopping/items', { token })).map((item) => item.name)).toEqual(['Karotte']);
+    // The item itself can still be added.
+    expect((await addItems(token, [{ name: 'Karotte', amount: '' }])).committed).toBe(true);
+  });
+
   it('rejects synonyms that are item names or synonyms of other items', async () => {
     const { token, item } = await setUpItems(['Karotte', 'Möhre', 'Klopapier']);
     await saveItem(token, { id: item('Klopapier').id, name: 'Klopapier', synonyms: ['Toilettenpapier'] });

@@ -645,18 +645,11 @@ export const findTakenSynonym = async (itemId: string | null, synonyms: string[]
   const db = getTx();
 
   for (const synonym of synonyms) {
-    const otherSynonym = sql.raw('other_synonym');
     const item = (await db.select({ name: table.shoppingItem.name })
         .from(table.shoppingItem)
         .where(and(
           itemId ? ne(table.shoppingItem.id, itemId) : undefined,
-          or(
-            eq(normalized(table.shoppingItem.name), normalized(synonym)),
-            sql`EXISTS (
-              SELECT 1 FROM unnest(${table.shoppingItem.synonyms}) AS ${otherSynonym}
-              WHERE ${normalized(otherSynonym)} = ${normalized(synonym)}
-            )`
-          )
+          or(eq(normalized(table.shoppingItem.name), normalized(synonym)), hasSynonym(synonym))
         ))
         .limit(1)
     ).at(0);
@@ -667,6 +660,29 @@ export const findTakenSynonym = async (itemId: string | null, synonyms: string[]
   }
 
   return null;
+};
+
+// Matches items that have the given name as a synonym, ignoring case and accents.
+const hasSynonym = (name: string) => {
+  const synonym = sql.raw('synonym');
+
+  return sql<boolean>`EXISTS (
+    SELECT 1 FROM unnest(${table.shoppingItem.synonyms}) AS ${synonym} WHERE ${normalized(synonym)} = ${normalized(name)}
+  )`;
+};
+
+/**
+ * Finds the item that has the given name as a synonym. Item names and synonyms are unique together, so a new item or a
+ * renamed one must not take the name.
+ */
+export const findShoppingItemWithSynonym = async (name: string, excludedItemId: string | null = null) => {
+  const db = getTx();
+
+  return (await db.select()
+      .from(table.shoppingItem)
+      .where(and(excludedItemId ? ne(table.shoppingItem.id, excludedItemId) : undefined, hasSynonym(name)))
+      .limit(1)
+  ).at(0);
 };
 
 export const findShoppingItemById = async (itemId: string) => {
