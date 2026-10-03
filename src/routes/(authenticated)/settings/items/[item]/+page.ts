@@ -5,7 +5,7 @@ import { handleApiLoad } from '$lib/utils/apiHelper';
 export const load: PageLoad = async ({ params, fetch }) => {
   const client = getApiClient(fetch);
 
-  // New items need a category, existing ones are moved in the categorization settings.
+  // New items need a category, existing ones are moved in the bulk edit settings.
   if (params.item === 'add') {
     return {
       item: null,
