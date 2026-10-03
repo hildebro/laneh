@@ -1,3 +1,28 @@
+# [4.3.0](https://github.com/hildebro/laneh/compare/v4.2.2...v4.3.0) (2026-10-03)
+
+
+### Bug Fixes
+
+* correct icon for browser ([9011e8e](https://github.com/hildebro/laneh/commit/9011e8ecd8a94ca1fee0faae8ecb53723b609b1a))
+* dockerfile ownership ([22b9aae](https://github.com/hildebro/laneh/commit/22b9aae8c00a4339be0aafebdfd9a62e9e7a0ff9))
+* import in migrate.ts ([4a87425](https://github.com/hildebro/laneh/commit/4a874258a2555dda1b7c8f8aa5fffd79cd3162f9))
+* prevent synonyms from ending up as new items ([34512c7](https://github.com/hildebro/laneh/commit/34512c74f2d9cdaab92d7589a7bfc5784ee3f38f))
+* revert migrate.ts import change ([7697967](https://github.com/hildebro/laneh/commit/769796786ebf91bdec8636baeb7b30695a46bbbd))
+* separate node_modules for docker ([406646f](https://github.com/hildebro/laneh/commit/406646f7ea62a64ecd2f17aa8ab32dd9254c0a08))
+
+
+### Features
+
+* add synonyms for shopping items ([4dc2ab9](https://github.com/hildebro/laneh/commit/4dc2ab930a0f7a8508e7676030a51376dec33851))
+* allow item-merges in bulk-edit view ([c7f24b5](https://github.com/hildebro/laneh/commit/c7f24b5097f6ebe7dc6725110e0d0624da1e5fc8))
+* functionality for merging items ([082918e](https://github.com/hildebro/laneh/commit/082918ea48d200f0009399e729265f273b53d935))
+* notification check whenever app opens ([e2e0c90](https://github.com/hildebro/laneh/commit/e2e0c90c65f0a844b75131bb3f5d8f617e726aff))
+* notifications for purchases and expenses ([bf92910](https://github.com/hildebro/laneh/commit/bf92910cca94762b49cea49426edd5843e78d9b1))
+* replace frontend levenshtein with psql similarity checks ([95d6540](https://github.com/hildebro/laneh/commit/95d6540ed5ee308de4d065f2d31f321e0a3cc8fa))
+* server-picker autocompletes protocol and common ports ([6a23477](https://github.com/hildebro/laneh/commit/6a23477b1795e08f7dcabf434899bdc00ef8f629))
+* setup wizard for default category language ([990962a](https://github.com/hildebro/laneh/commit/990962aea9179c9293841aacc787ff0c491e71ac))
+* toasts via header ([edc6347](https://github.com/hildebro/laneh/commit/edc6347e3870552f21592ee4cd4d4d4839424424))
+
 ## [4.2.2](https://github.com/hildebro/laneh/compare/v4.2.1...v4.2.2) (2026-10-02)
 
 
