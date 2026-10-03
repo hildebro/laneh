@@ -24,6 +24,12 @@ export const load: LayoutLoad = async ({ fetch }) => {
     return redirect(302, resolve('/login'));
   }
 
+  // A fresh instance has to finish the setup wizard before the app can be used.
+  const setup = await handleApiLoad(client.api.setup.$get());
+  if (!setup.completed) {
+    return redirect(302, resolve('/setup'));
+  }
+
   // Not awaited, since the page doesn't depend on it.
   void syncNotificationSession(logged_in_user);
 

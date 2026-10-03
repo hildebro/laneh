@@ -114,7 +114,7 @@ export const TEST_PASSWORD = 'password123';
 export async function initiate(householdName = 'Home', username = 'admin') {
   const result = await call<{ sessionToken: string }>('/public/initiate', {
     method: 'POST',
-    body: { householdName, username, password: TEST_PASSWORD, locale: 'en' }
+    body: { householdName, username, password: TEST_PASSWORD }
   });
 
   return result.sessionToken;

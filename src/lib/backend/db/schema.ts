@@ -38,6 +38,8 @@ export const systemStore = pgTable('system_store', {
 export const household = pgTable('household', {
   id: text().primaryKey(),
   name: text().notNull().unique(),
+  // Set once a member has gone through the setup wizard, which creates the default shopping categories.
+  setupCompleted: boolean().notNull().default(false),
   createdAt: timestamp().defaultNow().notNull()
 });
 export type Household = typeof household.$inferSelect;

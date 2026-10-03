@@ -78,6 +78,17 @@ describe('backup', () => {
     expect(await snapshot(restoredToken)).toEqual(before);
   });
 
+  it('skips the setup, even without categories', async () => {
+    const token = await initiate('Home', 'alice');
+
+    const backup = await exportBackup(token);
+    await backend.reset();
+    await importBackup(backup);
+
+    const restoredToken = await login('Home', 'alice');
+    expect(await call('/setup', { token: restoredToken })).toEqual({ completed: true });
+  });
+
   it('restores all households of a server', async () => {
     const token = await initiate('Home', 'alice');
     const other = await addHousehold(token, 'Other', 'carol');

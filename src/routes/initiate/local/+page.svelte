@@ -7,7 +7,6 @@
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import HelpHint from '$lib/components/HelpHint.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import { getLocale } from '$lib/paraglide/runtime.js';
 
   // Local mode has no use for households and users, so dummies are created instead of asking for them.
   async function startFresh() {
@@ -15,8 +14,7 @@
     return client.api.public.local.initiate.$post({
       json: {
         householdName: m.initiate_local_household_name(),
-        username: m.initiate_local_username(),
-        locale: getLocale()
+        username: m.initiate_local_username()
       }
     });
   }
@@ -25,7 +23,7 @@
     const { sessionToken } = await response.json();
     await Preferences.set({ key: 'session_token', value: sessionToken });
 
-    await goto(resolve('/'));
+    await goto(resolve('/setup'));
   }
 
   let files: FileList | undefined = $state();
