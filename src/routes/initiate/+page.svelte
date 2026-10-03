@@ -8,7 +8,6 @@
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import HelpHint from '$lib/components/HelpHint.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import { getLocale } from '$lib/paraglide/runtime.js';
 
   let householdName = $state('');
   let username = $state('');
@@ -16,7 +15,7 @@
 
   async function initiate() {
     const client = getApiClient();
-    return client.api.public.initiate.$post({ json: { householdName, username, password, locale: getLocale() } });
+    return client.api.public.initiate.$post({ json: { householdName, username, password } });
   }
 
   async function onInitiated(response: Response) {
@@ -27,7 +26,7 @@
 
     await Preferences.set({ key: 'householdName', value: householdName });
 
-    await goto(resolve('/'));
+    await goto(resolve('/setup'));
   }
 
   let files: FileList | undefined = $state();

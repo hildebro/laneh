@@ -8,7 +8,6 @@ import { SESSION_COOKIE } from '$lib';
 import { getLoggedInUser } from '$lib/backend/auth';
 import { DUMP_MANIFEST_FILE, type DumpManifest } from '$lib/backend/db/export';
 import {
-  addDefaultShoppingCategories,
   addHousehold,
   addUser,
   createSession,
@@ -22,8 +21,6 @@ import {
 import { extractTarGz } from '$lib/backend/db/tar';
 import { isLocalRuntime } from '$lib/backend/runtime';
 import { getAdminTx } from '$lib/context';
-import * as m from '$lib/paraglide/messages.js';
-import { type Locale, locales } from '$lib/paraglide/runtime.js';
 import { Admin } from '$lib/utils/userHelper';
 import { compareVersions } from '$lib/utils/versionHelper';
 import { z } from '$lib/zod';
@@ -31,40 +28,13 @@ import { z } from '$lib/zod';
 const initiateSchema = z.object({
   householdName: z.string().trim().nonempty(),
   username: z.string().trim().nonempty(),
-  password: z.string().min(6).max(64),
-  locale: z.enum(locales)
+  password: z.string().min(6).max(64)
 });
 
 const localInitiateSchema = z.object({
   householdName: z.string().trim().nonempty(),
-  username: z.string().trim().nonempty(),
-  locale: z.enum(locales)
+  username: z.string().trim().nonempty()
 });
-
-// Categories resembling the aisles of a typical supermarket, roughly in the order they are walked through.
-const defaultCategoryMessages = [
-  m.initiate_category_fruit_vegetables,
-  m.initiate_category_bakery,
-  m.initiate_category_meat_fish,
-  m.initiate_category_dairy,
-  m.initiate_category_chilled,
-  m.initiate_category_breakfast,
-  m.initiate_category_pasta_rice,
-  m.initiate_category_canned,
-  m.initiate_category_baking,
-  m.initiate_category_spices_sauces,
-  m.initiate_category_coffee_tea,
-  m.initiate_category_sweets_snacks,
-  m.initiate_category_drinks,
-  m.initiate_category_alcohol,
-  m.initiate_category_frozen,
-  m.initiate_category_toiletries,
-  m.initiate_category_household,
-  m.initiate_category_pets
-];
-
-const addDefaultCategories = (householdId: string, locale: Locale) =>
-  addDefaultShoppingCategories(householdId, defaultCategoryMessages.map((message) => message({}, { locale })));
 
 const loginSchema = z.object({
   householdName: z.string().trim().nonempty(),
@@ -142,7 +112,6 @@ const publicRouter = new Hono()
 
     const householdId = await addHousehold(initiateData.householdName);
     const userId = await addUser(initiateData.username, initiateData.password, householdId, Admin.Server);
-    await addDefaultCategories(householdId, initiateData.locale);
 
     const session = await createSession(userId);
     setCookie(c, SESSION_COOKIE, session.id, {
@@ -173,7 +142,6 @@ const publicRouter = new Hono()
 
     const householdId = await addHousehold(initiateData.householdName);
     const userId = await addUser(initiateData.username, password, householdId, Admin.Server);
-    await addDefaultCategories(householdId, initiateData.locale);
 
     const session = await createSession(userId);
 
@@ -246,6 +214,11 @@ const publicRouter = new Hono()
     // Dumps don't contain the stats. The imported purchases are older than the last calculation, so all items need to
     // be recalculated.
     await refreshShoppingItemStats(null);
+
+    // The imported households have been set up already, so their categories must not be mixed with the default ones.
+    // Dumps from before the setup wizard don't contain the flag. Only an empty instance can be imported into, so all
+    // households are imported ones.
+    await tx.execute(sql`UPDATE household SET setup_completed = true`);
 
     return c.json({ success: true });
   })

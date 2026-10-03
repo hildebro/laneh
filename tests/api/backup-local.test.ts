@@ -19,7 +19,7 @@ afterAll(backend.close);
 async function initiateLocal(householdName = 'Home', username = 'alice') {
   const result = await call<{ sessionToken: string }>('/public/local/initiate', {
     method: 'POST',
-    body: { householdName, username, locale: 'en' }
+    body: { householdName, username }
   });
 
   return result.sessionToken;

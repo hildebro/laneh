@@ -86,6 +86,23 @@ export const updateHousehold = async (id: string, name: string) => {
   await db.update(table.household).set({ name }).where(eq(table.household.id, id)).execute();
 };
 
+export const isHouseholdSetupCompleted = async (id: string) => {
+  const db = getTx();
+
+  const household = await db.query.household.findFirst({
+    columns: { setupCompleted: true },
+    where: eq(table.household.id, id)
+  });
+
+  return household?.setupCompleted ?? false;
+};
+
+export const completeHouseholdSetup = async (id: string) => {
+  const db = getTx();
+
+  await db.update(table.household).set({ setupCompleted: true }).where(eq(table.household.id, id)).execute();
+};
+
 export const findHousehold = async (id: string) => {
   const db = getTx();
 

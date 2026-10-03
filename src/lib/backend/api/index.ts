@@ -5,6 +5,7 @@ import balanceRouter from '$lib/backend/api/balance';
 import householdRouter from '$lib/backend/api/household';
 import notificationRouter from '$lib/backend/api/notification';
 import publicRouter from '$lib/backend/api/public';
+import setupRouter from '$lib/backend/api/setup';
 import shoppingRouter from '$lib/backend/api/shopping';
 import tasksRouter from '$lib/backend/api/task';
 import type { AppEnv } from '$lib/backend/api/types';
@@ -67,6 +68,7 @@ const routes = app
   .route('/shopping', shoppingRouter)
   .route('/balance', balanceRouter)
   .route('/notifications', notificationRouter)
+  .route('/setup', setupRouter)
   .route('/public', publicRouter);
 
 export type AppType = typeof routes;

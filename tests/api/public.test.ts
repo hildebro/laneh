@@ -1,5 +1,14 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { call, initiate, login, request, startTestBackend, TEST_PASSWORD } from '../helpers/backend';
+import {
+  addHousehold,
+  addUser,
+  call,
+  initiate,
+  login,
+  request,
+  startTestBackend,
+  TEST_PASSWORD
+} from '../helpers/backend';
 
 const backend = await startTestBackend();
 
@@ -20,18 +29,59 @@ describe('initiation', () => {
 
     const response = await request('/public/initiate', {
       method: 'POST',
-      body: { householdName: 'Other', username: 'intruder', password: TEST_PASSWORD, locale: 'en' }
+      body: { householdName: 'Other', username: 'intruder', password: TEST_PASSWORD }
     });
 
     expect(response.status).toBe(405);
   });
 
+});
+
+describe('setup', () => {
+  it('is required after initiation', async () => {
+    const token = await initiate();
+
+    expect(await call('/setup', { token })).toEqual({ completed: false });
+    expect(await call('/shopping/categoriesWithItems', { token })).toEqual([]);
+  });
+
   it('creates the default shopping categories in the chosen locale', async () => {
     const token = await initiate();
 
-    const categories = await call<{ name: string }[]>('/shopping/categoriesWithItems', { token });
+    await call('/setup', { method: 'POST', token, body: { categoryLocale: 'de' } });
 
+    const categories = await call<{ name: string }[]>('/shopping/categoriesWithItems', { token });
     expect(categories.length).toBeGreaterThan(10);
+    expect(categories[0].name).toBe('Obst & Gemüse');
+    expect(await call('/setup', { token })).toEqual({ completed: true });
+  });
+
+  it('can not be repeated', async () => {
+    const token = await initiate();
+    await call('/setup', { method: 'POST', token, body: { categoryLocale: 'en' } });
+
+    const response = await request('/setup', { method: 'POST', token, body: { categoryLocale: 'en' } });
+
+    expect(response.status).toBe(405);
+  });
+
+  it('is required for each household separately', async () => {
+    const token = await initiate();
+    await call('/setup', { method: 'POST', token, body: { categoryLocale: 'en' } });
+
+    const other = await addHousehold(token, 'Other');
+    const member = await addUser(other.token, 'Other', 'bob');
+
+    expect(await call('/setup', { token: member.token })).toEqual({ completed: false });
+
+    // Any member can complete it, not just admins.
+    await call('/setup', { method: 'POST', token: member.token, body: { categoryLocale: 'de' } });
+
+    expect(await call('/setup', { token: other.token })).toEqual({ completed: true });
+    const categories = await call<{ name: string }[]>('/shopping/categoriesWithItems', { token: other.token });
+    expect(categories[0].name).toBe('Obst & Gemüse');
+    const ownCategories = await call<{ name: string }[]>('/shopping/categoriesWithItems', { token });
+    expect(ownCategories[0].name).toBe('Fruit & vegetables');
   });
 });
 
