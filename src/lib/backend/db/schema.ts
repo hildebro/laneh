@@ -248,56 +248,6 @@ export const stagedShoppingPurchaseItem = pgTable('staged_shopping_purchase_item
   userId: text().notNull().references(() => user.id, { onDelete: 'cascade' })
 });
 
-export const stagedShoppingList = pgTable('staged_shopping_list', {
-  id: text().primaryKey(),
-  userId: text().notNull().unique().references(() => user.id, { onDelete: 'cascade' }),
-  status: text({ enum: ['validating', 'categorizing'] }).notNull()
-});
-export type StagedShoppingList = typeof stagedShoppingList.$inferSelect;
-
-export const stagedShoppingListRelations = relations(stagedShoppingList, ({ one, many }) => ({
-  user: one(user, { fields: [stagedShoppingList.userId], references: [user.id] }),
-  stagedItems: many(stagedShoppingItem)
-}));
-
-export const stagedShoppingItem = pgTable('staged_shopping_item', {
-  id: text().primaryKey(),
-  listId: text().notNull().references(() => stagedShoppingList.id, { onDelete: 'cascade' }),
-  status: text({ enum: ['perfect_match', 'unmatched'] }).notNull(),
-  name: text().notNull(),
-  amount: text().notNull(),
-  // FK to shopping_item, non-null only if status is 'perfect_match'
-  matchedItemId: text().references(() => shoppingItem.id),
-  // FK to shopping_item, non-null only if status is 'close_match'
-  suggestedItemId: text().references(() => shoppingItem.id),
-  // FK to shopping_category, non-null but must be set later in status 'unmatched'
-  selectedCategoryId: text().references(() => shoppingCategory.id)
-});
-export type StagedShoppingItem = typeof stagedShoppingItem.$inferSelect;
-
-export const stagedShoppingItemRelations = relations(stagedShoppingItem, ({ one }) => ({
-  // Each staged item belongs to one staged list
-  list: one(stagedShoppingList, { fields: [stagedShoppingItem.listId], references: [stagedShoppingList.id] }),
-  // Link to the actual item if it was a perfect match
-  matchedItem: one(shoppingItem, {
-    fields: [stagedShoppingItem.matchedItemId],
-    references: [shoppingItem.id],
-    relationName: 'matchedItem' // Explicit name helps Drizzle distinguish
-  }),
-  // Link to the suggested item if it was a close match
-  suggestedItem: one(shoppingItem, {
-    fields: [stagedShoppingItem.suggestedItemId],
-    references: [shoppingItem.id],
-    relationName: 'suggestedItem' // Explicit name
-  }),
-  // Link to the selected category if it was already done by the user
-  selectedCategory: one(shoppingCategory, {
-    fields: [stagedShoppingItem.selectedCategoryId],
-    references: [shoppingCategory.id],
-    relationName: 'selectedCategory' // Explicit name
-  })
-}));
-
 // ============================================================================
 // FINANCES
 // ============================================================================
