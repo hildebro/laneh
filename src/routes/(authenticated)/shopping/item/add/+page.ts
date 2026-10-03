@@ -15,7 +15,6 @@ export const load: PageLoad = async ({ fetch, parent }) => {
   }
 
   return {
-    allItems: await handleApiLoad(client.api.shopping.items.$get()),
     suggestions: await handleApiLoad(client.api.shopping.itemSuggestions.$get()),
     help_text: m.shopping_add_items_help()
   };

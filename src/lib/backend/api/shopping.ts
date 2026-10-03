@@ -17,6 +17,7 @@ import {
   findAllShoppingCategories,
   findAllShoppingItems,
   findShoppingCategory,
+  findSimilarShoppingItems,
   getItemAddSuggestions,
   moveCategoryOrderDown,
   moveCategoryOrderUp,
@@ -26,6 +27,7 @@ import {
 } from '$lib/backend/db/functions';
 import { isLocalRuntime } from '$lib/backend/runtime';
 import * as m from '$lib/paraglide/messages.js';
+import { locales } from '$lib/paraglide/runtime.js';
 import { z } from '$lib/zod';
 
 const setCategorySchema = z.object({
@@ -64,6 +66,11 @@ const itemsSchema = z.array(z.object({
       path: ['form']
     }
   );
+
+const similarItemsSchema = z.object({
+  names: z.array(z.string().trim().nonempty()),
+  locale: z.enum(locales)
+});
 
 const stagingItemSchema = z.object({
   itemId: z.string().nonempty()
@@ -137,6 +144,11 @@ const shoppingRouter = new Hono<AppEnv>()
     const items = c.req.valid('json');
 
     return c.json({ success: true, ...(await addShoppingItems(items)) });
+  })
+  .post('/similarItems', zValidator('json', similarItemsSchema), async (c) => {
+    const { names, locale } = c.req.valid('json');
+
+    return c.json(await findSimilarShoppingItems(names, locale));
   })
   .get('/itemSuggestions', async (c) => {
     return c.json(await getItemAddSuggestions());

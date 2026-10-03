@@ -2,7 +2,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import app from '$lib/backend/api';
 import { dbOptions, setDb } from '$lib/backend/db';
-import { migrateDb } from '$lib/backend/db/migrate';
+import { migrateDb, pgliteExtensions } from '$lib/backend/db/migrate';
 import { runNightlyJobsIfDue, startNightlyJobs } from '$lib/backend/jobs';
 import { enableLocalRuntime } from '$lib/backend/runtime';
 import { SerialContext, setTransactionContext } from '$lib/context';
@@ -12,7 +12,7 @@ export async function startLocalBackend(dataDir = 'idb://laneh') {
   // Ask the browser not to evict the database under storage pressure. Not supported everywhere, so failures are fine.
   await navigator.storage?.persist?.().catch(() => false);
 
-  const client = await PGlite.create(dataDir);
+  const client = await PGlite.create(dataDir, { extensions: pgliteExtensions });
   const db = drizzle(client, dbOptions);
   await migrateDb(client, db);
 

@@ -75,3 +75,59 @@ describe('adding items', () => {
     expect(await call<Item[]>('/shopping/items', { token: dave.token })).toEqual([]);
   });
 });
+
+describe('names per household', () => {
+  it('allows the same item and category names in different households', async () => {
+    const aliceToken = await initiate('Home', 'alice');
+    const dave = await addHousehold(aliceToken, 'Other', 'dave');
+    const aliceFood = await addCategory(aliceToken, 'Food');
+    const daveFood = await addCategory(dave.token, 'Food');
+
+    expect((await addItems(aliceToken, [{ name: 'Milk', amount: '', categoryId: aliceFood.id }])).committed).toBe(true);
+    expect((await addItems(dave.token, [{ name: 'Milk', amount: '', categoryId: daveFood.id }])).committed).toBe(true);
+
+    expect((await call<Item[]>('/shopping/items', { token: dave.token })).map((item) => item.name)).toEqual(['Milk']);
+  });
+});
+
+describe('similar items', () => {
+  const findSimilar = (token: string, names: string[], locale = 'de') =>
+    call<Record<string, Item | null>>('/shopping/similarItems', { method: 'POST', token, body: { names, locale } });
+
+  async function setUpItems(names: string[]) {
+    const token = await initiate();
+    const food = await addCategory(token, 'Food');
+    await addItems(token, names.map((name) => ({ name, amount: '', categoryId: food.id })));
+
+    return token;
+  }
+
+  it('matches typos, plurals and accents', async () => {
+    const token = await setUpItems(['Milch', 'Tomate', 'Nuss', 'Joghurt', 'Käse']);
+
+    const result = await findSimilar(token, ['Tomaten', 'Nüsse', 'Jogurt', 'Kase', 'Bio Milch']);
+
+    expect(Object.fromEntries(Object.entries(result).map(([name, item]) => [name, item?.name ?? null]))).toEqual({
+      Tomaten: 'Tomate',
+      Nüsse: 'Nuss',
+      Jogurt: 'Joghurt',
+      Kase: 'Käse',
+      'Bio Milch': 'Milch'
+    });
+  });
+
+  it('keeps exact matches and different items apart', async () => {
+    const token = await setUpItems(['Eis', 'Milchreis', 'Milch']);
+
+    const result = await findSimilar(token, ['milch', 'Reis', 'Brot']);
+
+    expect(result).toEqual({ milch: null, Reis: null, Brot: null });
+  });
+
+  it('only matches items of the own household', async () => {
+    const aliceToken = await setUpItems(['Tomate']);
+    const dave = await addHousehold(aliceToken, 'Other', 'dave');
+
+    expect(await findSimilar(dave.token, ['Tomaten'])).toEqual({ Tomaten: null });
+  });
+});

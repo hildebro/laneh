@@ -38,6 +38,7 @@ import {
   type User
 } from '$lib/backend/db/schema';
 import { getAdminTx, getTx } from '$lib/context';
+import type { Locale } from '$lib/paraglide/runtime.js';
 import type { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { SystemStoreKey } from '$lib/utils/systemStoreHelper';
 import { Assignment, TaskType, type Weekday } from '$lib/utils/taskHelper';
@@ -583,6 +584,50 @@ export const findShoppingItem = async (name: string): Promise<ShoppingItem | und
       .from(table.shoppingItem)
       .where(eq(lower(table.shoppingItem.name), name.toLowerCase()))
   ).at(0);
+};
+
+// Text search configurations, whose stemmers reduce words to their stem, e.g. "Tomaten" to "tomat".
+const textSearchConfigs: Record<Locale, string> = {
+  de: 'german',
+  en: 'english'
+};
+
+// Minimum trigram similarity for a name to count as a typo of an existing item. Lower values start matching different
+// items, especially compound words like "Milch" and "Milchreis" (0.45) or short words like "Reis" and "Eis" (0.29).
+const similarNameThreshold = 0.5;
+
+/**
+ * Finds the existing item each of the given names most likely refers to. A name matches, if it has the same stems
+ * (plurals and inflections) or is similar enough to be a typo. Case and accents are ignored. Names that exist exactly or
+ * resemble nothing are mapped to null.
+ */
+export const findSimilarShoppingItems = async (names: string[], locale: Locale) => {
+  const db = getTx();
+
+  const config = sql`${textSearchConfigs[locale]}::regconfig`;
+  const normalized = (value: AnyPgColumn | string) => sql`unaccent(lower(${value}))`;
+  const stems = (value: AnyPgColumn | string) => sql`array_to_string(tsvector_to_array(to_tsvector(${config}, ${normalized(value)})), ' ')`;
+
+  const result: Record<string, ShoppingItem | null> = {};
+  for (const name of names) {
+    const exactMatch = await findShoppingItem(name);
+    if (exactMatch) {
+      result[name] = null;
+      continue;
+    }
+
+    const sameStems = sql<boolean>`${stems(table.shoppingItem.name)} = ${stems(name)} AND ${stems(name)} <> ''`;
+    const similarity = sql<number>`similarity(${normalized(table.shoppingItem.name)}, ${normalized(name)})`;
+
+    result[name] = (await db.select()
+        .from(table.shoppingItem)
+        .where(or(sameStems, gte(similarity, similarNameThreshold)))
+        .orderBy(desc(sameStems), desc(similarity))
+        .limit(1)
+    ).at(0) ?? null;
+  }
+
+  return result;
 };
 
 export const reactivateShoppingItem = async (itemId: string, amount: string | undefined): Promise<void> => {

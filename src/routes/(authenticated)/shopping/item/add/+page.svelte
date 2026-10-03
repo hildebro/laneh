@@ -1,20 +1,20 @@
 <script lang="ts">
   import { CircleAlert, CirclePlus, Trash } from '@lucide/svelte';
-  import levenshteinPkg from 'fast-levenshtein';
   import { tick } from 'svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { getApiClient } from '$lib/apiClient';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { getLocale } from '$lib/paraglide/runtime.js';
   import { addToast } from '$lib/stores/toast';
+  import { handleApiLoad } from '$lib/utils/apiHelper';
   import { setStagedShoppingItems } from '$lib/utils/shoppingItemStaging';
-  // The actual function is usually on the '.get' property for this library
-  const levenshtein = levenshteinPkg.get;
 
   let { data } = $props();
 
   let correctionRequired = $state(true);
+  let correcting = $state(false);
 
   type RowItem = {
     amount: string,
@@ -116,29 +116,35 @@
     }
   }
 
-  function applyCorrections(e: MouseEvent) {
+  async function applyCorrections(e: MouseEvent) {
     if (!correctionRequired) {
       // With this return, the corrections will be skipped and the normal submit action will come next.
       return;
     }
 
+    // Looking up similar items takes a request, so the submit is triggered manually afterwards, if nothing changed.
+    e.preventDefault();
+    const form = (e.currentTarget as HTMLButtonElement).form;
+
+    correcting = true;
     let anyItemCorrected = false;
-    for (const index in items) {
-      anyItemCorrected = handleCorrection(parseInt(index)) || anyItemCorrected;
+    try {
+      anyItemCorrected = await handleCorrections();
+    } catch (error) {
+      // Corrections are only a convenience, so a failed lookup shouldn't keep the items from being added.
+      console.error(error);
+    } finally {
+      correcting = false;
     }
 
+    // The next submit won't execute corrections again, so reverted corrections stick.
+    correctionRequired = false;
+
     if (anyItemCorrected) {
-      // Prevent the button from causing a submit.
-      e.preventDefault();
       // Let the user know about executed corrections.
       addToast({ message: m.shopping_add_items_corrected(), duration: 6000 });
-      // Flip the value, so the next submit won't execute corrections again. Note that it's
-      // technically more appropriate to update this flag outside the if-clause. Whether something
-      // was corrected doesn't really matter for this flag: It could be set to false regardless.
-      // But that would cause the correction button to be removed from the DOM and in turn prevent
-      // the submit action. Since we only want to prevent it, if an item was corrected, we are
-      // forced to keep it here.
-      correctionRequired = false;
+    } else {
+      form?.requestSubmit();
     }
   }
 
@@ -161,62 +167,31 @@
   }
 
   /**
-   * Returns true, if the item has been corrected.
+   * Replaces names that most likely refer to an existing item (typos, plurals) with that item's name. Returns true, if
+   * any item has been corrected.
    */
-  function handleCorrection(index: number): boolean {
-    let itemToCorrect = items[index];
-    if (itemToCorrect.preventCorrection) {
+  async function handleCorrections(): Promise<boolean> {
+    const itemsToCorrect = items.filter(item => !item.preventCorrection && item.name.trim().length > 0);
+    if (itemsToCorrect.length === 0) {
       return false;
     }
 
-    const nameToCorrect = itemToCorrect.name.trim().toLowerCase();
-    if (nameToCorrect.length === 0) {
-      return false;
-    }
+    const client = getApiClient();
+    const similarItems = await handleApiLoad(client.api.shopping.similarItems.$post({
+      json: { names: itemsToCorrect.map(item => item.name), locale: getLocale() }
+    }));
 
-    // Dynamic maximum distance: Shorter words get less leeway.
-    // Length <= 4: max 1 typo
-    // Length 5-7: max 2 typos
-    // Length 8+: max 3 typos
-    let maxDistance = 1;
-    if (nameToCorrect.length >= 5) maxDistance = 2;
-    if (nameToCorrect.length >= 8) maxDistance = 3;
-
-    let closestItem = null;
-    let minDistanceFound = Infinity;
-
-    for (const item of data.allItems) {
-      const compareName = item.name.trim().toLowerCase();
-
-      // If an exact match exists on the ORIGINAL string, abort correction.
-      if (compareName === nameToCorrect) {
-        return false;
-      }
-
-      let distance = levenshtein(nameToCorrect, compareName);
-
-      // Substring Bonus: If one word entirely contains the other, we can artificially lower the
-      // distance by 1 to be more forgiving.
-      if (
-        (compareName.startsWith(nameToCorrect) || nameToCorrect.startsWith(compareName))
-        && distance > 0
-      ) {
-        distance -= 1;
-      }
-
-      // Check against our dynamic threshold
-      if (distance >= 0 && distance <= maxDistance && distance < minDistanceFound) {
-        minDistanceFound = distance;
-        closestItem = item;
+    let anyItemCorrected = false;
+    for (const item of itemsToCorrect) {
+      const similarItem = similarItems[item.name.trim()];
+      if (similarItem) {
+        item.overwrittenName = item.name;
+        item.name = similarItem.name;
+        anyItemCorrected = true;
       }
     }
 
-    if (closestItem) {
-      itemToCorrect.overwrittenName = itemToCorrect.name;
-      itemToCorrect.name = closestItem.name;
-    }
-
-    return !!closestItem;
+    return anyItemCorrected;
   }
 
   function handleRestore(index: number) {
@@ -323,7 +298,7 @@
       </div>
     {/if}
     {#snippet additionalButtons()}
-      <button type="submit" onclick={applyCorrections}>{ m.generic_save() }</button>
+      <button type="submit" onclick={applyCorrections} disabled={correcting}>{ m.generic_save() }</button>
     {/snippet}
   </ApiForm>
 </article>

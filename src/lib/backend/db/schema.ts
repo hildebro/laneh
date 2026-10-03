@@ -102,9 +102,10 @@ export const shoppingCategory = pgTable('shopping_category', {
     .notNull()
     .references(() => household.id, { onDelete: 'cascade' })
     .default(sql`current_setting('app.current_household_id')`),
-  name: text().notNull().unique(),
+  name: text().notNull(),
   priority: integer().notNull()
-}, () => [
+}, (table) => [
+  unique().on(table.name, table.householdId),
   pgPolicy('isolate_households', {
     for: 'all',
     using: sql`household_id = current_setting('app.current_household_id', true)`
@@ -133,11 +134,12 @@ export const shoppingItem = pgTable('shopping_item', {
     .references(() => household.id, { onDelete: 'cascade' })
     .default(sql`current_setting('app.current_household_id')`),
   categoryId: text().references(() => shoppingCategory.id),
-  name: text().notNull().unique(),
+  name: text().notNull(),
   amount: text().notNull().default(''),
   priority: integer().notNull(),
   active: boolean().notNull()
-}, () => [
+}, (table) => [
+  unique().on(table.name, table.householdId),
   pgPolicy('isolate_households', {
     for: 'all',
     using: sql`household_id = current_setting('app.current_household_id', true)`
