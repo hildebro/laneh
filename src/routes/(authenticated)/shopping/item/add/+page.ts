@@ -4,12 +4,13 @@ import { resolve } from '$app/paths';
 import { getApiClient } from '$lib/apiClient';
 import * as m from '$lib/paraglide/messages.js';
 import { handleApiLoad } from '$lib/utils/apiHelper';
+import { getStagedShoppingItems } from '$lib/utils/shoppingItemStaging';
 
-export const load: PageLoad = async ({ fetch }) => {
+export const load: PageLoad = async ({ fetch, parent }) => {
   const client = getApiClient(fetch);
+  const { logged_in_user } = await parent();
 
-  const existingList = await handleApiLoad(client.api.shopping.stagedItems.$get());
-  if (existingList) {
+  if (getStagedShoppingItems(logged_in_user.id)) {
     return redirect(302, resolve('/shopping/item/categorize'));
   }
 

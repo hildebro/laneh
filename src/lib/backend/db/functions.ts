@@ -1037,143 +1037,48 @@ export async function calculateUserDebts(): Promise<DebtResult[]> {
   return Array.from(resultsByCreditor.values());
 }
 
-// ------- STAGED SHOPPING LIST -------
-export const findStagedShoppingList = async (userId: string) => {
-  const db = getTx();
-
-  return db.query.stagedShoppingList.findFirst({
-    with: {
-      stagedItems: {
-        with: {
-          suggestedItem: {},
-          matchedItem: {}
-        }
-      }
-    },
-    where: eq(table.stagedShoppingList.userId, userId)
-  }).execute();
-};
-
-export const addStagedShoppingList = async (userId: string, items: {
+// ------- ADDING SHOPPING ITEMS -------
+export type ShoppingItemToAdd = {
   amount: string,
-  name: string
-}[]) => {
-  const db = getTx();
+  name: string,
+  categoryId?: string | null
+};
 
-  const listId = generateUUID();
-  await db.insert(table.stagedShoppingList).values({
-    id: listId,
-    userId: userId,
-    status: 'validating'
-  });
-
-  let needsCategorization = false;
+/**
+ * Adds all items at once, or none of them. Items whose name matches an existing item are reactivated. Every other item
+ * needs a valid category. If any category is missing, nothing is written and the items are returned, so the client can
+ * collect the categories and try again.
+ */
+export const addShoppingItems = async (items: ShoppingItemToAdd[]) => {
+  const resolvedItems = [];
   for (const item of items) {
-    const matchedItem = await findShoppingItem(item.name);
-    if (matchedItem) {
-      await addPerfectStagedItem(listId, matchedItem, item.amount);
+    const matched = !!(await findShoppingItem(item.name));
+    // An unknown category (deleted in the meantime) has to be picked again.
+    const category = !matched && item.categoryId ? await findShoppingCategory(item.categoryId) : undefined;
+
+    resolvedItems.push({
+      name: item.name,
+      amount: item.amount,
+      categoryId: category?.id ?? null,
+      needsCategory: !matched && !category
+    });
+  }
+
+  if (resolvedItems.some(item => item.needsCategory)) {
+    return { committed: false, items: resolvedItems };
+  }
+
+  for (const item of resolvedItems) {
+    // Looked up again, since the same name may occur more than once and is added by the first occurrence.
+    const existingItem = await findShoppingItem(item.name);
+    if (existingItem) {
+      await reactivateShoppingItem(existingItem.id, item.amount);
     } else {
-      await addNewStagedItem(listId, item.name, item.amount);
-      needsCategorization = true;
+      await addShoppingItem(item.categoryId as string, item.name, item.amount);
     }
   }
 
-  return needsCategorization;
-};
-
-export const addPerfectStagedItem = async (listId: string, matchedItem: ShoppingItem, amount: string | undefined): Promise<void> => {
-  const db = getTx();
-
-  await db.insert(table.stagedShoppingItem).values({
-    id: generateUUID(),
-    listId: listId,
-    status: 'perfect_match',
-    name: matchedItem.name,
-    amount: amount ?? '',
-    matchedItemId: matchedItem.id
-  });
-};
-
-export const addNewStagedItem = async (listId: string, name: string, amount: string | undefined): Promise<void> => {
-  const db = getTx();
-
-  await db.insert(table.stagedShoppingItem).values({
-    id: generateUUID(),
-    listId: listId,
-    status: 'unmatched',
-    name: name,
-    amount: amount ?? ''
-  });
-};
-
-export const assignCategoryToStagedItems = async (userId: string, itemIds: string[], categoryId: string) => {
-  const db = getTx();
-
-  await db.update(table.stagedShoppingItem)
-    .set({
-      selectedCategoryId: categoryId
-    })
-    .from(table.stagedShoppingList)
-    .where(
-      and(
-        eq(table.stagedShoppingItem.listId, table.stagedShoppingList.id),
-        eq(table.stagedShoppingList.userId, userId),
-        inArray(table.stagedShoppingItem.id, itemIds)
-      )
-    ).execute();
-};
-
-export const categorizationFinished = async (userId: string) => {
-  const db = getTx();
-
-  const result = await db
-    .select({ uncategorizedItemCount: count(table.stagedShoppingItem.id) })
-    .from(table.stagedShoppingItem)
-    .innerJoin(table.stagedShoppingList, eq(table.stagedShoppingItem.listId, table.stagedShoppingList.id))
-    .where(
-      and(
-        eq(table.stagedShoppingItem.status, 'unmatched'),
-        isNull(table.stagedShoppingItem.selectedCategoryId),
-        eq(table.stagedShoppingList.userId, userId)
-      )
-    ).execute();
-
-  const uncategorizedItemCount = result.at(0)?.uncategorizedItemCount ?? 0;
-
-  return uncategorizedItemCount === 0;
-};
-
-export const commitStagedItems = async (userId: string) => {
-  const db = getTx();
-
-  const list = await db.query.stagedShoppingList.findFirst({
-    with: {
-      stagedItems: {}
-    },
-    where: eq(table.stagedShoppingList.userId, userId)
-  }).execute();
-
-  if (!list) {
-    throw new Error('Trying to commit nonexistent list.');
-  }
-
-  for (const item of list.stagedItems) {
-    switch (item.status) {
-      case 'perfect_match':
-        await reactivateShoppingItem(item.matchedItemId as string, item.amount);
-        continue;
-      case 'unmatched':
-        await addShoppingItem(item.selectedCategoryId as string, item.name, item.amount);
-    }
-  }
-
-  await deleteStagedList(userId);
-};
-
-export const deleteStagedList = async (userId: string) => {
-  const db = getTx();
-
-  await db.delete(table.stagedShoppingList).where(eq(table.stagedShoppingList.userId, userId)).execute();
+  return { committed: true, items: resolvedItems };
 };
 
 // ------- TASKS -------

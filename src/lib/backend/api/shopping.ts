@@ -4,24 +4,19 @@ import type { AppEnv } from '$lib/backend/api/types';
 import {
   addNotification,
   addShoppingCategory,
-  addStagedShoppingList,
+  addShoppingItems,
   assignCategoryToShoppingItems,
-  assignCategoryToStagedItems,
-  categorizationFinished,
-  commitStagedItems,
   countActiveShoppingItems,
   createShoppingPurchase,
   deactivateShoppingItems,
   deleteCategory,
   deleteShoppingItems,
-  deleteStagedList,
   fetchLastPurchaseDate,
   findActiveItemsByCategory,
   findAllPurchases,
   findAllShoppingCategories,
   findAllShoppingItems,
   findShoppingCategory,
-  findStagedShoppingList,
   getItemAddSuggestions,
   moveCategoryOrderDown,
   moveCategoryOrderUp,
@@ -53,7 +48,8 @@ const categorySchema = z.object({
 
 const itemsSchema = z.array(z.object({
   amount: z.string().trim(),
-  name: z.string().trim()
+  name: z.string().trim(),
+  categoryId: z.string().nullish()
 }))
   .transform((data) => {
     return data
@@ -68,11 +64,6 @@ const itemsSchema = z.array(z.object({
       path: ['form']
     }
   );
-
-const categorizeItemSchema = z.object({
-  itemIds: z.array(z.string().nonoptional()).nonempty(m.shopping_categorize_select_items_invalid()),
-  categoryId: z.string().nonoptional()
-});
 
 const stagingItemSchema = z.object({
   itemId: z.string().nonempty()
@@ -145,43 +136,10 @@ const shoppingRouter = new Hono<AppEnv>()
   .post('/items', zValidator('json', itemsSchema), async (c) => {
     const items = c.req.valid('json');
 
-    const loggedInUser = c.get('loggedInUser');
-
-    const needsCategorization = await addStagedShoppingList(loggedInUser.id, items);
-    if (!needsCategorization) {
-      await commitStagedItems(loggedInUser.id);
-    }
-
-    return c.json({ success: true });
-  })
-  .post('/categorizeItems', zValidator('json', categorizeItemSchema), async (c) => {
-    const data = c.req.valid('json');
-
-    const loggedInUser = c.get('loggedInUser');
-
-    await assignCategoryToStagedItems(loggedInUser.id, data.itemIds, data.categoryId);
-
-    const finished = await categorizationFinished(loggedInUser.id);
-    if (finished) {
-      await commitStagedItems(loggedInUser.id);
-    }
-
-    return c.json({ success: true, finished });
-  })
-  .post('/cancelStagedItems', async (c) => {
-    const loggedInUser = c.get('loggedInUser');
-
-    await deleteStagedList(loggedInUser.id);
-
-    return c.json({ success: true });
+    return c.json({ success: true, ...(await addShoppingItems(items)) });
   })
   .get('/itemSuggestions', async (c) => {
     return c.json(await getItemAddSuggestions());
-  })
-  .get('/stagedItems', async (c) => {
-    const user = c.get('loggedInUser');
-
-    return c.json((await findStagedShoppingList(user.id)) ?? null);
   })
   .post('/setItemCategory', zValidator('json', setCategorySchema), async (c) => {
     const setCategory = c.req.valid('json');

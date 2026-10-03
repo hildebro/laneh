@@ -6,27 +6,36 @@
   import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
   import * as m from '$lib/paraglide/messages.js';
+  import { clearStagedShoppingItems, setStagedShoppingItems } from '$lib/utils/shoppingItemStaging';
 
   let { data } = $props();
 
-  let itemIds = $state([]);
+  // Indices into data.items
+  let selectedIndices = $state<number[]>([]);
 
   let pendingCategoryId = $state<string>('');
 
+  // Sends the whole list each time. The server only adds the items, once none of them needs a category anymore.
   async function submitCategorizeAction() {
     const client = getApiClient();
-    return client.api.shopping.categorizeItems.$post({
-      json: { itemIds, categoryId: pendingCategoryId }
+    return client.api.shopping.items.$post({
+      json: data.items.map((item, index) => selectedIndices.includes(index)
+        ? { ...item, categoryId: pendingCategoryId }
+        : item)
     });
   }
 
   async function onCategorizeSuccess(response: Response) {
-    const json = await response.json();
-    if (json?.finished) {
-      await goto(resolve('/shopping'));
-    }
+    const result = await response.json();
+    selectedIndices = [];
 
-    await invalidateAll();
+    if (result.committed) {
+      clearStagedShoppingItems(data.logged_in_user.id);
+      await goto(resolve('/shopping'));
+    } else {
+      // The form reloads the page data afterwards, which picks up the new state.
+      setStagedShoppingItems(data.logged_in_user.id, result.items);
+    }
   }
 
   async function submitNewCategoryAction() {
@@ -43,9 +52,9 @@
     categoryName = '';
   }
 
-  async function cancelAction() {
-    const client = getApiClient();
-    return client.api.shopping.cancelStagedItems.$post();
+  async function cancel() {
+    clearStagedShoppingItems(data.logged_in_user.id);
+    await goto(resolve('/shopping'));
   }
 </script>
 
@@ -54,24 +63,20 @@
 </svelte:head>
 
 <div class="action-bar">
-  <ApiForm
-    submitAction={cancelAction}
-    submitButtonText={m.shopping_cancel_staging()}
-    onSuccess={resolve('/shopping')}
-  >
-    <span></span>
-  </ApiForm>
+  <button type="button" onclick={cancel}>{ m.shopping_cancel_staging() }</button>
 </div>
 <article>
   <h2>{ m.shopping_categorize() }</h2>
 
   { m.shopping_categorize_select_items() }
   <div class="select-container">
-    {#each data.items.filter(item => item.status === 'unmatched' && item.selectedCategoryId === null) as item (item.id)}
-      <label>
-        <input type="checkbox" name="itemIds" value={item.id} bind:group={itemIds} />
-        {item.name}
-      </label>
+    {#each data.items as item, index (index)}
+      {#if item.needsCategory}
+        <label>
+          <input type="checkbox" name="itemIds" value={index} bind:group={selectedIndices} />
+          {item.name}
+        </label>
+      {/if}
     {/each}
   </div>
 
@@ -85,6 +90,7 @@
         {#each data.selectableCategories as category (category.id)}
           <button
             type="submit"
+            disabled={selectedIndices.length === 0}
             onclick={() => pendingCategoryId = category.id}
           >
             {category.name}

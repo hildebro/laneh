@@ -8,7 +8,7 @@
   import ApiForm from '$lib/components/ApiForm.svelte';
   import * as m from '$lib/paraglide/messages.js';
   import { addToast } from '$lib/stores/toast';
-  import { handleApiLoad } from '$lib/utils/apiHelper';
+  import { setStagedShoppingItems } from '$lib/utils/shoppingItemStaging';
   // The actual function is usually on the '.get' property for this library
   const levenshtein = levenshteinPkg.get;
 
@@ -149,12 +149,13 @@
     });
   }
 
-  async function onSuccess() {
-    const client = getApiClient();
-    const stagedList = await handleApiLoad(client.api.shopping.stagedItems.$get());
-    if (!stagedList) {
+  async function onSuccess(response: Response) {
+    const result = await response.json();
+    if (result.committed) {
       await goto(resolve('/shopping'));
     } else {
+      // Unknown items need a category first. Until then, the list is kept on the device.
+      setStagedShoppingItems(data.logged_in_user.id, result.items);
       await goto(resolve('/shopping/item/categorize'));
     }
   }

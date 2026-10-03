@@ -204,14 +204,8 @@ describe('notifications', () => {
 
     await call('/shopping/category', { method: 'POST', token: alice.token, body: { id: null, name: 'Food' } });
     const [food] = await call<{ id: string }[]>('/shopping/categoriesWithItems', { token: alice.token });
-    const items = [{ name: 'Milk', amount: '' }, { name: 'Bread', amount: '' }];
+    const items = [{ name: 'Milk', amount: '', categoryId: food.id }, { name: 'Bread', amount: '', categoryId: food.id }];
     await call('/shopping/items', { method: 'POST', token: alice.token, body: items });
-    const staged = await call<{ stagedItems: { id: string }[] }>('/shopping/stagedItems', { token: alice.token });
-    await call('/shopping/categorizeItems', {
-      method: 'POST',
-      token: alice.token,
-      body: { itemIds: staged.stagedItems.map((item) => item.id), categoryId: food.id }
-    });
 
     for (const item of await call<{ id: string }[]>('/shopping/items', { token: alice.token })) {
       await call('/shopping/stagePurchaseItem', { method: 'POST', token: alice.token, body: { itemId: item.id } });
