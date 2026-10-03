@@ -12,6 +12,7 @@ import {
   deactivateShoppingItems,
   deleteCategory,
   deleteShoppingItems,
+  dismissShoppingItemMergeCandidates,
   fetchLastPurchaseDate,
   findActiveItemsByCategory,
   findAllPurchases,
@@ -20,10 +21,12 @@ import {
   findShoppingCategory,
   findShoppingItem,
   findShoppingItemById,
+  findShoppingItemMergeCandidates,
   findShoppingItemWithSynonym,
   findSimilarShoppingItems,
   findTakenSynonym,
   getItemAddSuggestions,
+  mergeShoppingItems,
   moveCategoryOrderDown,
   moveCategoryOrderUp,
   stagePurchaseItem,
@@ -78,23 +81,63 @@ const similarItemsSchema = z.object({
   locale: z.enum(locales)
 });
 
+// Empty entries are dropped and duplicates (ignoring case) only kept once.
+const synonymsSchema = z.array(z.string().trim())
+  .transform((synonyms) => synonyms.filter((synonym, index) => synonym.length > 0
+    && synonyms.findIndex((other) => other.toLowerCase() === synonym.toLowerCase()) === index));
+
 const itemSchema = z.object({
   id: z.union([z.string().nonempty(), z.null()]),
   name: z.string().trim().nonempty(),
   // Only needed for new items, existing ones are moved in the categorization settings.
   categoryId: z.string().nullish(),
-  // Empty entries are dropped and duplicates (ignoring case) only kept once.
-  synonyms: z.array(z.string().trim())
-    .transform((synonyms) => synonyms.filter((synonym, index) => synonym.length > 0
-      && synonyms.findIndex((other) => other.toLowerCase() === synonym.toLowerCase()) === index))
+  synonyms: synonymsSchema
 });
 
 // Same as the unaccent(lower()) comparison in the database, e.g. "Möhre" and "mohre" are the same.
 const normalizeName = (name: string) => name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 
+/**
+ * Item names and synonyms are unique together across a household. Checks the name and synonyms meant for the given items
+ * against all other items. Returns the error to respond with, if they collide.
+ */
+async function validateItemNames(name: string, synonyms: string[], ownItemIds: string[]) {
+  const sameName = await findShoppingItem(name);
+  if (sameName && !ownItemIds.includes(sameName.id)) {
+    return formError('name', 'settings_items_name_taken', { name: sameName.name });
+  }
+
+  const synonymItem = await findShoppingItemWithSynonym(name, ownItemIds);
+  if (synonymItem) {
+    return formError('name', 'settings_items_name_is_synonym', { name, item: synonymItem.name });
+  }
+
+  const ownName = synonyms.find((synonym) => normalizeName(synonym) === normalizeName(name));
+  const taken = ownName ? { synonym: ownName, item: name } : await findTakenSynonym(ownItemIds, synonyms);
+  if (taken) {
+    return formError('synonyms', 'settings_items_synonym_taken', taken);
+  }
+
+  return null;
+}
+
 function formError(path: string, message: string, params?: Record<string, string>) {
   return new z.ZodError([{ code: 'custom', path: [path], message, params }]);
 }
+
+const mergeCandidatesSchema = z.object({
+  locale: z.enum(locales)
+});
+
+// Too few items are reported as a form error, since they are picked via checkboxes.
+const mergeItemsSchema = z.object({
+  itemIds: z.array(z.string().nonempty()),
+  // The merged items live on in the one with this id, but get the name and synonyms below.
+  mainItemId: z.string().nonempty(),
+  name: z.string().trim().nonempty(),
+  synonyms: synonymsSchema,
+  categoryId: z.string().nonempty()
+});
 
 const stagingItemSchema = z.object({
   itemId: z.string().nonempty()
@@ -205,22 +248,9 @@ const shoppingRouter = new Hono<AppEnv>()
   .post('/item', zValidator('json', itemSchema), async (c) => {
     const { id, name, categoryId, synonyms } = c.req.valid('json');
 
-    const sameName = await findShoppingItem(name);
-    if (sameName && sameName.id !== id) {
-      return c.json({ success: false, error: formError('name', 'settings_items_name_taken', { name: sameName.name }) }, 400);
-    }
-
-    const synonymItem = await findShoppingItemWithSynonym(name, id);
-    if (synonymItem) {
-      const error = formError('name', 'settings_items_name_is_synonym', { name, item: synonymItem.name });
-
+    const error = await validateItemNames(name, synonyms, id ? [id] : []);
+    if (error) {
       return c.json({ success: false, error }, 400);
-    }
-
-    const ownName = synonyms.find((synonym) => normalizeName(synonym) === normalizeName(name));
-    const taken = ownName ? { synonym: ownName, item: name } : await findTakenSynonym(id, synonyms);
-    if (taken) {
-      return c.json({ success: false, error: formError('synonyms', 'settings_items_synonym_taken', taken) }, 400);
     }
 
     if (id) {
@@ -236,6 +266,48 @@ const shoppingRouter = new Hono<AppEnv>()
 
       await createShoppingItem(categoryId, name, synonyms);
     }
+
+    return c.json({ success: true });
+  })
+  .get('/mergeCandidates', zValidator('query', mergeCandidatesSchema), async (c) => {
+    return c.json(await findShoppingItemMergeCandidates(c.req.valid('query').locale));
+  })
+  .post('/mergeItems', zValidator('json', mergeItemsSchema), async (c) => {
+    const { itemIds, mainItemId, name, synonyms, categoryId } = c.req.valid('json');
+
+    const uniqueItemIds = [...new Set(itemIds)];
+    if (uniqueItemIds.length < 2 || !uniqueItemIds.includes(mainItemId)) {
+      return c.json({ success: false, error: formError('form', 'settings_items_merge_invalid') }, 400);
+    }
+    for (const itemId of uniqueItemIds) {
+      if (!(await findShoppingItemById(itemId))) {
+        return c.json({ error: m.error_item_not_found() }, 404);
+      }
+    }
+    if (!(await findShoppingCategory(categoryId))) {
+      return c.json({ error: m.error_category_not_found() }, 404);
+    }
+
+    const error = await validateItemNames(name, synonyms, uniqueItemIds);
+    if (error) {
+      return c.json({ success: false, error }, 400);
+    }
+
+    const otherItemIds = uniqueItemIds.filter((itemId) => itemId !== mainItemId);
+    await mergeShoppingItems(mainItemId, otherItemIds, { name, synonyms, categoryId });
+
+    return c.json({ success: true });
+  })
+  .post('/dismissMergeCandidates', zValidator('json', itemActionSchema), async (c) => {
+    const { itemIds } = c.req.valid('json');
+    // Foreign keys ignore row level security, so items of other households have to be ruled out here.
+    for (const itemId of itemIds) {
+      if (!(await findShoppingItemById(itemId))) {
+        return c.json({ error: m.error_item_not_found() }, 404);
+      }
+    }
+
+    await dismissShoppingItemMergeCandidates(itemIds);
 
     return c.json({ success: true });
   })

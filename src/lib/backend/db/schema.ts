@@ -253,6 +253,23 @@ export const stagedShoppingPurchaseItem = pgTable('staged_shopping_purchase_item
   userId: text().notNull().references(() => user.id, { onDelete: 'cascade' })
 });
 
+// Pairs of similar items that the user marked as different, so the merge helper doesn't suggest them again. A pair is
+// stored in either order.
+export const shoppingItemDistinction = pgTable('shopping_item_distinction', {
+  itemId: text().notNull().references(() => shoppingItem.id, { onDelete: 'cascade' }),
+  otherItemId: text().notNull().references(() => shoppingItem.id, { onDelete: 'cascade' }),
+  householdId: text()
+    .notNull()
+    .references(() => household.id, { onDelete: 'cascade' })
+    .default(sql`current_setting('app.current_household_id')`)
+}, (t) => [
+  primaryKey({ columns: [t.itemId, t.otherItemId] }),
+  pgPolicy('isolate_households', {
+    for: 'all',
+    using: sql`household_id = current_setting('app.current_household_id', true)`
+  })
+]).enableRLS();
+
 // ============================================================================
 // FINANCES
 // ============================================================================

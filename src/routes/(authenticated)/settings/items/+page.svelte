@@ -15,6 +15,7 @@
 
 <div class="action-bar">
   <a role="button" href={resolve('/settings/items/add')}>{ m.settings_items_add() }</a>
+  <a role="button" href={resolve('/settings/items/merge')}>{ m.settings_items_merge_headline() }</a>
 </div>
 {#if categories.length === 0}
   <article>{m.settings_items_empty()}</article>
