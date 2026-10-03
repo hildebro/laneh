@@ -20,6 +20,7 @@ import {
   findShoppingCategory,
   findShoppingItem,
   findShoppingItemById,
+  findShoppingItemWithSynonym,
   findSimilarShoppingItems,
   findTakenSynonym,
   getItemAddSuggestions,
@@ -166,6 +167,16 @@ const shoppingRouter = new Hono<AppEnv>()
   .post('/items', zValidator('json', itemsSchema), async (c) => {
     const items = c.req.valid('json');
 
+    // A reverted correction may leave a name that is another item's synonym. Existing names are fine, they are the item.
+    for (const { name } of items) {
+      const synonymItem = !(await findShoppingItem(name)) && await findShoppingItemWithSynonym(name);
+      if (synonymItem) {
+        const error = formError('form', 'shopping_add_items_synonym_taken', { name, item: synonymItem.name });
+
+        return c.json({ success: false, error }, 400);
+      }
+    }
+
     return c.json({ success: true, ...(await addShoppingItems(items)) });
   })
   .post('/similarItems', zValidator('json', similarItemsSchema), async (c) => {
@@ -197,6 +208,13 @@ const shoppingRouter = new Hono<AppEnv>()
     const sameName = await findShoppingItem(name);
     if (sameName && sameName.id !== id) {
       return c.json({ success: false, error: formError('name', 'settings_items_name_taken', { name: sameName.name }) }, 400);
+    }
+
+    const synonymItem = await findShoppingItemWithSynonym(name, id);
+    if (synonymItem) {
+      const error = formError('name', 'settings_items_name_is_synonym', { name, item: synonymItem.name });
+
+      return c.json({ success: false, error }, 400);
     }
 
     const ownName = synonyms.find((synonym) => normalizeName(synonym) === normalizeName(name));
