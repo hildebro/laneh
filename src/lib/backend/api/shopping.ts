@@ -7,6 +7,7 @@ import {
   addShoppingItems,
   assignCategoryToShoppingItems,
   countActiveShoppingItems,
+  createShoppingItem,
   createShoppingPurchase,
   deactivateShoppingItems,
   deleteCategory,
@@ -17,13 +18,17 @@ import {
   findAllShoppingCategories,
   findAllShoppingItems,
   findShoppingCategory,
+  findShoppingItem,
+  findShoppingItemById,
   findSimilarShoppingItems,
+  findTakenSynonym,
   getItemAddSuggestions,
   moveCategoryOrderDown,
   moveCategoryOrderUp,
   stagePurchaseItem,
   unstagePurchaseItem,
-  updateShoppingCategory
+  updateShoppingCategory,
+  updateShoppingItem
 } from '$lib/backend/db/functions';
 import { isLocalRuntime } from '$lib/backend/runtime';
 import * as m from '$lib/paraglide/messages.js';
@@ -71,6 +76,24 @@ const similarItemsSchema = z.object({
   names: z.array(z.string().trim().nonempty()),
   locale: z.enum(locales)
 });
+
+const itemSchema = z.object({
+  id: z.union([z.string().nonempty(), z.null()]),
+  name: z.string().trim().nonempty(),
+  // Only needed for new items, existing ones are moved in the categorization settings.
+  categoryId: z.string().nullish(),
+  // Empty entries are dropped and duplicates (ignoring case) only kept once.
+  synonyms: z.array(z.string().trim())
+    .transform((synonyms) => synonyms.filter((synonym, index) => synonym.length > 0
+      && synonyms.findIndex((other) => other.toLowerCase() === synonym.toLowerCase()) === index))
+});
+
+// Same as the unaccent(lower()) comparison in the database, e.g. "Möhre" and "mohre" are the same.
+const normalizeName = (name: string) => name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+
+function formError(path: string, message: string, params?: Record<string, string>) {
+  return new z.ZodError([{ code: 'custom', path: [path], message, params }]);
+}
 
 const stagingItemSchema = z.object({
   itemId: z.string().nonempty()
@@ -157,6 +180,44 @@ const shoppingRouter = new Hono<AppEnv>()
     const setCategory = c.req.valid('json');
 
     await assignCategoryToShoppingItems(setCategory.itemIds, setCategory.categoryId);
+
+    return c.json({ success: true });
+  })
+  .get('/item/:id', async (c) => {
+    const item = await findShoppingItemById(c.req.param('id'));
+    if (!item) {
+      return c.json({ error: m.error_item_not_found() }, 404);
+    }
+
+    return c.json(item);
+  })
+  .post('/item', zValidator('json', itemSchema), async (c) => {
+    const { id, name, categoryId, synonyms } = c.req.valid('json');
+
+    const sameName = await findShoppingItem(name);
+    if (sameName && sameName.id !== id) {
+      return c.json({ success: false, error: formError('name', 'settings_items_name_taken', { name: sameName.name }) }, 400);
+    }
+
+    const ownName = synonyms.find((synonym) => normalizeName(synonym) === normalizeName(name));
+    const taken = ownName ? { synonym: ownName, item: name } : await findTakenSynonym(id, synonyms);
+    if (taken) {
+      return c.json({ success: false, error: formError('synonyms', 'settings_items_synonym_taken', taken) }, 400);
+    }
+
+    if (id) {
+      if (!(await findShoppingItemById(id))) {
+        return c.json({ error: m.error_item_not_found() }, 404);
+      }
+
+      await updateShoppingItem(id, name, synonyms);
+    } else {
+      if (!categoryId || !(await findShoppingCategory(categoryId))) {
+        return c.json({ success: false, error: formError('categoryId', 'form_invalid_nonempty') }, 400);
+      }
+
+      await createShoppingItem(categoryId, name, synonyms);
+    }
 
     return c.json({ success: true });
   })

@@ -49,6 +49,19 @@ async function seedHousehold(token: string) {
     }
   });
   await call('/shopping/category', { method: 'POST', token, body: { id: null, name: 'Garden' } });
+  const [garden] = await call<{ id: string }[]>('/shopping/categoriesWithItems', { token });
+  await call('/shopping/items', {
+    method: 'POST',
+    token,
+    body: [{ name: 'Shovel', amount: '', categoryId: garden.id }, { name: 'Rake', amount: '', categoryId: garden.id }]
+  });
+  const items = await call<{ id: string; name: string }[]>('/shopping/items', { token });
+  const shovel = items.find((item) => item.name === 'Shovel')!;
+  await call('/shopping/item', {
+    method: 'POST',
+    token,
+    body: { id: shovel.id, name: shovel.name, synonyms: ['Spade', "Gardener's friend"] }
+  });
 }
 
 // Everything a household sees, to compare it before and after a backup.

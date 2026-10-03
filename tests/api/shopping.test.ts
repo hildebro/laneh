@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { addHousehold, call, initiate, startTestBackend } from '../helpers/backend';
+import { addHousehold, call, initiate, request, startTestBackend } from '../helpers/backend';
 
 const backend = await startTestBackend();
 
@@ -129,5 +129,98 @@ describe('similar items', () => {
     const dave = await addHousehold(aliceToken, 'Other', 'dave');
 
     expect(await findSimilar(dave.token, ['Tomaten'])).toEqual({ Tomaten: null });
+  });
+});
+
+describe('item settings', () => {
+  type ItemWithSynonyms = Item & { synonyms: string[] };
+
+  const saveItem = (token: string, body: { id: string | null; name: string; categoryId?: string; synonyms: string[] }) =>
+    request('/shopping/item', { method: 'POST', token, body });
+  const findSimilar = (token: string, names: string[]) =>
+    call<Record<string, Item | null>>('/shopping/similarItems', { method: 'POST', token, body: { names, locale: 'de' } });
+  const similarNames = async (token: string, names: string[]) =>
+    Object.fromEntries(Object.entries(await findSimilar(token, names)).map(([name, item]) => [name, item?.name ?? null]));
+
+  async function setUpItems(names: string[]) {
+    const token = await initiate();
+    const food = await addCategory(token, 'Food');
+    if (names.length > 0) {
+      await addItems(token, names.map((name) => ({ name, amount: '', categoryId: food.id })));
+    }
+    const items = await call<Item[]>('/shopping/items', { token });
+
+    return { token, food, item: (name: string) => items.find((item) => item.name === name)! };
+  }
+
+  it('creates inactive items with synonyms', async () => {
+    const { token, food } = await setUpItems([]);
+
+    const response = await saveItem(token, { id: null, name: 'Karotte', categoryId: food.id, synonyms: ['Möhre'] });
+
+    expect(response.status).toBe(200);
+    const items = await call<ItemWithSynonyms[]>('/shopping/items', { token });
+    expect(items.map((item) => [item.name, item.categoryId, item.active, item.synonyms]))
+      .toEqual([['Karotte', food.id, false, ['Möhre']]]);
+  });
+
+  it('requires a category for new items', async () => {
+    const { token } = await setUpItems([]);
+
+    expect((await saveItem(token, { id: null, name: 'Karotte', synonyms: [] })).status).toBe(400);
+  });
+
+  it('renames items and cleans up their synonyms', async () => {
+    const { token, item } = await setUpItems(['Karrote']);
+
+    await saveItem(token, { id: item('Karrote').id, name: 'Karotte', synonyms: [' Möhre ', '', 'möhre', 'Mohrrübe'] });
+
+    const updated = await call<ItemWithSynonyms>(`/shopping/item/${item('Karrote').id}`, { token });
+    expect([updated.name, updated.synonyms]).toEqual(['Karotte', ['Möhre', 'Mohrrübe']]);
+  });
+
+  it('rejects names of other items', async () => {
+    const { token, item } = await setUpItems(['Karotte', 'Gurke']);
+
+    expect((await saveItem(token, { id: item('Gurke').id, name: 'karotte', synonyms: [] })).status).toBe(400);
+    // Changing the case of the own name is fine.
+    expect((await saveItem(token, { id: item('Gurke').id, name: 'gurke', synonyms: [] })).status).toBe(200);
+  });
+
+  it('rejects synonyms that are item names or synonyms of other items', async () => {
+    const { token, item } = await setUpItems(['Karotte', 'Möhre', 'Klopapier']);
+    await saveItem(token, { id: item('Klopapier').id, name: 'Klopapier', synonyms: ['Toilettenpapier'] });
+
+    const status = async (synonyms: string[]) =>
+      (await saveItem(token, { id: item('Karotte').id, name: 'Karotte', synonyms })).status;
+
+    expect(await status(['MÖHRE'])).toBe(400);
+    expect(await status(['karotte'])).toBe(400);
+    expect(await status(['Toilettenpapier'])).toBe(400);
+    // The own synonyms can be saved again.
+    expect(await status(['Rübe'])).toBe(200);
+    expect(await status(['Rübe', 'Mohrrübe'])).toBe(200);
+  });
+
+  it('corrects synonyms, their plurals and accents to the item', async () => {
+    const { token, item } = await setUpItems(['Karotte', 'Toilettenpapier']);
+    await saveItem(token, { id: item('Karotte').id, name: 'Karotte', synonyms: ['Möhre'] });
+    await saveItem(token, { id: item('Toilettenpapier').id, name: 'Toilettenpapier', synonyms: ['Klopapier'] });
+
+    expect(await similarNames(token, ['möhre', 'Möhren', 'Mohre', 'Klopapier', 'Gurke'])).toEqual({
+      möhre: 'Karotte',
+      Möhren: 'Karotte',
+      Mohre: 'Karotte',
+      Klopapier: 'Toilettenpapier',
+      Gurke: null
+    });
+  });
+
+  it('only finds items of the own household', async () => {
+    const { token, item } = await setUpItems(['Karotte']);
+    const dave = await addHousehold(token, 'Other', 'dave');
+
+    expect((await request(`/shopping/item/${item('Karotte').id}`, { token: dave.token })).status).toBe(404);
+    expect((await saveItem(dave.token, { id: item('Karotte').id, name: 'Gurke', synonyms: [] })).status).toBe(404);
   });
 });
