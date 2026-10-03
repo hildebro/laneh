@@ -59,8 +59,8 @@
       <a role="button" href={resolve('/settings/items')}>
         {m.settings_items_headline()}
       </a>
-      <a role="button" href={resolve('/settings/categorization')}>
-        {m.settings_categorization_headline()}
+      <a role="button" href={resolve('/settings/bulk-edit')}>
+        {m.settings_bulk_edit_headline()}
       </a>
       <a role="button" href={resolve('/settings/categories')}>
         {m.settings_categories_headline()}

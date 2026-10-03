@@ -1,11 +1,14 @@
 <script lang="ts">
   import { Undo2 } from '@lucide/svelte';
+  import { tick } from 'svelte';
   import { invalidateAll } from '$app/navigation';
   import { getApiClient } from '$lib/apiClient';
+  import type { ShoppingItem } from '$lib/backend/db/schema';
   import CategorizedItemSelect from '$lib/CategorizedItemSelect.svelte';
   import ApiForm from '$lib/components/ApiForm.svelte';
   import ApiFormGroup from '$lib/components/ApiFormGroup.svelte';
   import ApiFormItem from '$lib/components/ApiFormItem.svelte';
+  import ItemMerge from '$lib/ItemMerge.svelte';
   import * as m from '$lib/paraglide/messages.js';
 
   let showInactiveItems = $state(false);
@@ -44,6 +47,21 @@
   }
 
   let deleteDialog = $state<HTMLDialogElement>();
+
+  // Taken when the dialog opens, so the form keeps its items while the selection is cleared after the merge.
+  let mergeItems = $state<ShoppingItem[]>([]);
+  let mergeDialog = $state<HTMLDialogElement>();
+
+  async function openMergeDialog() {
+    mergeItems = data.categories.flatMap(category => category.shoppingItems).filter(item => itemIds.includes(item.id));
+    await tick();
+    mergeDialog?.showModal();
+  }
+
+  function onMergeSuccess() {
+    mergeDialog?.close();
+    itemIds = [];
+  }
 </script>
 
 {#if data.categories.every(category => category.shoppingItems.length === 0)}
@@ -91,11 +109,28 @@
           type="hidden"
         />
       </ApiForm>
+      <button onclick={openMergeDialog} disabled={itemIds.length < 2}>
+        { m.settings_items_merge() }
+      </button>
       <button class="error" onclick={() => deleteDialog?.showModal()}>
         { m.settings_items_delete() }
       </button>
     </div>
   </article>
+
+  <dialog bind:this={mergeDialog} onclose={() => mergeItems = []}>
+    {#if mergeItems.length > 0}
+      <h2>{m.settings_items_merge()}</h2>
+      <ItemMerge items={mergeItems} categories={data.categories} onMerged={onMergeSuccess}>
+        {#snippet additionalButtons()}
+          <button type="button" onclick={() => mergeDialog?.close()}>
+            <Undo2 />
+            { m.generic_cancel() }
+          </button>
+        {/snippet}
+      </ItemMerge>
+    {/if}
+  </dialog>
 
   <dialog bind:this={deleteDialog}>
     <ApiForm

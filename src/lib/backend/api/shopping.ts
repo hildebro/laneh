@@ -89,7 +89,7 @@ const synonymsSchema = z.array(z.string().trim())
 const itemSchema = z.object({
   id: z.union([z.string().nonempty(), z.null()]),
   name: z.string().trim().nonempty(),
-  // Only needed for new items, existing ones are moved in the categorization settings.
+  // Only needed for new items, existing ones are moved in the bulk edit settings.
   categoryId: z.string().nullish(),
   synonyms: synonymsSchema
 });
