@@ -1,6 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
 import { encodeHexLowerCase } from '@oslojs/encoding';
-import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 import { dev } from '$app/environment';
@@ -10,17 +9,20 @@ import { DUMP_MANIFEST_FILE, type DumpManifest } from '$lib/backend/db/export';
 import {
   addHousehold,
   addUser,
+  completeAllHouseholdSetups,
+  countAllHouseholds,
   createSession,
   findAllUsers,
   findAndVerifyUser,
   findLocalUser,
   getCachedRemoteVersion,
+  importDatabaseDump,
   refreshShoppingItemStats,
+  rollbackDatabaseImport,
   setCachedRemoteVersion
 } from '$lib/backend/db/functions';
 import { extractTarGz } from '$lib/backend/db/tar';
 import { isLocalRuntime } from '$lib/backend/runtime';
-import { getAdminTx } from '$lib/context';
 import { Admin } from '$lib/utils/userHelper';
 import { compareVersions } from '$lib/utils/versionHelper';
 import { z } from '$lib/zod';
@@ -183,16 +185,8 @@ const publicRouter = new Hono()
       .map((file) => file.content.trim())
       .filter((query) => query);
 
-    const tx = await getAdminTx();
     try {
-      // SET LOCAL automatically reverts when the transaction ends!
-      // No need for a finally block to clean it up.
-      await tx.execute(sql`SET LOCAL session_replication_role = 'replica';`);
-      await tx.execute(sql`SAVEPOINT import`);
-
-      for (const query of queries) {
-        await tx.execute(sql.raw(query));
-      }
+      await importDatabaseDump(queries);
     } catch (err) {
       // Now we will actually see why the import is failing!
       console.error('❌ Database Import Failed:', err);
@@ -202,13 +196,10 @@ const publicRouter = new Hono()
     }
 
     // Dumps from before the manifest can't tell where they came from. The household count has to decide instead.
-    if (isLocalRuntime() && !manifest) {
-      const result = await tx.execute<{ count: number }>(sql`SELECT count(*)::int AS count FROM household`);
-      if (result.rows[0].count > 1) {
-        await tx.execute(sql`ROLLBACK TO SAVEPOINT import`);
+    if (isLocalRuntime() && !manifest && await countAllHouseholds() > 1) {
+      await rollbackDatabaseImport();
 
-        return c.json({ success: false, error: serverDumpError }, 400);
-      }
+      return c.json({ success: false, error: serverDumpError }, 400);
     }
 
     // Dumps don't contain the stats. The imported purchases are older than the last calculation, so all items need to
@@ -218,7 +209,7 @@ const publicRouter = new Hono()
     // The imported households have been set up already, so their categories must not be mixed with the default ones.
     // Dumps from before the setup wizard don't contain the flag. Only an empty instance can be imported into, so all
     // households are imported ones.
-    await tx.execute(sql`UPDATE household SET setup_completed = true`);
+    await completeAllHouseholdSetups();
 
     return c.json({ success: true });
   })

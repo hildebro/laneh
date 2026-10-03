@@ -103,6 +103,20 @@ export const completeHouseholdSetup = async (id: string) => {
   await db.update(table.household).set({ setupCompleted: true }).where(eq(table.household.id, id)).execute();
 };
 
+// Marks the setup of every household as completed, regardless of RLS.
+export const completeAllHouseholdSetups = async () => {
+  const tx = await getAdminTx();
+
+  await tx.update(table.household).set({ setupCompleted: true }).execute();
+};
+
+// Counts all households, regardless of RLS.
+export const countAllHouseholds = async () => {
+  const tx = await getAdminTx();
+
+  return (await tx.select({ count: count() }).from(table.household).execute())[0].count;
+};
+
 export const findHousehold = async (id: string) => {
   const db = getTx();
 
@@ -1458,6 +1472,29 @@ export const deleteExpiredNotifications = async () => {
 
   await db.delete(table.notification)
     .where(lt(table.notification.createdAt, new Date(Date.now() - NOTIFICATION_MAX_AGE_MS)));
+};
+
+// ------- DATABASE IMPORT -------
+// Executes the queries of a dump with triggers and foreign key checks disabled. Raw SQL is unavoidable here, since the
+// dump consists of plain statements. A savepoint is set beforehand, so the import can be undone via
+// rollbackDatabaseImport() without rolling back the whole transaction.
+export const importDatabaseDump = async (queries: string[]) => {
+  const tx = await getAdminTx();
+
+  // SET LOCAL automatically reverts when the transaction ends!
+  // No need for a finally block to clean it up.
+  await tx.execute(sql`SET LOCAL session_replication_role = 'replica';`);
+  await tx.execute(sql`SAVEPOINT import`);
+
+  for (const query of queries) {
+    await tx.execute(sql.raw(query));
+  }
+};
+
+export const rollbackDatabaseImport = async () => {
+  const tx = getTx();
+
+  await tx.execute(sql`ROLLBACK TO SAVEPOINT import`);
 };
 
 // ------- GENERIC -------
