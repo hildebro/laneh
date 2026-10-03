@@ -55,7 +55,8 @@
         lastError = outcome.error;
       }
 
-      addToast({ title: m.server_picker_error(), message: lastError });
+      console.error(lastError);
+      addToast({ message: m.server_picker_error(), type: 'error' });
     } finally {
       pending = null;
     }
@@ -71,7 +72,8 @@
       await goto(resolve('/'));
     } catch (error) {
       localStorage.removeItem('serverUrl');
-      addToast({ title: m.server_picker_local_error(), message: String(error), type: 'error' });
+      console.error(error);
+      addToast({ message: m.server_picker_local_error(), type: 'error' });
     } finally {
       pending = null;
     }

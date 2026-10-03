@@ -28,7 +28,7 @@
   async function exportDatabase() {
     const res = await getApiClient().api.users.export.$get();
     if (!res.ok) {
-      addToast({ title: m.form_error(), message: m.error_database_export(), type: 'error' });
+      addToast({ message: m.error_database_export(), type: 'error' });
 
       return;
     }
@@ -42,7 +42,7 @@
     try {
       await saveFile(await res.blob(), downloadName);
     } catch {
-      addToast({ title: m.form_error(), message: m.error_database_export(), type: 'error' });
+      addToast({ message: m.error_database_export(), type: 'error' });
     }
   }
 

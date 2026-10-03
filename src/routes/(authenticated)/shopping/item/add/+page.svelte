@@ -131,11 +131,7 @@
       // Prevent the button from causing a submit.
       e.preventDefault();
       // Let the user know about executed corrections.
-      addToast({
-        title: m.shopping_add_items_correction_title(),
-        message: m.shopping_add_items_correction_description(),
-        duration: 6000
-      });
+      addToast({ message: m.shopping_add_items_corrected(), duration: 6000 });
       // Flip the value, so the next submit won't execute corrections again. Note that it's
       // technically more appropriate to update this flag outside the if-clause. Whether something
       // was corrected doesn't really matter for this flag: It could be set to false regardless.

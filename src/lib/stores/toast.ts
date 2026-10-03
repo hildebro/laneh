@@ -1,46 +1,37 @@
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 export type ToastType = 'primary' | 'warning' | 'error';
 
 export interface Toast {
   id: string;
-  title?: string;
   message: string;
   type: ToastType;
+  duration: number;
 }
 
-export const toasts = writable<Toast[]>([]);
-
 type ToastOptions = {
-  title?: string;
   message: string;
   type?: ToastType;
   duration?: number;
 };
 
-export function addToast(
-  {
-    title = undefined,
-    message,
-    type = 'primary',
-    duration = 3000
-  }: ToastOptions
-): void {
+// Only one toast fits into the header, so the others wait in line until it's their turn.
+const queue = writable<Toast[]>([]);
+
+export const currentToast = derived(queue, (all) => all[0]);
+
+/**
+ * Queues a toast. Messages need to be short, since they replace the title in the header, even on mobile.
+ */
+export function addToast({ message, type = 'primary', duration = 3000 }: ToastOptions): void {
   const id = Math.random().toString(36).substring(2, 9);
 
-  // New toasts are added at the start to appear on top
-  toasts.update((all) => [{ id, title, message, type }, ...all]);
-
-  if (duration > 0) {
-    setTimeout(() => {
-      removeToast(id);
-    }, duration);
-  }
+  queue.update((all) => [...all, { id, message, type, duration }]);
 }
 
 /**
- * Removes a toast by its unique ID.
+ * Removes a toast by its unique ID, which lets the next queued one take its place.
  */
 export function removeToast(id: string): void {
-  toasts.update((all) => all.filter((toast) => toast.id !== id));
+  queue.update((all) => all.filter((toast) => toast.id !== id));
 }

@@ -12,9 +12,9 @@
   import ThemeAction from './ThemeAction.svelte';
   import VersionMismatchAction from './VersionMismatchAction.svelte';
   import { page } from '$app/state';
-  import ToastContainer from '$lib/components/ToastContainer.svelte';
+  import HeaderToast from '$lib/components/HeaderToast.svelte';
   import * as m from '$lib/paraglide/messages.js';
-  import { addToast } from '$lib/stores/toast';
+  import { addToast, currentToast } from '$lib/stores/toast';
   import { loadVersions } from '$lib/stores/versions';
 
   let { children } = $props();
@@ -41,11 +41,7 @@
         App.exitApp();
       } else {
         lastBackPressed = now;
-        addToast({
-          message: 'Press back again to exit',
-          type: 'primary',
-          duration: 2000
-        });
+        addToast({ message: m.toast_back_to_exit(), duration: 2000 });
       }
     });
 
@@ -75,17 +71,16 @@
   });
 </script>
 
-<ToastContainer />
-
 <svelte:head>
   <title>Laneh</title>
 </svelte:head>
 
 <div class="app-shell">
   <header>
+    <HeaderToast />
     <div class="header-inner">
-      <div>
-        { m.header_head() }
+      <div class="header-title" role="status">
+        <span>{ $currentToast?.message ?? '' }</span>
       </div>
       <div class="header-action-container">
         <VersionMismatchAction />
@@ -125,6 +120,21 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 0.5rem;
+        /* Keeps the content above the toast fill */
+        position: relative;
+    }
+
+    .header-title {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .header-title span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .header-action-container {
