@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { setContext } from 'svelte';
   import type { Snippet } from 'svelte';
+  import { setContext } from 'svelte';
   import type { z } from 'zod';
   import { beforeNavigate, goto, invalidateAll } from '$app/navigation';
   import type { ResolvedPathname } from '$app/types';
@@ -96,14 +96,14 @@
 
         formState.errors = newErrors;
       } else if (response.status === 403) {
-        addToast({ title: m.form_error(), message: m.form_error_forbidden(), type: 'error' });
+        addToast({ message: m.form_error_forbidden(), type: 'error' });
       } else {
-        const errorMsg = result.message || result.error || m.form_error_generic();
-
-        addToast({ title: m.form_error(), message: errorMsg, type: 'error' });
+        // Server messages are too long for the header, so they only end up in the console.
+        console.error(result.message || result.error);
+        addToast({ message: m.form_error_generic(), type: 'error' });
       }
     } catch(e) {
-      addToast({ title: m.form_error(), message: m.form_error_generic(), type: 'error' });
+      addToast({ message: m.form_error_generic(), type: 'error' });
       throw e;
     } finally {
       isSubmitting = false;
