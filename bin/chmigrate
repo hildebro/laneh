@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker compose exec laneh-app npm run db:migrate
+podman compose exec laneh-app npm run db:migrate

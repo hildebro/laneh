@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ${DATABASE_LOCATION}:/var/lib/postgresql/data
+      # :Z relabels the folder for SELinux hosts and is ignored everywhere else
+      - ${DATABASE_LOCATION}:/var/lib/postgresql/data:Z
     networks:
       - laneh-network
     healthcheck:
