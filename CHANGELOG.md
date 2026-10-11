@@ -1,3 +1,11 @@
+# [4.4.0](https://github.com/hildebro/laneh/compare/v4.3.0...v4.4.0) (2026-10-11)
+
+
+### Features
+
+* automated backups ([428dff0](https://github.com/hildebro/laneh/commit/428dff06a3010b90ccb2dc1cd86ee9db71561949))
+* pie chart for expenses ([0b538fe](https://github.com/hildebro/laneh/commit/0b538fea33db3cd53121f3139ff489faad9a59c2))
+
 # [4.3.0](https://github.com/hildebro/laneh/compare/v4.2.2...v4.3.0) (2026-10-03)
 
 
