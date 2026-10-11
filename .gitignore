@@ -13,6 +13,7 @@ node_modules
 /.svelte-kit
 /build
 /postgres-data
+/backups
 # Data of the PGlite server from 3.x. Kept until the backup was imported.
 /pglite-data
 

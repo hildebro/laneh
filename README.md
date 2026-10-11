@@ -23,6 +23,7 @@ without a daemon) and Docker.
   container will not be accessible from the outside, so technically it's not super important to have a strong password.
 - Other values in `.env` like timezone can be changed, if you so desire. But their default value will work fine.
 - Create an empty folder called `postgres-data` (matching `DATABASE_LOCATION` from .env) inside the laneh folder.
+- Create an empty folder called `backups` (matching `BACKUP_LOCATION` from .env) inside the laneh folder.
 - run `podman compose up -d`
 - Access the app via http://localhost:3000
 
@@ -33,6 +34,12 @@ version mismatch between the mobile app and the connected server instance.
 
 - Navigate to your Laneh folder
 - Run `podman compose pull && podman compose up -d`
+
+### Backups
+
+The server creates a backup of the database every night at 2am (in the timezone `TZ` from .env) and stores it in the
+`BACKUP_LOCATION` folder. Backups of the last 3 days are kept, older ones are deleted. If the server was down at 2am, the
+backup is created as soon as it's running again. A backup can be imported on the setup page of a fresh instance.
 
 ### Run at startup (Podman)
 

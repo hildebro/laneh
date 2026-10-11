@@ -24,6 +24,9 @@ services:
       - 127.0.0.1:${APP_PORT}:3000
     env_file:
       - .env
+    volumes:
+      # Nightly backups of the database, see BACKUP_LOCATION in .env
+      - ${BACKUP_LOCATION}:/app/backups:Z
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@laneh-db:5432/${POSTGRES_DB}
       NODE_ENV: production

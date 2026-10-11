@@ -11,6 +11,7 @@ icons
 
 # Local data and secrets
 postgres-data
+backups
 pglite-data
 .env
 .env.*

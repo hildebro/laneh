@@ -8,14 +8,14 @@ import { runInTransactionContext } from '$lib/context';
 
 // Local hour at which the nightly jobs become due.
 const NIGHTLY_HOUR = 3;
-const CHECK_INTERVAL_MS = 10 * 60 * 1000;
+export const CHECK_INTERVAL_MS = 10 * 60 * 1000;
 
 let running = false;
 
-// Most recent point in time, at which the nightly jobs were supposed to run.
-function lastScheduledRun(now: Date) {
+// Most recent point in time, at which a job scheduled for the given local hour was supposed to run.
+export function lastScheduledRun(now: Date, hour = NIGHTLY_HOUR) {
   const scheduled = new Date(now);
-  scheduled.setHours(NIGHTLY_HOUR, 0, 0, 0);
+  scheduled.setHours(hour, 0, 0, 0);
   if (scheduled > now) {
     scheduled.setDate(scheduled.getDate() - 1);
   }
