@@ -1,5 +1,6 @@
 <script lang="ts">
   import ExpenseEntry from './ExpenseEntry.svelte';
+  import MonthExpensesChart from './MonthExpensesChart.svelte';
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
   import { priceFormatter } from '$lib/utils/formatter';
@@ -15,12 +16,11 @@
   });
 
   // Based on the local time, so the month matches the user's calendar.
-  const monthTotal = $derived.by(() => {
+  const monthEntries = $derived.by(() => {
     const now = new Date();
 
     return data.entries
-      .filter(entry => entry.date.getFullYear() === now.getFullYear() && entry.date.getMonth() === now.getMonth())
-      .reduce((sum, entry) => sum + entry.price, 0);
+      .filter(entry => entry.date.getFullYear() === now.getFullYear() && entry.date.getMonth() === now.getMonth());
   });
 </script>
 
@@ -31,7 +31,7 @@
 
 <article>
   <h2>{m.balance_month_total()}</h2>
-  <p class="month-total">{priceFormatter.format(monthTotal / 100)}</p>
+  <MonthExpensesChart entries={monthEntries} />
 </article>
 
 {#if data.showDebts}
@@ -65,11 +65,3 @@
 {#each recentEntries as entry (entry.id)}
   <ExpenseEntry {entry} />
 {/each}
-
-<style>
-    .month-total {
-        font-size: 2rem;
-        font-weight: bold;
-        margin: 0;
-    }
-</style>
