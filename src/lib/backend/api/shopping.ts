@@ -288,13 +288,16 @@ const shoppingRouter = new Hono<AppEnv>()
       return c.json({ error: m.error_category_not_found() }, 404);
     }
 
-    const error = await validateItemNames(name, synonyms, uniqueItemIds);
+    // Merged names that only differ by case or accents from the new name would collide with it, so they are dropped.
+    const mergedSynonyms = synonyms.filter((synonym) => normalizeName(synonym) !== normalizeName(name));
+
+    const error = await validateItemNames(name, mergedSynonyms, uniqueItemIds);
     if (error) {
       return c.json({ success: false, error }, 400);
     }
 
     const otherItemIds = uniqueItemIds.filter((itemId) => itemId !== mainItemId);
-    await mergeShoppingItems(mainItemId, otherItemIds, { name, synonyms, categoryId });
+    await mergeShoppingItems(mainItemId, otherItemIds, { name, synonyms: mergedSynonyms, categoryId });
 
     return c.json({ success: true });
   })
