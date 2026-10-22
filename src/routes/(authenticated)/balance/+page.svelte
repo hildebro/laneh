@@ -23,26 +23,6 @@
   <a role="button" href={resolve('/balance/add')}>{ m.balance_expense_add() }</a>
 </div>
 
-<article>
-  <h2>{m.balance_month_total()}</h2>
-  <MonthExpensesChart totals={monthTotals} label={m.balance_month_total()} />
-</article>
-
-<article>
-  <h2>{m.balance_last_month_total()}</h2>
-  <MonthExpensesChart totals={lastMonthTotals} label={m.balance_last_month_total()} />
-</article>
-
-<article>
-  <h2>{m.balance_average_3_months()}</h2>
-  <MonthExpensesChart totals={last3MonthsTotals} months={3} label={m.balance_average_3_months()} />
-</article>
-
-<article>
-  <h2>{m.balance_average_6_months()}</h2>
-  <MonthExpensesChart totals={last6MonthsTotals} months={6} label={m.balance_average_6_months()} />
-</article>
-
 {#if data.showDebts}
   <article>
     <h2>{m.balance()}</h2>
@@ -66,6 +46,26 @@
     {/each}
   </article>
 {/if}
+
+<article>
+  <h2>{m.balance_month_total()}</h2>
+  <MonthExpensesChart totals={monthTotals} label={m.balance_month_total()} />
+</article>
+
+<article>
+  <h2>{m.balance_last_month_total()}</h2>
+  <MonthExpensesChart totals={lastMonthTotals} label={m.balance_last_month_total()} />
+</article>
+
+<article>
+  <h2>{m.balance_average_3_months()}</h2>
+  <MonthExpensesChart totals={last3MonthsTotals} months={3} label={m.balance_average_3_months()} />
+</article>
+
+<article>
+  <h2>{m.balance_average_6_months()}</h2>
+  <MonthExpensesChart totals={last6MonthsTotals} months={6} label={m.balance_average_6_months()} />
+</article>
 
 <h2 class="headline">{ m.balance_expenses_recent() }</h2>
 {#if data.recentEntries.length === 0}
