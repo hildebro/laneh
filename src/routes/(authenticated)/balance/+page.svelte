@@ -1,21 +1,15 @@
 <script lang="ts">
   import ExpenseEntry from './ExpenseEntry.svelte';
   import MonthExpensesChart from './MonthExpensesChart.svelte';
+  import MonthlyExpensesChart from './MonthlyExpensesChart.svelte';
   import { resolve } from '$app/paths';
   import * as m from '$lib/paraglide/messages.js';
   import { priceFormatter } from '$lib/utils/formatter';
 
   let { data } = $props();
 
-  // The overview only loads aggregates, the full history lives on the list page. The totals are the six months before
-  // the current one, followed by the current month.
-  const totalsOfMonths = (from: number, to: number) => data.monthlyTotals.slice(from, to).flat();
-
-  // Only completed months count for the last month and the averages, so the running month doesn't skew them.
-  const monthTotals = $derived(totalsOfMonths(6, 7));
-  const lastMonthTotals = $derived(totalsOfMonths(5, 6));
-  const last3MonthsTotals = $derived(totalsOfMonths(3, 6));
-  const last6MonthsTotals = $derived(totalsOfMonths(0, 6));
+  // The overview only loads aggregates, the full history lives on the list page. The last month is the current one.
+  const monthTotals = $derived(data.monthlyTotals.at(-1)?.totals ?? []);
 </script>
 
 <div class="action-bar">
@@ -53,18 +47,8 @@
 </article>
 
 <article>
-  <h2>{m.balance_last_month_total()}</h2>
-  <MonthExpensesChart totals={lastMonthTotals} label={m.balance_last_month_total()} />
-</article>
-
-<article>
-  <h2>{m.balance_average_3_months()}</h2>
-  <MonthExpensesChart totals={last3MonthsTotals} months={3} label={m.balance_average_3_months()} />
-</article>
-
-<article>
-  <h2>{m.balance_average_6_months()}</h2>
-  <MonthExpensesChart totals={last6MonthsTotals} months={6} label={m.balance_average_6_months()} />
+  <h2>{m.balance_monthly_history()}</h2>
+  <MonthlyExpensesChart months={data.monthlyTotals} />
 </article>
 
 <h2 class="headline">{ m.balance_expenses_recent() }</h2>
@@ -74,3 +58,26 @@
 {#each data.recentEntries as entry (entry.id)}
   <ExpenseEntry {entry} />
 {/each}
+
+<style>
+    /* Set on the cards, so the charts inside share one palette without an extra wrapper that would break the card layout. */
+    article {
+        --series-1: #2a78d6;
+        --series-2: #eb6834;
+        --series-3: #1baf7a;
+        --series-4: #eda100;
+        --series-5: #e87ba4;
+        --series-6: #008300;
+        --series-7: #6250d6;
+    }
+
+    :global(:root[data-color-scheme="dark"]) article {
+        --series-1: #3987e5;
+        --series-2: #d95926;
+        --series-3: #199e70;
+        --series-4: #c98500;
+        --series-5: #d55181;
+        --series-6: #008300;
+        --series-7: #9085e9;
+    }
+</style>

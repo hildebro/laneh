@@ -1,36 +1,24 @@
 <script lang="ts">
-  import { BalanceEntryType } from '$lib/utils/balanceHelper';
+  import { expenseTypeColors } from './expenseTypeColors';
+  import type { BalanceEntryType } from '$lib/utils/balanceHelper';
   import { translateBalanceEntryType } from '$lib/utils/balanceTranslations';
   import { priceFormatter } from '$lib/utils/formatter';
 
-  let { totals, label, months = 1 }: {
-    // Summed up prices per type, over the given number of months.
+  let { totals, label }: {
+    // Summed up prices per type.
     totals: { type: BalanceEntryType, amount: number }[],
-    label: string,
-    // Amounts are divided by this, to show the monthly average of totals spanning several months.
-    months?: number
+    label: string
   } = $props();
-
-  // Each type keeps its color, no matter which types appear this month.
-  const typeColors: Record<BalanceEntryType, number> = {
-    [BalanceEntryType.Groceries]: 1,
-    [BalanceEntryType.EatingOut]: 2,
-    [BalanceEntryType.HouseholdGoods]: 3,
-    [BalanceEntryType.Transportation]: 4,
-    [BalanceEntryType.Events]: 5,
-    [BalanceEntryType.Gifts]: 6,
-    [BalanceEntryType.Miscellaneous]: 7
-  };
 
   const radius = 80;
   const innerRadius = 52;
 
-  const total = $derived(totals.reduce((sum, entry) => sum + entry.amount, 0) / months);
+  const total = $derived(totals.reduce((sum, entry) => sum + entry.amount, 0));
 
   const slices = $derived.by(() => {
     const sums: Partial<Record<BalanceEntryType, number>> = {};
     for (const entry of totals) {
-      sums[entry.type] = (sums[entry.type] ?? 0) + entry.amount / months;
+      sums[entry.type] = (sums[entry.type] ?? 0) + entry.amount;
     }
 
     const positiveSums = (Object.entries(sums) as [BalanceEntryType, number][])
@@ -85,7 +73,7 @@
       <path
         data-type={slice.type}
         d={arcPath(slice.startAngle, slice.endAngle)}
-        style:fill="var(--series-{typeColors[slice.type]})"
+        style:fill="var(--series-{expenseTypeColors[slice.type]})"
         style:stroke-width={slices.length === 1 ? 0 : null}
       >
         <title>{describe(slice)}</title>
@@ -100,7 +88,7 @@
     <ul class="legend">
       {#each slices as slice (slice.type)}
         <li data-type={slice.type}>
-          <span class="swatch" style:background-color="var(--series-{typeColors[slice.type]})"></span>
+          <span class="swatch" style:background-color="var(--series-{expenseTypeColors[slice.type]})"></span>
           <span class="label">{translateBalanceEntryType(slice.type)}</span>
           <span class="amount">{priceFormatter.format(slice.amount / 100)}</span>
           <span class="share">{percentFormatter.format(slice.share)}</span>
@@ -112,28 +100,10 @@
 
 <style>
     .month-expenses {
-        --series-1: #2a78d6;
-        --series-2: #eb6834;
-        --series-3: #1baf7a;
-        --series-4: #eda100;
-        --series-5: #e87ba4;
-        --series-6: #008300;
-        --series-7: #6250d6;
-
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 1rem;
-    }
-
-    :global(:root[data-color-scheme="dark"]) .month-expenses {
-        --series-1: #3987e5;
-        --series-2: #d95926;
-        --series-3: #199e70;
-        --series-4: #c98500;
-        --series-5: #d55181;
-        --series-6: #008300;
-        --series-7: #9085e9;
     }
 
     svg {

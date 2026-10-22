@@ -143,7 +143,7 @@ describe('validation', () => {
 });
 
 describe('overview', () => {
-  it('returns recent entries and totals per month and type', async () => {
+  it('returns recent entries and totals of the last six months per type', async () => {
     const { token, alice } = await setupHousehold();
 
     for (const price of [1000, 500]) {
@@ -156,13 +156,13 @@ describe('overview', () => {
 
     const overview = await call<{
       recentEntries: unknown[],
-      monthlyTotals: { type: string, amount: number }[][]
+      monthlyTotals: { month: string, totals: { type: string, amount: number }[] }[]
     }>('/balance/overview', { token });
 
     expect(overview.recentEntries).toHaveLength(2);
-    expect(overview.monthlyTotals).toHaveLength(7);
+    expect(overview.monthlyTotals).toHaveLength(6);
+    expect(overview.monthlyTotals.slice(0, 5).flatMap((entry) => entry.totals)).toEqual([]);
     // Entries are created now, so they land in the current month.
-    expect(overview.monthlyTotals.slice(0, 6).flat()).toEqual([]);
-    expect(overview.monthlyTotals[6]).toEqual([{ type: BalanceEntryType.Groceries, amount: 1500 }]);
+    expect(overview.monthlyTotals[5]?.totals).toEqual([{ type: BalanceEntryType.Groceries, amount: 1500 }]);
   });
 });

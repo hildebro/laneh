@@ -17,11 +17,14 @@ import { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { z } from '$lib/zod';
 
 // Month boundaries follow the time zone of the server, so every household member sees the same months.
-const findMonthStarts = () => {
+const findMonths = () => {
   const now = new Date();
 
-  // The six months before the current one, followed by the current month.
-  return [-6, -5, -4, -3, -2, -1, 0].map((offset) => new Date(now.getFullYear(), now.getMonth() + offset, 1));
+  // The last six months, including the current one.
+  return [-5, -4, -3, -2, -1, 0].map((offset) => {
+    const start = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    return { start, month: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}` };
+  });
 };
 
 const baseExpenseSchema = z.object({
@@ -66,11 +69,13 @@ const balanceRouter = new Hono<AppEnv>()
   })
   .get('/overview', async (c) => {
     const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+    const months = findMonths();
+    const totals = await sumBalanceEntriesByPeriod(months.map(({ start }) => start));
 
     return c.json({
       recentEntries: await findBalanceEntriesSince(new Date(Date.now() - sevenDaysInMs)),
-      // Six completed months followed by the current one.
-      monthlyTotals: await sumBalanceEntriesByPeriod(findMonthStarts())
+      // Ordered from the oldest to the current month.
+      monthlyTotals: months.map(({ month }, index) => ({ month, totals: totals[index] ?? [] }))
     });
   })
   .get('/debts', async (c) => {
