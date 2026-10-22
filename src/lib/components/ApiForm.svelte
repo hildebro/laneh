@@ -16,6 +16,7 @@
     submitButtonClasses = '',
     submitButtonHidden = false,
     warnOnUnsavedChanges = true,
+    invalidateOnSuccess = true,
     children
   }: {
     submitAction: () => Promise<Response>;
@@ -25,6 +26,8 @@
     submitButtonClasses?: string,
     submitButtonHidden?: boolean,
     warnOnUnsavedChanges?: boolean,
+    // Set to false, if the onSuccess callback updates the view itself and reloading all data would be wasteful.
+    invalidateOnSuccess?: boolean,
     children: Snippet;
   } = $props();
 
@@ -73,7 +76,9 @@
 
         if (typeof onSuccess === 'function') {
           await onSuccess(response);
-          await invalidateAll();
+          if (invalidateOnSuccess) {
+            await invalidateAll();
+          }
         } else if (typeof onSuccess === 'string') {
           // `redirectTo` is typed as ResolvedPathname, so it's fine to navigate without resolve.
           // eslint-disable-next-line svelte/no-navigation-without-resolve

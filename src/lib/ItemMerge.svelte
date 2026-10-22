@@ -13,12 +13,14 @@
     // Shows a checkbox per item, so the user can leave items out. Not needed, if the items have been picked already.
     allowDeselect = false,
     onMerged = undefined,
+    invalidateOnMerged = true,
     additionalButtons = undefined
   }: {
     items: ShoppingItem[],
     categories: ShoppingCategory[],
     allowDeselect?: boolean,
     onMerged?: () => void | Promise<void>,
+    invalidateOnMerged?: boolean,
     additionalButtons?: Snippet
   } = $props();
 
@@ -67,6 +69,7 @@
   submitButtonText={m.settings_items_merge()}
   onSuccess={async () => await onMerged?.()}
   warnOnUnsavedChanges={false}
+  invalidateOnSuccess={invalidateOnMerged}
   {additionalButtons}
 >
   <ul class="items">
