@@ -18,7 +18,8 @@ import {
   notInArray,
   or,
   type SQL,
-  sql
+  sql,
+  sum
 } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { lte } from 'drizzle-orm/sql/expressions/conditions';
@@ -1243,6 +1244,42 @@ export const findAllBalanceEntries = async () => {
       orderBy: [desc(table.balanceEntry.date)]
     })
     .execute();
+};
+
+export const findBalanceEntriesSince = async (since: Date) => {
+  const db = getTx();
+
+  return db.query.balanceEntry
+    .findMany({
+      with: {
+        user: withoutPassword
+      },
+      where: gte(table.balanceEntry.date, since),
+      orderBy: [desc(table.balanceEntry.date)]
+    })
+    .execute();
+};
+
+/**
+ * Sums up the prices per type for each period. A period starts at its boundary and ends at the next one, the last one
+ * is open ended. Boundaries have to be ascending.
+ */
+export const sumBalanceEntriesByPeriod = async (boundaries: Date[]) => {
+  const db = getTx();
+  const periods: { type: BalanceEntryType, amount: number }[][] = [];
+
+  for (const [index, start] of boundaries.entries()) {
+    const end = boundaries[index + 1];
+    const rows = await db
+      .select({ type: table.balanceEntry.type, amount: sum(table.balanceEntry.price).mapWith(Number) })
+      .from(table.balanceEntry)
+      .where(and(gte(table.balanceEntry.date, start), end ? lt(table.balanceEntry.date, end) : undefined))
+      .groupBy(table.balanceEntry.type);
+
+    periods.push(rows);
+  }
+
+  return periods;
 };
 
 export type DebtResult = {

@@ -7,21 +7,15 @@
 
   let { data } = $props();
 
-  // The full history lives on the list page, so the overview stays short.
-  const recentEntries = $derived.by(() => {
-    const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
+  // The overview only loads aggregates, the full history lives on the list page. The totals are the six months before
+  // the current one, followed by the current month.
+  const totalsOfMonths = (from: number, to: number) => data.monthlyTotals.slice(from, to).flat();
 
-    return data.entries.filter(entry => now - entry.date.getTime() <= sevenDaysInMs);
-  });
-
-  // Based on the local time, so the month matches the user's calendar.
-  const monthEntries = $derived.by(() => {
-    const now = new Date();
-
-    return data.entries
-      .filter(entry => entry.date.getFullYear() === now.getFullYear() && entry.date.getMonth() === now.getMonth());
-  });
+  // Only completed months count for the last month and the averages, so the running month doesn't skew them.
+  const monthTotals = $derived(totalsOfMonths(6, 7));
+  const lastMonthTotals = $derived(totalsOfMonths(5, 6));
+  const last3MonthsTotals = $derived(totalsOfMonths(3, 6));
+  const last6MonthsTotals = $derived(totalsOfMonths(0, 6));
 </script>
 
 <div class="action-bar">
@@ -31,7 +25,22 @@
 
 <article>
   <h2>{m.balance_month_total()}</h2>
-  <MonthExpensesChart entries={monthEntries} />
+  <MonthExpensesChart totals={monthTotals} label={m.balance_month_total()} />
+</article>
+
+<article>
+  <h2>{m.balance_last_month_total()}</h2>
+  <MonthExpensesChart totals={lastMonthTotals} label={m.balance_last_month_total()} />
+</article>
+
+<article>
+  <h2>{m.balance_average_3_months()}</h2>
+  <MonthExpensesChart totals={last3MonthsTotals} months={3} label={m.balance_average_3_months()} />
+</article>
+
+<article>
+  <h2>{m.balance_average_6_months()}</h2>
+  <MonthExpensesChart totals={last6MonthsTotals} months={6} label={m.balance_average_6_months()} />
 </article>
 
 {#if data.showDebts}
@@ -59,9 +68,9 @@
 {/if}
 
 <h2 class="headline">{ m.balance_expenses_recent() }</h2>
-{#if recentEntries.length === 0}
+{#if data.recentEntries.length === 0}
   <p class="headline">{ m.balance_expenses_recent_none() }</p>
 {/if}
-{#each recentEntries as entry (entry.id)}
+{#each data.recentEntries as entry (entry.id)}
   <ExpenseEntry {entry} />
 {/each}

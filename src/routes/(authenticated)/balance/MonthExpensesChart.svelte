@@ -1,10 +1,15 @@
 <script lang="ts">
-  import * as m from '$lib/paraglide/messages.js';
   import { BalanceEntryType } from '$lib/utils/balanceHelper';
   import { translateBalanceEntryType } from '$lib/utils/balanceTranslations';
   import { priceFormatter } from '$lib/utils/formatter';
 
-  let { entries }: { entries: { type: BalanceEntryType, price: number }[] } = $props();
+  let { totals, label, months = 1 }: {
+    // Summed up prices per type, over the given number of months.
+    totals: { type: BalanceEntryType, amount: number }[],
+    label: string,
+    // Amounts are divided by this, to show the monthly average of totals spanning several months.
+    months?: number
+  } = $props();
 
   // Each type keeps its color, no matter which types appear this month.
   const typeColors: Record<BalanceEntryType, number> = {
@@ -20,12 +25,12 @@
   const radius = 80;
   const innerRadius = 52;
 
-  const total = $derived(entries.reduce((sum, entry) => sum + entry.price, 0));
+  const total = $derived(totals.reduce((sum, entry) => sum + entry.amount, 0) / months);
 
   const slices = $derived.by(() => {
     const sums: Partial<Record<BalanceEntryType, number>> = {};
-    for (const entry of entries) {
-      sums[entry.type] = (sums[entry.type] ?? 0) + entry.price;
+    for (const entry of totals) {
+      sums[entry.type] = (sums[entry.type] ?? 0) + entry.amount / months;
     }
 
     const positiveSums = (Object.entries(sums) as [BalanceEntryType, number][])
@@ -72,7 +77,7 @@
 </script>
 
 <div class="month-expenses">
-  <svg viewBox="-82 -82 164 164" role="img" aria-label={m.balance_month_total()}>
+  <svg viewBox="-82 -82 164 164" role="img" aria-label={label}>
     {#if slices.length === 0}
       <path class="empty" d={arcPath(0, 2 * Math.PI)} />
     {/if}

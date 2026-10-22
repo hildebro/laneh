@@ -141,3 +141,28 @@ describe('validation', () => {
     expect(response.status).toBe(400);
   });
 });
+
+describe('overview', () => {
+  it('returns recent entries and totals per month and type', async () => {
+    const { token, alice } = await setupHousehold();
+
+    for (const price of [1000, 500]) {
+      await call('/balance', {
+        method: 'POST',
+        token,
+        body: expense(alice.id, price, [{ userId: alice.id, percent: 100 }])
+      });
+    }
+
+    const overview = await call<{
+      recentEntries: unknown[],
+      monthlyTotals: { type: string, amount: number }[][]
+    }>('/balance/overview', { token });
+
+    expect(overview.recentEntries).toHaveLength(2);
+    expect(overview.monthlyTotals).toHaveLength(7);
+    // Entries are created now, so they land in the current month.
+    expect(overview.monthlyTotals.slice(0, 6).flat()).toEqual([]);
+    expect(overview.monthlyTotals[6]).toEqual([{ type: BalanceEntryType.Groceries, amount: 1500 }]);
+  });
+});

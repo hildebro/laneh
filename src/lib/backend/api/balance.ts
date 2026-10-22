@@ -7,12 +7,22 @@ import {
   assertMatchingHousehold,
   calculateUserDebts,
   findAllBalanceEntries,
+  findBalanceEntriesSince,
   findBalanceEntry,
+  sumBalanceEntriesByPeriod,
   updateBalanceEntry
 } from '$lib/backend/db/functions';
 import { isLocalRuntime } from '$lib/backend/runtime';
 import { BalanceEntryType } from '$lib/utils/balanceHelper';
 import { z } from '$lib/zod';
+
+// Month boundaries follow the time zone of the server, so every household member sees the same months.
+const findMonthStarts = () => {
+  const now = new Date();
+
+  // The six months before the current one, followed by the current month.
+  return [-6, -5, -4, -3, -2, -1, 0].map((offset) => new Date(now.getFullYear(), now.getMonth() + offset, 1));
+};
 
 const baseExpenseSchema = z.object({
   purchaseId: z.transform((val) => (val !== '' ? val : null)).pipe(z.string().nullable()),
@@ -53,6 +63,15 @@ const householdMismatchError = { error: 'Household of all users must match your 
 const balanceRouter = new Hono<AppEnv>()
   .get('/', async (c) => {
     return c.json(await findAllBalanceEntries());
+  })
+  .get('/overview', async (c) => {
+    const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+
+    return c.json({
+      recentEntries: await findBalanceEntriesSince(new Date(Date.now() - sevenDaysInMs)),
+      // Six completed months followed by the current one.
+      monthlyTotals: await sumBalanceEntriesByPeriod(findMonthStarts())
+    });
   })
   .get('/debts', async (c) => {
     return c.json(await calculateUserDebts());

@@ -5,8 +5,8 @@ import { handleApiLoad } from '$lib/utils/apiHelper';
 export const load: PageLoad = async ({ fetch }) => {
   const client = getApiClient(fetch);
 
-  const apiEntries = await handleApiLoad(client.api.balance.$get());
-  const entries = apiEntries.map(apiEntry => {
+  const overview = await handleApiLoad(client.api.balance.overview.$get());
+  const recentEntries = overview.recentEntries.map(apiEntry => {
     return {
       ...apiEntry,
       date: new Date(apiEntry.date)
@@ -19,6 +19,7 @@ export const load: PageLoad = async ({ fetch }) => {
     userDebts: await handleApiLoad(client.api.balance.debts.$get()),
     // Balances between users are meaningless in a single person household.
     showDebts: users.length > 1,
-    entries
+    recentEntries,
+    monthlyTotals: overview.monthlyTotals
   };
 };
