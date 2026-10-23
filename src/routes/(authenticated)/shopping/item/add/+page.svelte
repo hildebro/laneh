@@ -10,6 +10,7 @@
   import { addToast } from '$lib/stores/toast';
   import { handleApiLoad } from '$lib/utils/apiHelper';
   import { setStagedShoppingItems } from '$lib/utils/shoppingItemStaging';
+  import { maxVisibleSuggestions } from '$lib/utils/suggestionHelper';
 
   let { data } = $props();
 
@@ -66,7 +67,6 @@
   }
 
   // Show the first few suggestions that aren't in the list yet, so picked ones get replaced by the next in line.
-  const maxVisibleSuggestions = 6;
   let visibleSuggestions = $derived(
     data.suggestions
       .filter(suggestion => !items.some(item => item.name === suggestion.name))

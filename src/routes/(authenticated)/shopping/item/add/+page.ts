@@ -5,6 +5,7 @@ import { getApiClient } from '$lib/apiClient';
 import * as m from '$lib/paraglide/messages.js';
 import { handleApiLoad } from '$lib/utils/apiHelper';
 import { getStagedShoppingItems } from '$lib/utils/shoppingItemStaging';
+import { shuffleByRank } from '$lib/utils/suggestionHelper';
 
 export const load: PageLoad = async ({ fetch, parent }) => {
   const client = getApiClient(fetch);
@@ -15,7 +16,8 @@ export const load: PageLoad = async ({ fetch, parent }) => {
   }
 
   return {
-    suggestions: await handleApiLoad(client.api.shopping.itemSuggestions.$get()),
+    // Shuffled once per visit, so the suggestions don't change while picking.
+    suggestions: shuffleByRank(await handleApiLoad(client.api.shopping.itemSuggestions.$get())),
     help_text: m.shopping_add_items_help()
   };
 };
