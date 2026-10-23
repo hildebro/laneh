@@ -390,10 +390,21 @@ describe('merging items', () => {
 
     expect(await status('Mandel', [])).toBe(400);
     expect(await status('Nuss', ['mandel'])).toBe(400);
-    // Synonyms that only differ from the name by case or accents are dropped rather than rejected.
-    expect(await status('Nuss', ['nuss'])).toBe(200);
     // The names of the merged items are free to use.
     expect(await status('Nüsse', ['Nuss'])).toBe(200);
+  });
+
+  it('drops synonyms that only differ from the name by case or accents', async () => {
+    const token = await initiate();
+    const food = await addCategory(token, 'Food');
+    await addItems(token, ['Nuss', 'Nüsse'].map((name) => ({ name, amount: '', categoryId: food.id })));
+    const nuss = await itemId(token, 'Nuss');
+    const itemIds = [nuss, await itemId(token, 'Nüsse')];
+
+    const response = await merge(token, { itemIds, mainItemId: nuss, name: 'Nuss', synonyms: ['nuss'], categoryId: food.id });
+
+    expect(response.status).toBe(200);
+    expect((await items(token)).map((item) => [item.name, item.synonyms])).toEqual([['Nuss', []]]);
   });
 
   it('rejects merges without other items and items of other households', async () => {
