@@ -985,15 +985,21 @@ export const findAllShoppingItems = async () => {
   return db.query.shoppingItem.findMany().execute();
 };
 
+// Items bought often enough, that aren't on the list, ordered by how overdue they are: the time since the last purchase
+// relative to the usual distance between purchases. 1 means due today, 2 means twice as long as usual.
 export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 8) => {
   const db = getTx();
+
+  const overdueFactor = sql<number | null>`EXTRACT(EPOCH FROM (now() - ${table.shoppingItemStats.lastPurchaseDate}))
+    / 86400 / NULLIF(${table.shoppingItemStats.medianDaysBetweenPurchases}, 0)`;
 
   return db.select({
     id: shoppingItem.id,
     name: shoppingItem.name,
     purchaseCount: table.shoppingItemStats.purchaseCount,
     lastPurchaseDate: table.shoppingItemStats.lastPurchaseDate,
-    nextPurchaseDate: table.shoppingItemStats.nextPurchaseDate
+    medianDaysBetweenPurchases: table.shoppingItemStats.medianDaysBetweenPurchases,
+    overdueFactor: overdueFactor.as('overdue_factor')
   })
     .from(table.shoppingItemStats)
     .innerJoin(shoppingItem, eq(table.shoppingItemStats.itemId, shoppingItem.id))
@@ -1003,7 +1009,7 @@ export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 
       // And isn't on the list already
       eq(shoppingItem.active, false)
     ))
-    .orderBy(sql`${table.shoppingItemStats.nextPurchaseDate} ASC NULLS LAST`);
+    .orderBy(sql`overdue_factor DESC NULLS LAST`);
 };
 
 // ------- SHOPPING ITEM STATS -------
@@ -1012,34 +1018,40 @@ export const getItemAddSuggestions = async (frequentlyBoughtThreshold: number = 
 const upsertShoppingItemStats = async (itemFilter?: SQL) => {
   const tx = getTx();
 
-  const purchaseCount = count(table.shoppingPurchaseItem.purchaseId);
-  const firstPurchase = min(table.shoppingPurchase.date);
-  const lastPurchase = max(table.shoppingPurchase.date);
-  // Average distance between purchases. Null for a single purchase, since there is no distance yet.
-  const averageDistance = sql`(${lastPurchase} - ${firstPurchase}) / NULLIF(${purchaseCount} - 1, 0)`;
+  // The days between each purchase of an item and the one before it.
+  const gaps = tx.$with('gaps').as(
+    tx.select({
+      itemId: table.shoppingPurchaseItem.itemId,
+      purchaseDate: table.shoppingPurchase.date,
+      gapDays: sql<number | null>`EXTRACT(EPOCH FROM ${table.shoppingPurchase.date} - LAG(${table.shoppingPurchase.date})
+        OVER (PARTITION BY ${table.shoppingPurchaseItem.itemId} ORDER BY ${table.shoppingPurchase.date})) / 86400`
+        .as('gap_days')
+    })
+      .from(table.shoppingPurchaseItem)
+      .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
+  );
+
+  // Null for a single purchase, since there is no distance yet.
+  const medianGap = sql<number>`PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${gaps.gapDays})`;
 
   await tx.insert(table.shoppingItemStats).select(
-    tx.select({
+    tx.with(gaps).select({
       itemId: shoppingItem.id,
       householdId: shoppingItem.householdId,
-      purchaseCount: sql<number>`${purchaseCount}::int`.as('purchase_count'),
-      averageDaysBetweenPurchases: sql<number>`EXTRACT(EPOCH FROM ${averageDistance}) / 86400`
-        .as('average_days_between_purchases'),
-      lastPurchaseDate: sql<Date>`${lastPurchase}`.as('last_purchase_date'),
-      nextPurchaseDate: sql<Date>`${lastPurchase} + ${averageDistance}`.as('next_purchase_date')
+      purchaseCount: sql<number>`COUNT(${gaps.purchaseDate})::int`.as('purchase_count'),
+      medianDaysBetweenPurchases: medianGap.as('median_days_between_purchases'),
+      lastPurchaseDate: sql<Date>`MAX(${gaps.purchaseDate})`.as('last_purchase_date')
     })
       .from(shoppingItem)
-      .innerJoin(table.shoppingPurchaseItem, eq(shoppingItem.id, table.shoppingPurchaseItem.itemId))
-      .innerJoin(table.shoppingPurchase, eq(table.shoppingPurchaseItem.purchaseId, table.shoppingPurchase.id))
+      .innerJoin(gaps, eq(shoppingItem.id, gaps.itemId))
       .where(itemFilter)
       .groupBy(shoppingItem.id, shoppingItem.householdId)
   ).onConflictDoUpdate({
     target: table.shoppingItemStats.itemId,
     set: {
       purchaseCount: sql`excluded.purchase_count`,
-      averageDaysBetweenPurchases: sql`excluded.average_days_between_purchases`,
-      lastPurchaseDate: sql`excluded.last_purchase_date`,
-      nextPurchaseDate: sql`excluded.next_purchase_date`
+      medianDaysBetweenPurchases: sql`excluded.median_days_between_purchases`,
+      lastPurchaseDate: sql`excluded.last_purchase_date`
     }
   });
 };

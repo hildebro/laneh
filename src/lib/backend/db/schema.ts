@@ -228,11 +228,10 @@ export const shoppingItemStats = pgTable('shopping_item_stats', {
     .references(() => household.id, { onDelete: 'cascade' })
     .default(sql`current_setting('app.current_household_id')`),
   purchaseCount: integer().notNull(),
-  // Null, if the item has only been purchased once.
-  averageDaysBetweenPurchases: doublePrecision(),
-  lastPurchaseDate: timestamp().notNull(),
-  // Last purchase date + average distance. Null, if the item has only been purchased once.
-  nextPurchaseDate: timestamp()
+  // Median distance between consecutive purchases, which is robust against outliers like a long holiday. Null, if the
+  // item has only been purchased once.
+  medianDaysBetweenPurchases: doublePrecision(),
+  lastPurchaseDate: timestamp().notNull()
 }, () => [
   pgPolicy('isolate_households', {
     for: 'all',
