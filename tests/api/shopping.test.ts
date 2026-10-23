@@ -434,3 +434,28 @@ describe('merging items', () => {
     expect((await items(token)).map((item) => item.name).sort()).toEqual(['Nuss', 'Nüsse']);
   });
 });
+
+describe('ordering categories', () => {
+  const order = async (token: string) =>
+    (await call<{ name: string }[]>('/shopping/categoriesWithItems', { token })).map((category) => category.name);
+  const move = (token: string, path: string, categoryId: string) =>
+    call(`/shopping/${path}`, { method: 'POST', token, body: { categoryId } });
+
+  it('moves a category to the start or the end', async () => {
+    const token = await initiate();
+    const [a, b, c] = [await addCategory(token, 'A'), await addCategory(token, 'B'), await addCategory(token, 'C')];
+
+    await move(token, 'moveCategoryToStart', c.id);
+    expect((await order(token))[0]).toBe('C');
+
+    await move(token, 'moveCategoryToEnd', c.id);
+    await move(token, 'moveCategoryToEnd', a.id);
+    expect((await order(token)).slice(-3)).toEqual(['B', 'C', 'A']);
+
+    // Moving the category that is already at the edge changes nothing.
+    await move(token, 'moveCategoryToEnd', a.id);
+    await move(token, 'moveCategoryToStart', b.id);
+    await move(token, 'moveCategoryToStart', b.id);
+    expect((await order(token))[0]).toBe('B');
+  });
+});

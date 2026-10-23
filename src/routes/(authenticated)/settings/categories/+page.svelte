@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowDown, ArrowUp, Pencil } from '@lucide/svelte';
+  import { ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Pencil } from '@lucide/svelte';
   import { flip } from 'svelte/animate';
   import { invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -11,11 +11,15 @@
 
   let submitting = $state(false);
 
-  async function submitAction(categoryId: string, direction: 'up' | 'down'): Promise<void> {
+  async function submitAction(categoryId: string, direction: 'up' | 'down' | 'start' | 'end'): Promise<void> {
     submitting = true;
 
     const client = getApiClient();
-    if (direction === 'up') {
+    if (direction === 'start') {
+      await client.api.shopping.moveCategoryToStart.$post({ json: { categoryId } });
+    } else if (direction === 'end') {
+      await client.api.shopping.moveCategoryToEnd.$post({ json: { categoryId } });
+    } else if (direction === 'up') {
       await client.api.shopping.moveCategoryUp.$post({ json: { categoryId } });
     } else {
       await client.api.shopping.moveCategoryDown.$post({ json: { categoryId } });
@@ -37,6 +41,15 @@
         <a role="button" href={resolve('/(authenticated)/settings/categories/[category]', {category: category.id})}>
           <Pencil />
         </a>
+      </div>
+      <div class="action-row">
+        <button type="button" disabled={submitting} onclick={async () => await submitAction(category.id, 'start')}>
+          {#if submitting}
+            <LoadingSpinner size={6} bright />
+          {:else }
+            <ArrowUpToLine />
+          {/if}
+        </button>
         <button type="button" disabled={submitting} onclick={async () => await submitAction(category.id, 'up')}>
           {#if submitting}
             <LoadingSpinner size={6} bright />
@@ -49,6 +62,13 @@
             <LoadingSpinner size={6} bright />
           {:else }
             <ArrowDown />
+          {/if}
+        </button>
+        <button type="button" disabled={submitting} onclick={async () => await submitAction(category.id, 'end')}>
+          {#if submitting}
+            <LoadingSpinner size={6} bright />
+          {:else }
+            <ArrowDownToLine />
           {/if}
         </button>
       </div>

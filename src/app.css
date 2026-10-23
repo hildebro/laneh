@@ -406,6 +406,11 @@ main > .single-col-wrapper > article > footer {
     gap: 0.5rem;
 }
 
+/* Stacked rows get the same spacing as the buttons within a row. */
+.action-row + .action-row {
+    margin-top: 0.5rem;
+}
+
 /* =========================================
    6. Lists
    ========================================= */

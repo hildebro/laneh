@@ -564,6 +564,32 @@ export const moveCategoryOrderDown = async (categoryId: string) => {
   await executePrioritySwap(category, categoryBelow);
 };
 
+// Moves the category past all others by giving it a priority beyond the current extreme, which the caller selects as
+// an aggregate over the priorities. Priorities only need to be ordered, so they may become negative.
+const moveCategoryOrderBeyond = async (categoryId: string, extreme: SQL<number | null>, step: -1 | 1) => {
+  const db = getTx();
+
+  const category = await findShoppingCategory(categoryId);
+  if (!category) {
+    throw new Error('Trying to move a non-existent category');
+  }
+
+  const [{ value }] = await db.select({ value: extreme }).from(table.shoppingCategory);
+  if (value === null || value === category.priority) {
+    return;
+  }
+
+  await db.update(table.shoppingCategory)
+    .set({ priority: value + step })
+    .where(eq(table.shoppingCategory.id, categoryId));
+};
+
+export const moveCategoryOrderToStart = (categoryId: string) =>
+  moveCategoryOrderBeyond(categoryId, min(table.shoppingCategory.priority), -1);
+
+export const moveCategoryOrderToEnd = (categoryId: string) =>
+  moveCategoryOrderBeyond(categoryId, max(table.shoppingCategory.priority), 1);
+
 async function executePrioritySwap(
   categoryAbove: ShoppingCategory,
   categoryBelow: ShoppingCategory

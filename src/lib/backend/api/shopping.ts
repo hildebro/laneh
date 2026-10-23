@@ -28,6 +28,8 @@ import {
   getItemAddSuggestions,
   mergeShoppingItems,
   moveCategoryOrderDown,
+  moveCategoryOrderToEnd,
+  moveCategoryOrderToStart,
   moveCategoryOrderUp,
   stagePurchaseItem,
   unstagePurchaseItem,
@@ -339,6 +341,20 @@ const shoppingRouter = new Hono<AppEnv>()
     const action = c.req.valid('json');
 
     await moveCategoryOrderDown(action.categoryId);
+
+    return c.json({ success: true });
+  })
+  .post('/moveCategoryToStart', zValidator('json', categoryActionSchema), async (c) => {
+    const action = c.req.valid('json');
+
+    await moveCategoryOrderToStart(action.categoryId);
+
+    return c.json({ success: true });
+  })
+  .post('/moveCategoryToEnd', zValidator('json', categoryActionSchema), async (c) => {
+    const action = c.req.valid('json');
+
+    await moveCategoryOrderToEnd(action.categoryId);
 
     return c.json({ success: true });
   })
