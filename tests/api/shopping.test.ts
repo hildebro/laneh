@@ -390,7 +390,8 @@ describe('merging items', () => {
 
     expect(await status('Mandel', [])).toBe(400);
     expect(await status('Nuss', ['mandel'])).toBe(400);
-    expect(await status('Nuss', ['nuss'])).toBe(400);
+    // Synonyms that only differ from the name by case or accents are dropped rather than rejected.
+    expect(await status('Nuss', ['nuss'])).toBe(200);
     // The names of the merged items are free to use.
     expect(await status('Nüsse', ['Nuss'])).toBe(200);
   });
