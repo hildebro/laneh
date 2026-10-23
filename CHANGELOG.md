@@ -1,3 +1,23 @@
+# [4.5.0](https://github.com/hildebro/laneh/compare/v4.4.0...v4.5.0) (2026-10-23)
+
+
+### Bug Fixes
+
+* debts between users up top ([2d1e9a5](https://github.com/hildebro/laneh/commit/2d1e9a50f88a2e6986056aec97760c48b823385d))
+* merge issue with accents ([8173423](https://github.com/hildebro/laneh/commit/8173423d46b267a147c12d1868861a5688065fe2))
+* merge test ([01ad9f8](https://github.com/hildebro/laneh/commit/01ad9f8fb920eeab9abb3c609e72cd9786f3907a))
+* stop invalidateAll when working through merge list ([16bb3ed](https://github.com/hildebro/laneh/commit/16bb3edf73479c4a05f73fb8e1cbe6097393902f))
+* test fail again ([43e1400](https://github.com/hildebro/laneh/commit/43e1400c2b37384928e3baefa1cbed281b23faaa))
+
+
+### Features
+
+* add some randomness to suggestion ranking ([254b122](https://github.com/hildebro/laneh/commit/254b12227433eaa742d6deb20da80dd140b5237c))
+* change the historic data to line graph ([1c6095d](https://github.com/hildebro/laneh/commit/1c6095d21ffea9cd324c8c08fb30daa2e0f9168b))
+* replace next-purchase-date for item suggestions with median approach ([2f9dfc0](https://github.com/hildebro/laneh/commit/2f9dfc07975337aa9d41efae50bcfeb6ee1123ad))
+* show more expense data ([39ee1c3](https://github.com/hildebro/laneh/commit/39ee1c332376538c0a07ab9a3ea8c8a0beb65841))
+* start/end functions for category move ([dc1c6ac](https://github.com/hildebro/laneh/commit/dc1c6acb36e84e12afdd4c4151cc8b2aaa4341c5))
+
 # [4.4.0](https://github.com/hildebro/laneh/compare/v4.3.0...v4.4.0) (2026-10-11)
 
 
